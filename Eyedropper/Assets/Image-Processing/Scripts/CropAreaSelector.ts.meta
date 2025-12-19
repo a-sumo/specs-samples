@@ -1,0 +1,56 @@
+- !<AssetImportMetadata/79ec0b78-b541-4e4a-87bc-0119cacc0aaf>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> ad9ef54e-dc0a-4888-b132-869108366b81
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> ad9ef54e-dc0a-4888-b132-869108366b81
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> de4cde2b-a2ae-4515-a144-20de9a17e877
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/de4cde2b-a2ae-4515-a144-20de9a17e877>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: e9971857-fb8b-4c7f-88b1-567604e0e8e3
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cropAreaMesh: false
+    gridScale: false
+    screenCropTexture: false
+    selectedPixelMesh: false
+    snapshotButton: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - gridScale: !<float> 9.000000
+      screenCropTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      cropAreaMesh: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      selectedPixelMesh: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      snapshotButton: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float gridScale = 9 {"hint":"Grid size (odd number). E.g., 9 = 9x9 grid with center pixel in middle"}'
+    - '// @input Asset.Texture screenCropTexture {"hint":"The source screen texture to capture snapshots from"}'
+    - '// @input SceneObject cropAreaMesh {"hint":"Mesh displaying the cropped pixel grid"}'
+    - '// @input SceneObject selectedPixelMesh {"hint":"Mesh displaying the currently selected color"}'
+    - '// @input AssignableType snapshotButton {"hint":"Button to trigger snapshot capture"}'

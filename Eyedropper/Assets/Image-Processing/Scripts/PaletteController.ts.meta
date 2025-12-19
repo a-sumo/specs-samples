@@ -1,0 +1,75 @@
+- !<AssetImportMetadata/082af7f3-a43f-49c4-9157-7849c8d54d6c>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 764db4d3-664c-49fa-bc76-d3d4f39dd0e5
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 764db4d3-664c-49fa-bc76-d3d4f39dd0e5
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> dd732960-2839-415e-af31-bd28600065a6
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/dd732960-2839-415e-af31-bd28600065a6>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 63ce21d3-09dd-4e61-8b51-a720fab07f30
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    coloredSquarePath: false
+    columns: false
+    defaultSelectedIndex: false
+    editorTestButton: false
+    itemIds: false
+    itemPrefabs: false
+    layoutByRow: false
+    offset: false
+    padding: false
+    rows: false
+    slotTextPath: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - itemPrefabs: !<reference.ObjectPrefab[]>
+        []
+      itemIds: ""
+      coloredSquarePath: Colored Square
+      slotTextPath: Text
+      columns: !<float> 0.000000
+      rows: !<float> 0.000000
+      padding: !<Vec2> {x: 5.000000, y: 5.000000}
+      offset: !<Vec2> {x: 0.000000, y: 0.000000}
+      defaultSelectedIndex: !<float> 0.000000
+      layoutByRow: true
+      editorTestButton: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.ObjectPrefab[] itemPrefabs = {} {"hint":"List of prefabs to instantiate as palette items"}'
+    - '// @input string itemIds {"hint":"Optional IDs for each prefab (comma-separated)"}'
+    - '// @input string coloredSquarePath = "Colored Square" {"hint":"Path to the colored square within item hierarchy"}'
+    - "// @input string slotTextPath = \"Text\" {\"hint\":\"Path to the slot's text within item hierarchy\"}"
+    - '// @input float columns {"hint":"Number of columns in the grid (0 = auto-calculate)"}'
+    - '// @input float rows {"hint":"Number of rows in the grid (0 = auto-calculate)"}'
+    - '// @input vec2 padding = {5,5} {"hint":"Padding between items"}'
+    - '// @input vec2 offset = {0,0} {"hint":"Offset of the item grid"}'
+    - '// @input float defaultSelectedIndex {"hint":"Index of the default selected item (-1 for none)"}'
+    - '// @input bool layoutByRow = true {"hint":"Layout direction: true = row-first, false = column-first"}'
+    - '// @input SceneObject editorTestButton {"hint":"In editor scanner creation button"}'

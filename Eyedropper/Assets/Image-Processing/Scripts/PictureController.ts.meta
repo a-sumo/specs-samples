@@ -1,0 +1,47 @@
+- !<AssetImportMetadata/95189bcf-4fbb-45e4-87e2-3ff4753f522f>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> dbe1d244-10d6-49c4-acda-7dac03f0eb03
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> dbe1d244-10d6-49c4-acda-7dac03f0eb03
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> ba2b4911-607a-4883-a616-ff6c80d10141
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/ba2b4911-607a-4883-a616-ff6c80d10141>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 27a76c87-06b8-422b-92dc-9eb67b7f8cd8
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    interactablePath: false
+    scannerPrefab: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - scannerPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      interactablePath: ImageAnchor/CameraCrop
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.ObjectPrefab scannerPrefab
+    - "// @input string interactablePath = \"ImageAnchor/CameraCrop\" {\"hint\":\"Path to the interactable object within scanner hierarchy (e.g., 'ImageAnchor/CameraCrop')\"}"

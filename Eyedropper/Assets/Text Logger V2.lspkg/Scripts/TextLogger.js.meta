@@ -1,0 +1,67 @@
+- !<AssetImportMetadata/07049897-6ec4-3ceb-b61a-3319287e55b8>
+  ImportedAssetIds:
+    JavaScriptAsset: !<reference> 16c736b1-3404-4343-9b10-249148d7577b
+  ImporterName: JavaScriptAssetImporter
+  PrimaryAsset: !<reference> 16c736b1-3404-4343-9b10-249148d7577b
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    AssetLibraryId: 5nfyXTrDoezZlY6f8Pmows
+  AssetDataMap:
+    JavaScriptAsset: !<own> 355cfa7f-635b-4314-9029-37b48f3341f1
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<ScriptAssetData/355cfa7f-635b-4314-9029-37b48f3341f1>
+  SvgIcon: |
+    <svg width="16" height="18" viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13.5 4V14H14.5V4H13.5ZM11 16.5H5V17.5H11V16.5ZM2.5 14.002V3.99923H1.5V14.002H2.5ZM11 0.5H5V1.5H11V0.5ZM5 16.5C3.61885 16.5 2.5 15.3823 2.5 14.002H1.5C1.5 15.9355 3.06744 17.5 5 17.5V16.5ZM13.5 14C13.5 15.3807 12.3807 16.5 11 16.5V17.5C12.933 17.5 14.5 15.933 14.5 14H13.5ZM14.5 4C14.5 2.067 12.933 0.5 11 0.5V1.5C12.3807 1.5 13.5 2.61929 13.5 4H14.5ZM2.5 3.99923C2.5 2.61869 3.61912 1.5 5 1.5V0.5C3.06717 0.5 1.5 2.06607 1.5 3.99923H2.5Z" fill="#A2D063"/>
+    <rect x="9" y="6" width="3" height="3" rx="1.5" fill="#A2D063"/>
+    <rect x="4" y="12" width="8" height="2" rx="1" fill="#A2D063"/>
+    <path d="M4 6L7 8L4 10" stroke="#A2D063" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+  SetupScript:
+    code: ""
+  Description: |-
+    With this component on an object at the top of the Objects panel, your script can call `global.textLogger.log("Hello!");` to print to the screen. Useful to see logs when pushed to device.
+    
+    Pro tip: You can log multiple things:
+    ```
+    global.textLogger.log("You", "can", {"use": "many"}, 'arguments also.');
+    ```
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 0005ec57-fb6d-1f06-0000-000000000a2a
+  ExportUid: 0005ec5b-91f4-f31c-0000-00000003085f
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    customDisplay: false
+    logColor: false
+    logLimit: false
+    logTextSize: false
+    loggingEnabled: false
+    spectaclesMode: false
+    useStudioLog: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - loggingEnabled: true
+      logColor: !<Vec4> {x: 0.000000, y: 1.000000, z: 0.000000, w: 1.000000}
+      logLimit: 20
+      logTextSize: 25
+      customDisplay: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      useStudioLog: true
+      spectaclesMode: false
+  ScriptTypes:
+    -
+      {}

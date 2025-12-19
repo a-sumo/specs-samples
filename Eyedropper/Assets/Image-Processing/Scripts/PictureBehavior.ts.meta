@@ -1,0 +1,60 @@
+- !<AssetImportMetadata/55225fdc-969b-4456-aadd-918ff58ba4ad>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> a08c1b03-e037-4a32-bdbd-20d26dbffe38
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> a08c1b03-e037-4a32-bdbd-20d26dbffe38
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 9319cdc2-66cd-4cfb-b528-c409882fa752
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/9319cdc2-66cd-4cfb-b528-c409882fa752>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: c57e2c66-ec58-491d-93d3-e5d82d20027d
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    captureRendMesh: false
+    circleObjs: false
+    cropRegion: false
+    editorCamObj: false
+    picAnchorObj: false
+    screenCropTexture: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - circleObjs: !<reference.SceneObject[]>
+        []
+      editorCamObj: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      picAnchorObj: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      captureRendMesh: !<reference.RenderMeshVisual> 00000000-0000-0000-0000-000000000000
+      screenCropTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      cropRegion: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - "// @input SceneObject[] circleObjs"
+    - // @input SceneObject editorCamObj
+    - // @input SceneObject picAnchorObj
+    - // @input Component.RenderMeshVisual captureRendMesh
+    - // @input Asset.Texture screenCropTexture
+    - // @input AssignableType cropRegion

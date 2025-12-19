@@ -1,0 +1,77 @@
+- !<AssetImportMetadata/56589407-e593-4146-9d3f-05b7ee28aa6b>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 19e2d910-0194-4099-b9e6-bea1e2ca804b
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 19e2d910-0194-4099-b9e6-bea1e2ca804b
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 816ac1e9-accb-4315-9b53-dd4ffcf991ce
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/816ac1e9-accb-4315-9b53-dd4ffcf991ce>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 517ce637-95d0-4f19-bc00-1121a879727d
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cameraCropPath: false
+    cursorPlane: false
+    defaultGridSize: false
+    gridSizeSlider: false
+    gridSizeText: false
+    maxGridSize: false
+    minGridSize: false
+    paletteController: false
+    regionHoverPlane: false
+    sampleColorIndicator: false
+    sampleRegionIndicator: false
+    sampledColorText: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - cursorPlane: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      regionHoverPlane: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      sampledColorText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      sampleColorIndicator: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      sampleRegionIndicator: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      defaultGridSize: !<float> 9.000000
+      cameraCropPath: ImageAnchor/CameraCrop
+      paletteController: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+      gridSizeSlider: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      gridSizeText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      minGridSize: !<float> 3.000000
+      maxGridSize: !<float> 21.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject cursorPlane {"hint":"The cursor plane SceneObject to move around"}'
+    - '// @input SceneObject regionHoverPlane {"hint":"The region hover plane SceneObject (positioned at hit with normal offset)"}'
+    - '// @input Component.Text sampledColorText {"hint":"Text component to display the sampled color as HEX code"}'
+    - '// @input SceneObject sampleColorIndicator {"hint":"Object whose material mainColor will be set to the sampled color"}'
+    - '// @input SceneObject sampleRegionIndicator {"hint":"Object showing the sampled region grid"}'
+    - '// @input float defaultGridSize = 9 {"hint":"Default grid size for texture sampling (odd number, e.g., 9 = 9x9 grid). Overridden by slider if assigned."}'
+    - '// @input string cameraCropPath = "ImageAnchor/CameraCrop" {"hint":"Path to cameraCrop within scanner hierarchy"}'
+    - '// @input AssignableType paletteController {"hint":"PaletteController to set colors on when sampling"}'
+    - '// @input SceneObject gridSizeSlider {"hint":"Slider to control grid size (optional). If assigned, this overrides defaultGridSize."}'
+    - '// @input Component.Text gridSizeText {"hint":"Text to display current grid size (optional)"}'
+    - '// @input float minGridSize = 3 {"hint":"Minimum grid size"}'
+    - '// @input float maxGridSize = 21 {"hint":"Maximum grid size"}'

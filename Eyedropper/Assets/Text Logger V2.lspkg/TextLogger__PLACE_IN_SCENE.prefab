@@ -1,0 +1,82 @@
+- !<ObjectPrefab/95b1ee6a-3fbe-4b22-9e89-0b7dd33a873e>
+  PackagePath: ""
+  objects:
+    - !<own> a412389f-ff78-4107-ae45-77a32f84f5e4
+  LazyLoading: false
+  RetainAssets: true
+- !<ScriptComponent/444bb8b8-f272-48ec-8e9c-f18c17f5df99>
+  PrefabRemaps:
+    []
+  Name: TextLoggerExample
+  Enabled: true
+  ScriptAsset: !<reference> 7329c04c-7475-48c6-934e-37fa5cdf3562
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
+- !<ScriptComponent/935bd9fe-d073-487b-95bd-300a9af3eac7>
+  PrefabRemaps:
+    []
+  Name: TextLogger
+  Enabled: true
+  ScriptAsset: !<reference> 16c736b1-3404-4343-9b10-249148d7577b
+  ScriptInputsDefault:
+    loggingEnabled: true
+    logLimit: true
+    logTextSize: true
+    customDisplay: true
+    useStudioLog: true
+    spectaclesMode: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      loggingEnabled: true
+      logColor: !<Vec4> {x: 0.630838, y: 0.821698, z: 0.360967, w: 1.000000}
+      logLimit: 20
+      logTextSize: 25
+      customDisplay: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      useStudioLog: true
+      spectaclesMode: false
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/a412389f-ff78-4107-ae45-77a32f84f5e4>
+  PrefabRemaps:
+    - 444bb8b8-f272-48ec-8e9c-f18c17f5df99: 444bb8b8-f272-48ec-7163-0e73e80a2066
+    - 935bd9fe-d073-487b-95bd-300a9af3eac7: 935bd9fe-d073-487b-6a42-cff5650c1538
+    - a412389f-ff78-4107-ae45-77a32f84f5e4: a412389f-ff78-4107-51ba-885cd07b0a1b
+    - efbc3128-c761-4f9b-9f73-74ca4cbd0e31: efbc3128-c761-4f9b-608c-8b35b342f1ce
+  Name: TextLogger__PLACE_IN_SCENE
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> efbc3128-c761-4f9b-9f73-74ca4cbd0e31
+  Components:
+    - !<own> 935bd9fe-d073-487b-95bd-300a9af3eac7
+- !<SceneObject/efbc3128-c761-4f9b-9f73-74ca4cbd0e31>
+  PrefabRemaps:
+    []
+  Name: "Example usage [DELETE_ME]"
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 444bb8b8-f272-48ec-8e9c-f18c17f5df99

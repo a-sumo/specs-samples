@@ -1,0 +1,37 @@
+- !<NativePackageDescriptor/1ca049d3-0eea-46c8-bd0c-0fc437c2c0f3>
+  PackagePath: ""
+  StudioVersion:
+    major: 5
+    minor: 15
+    patch: 1
+    build: 25102815
+    type: Unset
+    buildFlavor: ""
+    timestamp: 0
+    commit: ""
+  Description: 'Screen Logger Script Allows you to print on the screen from scripts. Example usage: global.textLogger.log("Hello World,") Optionally uses `Studio.log` to print logs from device onto Logger panel. Also useful for debugging on Spectacles as it will show your logs on display. Click here to learn more on how to use debbuging in Lens Studio'
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  UpdateCheckpoint: 76
+  ExportUid: 665de1d1-51a0-44a8-8848-16fd483b9fc8
+  ComponentUid: 16935c33-8fd8-4155-b6f3-4fd12391d877
+  PackagePolicy: CanBeUnpackedTransparent
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  Instantiable: !<reference> 00000000-0000-0000-0000-000000000000
+  AssetLibraryDependencyStructure: !<AssetLibraryDependencyStructure>
+    Name: ""
+    AssetId: ""
+    Hash: ""
+    Version:
+      major: 0
+      minor: 0
+      patch: 0
+      build: 0

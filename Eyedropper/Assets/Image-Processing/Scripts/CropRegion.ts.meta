@@ -1,0 +1,51 @@
+- !<AssetImportMetadata/a3e823f3-04fa-46e1-97ea-e64fcf7c3e07>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 2780cbc4-fc22-4209-a193-2e86cb12c031
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 2780cbc4-fc22-4209-a193-2e86cb12c031
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 077ef33a-a314-4c14-bfed-0237eddf26ef
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/077ef33a-a314-4c14-bfed-0237eddf26ef>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 639b0802-2bb1-44a5-9a35-a0584cbc92d2
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cameraService: false
+    pointsToTrack: false
+    screenCropTexture: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - cameraService: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+      screenCropTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      pointsToTrack: !<reference.SceneObject[]>
+        []
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input AssignableType cameraService
+    - // @input Asset.Texture screenCropTexture
+    - "// @input SceneObject[] pointsToTrack"
