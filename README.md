@@ -1,7 +1,37 @@
-# specs-samples
+# Spectacles Lens Studio Samples
 
-<img width="515" height="515" alt="ghost-eyedropper 2" src="https://github.com/user-attachments/assets/cd73f314-d1c4-4d74-97bb-b2b7506bd276" />
+A collection of self-contained sample projects for [Lens Studio](https://developers.snap.com/lens-studio/home) targeting Spectacles AR Glasses. Each project demonstrates specific features and techniques with minimal dependencies.
 
+## Projects
 
-https://github.com/user-attachments/assets/6cbe8027-2093-4550-99c3-60c19abc9ab7
+| | | |
+|:--:|:--|:--:|
+| <img src="assets/eyedropper/preview.png" width="60"> | **Eyedropper**<br>A color picker tool that samples colors from the real world.<br>[`Eyedropper/`](Eyedropper/) | <img src="assets/eyedropper/demo.gif" width="150"> |
 
+---
+
+## Getting Started
+
+1. Download and install [Lens Studio](https://developers.snap.com/lens-studio/home)
+2. Clone this repository
+3. Open any project's `.esproj` file in Lens Studio
+
+## Adding New Projects
+
+Each sample project should follow this structure:
+
+```
+ProjectName/
+├── ProjectName.esproj
+├── Assets/
+└── ...
+
+assets/
+└── projectname/
+    ├── preview.png    # Preview image (recommended: 400px width)
+    └── demo.gif       # Demo animation (optional)
+```
+
+## License
+
+See [LICENSE](LICENSE) for details.
