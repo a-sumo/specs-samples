@@ -1,6 +1,6 @@
 # Spectacles Lens Studio Samples
 
-A collection of self-contained sample projects for [Lens Studio](https://developers.snap.com/lens-studio/home) targeting Spectacles AR Glasses. Each project demonstrates specific features and techniques with minimal dependencies.
+A collection of self-contained sample projects for [Lens Studio](https://developers.snap.com/lens-studio/home), targeting Spectacles AR Glasses. Each project demonstrates specific features and techniques with minimal dependencies.
 
 ## Projects
 
