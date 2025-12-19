@@ -18,18 +18,16 @@ A collection of self-contained sample projects for [Lens Studio](https://develop
 
 ## Adding New Projects
 
-Each sample project should follow this structure:
+Each sample project follows this structure:
 
 ```
 ProjectName/
 ├── ProjectName.esproj
-├── Assets/
-└── ...
-
-assets/
-└── projectname/
-    ├── preview.png    # Preview image (recommended: 400px width)
-    └── demo.gif       # Demo animation (optional)
+└── Assets/
+    ├── Scripts/
+    ├── Materials/
+    ├── Images/
+    └── Prefabs/
 ```
 
 ## License
