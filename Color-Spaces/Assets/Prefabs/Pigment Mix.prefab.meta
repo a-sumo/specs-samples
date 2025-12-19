@@ -210,7 +210,7 @@
   RotationTension: 30.000000
   ForceCompound: false
   Intangible: false
-  ShowCollider: true
+  ShowCollider: false
 - !<VFXComponent/dfc98615-4a43-4b10-444b-bac9e2e9810b>
   PrefabRemaps:
     []
