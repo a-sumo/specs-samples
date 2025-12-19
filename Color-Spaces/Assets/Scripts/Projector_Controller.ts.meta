@@ -1,0 +1,60 @@
+- !<AssetImportMetadata/c63ecca3-8e1f-44b7-9580-0d9f74b5d12f>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 628d8351-5916-4e0d-a637-aad40852ad28
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 628d8351-5916-4e0d-a637-aad40852ad28
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> eefe6c47-64ca-44e6-9a2f-25779f5d13a8
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/eefe6c47-64ca-44e6-9a2f-25779f5d13a8>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: ff1daa66-fcfb-4c1b-acd3-e4aecc31bdc3
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    continuousUpdate: false
+    gamutProjector: false
+    offset: false
+    rotation: false
+    scale: false
+    targetObjects: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - gamutProjector: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      targetObjects: !<reference.SceneObject[]>
+        []
+      scale: !<Vec3> {x: 100.000000, y: 100.000000, z: 100.000000}
+      rotation: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      offset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      continuousUpdate: true
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Component.ScriptComponent gamutProjector {"hint":"Reference to Projector_Gamut script"}'
+    - '// @input SceneObject[] targetObjects {"hint":"SceneObjects to position (one per projected color)"}'
+    - '// @input vec3 scale = {100,100,100} {"hint":"Scale factor for LAB space (same as VFX)"}'
+    - '// @input vec3 rotation = {0,0,0} {"hint":"Rotation in degrees (same as VFX)"}'
+    - '// @input vec3 offset = {0,0,0} {"hint":"World position offset (same as VFX)"}'
+    - '// @input bool continuousUpdate = true {"hint":"Update positions every frame"}'

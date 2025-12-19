@@ -1,0 +1,99 @@
+- !<AssetImportMetadata/6d78a22d-db3f-0880-8c1c-dfd3f9730b6e>
+  ImportedAssetIds:
+    ObjectPrefab: !<reference> 68d5d38a-9960-4efa-9a45-673830df14af
+  ImporterName: ObjectPrefabImporter
+  PrimaryAsset: !<reference> 68d5d38a-9960-4efa-9a45-673830df14af
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    ObjectPrefab: !<own> 050d804e-7dc7-4da8-916d-476c94952a74
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<ObjectPrefabAssetData/050d804e-7dc7-4da8-916d-476c94952a74>
+  Prototype: !<ObjectOwner/2b63c7ed-39a4-4329-8e4c-120d90eeb3e1>
+    PackagePath: ""
+    objects:
+      - !<own> 9aec6476-92dc-494a-5a61-428496420519
+- !<VFXComponent/1a913c4e-dd76-4165-52ac-63899caf0620>
+  PrefabRemaps:
+    []
+  Name: VFX Component
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  VFXAsset: !<reference> 90883ce3-f7db-447e-a237-9682710b32cd
+- !<SceneObject/561eae79-c629-403a-4cd8-678f9b34b97b>
+  PrefabRemaps:
+    []
+  Name: TestEncoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> fc255693-567b-42a1-7f45-8ce5ffbaa933
+- !<SceneObject/9aec6476-92dc-494a-5a61-428496420519>
+  PrefabRemaps:
+    []
+  Name: Test Encoder Decoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> f3c55855-7674-4317-70fa-df36020a1088
+    - !<own> 561eae79-c629-403a-4cd8-678f9b34b97b
+  Components:
+    []
+- !<SceneObject/f3c55855-7674-4317-70fa-df36020a1088>
+  PrefabRemaps:
+    []
+  Name: TestDecoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 1a913c4e-dd76-4165-52ac-63899caf0620
+- !<ScriptComponent/fc255693-567b-42a1-7f45-8ce5ffbaa933>
+  PrefabRemaps:
+    []
+  Name: Test_MinimalEncoder
+  Enabled: true
+  ScriptAsset: !<reference> efc0901d-4180-4175-a318-b21522b5062c
+  ScriptInputsDefault:
+    texSize: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      encoderMaterial: !<reference.Material> e4bc1937-57a3-4ced-b572-ab5db95dd5f3
+      vfxComponent: !<reference.VFXComponent> 1a913c4e-dd76-4165-52ac-63899caf0620
+      texSize: !<float> 8.000000
+      scale: !<float> 10.000000
+  ScriptTypes:
+    "":
+      {}

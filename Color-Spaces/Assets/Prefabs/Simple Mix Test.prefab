@@ -1,0 +1,75 @@
+- !<ObjectPrefab/8d231b11-00e0-4d6a-82db-2e6f0899df82>
+  PackagePath: ""
+  objects:
+    - !<own> f5a60612-4509-4d47-862c-ec026274e10a
+  LazyLoading: false
+  RetainAssets: true
+- !<ScriptComponent/2a09ef7c-2bbc-42cb-b0cf-da29823c1b2d>
+  PrefabRemaps:
+    []
+  Name: Test_Colormix
+  Enabled: true
+  ScriptAsset: !<reference> 1146df87-fa30-4ba0-b22e-c9c86c76fbe7
+  ScriptInputsDefault:
+    pig2Color: true
+    pig3Color: true
+    pig4Color: true
+    pig5Color: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      material: !<reference.Material> 30776f04-bec6-4518-bc31-aeaf6b39099b
+      pig0Color: !<Vec3> {x: 0.906065, y: 0.169604, z: 0.248661}
+      pig0Conc: !<float> 0.000000
+      pig1Color: !<Vec3> {x: 0.011887, y: 0.552026, z: 0.929839}
+      pig1Conc: !<float> 1.000000
+      pig2Color: !<Vec3> {x: 1.000000, y: 0.920000, z: 0.000000}
+      pig2Conc: 0.400000
+      pig3Color: !<Vec3> {x: 0.890000, y: 0.000000, z: 0.130000}
+      pig3Conc: 0.980000
+      pig4Color: !<Vec3> {x: 0.100000, y: 0.100000, z: 0.700000}
+      pig4Conc: !<float> 0.000000
+      pig5Color: !<Vec3> {x: 0.000000, y: 0.470000, z: 0.440000}
+      pig5Conc: !<float> 0.000000
+  ScriptTypes:
+    "":
+      {}
+- !<RenderMeshVisual/c2febf1c-4c27-402e-909c-c02eeb7902eb>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> 30776f04-bec6-4518-bc31-aeaf6b39099b
+  Mesh: !<reference> ea4a2078-e2dd-44ff-8120-14f01a6c9728
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
+- !<SceneObject/f5a60612-4509-4d47-862c-ec026274e10a>
+  PrefabRemaps:
+    - 2a09ef7c-2bbc-42cb-b0cf-da29823c1b2d: 2a09ef7c-2bbc-42cb-4f30-25d67dc3e4d2
+    - c2febf1c-4c27-402e-909c-c02eeb7902eb: c2febf1c-4c27-402e-6f63-3fd11486fd14
+    - f5a60612-4509-4d47-862c-ec026274e10a: f5a60612-4509-4d47-79d3-13fd9d8b1ef5
+  Name: Colormix Test
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 2a09ef7c-2bbc-42cb-b0cf-da29823c1b2d
+    - !<own> c2febf1c-4c27-402e-909c-c02eeb7902eb

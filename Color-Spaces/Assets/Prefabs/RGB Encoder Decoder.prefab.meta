@@ -1,0 +1,217 @@
+- !<AssetImportMetadata/ee57f5fe-a3e7-06d1-f3fc-1229b7ddd31c>
+  ImportedAssetIds:
+    ObjectPrefab: !<reference> c3ef7b66-ea7f-4b40-8431-391b33021226
+  ImporterName: ObjectPrefabImporter
+  PrimaryAsset: !<reference> c3ef7b66-ea7f-4b40-8431-391b33021226
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    ObjectPrefab: !<own> 734f51a8-30d5-49dd-b7e2-15efe3d89907
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<ScriptComponent/163994fd-c48b-442b-8d3d-801b37960a02>
+  PrefabRemaps:
+    []
+  Name: Interactable
+  Enabled: true
+  ScriptAsset: !<reference> 652e631a-22d0-4941-9f74-2943df59f34c
+  ScriptInputsDefault:
+    targetingMode: true
+    targetingVisual: true
+    ignoreInteractionPlane: true
+    keepHoverOnTrigger: true
+    enableInstantDrag: true
+    isScrollable: true
+    allowMultipleInteractors: true
+    enablePokeDirectionality: true
+    acceptableXDirections: true
+    acceptableYDirections: true
+    acceptableZDirections: true
+    useFilteredPinch: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      targetingMode: !<float> 3.000000
+      targetingVisual: !<float> 1.000000
+      ignoreInteractionPlane: false
+      keepHoverOnTrigger: false
+      enableInstantDrag: false
+      isScrollable: false
+      allowMultipleInteractors: true
+      enablePokeDirectionality: false
+      acceptableXDirections: !<float> 0.000000
+      acceptableYDirections: !<float> 0.000000
+      acceptableZDirections: !<float> 1.000000
+      useFilteredPinch: false
+  ScriptTypes:
+    "":
+      {}
+- !<VFXComponent/38e8b0a6-b34f-479a-9b52-2d5f8019cbf2>
+  PrefabRemaps:
+    []
+  Name: VFX Component
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  VFXAsset: !<reference> d5812aee-bdca-4c25-b9d5-33cd80421c29
+- !<ObjectPrefabAssetData/734f51a8-30d5-49dd-b7e2-15efe3d89907>
+  Prototype: !<ObjectOwner/643758c1-de1c-48f5-8f8c-8daf81165dbe>
+    PackagePath: ""
+    objects:
+      - !<own> 93694ddd-0b50-44e7-5ed2-951db38989f7
+- !<SceneObject/93694ddd-0b50-44e7-5ed2-951db38989f7>
+  PrefabRemaps:
+    []
+  Name: RGB Encoder Decoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> fa6128f2-47e5-40a9-4d25-7bf847bcf240
+    - !<own> a9019271-7ae2-4477-ac82-1dc7b876f44b
+  Components:
+    - !<own> 163994fd-c48b-442b-8d3d-801b37960a02
+    - !<own> b2843cc4-554d-41c0-acd9-f967c88b2ef4
+    - !<own> aa204502-1ec8-437b-87f4-a3327ed6d87a
+- !<SceneObject/a9019271-7ae2-4477-ac82-1dc7b876f44b>
+  PrefabRemaps:
+    []
+  Name: RGB Decoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 38e8b0a6-b34f-479a-9b52-2d5f8019cbf2
+- !<ColliderComponent/aa204502-1ec8-437b-87f4-a3327ed6d87a>
+  PrefabRemaps:
+    []
+  Name: Physics Collider
+  Enabled: true
+  Shape: !<Box>
+    FitVisual: false
+    Size: {x: 1.000000, y: 1.000000, z: 1.000000}
+  Matter: !<reference> 00000000-0000-0000-0000-000000000000
+  Filter: !<reference> 00000000-0000-0000-0000-000000000000
+  OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
+  WorldSettings: !<reference> 00000000-0000-0000-0000-000000000000
+  EnableSmoothing: false
+  PositionTension: 30.000000
+  RotationTension: 30.000000
+  ForceCompound: false
+  Intangible: false
+  ShowCollider: true
+- !<ScriptComponent/b2843cc4-554d-41c0-acd9-f967c88b2ef4>
+  PrefabRemaps:
+    []
+  Name: InteractableManipulation
+  Enabled: true
+  ScriptAsset: !<reference> 664b556b-1946-4c2c-866a-e675b4e86006
+  ScriptInputsDefault:
+    manipulateRootSceneObject: true
+    minimumScaleFactor: true
+    maximumScaleFactor: true
+    enableTranslation: true
+    enableRotation: true
+    enableScale: true
+    enableStretchZ: true
+    showStretchZProperties: true
+    zStretchFactorMin: true
+    zStretchFactorMax: true
+    useFilter: true
+    showFilterProperties: true
+    minCutoff: true
+    beta: true
+    dcutoff: true
+    showTranslationProperties: true
+    _enableXTranslation: true
+    _enableYTranslation: true
+    _enableZTranslation: true
+    showRotationProperties: true
+    isSynced: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      manipulateRootSceneObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      minimumScaleFactor: 0.250000
+      maximumScaleFactor: !<float> 20.000000
+      enableTranslation: true
+      enableRotation: true
+      enableScale: true
+      enableStretchZ: true
+      showStretchZProperties: false
+      zStretchFactorMin: !<float> 1.000000
+      zStretchFactorMax: !<float> 12.000000
+      useFilter: true
+      showFilterProperties: false
+      minCutoff: !<float> 2.000000
+      beta: 0.015000
+      dcutoff: !<float> 1.000000
+      showTranslationProperties: false
+      _enableXTranslation: true
+      _enableYTranslation: true
+      _enableZTranslation: true
+      showRotationProperties: false
+      _rotationAxis: !<string> Y
+      isSynced: false
+  ScriptTypes:
+    "":
+      {}
+- !<ScriptComponent/e0d43a62-a48c-42c6-5883-fab8dec61a74>
+  PrefabRemaps:
+    []
+  Name: Encoder_RGBCube
+  Enabled: true
+  ScriptAsset: !<reference> bc289aba-0faf-420e-a73a-58eee3a8683b
+  ScriptInputsDefault:
+    texSize: true
+    rgbRes: true
+    scale: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      encoderMaterial: !<reference.Material> fe026662-056e-497a-9118-f650bb847e71
+      vfxComponent: !<reference.VFXComponent> 38e8b0a6-b34f-479a-9b52-2d5f8019cbf2
+      texSize: !<float> 64.000000
+      rgbRes: !<float> 16.000000
+      scale: !<float> 100.000000
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/fa6128f2-47e5-40a9-4d25-7bf847bcf240>
+  PrefabRemaps:
+    []
+  Name: RGBCubeEncoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> e0d43a62-a48c-42c6-5883-fab8dec61a74

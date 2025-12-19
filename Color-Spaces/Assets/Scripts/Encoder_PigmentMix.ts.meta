@@ -1,0 +1,77 @@
+- !<AssetImportMetadata/319a072c-70f0-4674-b8c7-bb241bc4cef7>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 48ceee92-eb88-445f-8ae2-fa7b9ee1c680
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 48ceee92-eb88-445f-8ae2-fa7b9ee1c680
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> b017621e-1487-4614-95aa-34b873aee2c5
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/b017621e-1487-4614-95aa-34b873aee2c5>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 796b6bb1-9cbb-4791-950d-f5197578d980
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    encoderMaterial: false
+    mixSteps: false
+    paletteController: false
+    pig0Color: false
+    pig1Color: false
+    pig2Color: false
+    pig3Color: false
+    pig4Color: false
+    pig5Color: false
+    scale: false
+    texSize: false
+    vfxComponent: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - encoderMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      vfxComponent: !<reference.VFXComponent> 00000000-0000-0000-0000-000000000000
+      paletteController: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      texSize: !<float> 64.000000
+      mixSteps: !<float> 20.000000
+      scale: !<float> 100.000000
+      pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
+      pig1Color: !<Vec3> {x: 0.080000, y: 0.080000, z: 0.080000}
+      pig2Color: !<Vec3> {x: 1.000000, y: 0.920000, z: 0.000000}
+      pig3Color: !<Vec3> {x: 0.890000, y: 0.000000, z: 0.130000}
+      pig4Color: !<Vec3> {x: 0.100000, y: 0.100000, z: 0.700000}
+      pig5Color: !<Vec3> {x: 0.000000, y: 0.470000, z: 0.440000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.Material encoderMaterial {"hint":"Material with PigmentGamutEncoder shader"}'
+    - '// @input Component.VFXComponent vfxComponent {"hint":"VFX component to receive textures"}'
+    - '// @input Component.ScriptComponent paletteController {"hint":"PaletteController to get pigment colors from"}'
+    - '// @input float texSize = 64 {"hint":"Output texture size (64 = 4096 pixels)"}'
+    - '// @input float mixSteps = 20 {"hint":"Mix steps between pigments"}'
+    - '// @input float scale = 100 {"hint":"Scale for VFX positions"}'
+    - '// @input vec3 pig0Color = {1,1,1} {"hint":"Fallback: White pigment", "widget":"color"}'
+    - '// @input vec3 pig1Color = {0.08,0.08,0.08} {"hint":"Fallback: Black pigment", "widget":"color"}'
+    - '// @input vec3 pig2Color = {1,0.92,0} {"hint":"Fallback: Yellow pigment", "widget":"color"}'
+    - '// @input vec3 pig3Color = {0.89,0,0.13} {"hint":"Fallback: Red pigment", "widget":"color"}'
+    - '// @input vec3 pig4Color = {0.1,0.1,0.7} {"hint":"Fallback: Blue pigment", "widget":"color"}'
+    - '// @input vec3 pig5Color = {0,0.47,0.44} {"hint":"Fallback: Green pigment", "widget":"color"}'

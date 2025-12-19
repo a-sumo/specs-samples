@@ -1,0 +1,77 @@
+- !<ObjectPrefab/1889193c-f79a-43dc-aedd-64b15187c041>
+  PackagePath: ""
+  objects:
+    - !<own> f53904cf-6908-45fa-b59c-fbffede61112
+  LazyLoading: false
+  RetainAssets: true
+- !<RenderMeshVisual/1bc60c88-5e2e-4df8-a950-58124c5f7d50>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> c3079986-35a9-4666-9231-46238388dc63
+  Mesh: !<reference> ea4a2078-e2dd-44ff-8120-14f01a6c9728
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
+- !<ScriptComponent/ccb937ab-a4ae-40a4-92d2-8571bc02d6db>
+  PrefabRemaps:
+    []
+  Name: Util_SpectralMix
+  Enabled: true
+  ScriptAsset: !<reference> 3fa02e69-5303-45dc-badf-c10ad8fec573
+  ScriptInputsDefault:
+    pig0Color: true
+    pig1Color: true
+    pig2Color: true
+    pig3Color: true
+    pig4Color: true
+    pig5Color: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      material: !<reference.Material> c3079986-35a9-4666-9231-46238388dc63
+      pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
+      pig0Conc: 0.070000
+      pig1Color: !<Vec3> {x: 0.080000, y: 0.080000, z: 0.080000}
+      pig1Conc: !<float> 0.000000
+      pig2Color: !<Vec3> {x: 1.000000, y: 0.920000, z: 0.000000}
+      pig2Conc: 0.660000
+      pig3Color: !<Vec3> {x: 0.890000, y: 0.000000, z: 0.130000}
+      pig3Conc: !<float> 0.000000
+      pig4Color: !<Vec3> {x: 0.100000, y: 0.100000, z: 0.700000}
+      pig4Conc: 0.600000
+      pig5Color: !<Vec3> {x: 0.000000, y: 0.470000, z: 0.440000}
+      pig5Conc: !<float> 0.000000
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/f53904cf-6908-45fa-b59c-fbffede61112>
+  PrefabRemaps:
+    - 1bc60c88-5e2e-4df8-a950-58124c5f7d50: 1bc60c88-5e2e-4df8-56af-a7edb3a082af
+    - ccb937ab-a4ae-40a4-92d2-8571bc02d6db: ccb937ab-a4ae-40a4-6d2d-7a8e43fd2924
+    - f53904cf-6908-45fa-b59c-fbffede61112: f53904cf-6908-45fa-4a63-04001219eeed
+  Name: Spectral Mix Test
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> ccb937ab-a4ae-40a4-92d2-8571bc02d6db
+    - !<own> 1bc60c88-5e2e-4df8-a950-58124c5f7d50
