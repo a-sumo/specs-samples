@@ -1,8 +1,11 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 825
+    size: 828
     values:
+      - ""
+      - ColorSpaceTransforms.mat
+      - ColorSpaceTransforms.ss_graph
       - Images
       - Images/lab_color(1).png
       - Images/lab_x(1).png
@@ -17,10 +20,11 @@ CollapsedEntities:
       - Images/test_encoding/pos_x.png
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
-      - Materials
+      - Materials/Color Gradient Opacity 2.mat
+      - Materials/Color Gradient Opacity.mat
       - Materials/Color Gradient Opacity.ss_graph
-      - Materials/Gamut Projection.mat
-      - Materials/Gamut Projection.ss_graph
+      - Materials/Color Gradient.mat
+      - Materials/Color Gradient.ss_graph
       - Materials/LabEncoder.mat
       - Materials/LabEncoder.ss_graph
       - Materials/Pigment Gamut Encoder Hi Res.mat
@@ -33,14 +37,11 @@ CollapsedEntities:
       - Materials/Remap Texture With Palette Colors.ss_graph
       - Materials/Spectral Mix.mat
       - Materials/Spectral Mix.ss_graph
-      - Materials/Tests
       - Materials/Tests/Color Mix Test.mat
       - Materials/Tests/Color Mix Test.ss_graph
       - Materials/Tests/TestEncoder.mat
       - Materials/Tests/TestEncoder.ss_graph
-      - Prefabs
       - Prefabs/Color Slot.prefab
-      - Prefabs/Gamut Projector Interactable.prefab
       - Prefabs/LAB Encoder Decoder.prefab
       - Prefabs/LAB Space Interactable.prefab
       - Prefabs/Pigment Gamut Encoder Decoder Hi Res.prefab
@@ -57,19 +58,22 @@ CollapsedEntities:
       - Rendering/Echopark.hdr/Specular
       - Rendering/Render Target.renderTarget
       - Rendering/Screen Crop Texture.screenCropTexture
+      - Rope.mat
+      - Rope.ss_graph
       - RoundedRectangle.mat
       - RoundedRectangle.ss_graph
       - Scene.scene
-      - Scripts
       - Scripts/Encoder_FullRGB.ts
       - Scripts/Encoder_PigmentMix.ts
       - Scripts/Encoder_RGBCube.ts
       - Scripts/PigmentMixGamutGenerator.ts
-      - Scripts/Projector_Controller.ts
       - Scripts/Projector_Gamut.ts
+      - Scripts/Projector_Gamut_Mesh.ts
       - Scripts/RGBCubeGenerator.ts
       - Scripts/RGBCubeLattice.ts
       - Scripts/Util_SpectralMix.ts
+      - Shaders
+      - Shaders/ColorSpaceTransform.js
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
@@ -667,6 +671,7 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/SIK Examples.prefab
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
+      - SpectaclesUIKit.lspkg
       - SpectaclesUIKit.lspkg/Audio
       - SpectaclesUIKit.lspkg/Audio/HoverAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/SliderProgressionAudioTrack.wav
@@ -819,9 +824,7 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Textures/test-image.jpg
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
-      - VFX
       - VFX/Decode From Texture File.vfxgraph
-      - VFX/Gamut Projector Decoder.vfxgraph
       - VFX/LAB Decoder.vfxgraph
       - VFX/Pigment Gamut Decoder Hi Res.vfxgraph
       - VFX/Pigment Gamut Decoder.vfxgraph

@@ -206,14 +206,16 @@
   Enabled: true
   ScriptAsset: !<reference> 7100dc9a-700e-49d8-8a1b-d3040a8fb5a5
   ScriptInputsDefault:
+    projectionMaterial: true
+    vfxComponent: true
     maxColors: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       encoder: !<reference.ScriptComponent> 7a878e16-7e28-490b-844e-a6c28260c933
-      projectionMaterial: !<reference.Material> 42decfe2-1dc6-4f65-8c66-2ffe83e2b25e
-      vfxComponent: !<reference.VFXComponent> a736cfb1-456e-408f-8097-d91d23f2f1ea
+      projectionMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      vfxComponent: !<reference.VFXComponent> 00000000-0000-0000-0000-000000000000
       maxColors: !<float> 64.000000
       paletteController: !<reference.ScriptComponent> 734aea69-f183-4638-868d-fb871edfd11a
   ScriptTypes:

@@ -26,10 +26,12 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    _blend: false
     _capSegments: false
     _capStyle: false
     _circleSegments: false
-    _colorSpace: false
+    _colorSpaceFrom: false
+    _colorSpaceTo: false
     _cubeSize: false
     _gridDensity: false
     _lineSegments: false
@@ -56,7 +58,9 @@
       _showWireframe: true
       _showGridLines: true
       _capStyle: !<float> 2.000000
-      _colorSpace: !<float> 0.000000
+      _colorSpaceFrom: !<float> 0.000000
+      _colorSpaceTo: !<float> 0.000000
+      _blend: !<float> 0.000000
   ScriptTypes:
     -
       {}
@@ -71,4 +75,6 @@
     - '// @input bool _showWireframe = true {"hint":"Draw the wireframe edges of the cube"}'
     - '// @input bool _showGridLines = true {"hint":"Draw the grid of vertical lines"}'
     - '// @input float _capStyle = 2 {"hint":"End cap style for tubes", "widget":"combobox", "values":[{"label":"None", "value":0}, {"label":"Flat", "value":1}, {"label":"Rounded", "value":2}]}'
-    - '// @input float _colorSpace {"widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _blend {"hint":"Interpolation: 0 = from space, 1 = to space"}'
