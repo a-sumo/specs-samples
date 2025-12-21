@@ -5,6 +5,7 @@ data:
     - 5f7b467b-1977-41fc-9a32-4f2558cfdc95: /Users/armand/Documents/Spectacles-Sample/Crop/Assets/Color-Space.lspkg/VFX/LAB Decoder.vfxgraph
     - 76e71b5e-182d-49f1-88a8-6543100bf1a0: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 88e4c541-1d5b-4b63-be87-ab9dcf507243: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/SpectaclesInteractionKit@0.15.0/SpectaclesInteractionKit.lspkg
+    - b3b4705d-e5ce-4b03-a68b-22e6452dacbc: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/ColorSpaceTransforms.ss_graph
     - b90a8303-e81b-49ae-b63e-6709eb6446ec: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - c63ecca3-8e1f-44b7-9580-0d9f74b5d12f: /Applications/Lens Studio.app/Contents/JsPlugins/PresetsRegistry/Assets/TypeScript/Resources/Untitled TypeScript.ts
     - cc8b9cc8-c63c-4691-b5db-9818bac00e1d: /Users/armand/Documents/motion-operators/MotionOperators/Assets/Materials/Color Gradient.ss_graph

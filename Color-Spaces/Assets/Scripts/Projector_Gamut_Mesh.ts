@@ -33,8 +33,25 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
             new ComboBoxItem("CIELUV", 4),
         ])
     )
-    @hint("Color space for 3D positioning")
-    private _colorSpace: number = 0;
+    @hint("Source color space (blend = 0)")
+    private _colorSpaceFrom: number = 0;
+
+    @input
+    @widget(
+        new ComboBoxWidget([
+            new ComboBoxItem("RGB", 0),
+            new ComboBoxItem("CIELAB", 1),
+            new ComboBoxItem("CIEXYZ", 2),
+            new ComboBoxItem("Oklab", 3),
+            new ComboBoxItem("CIELUV", 4),
+        ])
+    )
+    @hint("Target color space (blend = 1)")
+    private _colorSpaceTo: number = 0;
+
+    @input
+    @hint("Interpolation: 0 = from space, 1 = to space")
+    private _blend: number = 0.0;
 
     // ============ GAMUT SETTINGS ============
 
@@ -95,11 +112,6 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     private projectedColors: vec3[] = [];
     private projectedLAB: vec3[] = [];
     private colorCount: number = 0;
-
-    // Cached positions for ALL color spaces (indexed by colorSpace enum)
-    // [colorSpace][colorIndex] = position
-    private inputPositionsPerSpace: vec3[][] = [];
-    private projectedPositionsPerSpace: vec3[][] = [];
     private mesh: RenderMesh | null = null;
 
     onAwake(): void {
@@ -119,7 +131,19 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
                 new vec3(1, 0.5, 0),    // orange
                 new vec3(0.5, 0, 0.5),  // purple
             ]);
+            this.updateMaterialParams();
         });
+    }
+
+    private updateMaterialParams(): void {
+        if (this.material) {
+            const pass = this.material.mainPass;
+            pass.colorSpaceFrom = this._colorSpaceFrom;
+            pass.colorSpaceTo = this._colorSpaceTo;
+            pass.blend = this._blend;
+            pass.projectionBlend = this._projectionBlend;
+            pass.cubeSize = this._cubeSize;
+        }
     }
 
     private initializePigments(): void {
@@ -314,74 +338,14 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         return this.xyzToLab(xyz.x, xyz.y, xyz.z);
     }
 
+    // Always generate in RGB space - shader handles color space transformation
     private rgbToDisplayPosition(r: number, g: number, b: number): vec3 {
         const size = this._cubeSize;
-
-        switch (this._colorSpace) {
-            case 0: // RGB
-                return new vec3(
-                    (r - 0.5) * size,
-                    (b - 0.5) * size,
-                    (g - 0.5) * size
-                );
-
-            case 1: { // CIELAB
-                const lr = this.srgbToLinear(r);
-                const lg = this.srgbToLinear(g);
-                const lb = this.srgbToLinear(b);
-                const xyz = this.linearRgbToXyz(lr, lg, lb);
-                const lab = this.xyzToLab(xyz.x, xyz.y, xyz.z);
-                return new vec3(
-                    (lab.y / 128) * size * 0.5,
-                    (lab.x / 100 - 0.5) * size,
-                    (lab.z / 128) * size * 0.5
-                );
-            }
-
-            case 2: { // CIEXYZ
-                const lr = this.srgbToLinear(r);
-                const lg = this.srgbToLinear(g);
-                const lb = this.srgbToLinear(b);
-                const xyz = this.linearRgbToXyz(lr, lg, lb);
-                return new vec3(
-                    (xyz.x - 0.5) * size,
-                    (xyz.y - 0.5) * size,
-                    (xyz.z - 0.5) * size
-                );
-            }
-
-            case 3: { // Oklab
-                const lr = this.srgbToLinear(r);
-                const lg = this.srgbToLinear(g);
-                const lb = this.srgbToLinear(b);
-                const oklab = this.linearRgbToOklab(lr, lg, lb);
-                return new vec3(
-                    (oklab.y / 0.4) * size * 0.5,
-                    (oklab.x - 0.5) * size,
-                    (oklab.z / 0.4) * size * 0.5
-                );
-            }
-
-            case 4: { // CIELUV
-                const lr = this.srgbToLinear(r);
-                const lg = this.srgbToLinear(g);
-                const lb = this.srgbToLinear(b);
-                const xyz = this.linearRgbToXyz(lr, lg, lb);
-                const luv = this.xyzToLuv(xyz.x, xyz.y, xyz.z);
-                return new vec3(
-                    (luv.y / 200) * size * 0.5,
-                    (luv.x / 100 - 0.5) * size,
-                    (luv.z / 200) * size * 0.5
-                );
-            }
-
-            default:
-                return new vec3(
-                    (r - 0.5) * size,
-                    (b - 0.5) * size,
-                    (g - 0.5) * size
-                );
-        }
+        return new vec3(
+            (r - 0.5) * size,
+            (b - 0.5) * size,
+            (g - 0.5) * size
+        );
     }
 
     // ============================================
@@ -430,108 +394,34 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     // MESH GENERATION
     // ============================================
 
-    private cachePositionsForAllSpaces(): void {
-        // Precompute positions for all 5 color spaces
-        this.inputPositionsPerSpace = [[], [], [], [], []];
-        this.projectedPositionsPerSpace = [[], [], [], [], []];
-
-        for (let i = 0; i < this.inputColors.length; i++) {
-            const inputRGB = this.inputColors[i];
-            const projectedRGB = this.projectedColors[i];
-
-            // Compute linear RGB once (shared by most color spaces)
-            const inLR = this.srgbToLinear(inputRGB.x);
-            const inLG = this.srgbToLinear(inputRGB.y);
-            const inLB = this.srgbToLinear(inputRGB.z);
-            const prLR = this.srgbToLinear(projectedRGB.x);
-            const prLG = this.srgbToLinear(projectedRGB.y);
-            const prLB = this.srgbToLinear(projectedRGB.z);
-
-            // Compute XYZ once (shared by LAB, XYZ, LUV)
-            const inXYZ = this.linearRgbToXyz(inLR, inLG, inLB);
-            const prXYZ = this.linearRgbToXyz(prLR, prLG, prLB);
-
-            const size = this._cubeSize;
-
-            for (let space = 0; space < 5; space++) {
-                let inPos: vec3, prPos: vec3;
-
-                switch (space) {
-                    case 0: // RGB
-                        inPos = new vec3((inputRGB.x - 0.5) * size, (inputRGB.z - 0.5) * size, (inputRGB.y - 0.5) * size);
-                        prPos = new vec3((projectedRGB.x - 0.5) * size, (projectedRGB.z - 0.5) * size, (projectedRGB.y - 0.5) * size);
-                        break;
-                    case 1: { // CIELAB
-                        const inLab = this.xyzToLab(inXYZ.x, inXYZ.y, inXYZ.z);
-                        const prLab = this.xyzToLab(prXYZ.x, prXYZ.y, prXYZ.z);
-                        inPos = new vec3((inLab.y / 128) * size * 0.5, (inLab.x / 100 - 0.5) * size, (inLab.z / 128) * size * 0.5);
-                        prPos = new vec3((prLab.y / 128) * size * 0.5, (prLab.x / 100 - 0.5) * size, (prLab.z / 128) * size * 0.5);
-                        break;
-                    }
-                    case 2: // CIEXYZ
-                        inPos = new vec3((inXYZ.x - 0.5) * size, (inXYZ.y - 0.5) * size, (inXYZ.z - 0.5) * size);
-                        prPos = new vec3((prXYZ.x - 0.5) * size, (prXYZ.y - 0.5) * size, (prXYZ.z - 0.5) * size);
-                        break;
-                    case 3: { // Oklab
-                        const inOk = this.linearRgbToOklab(inLR, inLG, inLB);
-                        const prOk = this.linearRgbToOklab(prLR, prLG, prLB);
-                        inPos = new vec3((inOk.y / 0.4) * size * 0.5, (inOk.x - 0.5) * size, (inOk.z / 0.4) * size * 0.5);
-                        prPos = new vec3((prOk.y / 0.4) * size * 0.5, (prOk.x - 0.5) * size, (prOk.z / 0.4) * size * 0.5);
-                        break;
-                    }
-                    case 4: { // CIELUV
-                        const inLuv = this.xyzToLuv(inXYZ.x, inXYZ.y, inXYZ.z);
-                        const prLuv = this.xyzToLuv(prXYZ.x, prXYZ.y, prXYZ.z);
-                        inPos = new vec3((inLuv.y / 200) * size * 0.5, (inLuv.x / 100 - 0.5) * size, (inLuv.z / 200) * size * 0.5);
-                        prPos = new vec3((prLuv.y / 200) * size * 0.5, (prLuv.x / 100 - 0.5) * size, (prLuv.z / 200) * size * 0.5);
-                        break;
-                    }
-                    default:
-                        inPos = new vec3(0, 0, 0);
-                        prPos = new vec3(0, 0, 0);
-                }
-
-                this.inputPositionsPerSpace[space].push(inPos);
-                this.projectedPositionsPerSpace[space].push(prPos);
-            }
-        }
-    }
-
     private generateMesh(): void {
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
             { name: "normal", components: 3 },
-            { name: "texture0", components: 2 },
-            { name: "texture1", components: 2 },
+            { name: "texture0", components: 2 },  // input r, g
+            { name: "texture1", components: 2 },  // input b, projected r
+            { name: "texture2", components: 2 },  // projected g, b
         ]);
 
         this.meshBuilder.topology = MeshTopology.Triangles;
         this.meshBuilder.indexType = MeshIndexType.UInt16;
 
         const size = this._sampleSize;
-        const blend = this._projectionBlend;
-        const space = this._colorSpace;
 
-        // Use precomputed positions for current color space
-        const inputPositions = this.inputPositionsPerSpace[space];
-        const projectedPositions = this.projectedPositionsPerSpace[space];
-
+        // Generate cubes in RGB space using INPUT colors (shader handles transformation)
         for (let i = 0; i < this.projectedColors.length; i++) {
             const inputRGB = this.inputColors[i];
             const projectedRGB = this.projectedColors[i];
-            const inputPos = inputPositions[i];
-            const projectedPos = projectedPositions[i];
 
-            // Interpolate color and position based on blend
-            const r = inputRGB.x + (projectedRGB.x - inputRGB.x) * blend;
-            const g = inputRGB.y + (projectedRGB.y - inputRGB.y) * blend;
-            const b = inputRGB.z + (projectedRGB.z - inputRGB.z) * blend;
+            // Position in RGB space based on input color
+            const pos = this.rgbToDisplayPosition(inputRGB.x, inputRGB.y, inputRGB.z);
 
-            const px = inputPos.x + (projectedPos.x - inputPos.x) * blend;
-            const py = inputPos.y + (projectedPos.y - inputPos.y) * blend;
-            const pz = inputPos.z + (projectedPos.z - inputPos.z) * blend;
-
-            this.generateCube(px, py, pz, r, g, b, size);
+            this.generateCube(
+                pos.x, pos.y, pos.z,
+                inputRGB.x, inputRGB.y, inputRGB.z,
+                projectedRGB.x, projectedRGB.y, projectedRGB.z,
+                size
+            );
         }
 
         if (this.meshBuilder.isValid()) {
@@ -541,9 +431,13 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         }
     }
 
-    private generateCube(cx: number, cy: number, cz: number, r: number, g: number, b: number, size: number): void {
+    private generateCube(
+        cx: number, cy: number, cz: number,
+        inR: number, inG: number, inB: number,
+        prR: number, prG: number, prB: number,
+        size: number
+    ): void {
         const half = size * 0.5;
-        const faceStartBase = this.meshBuilder.getVerticesCount();
 
         // Pre-computed corner offsets and face data to avoid object allocation
         // 8 corners: [x,y,z] offsets from center
@@ -575,11 +469,13 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
             for (let v = 0; v < 4; v++) {
                 const vi = faces[fi + 3 + v] * 3;
+                // UV layout: texture0 = (inR, inG), texture1 = (inB, prR), texture2 = (prG, prB)
                 this.meshBuilder.appendVerticesInterleaved([
                     cx + offsets[vi], cy + offsets[vi + 1], cz + offsets[vi + 2],
                     nx, ny, nz,
-                    r, g,
-                    b, 1.0,
+                    inR, inG,
+                    inB, prR,
+                    prG, prB,
                 ]);
             }
 
@@ -591,8 +487,10 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     }
 
     // ============================================
-    // PUBLIC API
+    // PUBLIC API (use as event callbacks)
     // ============================================
+
+    private static readonly COLOR_SPACE_COUNT = 5;
 
     public setInputColors(colors: vec3[]): void {
         this.inputColors = colors.slice();
@@ -600,15 +498,15 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         this.inputColors = this.inputColors.slice(0, this.colorCount);
 
         this.projectColors();
-        this.cachePositionsForAllSpaces();
         this.generateMesh();
+        this.updateMaterialParams();
     }
 
     public reproject(): void {
         if (this.inputColors.length > 0) {
             this.projectColors();
-            this.cachePositionsForAllSpaces();
             this.generateMesh();
+            this.updateMaterialParams();
         }
     }
 
@@ -617,9 +515,63 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         this.buildGamutLUT();
         if (this.inputColors.length > 0) {
             this.projectColors();
-            this.cachePositionsForAllSpaces();
             this.generateMesh();
+            this.updateMaterialParams();
         }
+    }
+
+    /** Cycle to next color space */
+    public nextColorSpace(): void {
+        const next = (this._colorSpaceTo + 1) % Projector_Gamut_Mesh.COLOR_SPACE_COUNT;
+        this._colorSpaceFrom = next;
+        this._colorSpaceTo = next;
+        this._blend = 1.0;
+        this.updateMaterialParams();
+    }
+
+    /** Cycle to previous color space */
+    public prevColorSpace(): void {
+        const prev = (this._colorSpaceTo - 1 + Projector_Gamut_Mesh.COLOR_SPACE_COUNT) % Projector_Gamut_Mesh.COLOR_SPACE_COUNT;
+        this._colorSpaceFrom = prev;
+        this._colorSpaceTo = prev;
+        this._blend = 1.0;
+        this.updateMaterialParams();
+    }
+
+    /** Set target color space by index (0=RGB, 1=CIELAB, 2=CIEXYZ, 3=Oklab, 4=CIELUV) */
+    public setColorSpaceIndex(index: number): void {
+        this._colorSpaceFrom = index;
+        this._colorSpaceTo = index;
+        this._blend = 1.0;
+        this.updateMaterialParams();
+    }
+
+    /** Set color space blend value (0 = from space, 1 = to space) */
+    public setBlend(value: number): void {
+        this._blend = value;
+        this.updateMaterialParams();
+    }
+
+    /** Start color space transition: set from=current, to=target, blend=0 */
+    public startTransition(targetSpace: number): void {
+        this._colorSpaceFrom = this._colorSpaceTo;
+        this._colorSpaceTo = targetSpace;
+        this._blend = 0.0;
+        this.updateMaterialParams();
+    }
+
+    /** Set both color spaces and blend */
+    public setColorSpace(from: number, to: number, blend: number = 1.0): void {
+        this._colorSpaceFrom = from;
+        this._colorSpaceTo = to;
+        this._blend = blend;
+        this.updateMaterialParams();
+    }
+
+    /** Set projection blend (0 = input color/pos, 1 = projected color/pos) */
+    public setProjectionBlend(value: number): void {
+        this._projectionBlend = Math.max(0, Math.min(1, value));
+        this.updateMaterialParams();
     }
 
     public getInputColors(): vec3[] {
@@ -668,8 +620,8 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     set cubeSize(value: number) {
         this._cubeSize = value;
         if (this.projectedColors.length > 0) {
-            this.cachePositionsForAllSpaces();  // cubeSize affects positions
             this.generateMesh();
+            this.updateMaterialParams();
         }
     }
 
@@ -681,13 +633,22 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         }
     }
 
-    get colorSpace(): number { return this._colorSpace; }
-    set colorSpace(value: number) {
-        this._colorSpace = value;
-        // Positions already cached for all spaces - just regenerate mesh
-        if (this.projectedColors.length > 0) {
-            this.generateMesh();
-        }
+    get colorSpaceFrom(): number { return this._colorSpaceFrom; }
+    set colorSpaceFrom(value: number) {
+        this._colorSpaceFrom = value;
+        this.updateMaterialParams();
+    }
+
+    get colorSpaceTo(): number { return this._colorSpaceTo; }
+    set colorSpaceTo(value: number) {
+        this._colorSpaceTo = value;
+        this.updateMaterialParams();
+    }
+
+    get blend(): number { return this._blend; }
+    set blend(value: number) {
+        this._blend = value;
+        this.updateMaterialParams();
     }
 
     get gamutSampleSteps(): number { return this._gamutSampleSteps; }
@@ -696,7 +657,6 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         this.buildGamutLUT();
         if (this.inputColors.length > 0) {
             this.projectColors();
-            this.cachePositionsForAllSpaces();
             this.generateMesh();
         }
     }
@@ -704,8 +664,6 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     get projectionBlend(): number { return this._projectionBlend; }
     set projectionBlend(value: number) {
         this._projectionBlend = Math.max(0, Math.min(1, value));
-        if (this.projectedColors.length > 0) {
-            this.generateMesh();
-        }
+        this.updateMaterialParams();
     }
 }

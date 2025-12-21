@@ -26,7 +26,9 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
-    _colorSpace: false
+    _blend: false
+    _colorSpaceFrom: false
+    _colorSpaceTo: false
     _cubeSize: false
     _gamutSampleSteps: false
     _gamutTolerance: false
@@ -54,7 +56,9 @@
       _lineSegments: !<float> 24.000000
       _sampleSize: !<float> 2.000000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
-      _colorSpace: !<float> 0.000000
+      _colorSpaceFrom: !<float> 0.000000
+      _colorSpaceTo: !<float> 0.000000
+      _blend: !<float> 0.000000
       _gamutTolerance: 0.050000
       _gamutSampleSteps: !<float> 20.000000
       pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
@@ -72,7 +76,9 @@
     - '// @input float _lineSegments = 32 {"hint":"Number of samples per line"}'
     - '// @input float _sampleSize = 2 {"hint":"Size of each sample cube"}'
     - '// @input Asset.Material material {"hint":"Material for sample cubes"}'
-    - '// @input float _colorSpace {"hint":"Color space for 3D positioning", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _blend {"hint":"Interpolation: 0 = from space, 1 = to space"}'
     - '// @input float _gamutTolerance = 0.05 {"hint":"Tolerance for matching RGB to achievable gamut (0-1)"}'
     - '// @input float _gamutSampleSteps = 20 {"hint":"Resolution of pigment mix sampling for gamut LUT"}'
     - '// @input vec3 pig0Color = {1,1,1} {"hint":"Pigment 0: White", "widget":"color"}'

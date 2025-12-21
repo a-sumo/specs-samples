@@ -1,9 +1,11 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 828
+    size: 831
     values:
       - ""
+      - ColorSpaceTransforms 2.mat
+      - ColorSpaceTransforms 2.ss_graph
       - ColorSpaceTransforms.mat
       - ColorSpaceTransforms.ss_graph
       - Images
@@ -74,6 +76,7 @@ CollapsedEntities:
       - Scripts/Util_SpectralMix.ts
       - Shaders
       - Shaders/ColorSpaceTransform.js
+      - Shaders/ProjectorGamutTransform.js
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio

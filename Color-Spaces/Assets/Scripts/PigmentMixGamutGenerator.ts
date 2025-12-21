@@ -39,8 +39,25 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
       new ComboBoxItem("CIELUV", 4),
     ])
   )
-  @hint("Color space for 3D positioning")
-  private _colorSpace: number = 0;
+  @hint("Source color space (blend = 0)")
+  private _colorSpaceFrom: number = 0;
+
+  @input
+  @widget(
+    new ComboBoxWidget([
+      new ComboBoxItem("RGB", 0),
+      new ComboBoxItem("CIELAB", 1),
+      new ComboBoxItem("CIEXYZ", 2),
+      new ComboBoxItem("Oklab", 3),
+      new ComboBoxItem("CIELUV", 4),
+    ])
+  )
+  @hint("Target color space (blend = 1)")
+  private _colorSpaceTo: number = 0;
+
+  @input
+  @hint("Interpolation: 0 = from space, 1 = to space")
+  private _blend: number = 0.0;
 
   // ============ GAMUT SETTINGS ============
 
@@ -101,6 +118,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     this.setupMeshVisual();
     this.collectSampleData();
     this.generateMesh();
+    this.updateMaterialParams();
   }
 
   private initializePigments(): void {
@@ -300,73 +318,23 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     );
   }
 
+  // Always generate in RGB space - shader handles color space transformation
   private rgbToDisplayPosition(r: number, g: number, b: number): vec3 {
     const size = this._cubeSize;
+    return new vec3(
+      (r - 0.5) * size,
+      (b - 0.5) * size,
+      (g - 0.5) * size
+    );
+  }
 
-    switch (this._colorSpace) {
-      case 0: // RGB
-        return new vec3(
-          (r - 0.5) * size,
-          (b - 0.5) * size,
-          (g - 0.5) * size
-        );
-
-      case 1: { // CIELAB
-        const lr = this.srgbToLinear(r);
-        const lg = this.srgbToLinear(g);
-        const lb = this.srgbToLinear(b);
-        const xyz = this.linearRgbToXyz(lr, lg, lb);
-        const lab = this.xyzToLab(xyz.x, xyz.y, xyz.z);
-        return new vec3(
-          (lab.y / 128) * size * 0.5,
-          (lab.x / 100 - 0.5) * size,
-          (lab.z / 128) * size * 0.5
-        );
-      }
-
-      case 2: { // CIEXYZ
-        const lr = this.srgbToLinear(r);
-        const lg = this.srgbToLinear(g);
-        const lb = this.srgbToLinear(b);
-        const xyz = this.linearRgbToXyz(lr, lg, lb);
-        return new vec3(
-          (xyz.x - 0.5) * size,
-          (xyz.y - 0.5) * size,
-          (xyz.z - 0.5) * size
-        );
-      }
-
-      case 3: { // Oklab
-        const lr = this.srgbToLinear(r);
-        const lg = this.srgbToLinear(g);
-        const lb = this.srgbToLinear(b);
-        const oklab = this.linearRgbToOklab(lr, lg, lb);
-        return new vec3(
-          (oklab.y / 0.4) * size * 0.5,
-          (oklab.x - 0.5) * size,
-          (oklab.z / 0.4) * size * 0.5
-        );
-      }
-
-      case 4: { // CIELUV
-        const lr = this.srgbToLinear(r);
-        const lg = this.srgbToLinear(g);
-        const lb = this.srgbToLinear(b);
-        const xyz = this.linearRgbToXyz(lr, lg, lb);
-        const luv = this.xyzToLuv(xyz.x, xyz.y, xyz.z);
-        return new vec3(
-          (luv.y / 200) * size * 0.5,
-          (luv.x / 100 - 0.5) * size,
-          (luv.z / 200) * size * 0.5
-        );
-      }
-
-      default:
-        return new vec3(
-          (r - 0.5) * size,
-          (b - 0.5) * size,
-          (g - 0.5) * size
-        );
+  private updateMaterialParams(): void {
+    if (this.material) {
+      const pass = this.material.mainPass;
+      pass.colorSpaceFrom = this._colorSpaceFrom;
+      pass.colorSpaceTo = this._colorSpaceTo;
+      pass.blend = this._blend;
+      pass.cubeSize = this._cubeSize;
     }
   }
 
@@ -474,20 +442,77 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   }
 
   // ============================================
-  // PUBLIC API
+  // PUBLIC API (use as event callbacks)
   // ============================================
+
+  private static readonly COLOR_SPACE_COUNT = 5;
 
   public refresh(): void {
     this.initializePigments();
     this.buildGamutLUT();
     this.collectSampleData();
     this.generateMesh();
+    this.updateMaterialParams();
   }
+
+  /** Cycle to next color space */
+  public nextColorSpace(): void {
+    const next = (this._colorSpaceTo + 1) % PigmentMixGamutGenerator.COLOR_SPACE_COUNT;
+    this._colorSpaceFrom = next;
+    this._colorSpaceTo = next;
+    this._blend = 1.0;
+    this.updateMaterialParams();
+  }
+
+  /** Cycle to previous color space */
+  public prevColorSpace(): void {
+    const prev = (this._colorSpaceTo - 1 + PigmentMixGamutGenerator.COLOR_SPACE_COUNT) % PigmentMixGamutGenerator.COLOR_SPACE_COUNT;
+    this._colorSpaceFrom = prev;
+    this._colorSpaceTo = prev;
+    this._blend = 1.0;
+    this.updateMaterialParams();
+  }
+
+  /** Set target color space by index (0=RGB, 1=CIELAB, 2=CIEXYZ, 3=Oklab, 4=CIELUV) */
+  public setColorSpaceIndex(index: number): void {
+    this._colorSpaceFrom = index;
+    this._colorSpaceTo = index;
+    this._blend = 1.0;
+    this.updateMaterialParams();
+  }
+
+  /** Set blend value (0 = from space, 1 = to space) */
+  public setBlend(value: number): void {
+    this._blend = value;
+    this.updateMaterialParams();
+  }
+
+  /** Start transition: set from=current, to=target, blend=0 */
+  public startTransition(targetSpace: number): void {
+    this._colorSpaceFrom = this._colorSpaceTo;
+    this._colorSpaceTo = targetSpace;
+    this._blend = 0.0;
+    this.updateMaterialParams();
+  }
+
+  /** Set both color spaces and blend */
+  public setColorSpace(from: number, to: number, blend: number = 1.0): void {
+    this._colorSpaceFrom = from;
+    this._colorSpaceTo = to;
+    this._blend = blend;
+    this.updateMaterialParams();
+  }
+
+  // ============================================
+  // PROPERTY ACCESSORS
+  // ============================================
 
   get cubeSize(): number { return this._cubeSize; }
   set cubeSize(value: number) {
     this._cubeSize = value;
+    this.collectSampleData();
     this.generateMesh();
+    this.updateMaterialParams();
   }
 
   get gridDensity(): number { return this._gridDensity; }
@@ -510,11 +535,22 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     this.generateMesh();
   }
 
-  get colorSpace(): number { return this._colorSpace; }
-  set colorSpace(value: number) {
-    this._colorSpace = value;
-    this.collectSampleData();
-    this.generateMesh();
+  get colorSpaceFrom(): number { return this._colorSpaceFrom; }
+  set colorSpaceFrom(value: number) {
+    this._colorSpaceFrom = value;
+    this.updateMaterialParams();
+  }
+
+  get colorSpaceTo(): number { return this._colorSpaceTo; }
+  set colorSpaceTo(value: number) {
+    this._colorSpaceTo = value;
+    this.updateMaterialParams();
+  }
+
+  get blend(): number { return this._blend; }
+  set blend(value: number) {
+    this._blend = value;
+    this.updateMaterialParams();
   }
 
   get gamutTolerance(): number { return this._gamutTolerance; }
