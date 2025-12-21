@@ -1,0 +1,215 @@
+- !<ObjectPrefab/6626108a-a264-404f-b362-76508eed458f>
+  PackagePath: ""
+  objects:
+    - !<own> 960c57cd-b836-4eda-9b53-542dd3392655
+  LazyLoading: false
+  RetainAssets: true
+- !<ColliderComponent/0fd9bfff-fec0-4b17-9f2e-6f903c593ab2>
+  PrefabRemaps:
+    []
+  Name: Physics Collider
+  Enabled: true
+  Shape: !<Box>
+    FitVisual: false
+    Size: {x: 1.000000, y: 1.000000, z: 1.000000}
+  Matter: !<reference> 00000000-0000-0000-0000-000000000000
+  Filter: !<reference> 00000000-0000-0000-0000-000000000000
+  OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
+  WorldSettings: !<reference> 00000000-0000-0000-0000-000000000000
+  EnableSmoothing: false
+  PositionTension: 30.000000
+  RotationTension: 30.000000
+  ForceCompound: false
+  Intangible: false
+  ShowCollider: true
+- !<SceneObject/48e14bcf-dbc4-4dca-98c0-c7b1f08d81d8>
+  PrefabRemaps:
+    []
+  Name: Pigment Gamut Decoder Hi Res
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 67d38f4d-d4bf-4e88-bb93-94c2804206f7
+- !<VFXComponent/67d38f4d-d4bf-4e88-bb93-94c2804206f7>
+  PrefabRemaps:
+    []
+  Name: VFX Component
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  VFXAsset: !<reference> 01b4da44-332e-43bc-a11b-dc6aa6309a89
+- !<SceneObject/960c57cd-b836-4eda-9b53-542dd3392655>
+  PrefabRemaps:
+    - 0fd9bfff-fec0-4b17-9f2e-6f903c593ab2: 0d236f8c-3841-4436-9b3f-1bd03e1b3a1d
+    - 48e14bcf-dbc4-4dca-98c0-c7b1f08d81d8: 48e14bcf-dbc4-4dca-673f-384e0f727e27
+    - 67d38f4d-d4bf-4e88-bb93-94c2804206f7: 67d38f4d-d4bf-4e88-446c-6b3d7fbdf908
+    - 960c57cd-b836-4eda-9b53-542dd3392655: 960c57cd-b836-4eda-64ac-abd22cc6d9aa
+    - af37bf64-03d9-4ea4-bb22-605f573cf198: 6568379c-6485-4487-86fa-0338c51009b9
+    - c58c75e1-5c63-4e01-a9c1-f0e9d99b5d80: c58c75e1-5c63-4e01-563e-0f162664a27f
+    - ef6eb983-ae07-4eac-a9b6-e93ad8044934: ef6eb983-ae07-4eac-5649-16c527fbb6cb
+    - f468f278-5ddb-4d53-a04a-a0a8a96b68e1: 84771fda-5cca-4059-be13-7984d245699a
+  Name: Pigment Gamut Encoder Decoder Hi Res
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> c58c75e1-5c63-4e01-a9c1-f0e9d99b5d80
+    - !<own> 48e14bcf-dbc4-4dca-98c0-c7b1f08d81d8
+  Components:
+    - !<own> f468f278-5ddb-4d53-a04a-a0a8a96b68e1
+    - !<own> af37bf64-03d9-4ea4-bb22-605f573cf198
+    - !<own> 0fd9bfff-fec0-4b17-9f2e-6f903c593ab2
+- !<ScriptComponent/af37bf64-03d9-4ea4-bb22-605f573cf198>
+  PrefabRemaps:
+    []
+  Name: InteractableManipulation
+  Enabled: true
+  ScriptAsset: !<reference> 664b556b-1946-4c2c-866a-e675b4e86006
+  ScriptInputsDefault:
+    manipulateRootSceneObject: true
+    minimumScaleFactor: true
+    maximumScaleFactor: true
+    enableTranslation: true
+    enableRotation: true
+    enableScale: true
+    enableStretchZ: true
+    showStretchZProperties: true
+    zStretchFactorMin: true
+    zStretchFactorMax: true
+    useFilter: true
+    showFilterProperties: true
+    minCutoff: true
+    beta: true
+    dcutoff: true
+    showTranslationProperties: true
+    _enableXTranslation: true
+    _enableYTranslation: true
+    _enableZTranslation: true
+    showRotationProperties: true
+    _rotationAxis: true
+    isSynced: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      manipulateRootSceneObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      minimumScaleFactor: 0.250000
+      maximumScaleFactor: !<float> 20.000000
+      enableTranslation: true
+      enableRotation: true
+      enableScale: true
+      enableStretchZ: true
+      showStretchZProperties: false
+      zStretchFactorMin: !<float> 1.000000
+      zStretchFactorMax: !<float> 12.000000
+      useFilter: true
+      showFilterProperties: false
+      minCutoff: !<float> 2.000000
+      beta: 0.015000
+      dcutoff: !<float> 1.000000
+      showTranslationProperties: false
+      _enableXTranslation: true
+      _enableYTranslation: true
+      _enableZTranslation: true
+      showRotationProperties: false
+      _rotationAxis: All
+      isSynced: false
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/c58c75e1-5c63-4e01-a9c1-f0e9d99b5d80>
+  PrefabRemaps:
+    []
+  Name: PigmentGamutEncoderHiRes
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> ef6eb983-ae07-4eac-a9b6-e93ad8044934
+- !<ScriptComponent/ef6eb983-ae07-4eac-a9b6-e93ad8044934>
+  PrefabRemaps:
+    []
+  Name: Encoder_PigmentMixHiRes
+  Enabled: true
+  ScriptAsset: !<reference> 01562774-795c-49a2-93ab-149ba2f43a8a
+  ScriptInputsDefault:
+    texSize: true
+    pig4Color: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      encoderMaterial: !<reference.Material> 38452664-f818-4047-8a59-63af73b4895f
+      vfxComponent: !<reference.VFXComponent> 67d38f4d-d4bf-4e88-bb93-94c2804206f7
+      texSize: !<float> 128.000000
+      mixSteps: !<float> 10.000000
+      scale: !<float> 1.000000
+      pig0Color: !<Vec3> {x: 0.248386, y: 1.000000, z: 0.282689}
+      pig1Color: !<Vec3> {x: 0.000000, y: 0.822431, z: 1.000000}
+      pig2Color: !<Vec3> {x: 0.000000, y: 0.070924, z: 0.987900}
+      pig3Color: !<Vec3> {x: 0.414267, y: 0.840482, z: 0.847013}
+      pig4Color: !<Vec3> {x: 0.100000, y: 0.100000, z: 0.700000}
+      pig5Color: !<Vec3> {x: 0.975616, y: 1.000000, z: 0.965454}
+  ScriptTypes:
+    "":
+      {}
+- !<ScriptComponent/f468f278-5ddb-4d53-a04a-a0a8a96b68e1>
+  PrefabRemaps:
+    []
+  Name: Interactable
+  Enabled: true
+  ScriptAsset: !<reference> 652e631a-22d0-4941-9f74-2943df59f34c
+  ScriptInputsDefault:
+    targetingMode: true
+    targetingVisual: true
+    ignoreInteractionPlane: true
+    keepHoverOnTrigger: true
+    enableInstantDrag: true
+    isScrollable: true
+    allowMultipleInteractors: true
+    enablePokeDirectionality: true
+    acceptableXDirections: true
+    acceptableYDirections: true
+    acceptableZDirections: true
+    useFilteredPinch: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      targetingMode: !<float> 3.000000
+      targetingVisual: !<float> 1.000000
+      ignoreInteractionPlane: false
+      keepHoverOnTrigger: false
+      enableInstantDrag: false
+      isScrollable: false
+      allowMultipleInteractors: true
+      enablePokeDirectionality: false
+      acceptableXDirections: !<float> 0.000000
+      acceptableYDirections: !<float> 0.000000
+      acceptableZDirections: !<float> 1.000000
+      useFilteredPinch: false
+  ScriptTypes:
+    "":
+      {}

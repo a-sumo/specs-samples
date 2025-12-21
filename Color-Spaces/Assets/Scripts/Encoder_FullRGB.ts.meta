@@ -1,0 +1,56 @@
+- !<AssetImportMetadata/d6c4c96c-d82e-8543-3fa9-818d16a09c34>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 2d57b839-30be-46f0-b491-d7a3bc219be2
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 2d57b839-30be-46f0-b491-d7a3bc219be2
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 4e5081c3-66a7-47db-a8d5-4c5700097c0c
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/4e5081c3-66a7-47db-a8d5-4c5700097c0c>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 9c5f67e4-dbb8-4da4-96c5-e97ca6907f7b
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    encoderMaterial: false
+    rgbRes: false
+    scale: false
+    texSize: false
+    vfxComponent: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - encoderMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      vfxComponent: !<reference.VFXComponent> 00000000-0000-0000-0000-000000000000
+      texSize: !<float> 64.000000
+      rgbRes: !<float> 16.000000
+      scale: !<float> 100.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.Material encoderMaterial {"hint":"Material with LAB encoder Code Node (outputs labPos and rgbCol)"}'
+    - '// @input Component.VFXComponent vfxComponent {"hint":"VFX component to receive textures"}'
+    - '// @input float texSize = 64 {"hint":"Texture size (64 = 4096 pixels)"}'
+    - '// @input float rgbRes = 16 {"hint":"RGB resolution (16 = 16³ = 4096 points)"}'
+    - '// @input float scale = 100 {"hint":"Scale for VFX positions"}'

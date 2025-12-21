@@ -1,0 +1,80 @@
+- !<AssetImportMetadata/e58f6f58-6004-5f88-a525-2ff0f6a93e42>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 3fa02e69-5303-45dc-badf-c10ad8fec573
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 3fa02e69-5303-45dc-badf-c10ad8fec573
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> ddd56967-87c5-471c-af39-43fc13a52c91
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/ddd56967-87c5-471c-af39-43fc13a52c91>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 1d8c2b1e-2c9f-46be-81c2-2c6159a7e967
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    material: false
+    pig0Color: false
+    pig0Conc: false
+    pig1Color: false
+    pig1Conc: false
+    pig2Color: false
+    pig2Conc: false
+    pig3Color: false
+    pig3Conc: false
+    pig4Color: false
+    pig4Conc: false
+    pig5Color: false
+    pig5Conc: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
+      pig0Conc: 0.200000
+      pig1Color: !<Vec3> {x: 0.080000, y: 0.080000, z: 0.080000}
+      pig1Conc: 0.200000
+      pig2Color: !<Vec3> {x: 1.000000, y: 0.920000, z: 0.000000}
+      pig2Conc: 0.200000
+      pig3Color: !<Vec3> {x: 0.890000, y: 0.000000, z: 0.130000}
+      pig3Conc: 0.150000
+      pig4Color: !<Vec3> {x: 0.100000, y: 0.100000, z: 0.700000}
+      pig4Conc: 0.150000
+      pig5Color: !<Vec3> {x: 0.000000, y: 0.470000, z: 0.440000}
+      pig5Conc: 0.100000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.Material material
+    - '// @input vec3 pig0Color = {1,1,1} {"widget":"color"}'
+    - '// @input float pig0Conc = 0.2 {"widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input vec3 pig1Color = {0.08,0.08,0.08} {"widget":"color"}'
+    - '// @input float pig1Conc = 0.2 {"widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input vec3 pig2Color = {1,0.92,0} {"widget":"color"}'
+    - '// @input float pig2Conc = 0.2 {"widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input vec3 pig3Color = {0.89,0,0.13} {"widget":"color"}'
+    - '// @input float pig3Conc = 0.15 {"widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input vec3 pig4Color = {0.1,0.1,0.7} {"widget":"color"}'
+    - '// @input float pig4Conc = 0.15 {"widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input vec3 pig5Color = {0,0.47,0.44} {"widget":"color"}'
+    - '// @input float pig5Conc = 0.1 {"widget":"slider", "min":0, "max":1, "step":0.01}'

@@ -1,0 +1,56 @@
+- !<AssetImportMetadata/211c6c8f-4901-4f6f-8119-52210467dd17>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 7100dc9a-700e-49d8-8a1b-d3040a8fb5a5
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 7100dc9a-700e-49d8-8a1b-d3040a8fb5a5
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> c6bcfe02-df1d-4326-9aa1-4106d0913c93
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/c6bcfe02-df1d-4326-9aa1-4106d0913c93>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 91564067-06b0-4c76-bc97-6686a8b24d5c
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    encoder: false
+    maxColors: false
+    paletteController: false
+    projectionMaterial: false
+    vfxComponent: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - encoder: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      projectionMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      vfxComponent: !<reference.VFXComponent> 00000000-0000-0000-0000-000000000000
+      maxColors: !<float> 64.000000
+      paletteController: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Component.ScriptComponent encoder {"hint":"Encoder script (Encoder_PigmentMix, Encoder_FullRGB, etc.)"}'
+    - '// @input Asset.Material projectionMaterial {"hint":"Material with Gamut Projection shader"}'
+    - '// @input Component.VFXComponent vfxComponent {"hint":"VFX component to display projected colors (optional)"}'
+    - '// @input float maxColors = 64 {"hint":"Maximum colors to support (determines texture size)"}'
+    - '// @input Component.ScriptComponent paletteController {"hint":"PaletteController to listen for color changes (optional, for auto-reproject)"}'

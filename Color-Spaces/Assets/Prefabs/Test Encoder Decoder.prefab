@@ -1,0 +1,88 @@
+- !<ObjectPrefab/68d5d38a-9960-4efa-9a45-673830df14af>
+  PackagePath: ""
+  objects:
+    - !<own> 9aec6476-92dc-494a-a59e-bd7b69bdfae6
+  LazyLoading: false
+  RetainAssets: true
+- !<VFXComponent/1a913c4e-dd76-4165-ad53-9c766350f9df>
+  PrefabRemaps:
+    []
+  Name: VFX Component
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  VFXAsset: !<reference> 90883ce3-f7db-447e-a237-9682710b32cd
+- !<SceneObject/561eae79-c629-403a-b327-987064cb4684>
+  PrefabRemaps:
+    []
+  Name: TestEncoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> fc255693-567b-42a1-80ba-731a004556cc
+- !<SceneObject/9aec6476-92dc-494a-a59e-bd7b69bdfae6>
+  PrefabRemaps:
+    - 1a913c4e-dd76-4165-ad53-9c766350f9df: 1a913c4e-dd76-4165-52ac-63899caf0620
+    - 561eae79-c629-403a-b327-987064cb4684: 561eae79-c629-403a-4cd8-678f9b34b97b
+    - 9aec6476-92dc-494a-a59e-bd7b69bdfae6: 9aec6476-92dc-494a-5a61-428496420519
+    - f3c55855-7674-4317-8f05-20c9fdf5ef77: f3c55855-7674-4317-70fa-df36020a1088
+    - fc255693-567b-42a1-80ba-731a004556cc: fc255693-567b-42a1-7f45-8ce5ffbaa933
+  Name: Test Encoder Decoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> f3c55855-7674-4317-8f05-20c9fdf5ef77
+    - !<own> 561eae79-c629-403a-b327-987064cb4684
+  Components:
+    []
+- !<SceneObject/f3c55855-7674-4317-8f05-20c9fdf5ef77>
+  PrefabRemaps:
+    []
+  Name: TestDecoder
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 1a913c4e-dd76-4165-ad53-9c766350f9df
+- !<ScriptComponent/fc255693-567b-42a1-80ba-731a004556cc>
+  PrefabRemaps:
+    []
+  Name: Test_MinimalEncoder
+  Enabled: true
+  ScriptAsset: !<reference> efc0901d-4180-4175-a318-b21522b5062c
+  ScriptInputsDefault:
+    texSize: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      encoderMaterial: !<reference.Material> e4bc1937-57a3-4ced-b572-ab5db95dd5f3
+      vfxComponent: !<reference.VFXComponent> 1a913c4e-dd76-4165-ad53-9c766350f9df
+      texSize: !<float> 8.000000
+      scale: !<float> 10.000000
+  ScriptTypes:
+    "":
+      {}

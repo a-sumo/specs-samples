@@ -1,0 +1,13 @@
+data:
+  externalSources:
+    - 05601544-cba8-4da0-9c6e-fc472ec3129f: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/Materials/Color Gradient.ss_graph
+    - 2cf800ba-2218-4adc-881c-f2afcd40b01e: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - 5f7b467b-1977-41fc-9a32-4f2558cfdc95: /Users/armand/Documents/Spectacles-Sample/Crop/Assets/Color-Space.lspkg/VFX/LAB Decoder.vfxgraph
+    - 76e71b5e-182d-49f1-88a8-6543100bf1a0: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - 88e4c541-1d5b-4b63-be87-ab9dcf507243: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/SpectaclesInteractionKit@0.15.0/SpectaclesInteractionKit.lspkg
+    - a429ed5d-6a9a-4814-aafb-578f1e46c656: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/ColorSpaceTransforms 2.ss_graph
+    - b3b4705d-e5ce-4b03-a68b-22e6452dacbc: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/ColorSpaceTransforms.ss_graph
+    - c63ecca3-8e1f-44b7-9580-0d9f74b5d12f: /Applications/Lens Studio.app/Contents/JsPlugins/PresetsRegistry/Assets/TypeScript/Resources/Untitled TypeScript.ts
+    - cc8b9cc8-c63c-4691-b5db-9818bac00e1d: /Users/armand/Documents/motion-operators/MotionOperators/Assets/Materials/Color Gradient.ss_graph
+    - df71d496-fa03-4f7a-8dae-2fbba9cf5fc0: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - fed6be00-fecb-4790-97b2-00ccb96537ca: /Users/armand/Documents/motion-operators/MotionOperators/Assets/Scripts/RGBCubeGenerator.ts

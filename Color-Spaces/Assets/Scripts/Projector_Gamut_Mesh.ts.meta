@@ -1,0 +1,89 @@
+- !<AssetImportMetadata/0dc6062d-27b4-447f-ad6b-5f167fc7e3cb>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 8e3edd20-c99e-49fb-9c27-29bd05e77516
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 8e3edd20-c99e-49fb-9c27-29bd05e77516
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 8351a906-669c-4a28-ad03-6da7899b9258
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/8351a906-669c-4a28-ad03-6da7899b9258>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: a56331b6-b242-4958-9396-5fc15bc3697f
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _blend: false
+    _colorSpaceFrom: false
+    _colorSpaceTo: false
+    _cubeSize: false
+    _gamutSampleSteps: false
+    _projectionBlend: false
+    _sampleSize: false
+    colorSpaceText: false
+    material: false
+    maxColors: false
+    pig0Color: false
+    pig1Color: false
+    pig2Color: false
+    pig3Color: false
+    pig4Color: false
+    pig5Color: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - _cubeSize: !<float> 100.000000
+      _sampleSize: !<float> 4.000000
+      _projectionBlend: !<float> 1.000000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      _colorSpaceFrom: !<float> 0.000000
+      _colorSpaceTo: !<float> 0.000000
+      _blend: !<float> 0.000000
+      colorSpaceText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      _gamutSampleSteps: !<float> 20.000000
+      pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
+      pig1Color: !<Vec3> {x: 0.080000, y: 0.080000, z: 0.080000}
+      pig2Color: !<Vec3> {x: 1.000000, y: 0.920000, z: 0.000000}
+      pig3Color: !<Vec3> {x: 0.890000, y: 0.000000, z: 0.130000}
+      pig4Color: !<Vec3> {x: 0.100000, y: 0.100000, z: 0.700000}
+      pig5Color: !<Vec3> {x: 0.000000, y: 0.470000, z: 0.440000}
+      maxColors: !<float> 64.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float _cubeSize = 100 {"hint":"Size of the display space in scene units"}'
+    - '// @input float _sampleSize = 1 {"hint":"Size of each sample cube"}'
+    - '// @input float _projectionBlend = 1 {"hint":"Projection blend: 0 = original input position/color, 1 = fully projected"}'
+    - '// @input Asset.Material material {"hint":"Material for projected color cubes"}'
+    - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _blend {"hint":"Interpolation: 0 = from space, 1 = to space"}'
+    - '// @input Component.Text colorSpaceText {"hint":"Text component to display active color space name"}'
+    - '// @input float _gamutSampleSteps = 20 {"hint":"Resolution of pigment mix sampling for gamut LUT"}'
+    - '// @input vec3 pig0Color = {1,1,1} {"hint":"Pigment 0: White", "widget":"color"}'
+    - '// @input vec3 pig1Color = {0.08,0.08,0.08} {"hint":"Pigment 1: Black", "widget":"color"}'
+    - '// @input vec3 pig2Color = {1,0.92,0} {"hint":"Pigment 2: Yellow", "widget":"color"}'
+    - '// @input vec3 pig3Color = {0.89,0,0.13} {"hint":"Pigment 3: Red", "widget":"color"}'
+    - '// @input vec3 pig4Color = {0.1,0.1,0.7} {"hint":"Pigment 4: Blue", "widget":"color"}'
+    - '// @input vec3 pig5Color = {0,0.47,0.44} {"hint":"Pigment 5: Green", "widget":"color"}'
+    - '// @input float maxColors = 64 {"hint":"Maximum input colors to support"}'

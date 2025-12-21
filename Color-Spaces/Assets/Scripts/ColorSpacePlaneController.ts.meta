@@ -1,0 +1,56 @@
+- !<AssetImportMetadata/f8d32563-92d1-4dc3-888c-6fb300b69dca>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 2c2743d8-f728-4a49-9d5e-cf17423f022d
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 2c2743d8-f728-4a49-9d5e-cf17423f022d
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 0006c185-d108-41bf-90bc-01e8b612eb03
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/0006c185-d108-41bf-90bc-01e8b612eb03>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 789a9b94-c046-423e-bbf6-d47381e5bb55
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cubeGenerator: false
+    cursor: false
+    deadZone: false
+    debugText: false
+    plane: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - plane: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      cursor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      cubeGenerator: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      deadZone: 0.150000
+      debugText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject plane {"hint":"The plane SceneObject with Interactable"}'
+    - '// @input SceneObject cursor {"hint":"Visual cursor/handle that follows hover position"}'
+    - '// @input Component.ScriptComponent cubeGenerator {"hint":"Reference to RGBCubeGenerator"}'
+    - '// @input float deadZone = 0.15 {"hint":"Dead zone radius in center (0-1, where 0.15 = 15%)"}'
+    - '// @input Component.Text debugText {"hint":"Text for debug display"}'
