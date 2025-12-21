@@ -818,7 +818,6 @@
   ScriptAsset: !<reference> a519bb72-442a-4dc1-b394-f2e240a47203
   ScriptInputsDefault:
     _lineSegments: true
-    _colorSpace: true
     _gamutTolerance: true
     _gamutSampleSteps: true
     pig0Color: true
@@ -835,7 +834,7 @@
       _lineSegments: !<float> 24.000000
       _sampleSize: 0.200000
       material: !<reference.Material> 2a160c56-dc8c-4312-aa63-acba765b3402
-      _colorSpace: !<float> 0.000000
+      _colorSpace: !<float> 3.000000
       _gamutTolerance: 0.050000
       _gamutSampleSteps: !<float> 20.000000
       pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
