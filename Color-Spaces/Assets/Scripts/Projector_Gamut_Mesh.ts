@@ -2,6 +2,7 @@
 // Mesh-based gamut projection - finds nearest achievable pigment mix for each input color
 // Creates cube meshes at projected positions in the chosen color space
 
+
 @component
 export class Projector_Gamut_Mesh extends BaseScriptComponent {
 

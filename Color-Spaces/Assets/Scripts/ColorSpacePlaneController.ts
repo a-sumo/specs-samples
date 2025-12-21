@@ -1,16 +1,21 @@
 import { Interactable } from "SpectaclesInteractionKit.lspkg/Components/Interaction/Interactable/Interactable";
-import { InteractorEvent } from "SpectaclesInteractionKit.lspkg/Core/Interactor/InteractorEvent";
+import { DragInteractorEvent } from "SpectaclesInteractionKit.lspkg/Core/Interactor/InteractorEvent";
+import { RGBCubeGenerator } from "./RGBCubeGenerator";
+import { PigmentMixGamutGenerator } from "./PigmentMixGamutGenerator";
+import { Projector_Gamut_Mesh } from "./Projector_Gamut_Mesh";
 
 /**
  * Interactive plane for color space selection.
- * Hover over the plane - cursor position determines color space blend.
+ * Drag on the plane - cursor position determines color space blend.
  *
- * Layout (UV 0-1, center = 0.5,0.5):
+ * Layout:
  *        CIELAB (top)
  *           |
  *   CIELUV -- RGB -- CIEXYZ
  *           |
  *        Oklab (bottom)
+ *
+ * Subscribe to onColorSpaceChange to receive updates.
  */
 @component
 export class ColorSpacePlaneController extends BaseScriptComponent {
@@ -23,10 +28,6 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   cursor: SceneObject;
 
   @input
-  @hint("Reference to RGBCubeGenerator")
-  cubeGenerator: ScriptComponent;
-
-  @input
   @hint("Dead zone radius in center (0-1, where 0.15 = 15%)")
   deadZone: number = 0.15;
 
@@ -34,21 +35,33 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   @hint("Text for debug display")
   debugText: Text;
 
-  private cubeGeneratorApi: any;
+  @input
+  @hint("UV offset for plane local coords (0.5 for -0.5..0.5 planes, 0 for 0..1 planes)")
+  uvOffset: number = 0.5;
+
+  @input
+  @hint("RGBCubeGenerator to update")
+  rgbCubeGenerator: RGBCubeGenerator;
+
+  @input
+  @hint("PigmentMixGamutGenerator to update")
+  pigmentMixGenerator: PigmentMixGamutGenerator;
+
+  @input
+  @hint("Projector_Gamut_Mesh to update")
+  projectorGamutMesh: Projector_Gamut_Mesh;
+
+  private static readonly SPACE_NAMES = ["RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"];
+
   private planeTransform: Transform;
   private cursorTransform: Transform | null = null;
   private interactable: Interactable | null = null;
-  private lastActiveSpace: number = 0;
-  private isHovering: boolean = false;
+  private isDragging: boolean = false;
 
   // Cleanup
   private unsubscribeEvents: (() => void)[] = [];
 
   onAwake(): void {
-    if (this.cubeGenerator) {
-      this.cubeGeneratorApi = this.cubeGenerator as any;
-    }
-
     if (this.plane) {
       this.planeTransform = this.plane.getTransform();
       this.interactable = this.plane.getComponent(Interactable.getTypeName()) as Interactable;
@@ -60,7 +73,7 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     }
 
     if (this.interactable) {
-      this.setupHoverEvents();
+      this.setupDragEvents();
     } else {
       print("ColorSpacePlaneController: No Interactable found on plane");
     }
@@ -68,36 +81,34 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     this.createEvent("OnDestroyEvent").bind(() => this.onDestroy());
   }
 
-  private setupHoverEvents(): void {
+  private setupDragEvents(): void {
     if (!this.interactable) return;
 
     this.unsubscribeEvents.push(
-      this.interactable.onHoverEnter((e: InteractorEvent) => {
-        this.isHovering = true;
-        this.handleHover(e);
+      this.interactable.onDragStart.add((e: DragInteractorEvent) => {
+        this.isDragging = true;
+        this.handleDrag(e);
       })
     );
 
     this.unsubscribeEvents.push(
-      this.interactable.onHoverUpdate((e: InteractorEvent) => {
-        this.handleHover(e);
+      this.interactable.onDragUpdate.add((e: DragInteractorEvent) => {
+        this.handleDrag(e);
       })
     );
 
     this.unsubscribeEvents.push(
-      this.interactable.onHoverExit(() => {
-        this.isHovering = false;
+      this.interactable.onDragEnd.add(() => {
+        this.isDragging = false;
         this.hideCursor();
-        // Optionally snap back to center (RGB)
-        // this.processUV(0.5, 0.5);
       })
     );
   }
 
-  private handleHover(e: InteractorEvent): void {
-    if (!e.interactor?.targetHitInfo?.hit?.position) return;
+  private handleDrag(e: DragInteractorEvent): void {
+    if (!e.interactor?.planecastPoint) return;
 
-    const worldPos = e.interactor.targetHitInfo.hit.position;
+    const worldPos = e.interactor.planecastPoint;
     const uv = this.worldToUV(worldPos);
 
     // Position cursor at hit
@@ -113,10 +124,12 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     const invertedWorld = this.planeTransform.getInvertedWorldTransform();
     const localPos = invertedWorld.multiplyPoint(worldPos);
 
-    // Unit plane: local coords -0.5 to 0.5, remap to 0-1
+    // Remap local coords to 0-1 UV
+    // uvOffset=0.5 for planes with local coords -0.5..0.5
+    // uvOffset=0 for planes with local coords 0..1
     return new vec2(
-      Math.max(0, Math.min(1, localPos.x + 0.5)),
-      Math.max(0, Math.min(1, localPos.y + 0.5))
+      Math.max(0, Math.min(1, localPos.x + this.uvOffset)),
+      Math.max(0, Math.min(1, localPos.y + this.uvOffset))
     );
   }
 
@@ -134,57 +147,65 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     }
   }
 
+  // 4 non-RGB presets evenly spaced at 90° intervals
+  // RGB is always the "from" space, we transition toward the nearest preset
+  // Angle 0 = right (+X), counter-clockwise
+  private readonly presetAngles: { angle: number; space: number; name: string }[] = [
+    { angle: 0,                name: "CIEXYZ",  space: 2 },  // right
+    { angle: Math.PI / 2,      name: "CIELAB",  space: 1 },  // top
+    { angle: Math.PI,          name: "CIELUV",  space: 4 },  // left
+    { angle: 3 * Math.PI / 2,  name: "Oklab",   space: 3 },  // bottom
+  ];
+
   private processUV(u: number, v: number): void {
-    // Remap from 0-1 to -1 to 1 (center = 0)
-    const x = (u - 0.5) * 2;  // -1 to 1
-    const y = (v - 0.5) * 2;  // -1 to 1
+    // Angular layout: 4 presets at corners (90° each)
+    // Center = RGB, move outward = transition from RGB to nearest preset
 
-    // Distance from center
-    const dist = Math.min(1, Math.sqrt(x * x + y * y));
+    const dx = u - 0.5;
+    const dy = v - 0.5;
+    const dist = Math.min(1, Math.sqrt(dx * dx + dy * dy) * 2);
 
-    // Angle from center
-    const angle = Math.atan2(y, x);
+    // Get angle from center (0 = right, counter-clockwise)
+    let angle = Math.atan2(dy, dx);
+    if (angle < 0) angle += 2 * Math.PI;  // Normalize to 0..2π
 
-    // Determine target space based on angle
-    let targetSpace = 0;
-    if (dist > this.deadZone) {
-      const deg = angle * 180 / Math.PI;
-      if (deg >= -45 && deg < 45) {
-        targetSpace = 2;  // CIEXYZ (right, +X)
-      } else if (deg >= 45 && deg < 135) {
-        targetSpace = 1;  // CIELAB (up, +Y)
-      } else if (deg >= 135 || deg < -135) {
-        targetSpace = 4;  // CIELUV (left, -X)
-      } else {
-        targetSpace = 3;  // Oklab (down, -Y)
+    // Find nearest preset by angle
+    let nearestPreset = this.presetAngles[0];
+    let minAngleDiff = Math.PI * 2;
+
+    for (const preset of this.presetAngles) {
+      let diff = Math.abs(angle - preset.angle);
+      if (diff > Math.PI) diff = 2 * Math.PI - diff;  // Handle wraparound
+      if (diff < minAngleDiff) {
+        minAngleDiff = diff;
+        nearestPreset = preset;
       }
     }
 
-    // Blend amount (0 at center/deadzone, 1 at edge)
+    // Blend based on distance from center
     let blend = 0;
     if (dist > this.deadZone) {
       blend = (dist - this.deadZone) / (1 - this.deadZone);
     }
 
-    this.updateColorSpace(targetSpace, blend);
+    // Always transition from RGB (0) to the nearest preset
+    this.updateColorSpaceSimple(nearestPreset.space, blend);
 
     // Debug
-    const names = ["RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"];
-    this.updateDebugText(`${names[targetSpace]} ${(blend * 100).toFixed(0)}%`);
+    const angleDeg = (angle * 180 / Math.PI).toFixed(0);
+    this.updateDebugText(`UV: ${u.toFixed(2)}, ${v.toFixed(2)} | ${angleDeg}° | RGB→${nearestPreset.name} ${(blend * 100).toFixed(0)}%`);
   }
 
-  private updateColorSpace(targetSpace: number, blend: number): void {
-    if (!this.cubeGeneratorApi) return;
-
-    if (targetSpace !== this.lastActiveSpace) {
-      if (this.cubeGeneratorApi.startTransition) {
-        this.cubeGeneratorApi.startTransition(targetSpace);
-      }
-      this.lastActiveSpace = targetSpace;
+  private updateColorSpaceSimple(targetSpace: number, blend: number): void {
+    // Update all target generators directly
+    if (this.rgbCubeGenerator) {
+      this.rgbCubeGenerator.setColorSpace(0, targetSpace, blend);
     }
-
-    if (this.cubeGeneratorApi.setBlend) {
-      this.cubeGeneratorApi.setBlend(blend);
+    if (this.pigmentMixGenerator) {
+      this.pigmentMixGenerator.setColorSpace(0, targetSpace, blend);
+    }
+    if (this.projectorGamutMesh) {
+      this.projectorGamutMesh.setColorSpace(0, targetSpace, blend);
     }
   }
 
@@ -205,8 +226,8 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     this.hideCursor();
   }
 
-  /** Check if currently hovering */
-  public getIsHovering(): boolean {
-    return this.isHovering;
+  /** Check if currently dragging */
+  public getIsDragging(): boolean {
+    return this.isDragging;
   }
 }
