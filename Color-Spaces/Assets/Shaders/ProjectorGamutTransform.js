@@ -15,7 +15,6 @@
 // 2 = CIEXYZ
 // 3 = Oklab
 // 4 = CIELUV
-// 5 = HSL
 
 input_float cubeSize;
 input_int colorSpaceFrom;
@@ -92,33 +91,6 @@ vec3 linearRgbToOklab(float r, float g, float b) {
     );
 }
 
-// RGB to HSL (sRGB input, not linear)
-vec3 rgbToHsl(float r, float g, float b) {
-    float maxC = max(max(r, g), b);
-    float minC = min(min(r, g), b);
-    float delta = maxC - minC;
-
-    float L = (maxC + minC) * 0.5;
-
-    float H = 0.0;
-    float S = 0.0;
-
-    if (delta > 0.0001) {
-        S = L > 0.5 ? delta / (2.0 - maxC - minC) : delta / (maxC + minC);
-
-        if (maxC == r) {
-            H = (g - b) / delta + (g < b ? 6.0 : 0.0);
-        } else if (maxC == g) {
-            H = (b - r) / delta + 2.0;
-        } else {
-            H = (r - g) / delta + 4.0;
-        }
-        H /= 6.0;
-    }
-
-    return vec3(H, S, L);
-}
-
 // RGB space position (base position, mesh is generated in this space)
 vec3 rgbSpacePosition(float r, float g, float b, float size) {
     return vec3((r - 0.5) * size, (b - 0.5) * size, (g - 0.5) * size);
@@ -129,20 +101,6 @@ vec3 colorSpacePosition(float r, float g, float b, int space, float size) {
     if (space == 0) {
         // RGB
         return rgbSpacePosition(r, g, b, size);
-    }
-
-    if (space == 5) {
-        // HSL - cylindrical, hue as angle around Y axis
-        // H: 0-1 -> angle, S: 0-1 -> radius, L: 0-1 -> height
-        vec3 hsl = rgbToHsl(r, g, b);
-        float angle = hsl.x * 2.0 * PI;
-        // Scale radius to match cube diagonal (sqrt(2)/2 ≈ 0.707)
-        float radius = hsl.y * size * 0.707;
-        return vec3(
-            cos(angle) * radius,
-            (hsl.z - 0.5) * size,
-            sin(angle) * radius
-        );
     }
 
     // These need linear RGB

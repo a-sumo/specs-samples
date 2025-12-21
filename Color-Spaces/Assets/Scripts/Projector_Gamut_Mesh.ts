@@ -31,7 +31,6 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
             new ComboBoxItem("CIEXYZ", 2),
             new ComboBoxItem("Oklab", 3),
             new ComboBoxItem("CIELUV", 4),
-            new ComboBoxItem("HSL", 5),
         ])
     )
     @hint("Source color space (blend = 0)")
@@ -45,7 +44,6 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
             new ComboBoxItem("CIEXYZ", 2),
             new ComboBoxItem("Oklab", 3),
             new ComboBoxItem("CIELUV", 4),
-            new ComboBoxItem("HSL", 5),
         ])
     )
     @hint("Target color space (blend = 1)")
@@ -105,7 +103,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     private static readonly NUM_PIGMENTS = 6;
     private static readonly COLOR_SPACE_NAMES = [
-        "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV", "HSL"
+        "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"
     ];
     private readonly D65 = { X: 0.95047, Y: 1.0, Z: 1.08883 };
 
@@ -512,7 +510,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     // PUBLIC API (use as event callbacks)
     // ============================================
 
-    private static readonly COLOR_SPACE_COUNT = 6;
+    private static readonly COLOR_SPACE_COUNT = 5;
 
     public setInputColors(colors: vec3[]): void {
         this.inputColors = colors.slice();

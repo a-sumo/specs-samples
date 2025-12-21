@@ -375,7 +375,7 @@ export class RGBCubeGenerator extends BaseScriptComponent {
     @input resolution: number = 8;
 
     private static readonly COLOR_SPACE_NAMES = [
-        "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV", "HSL"
+        "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"
     ];
     private static readonly COLOR_SPACE_COUNT = 6;
 
