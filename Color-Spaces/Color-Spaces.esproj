@@ -13,7 +13,7 @@ metaInfo:
     []
   tags:
     []
-  lensName: Color-Spaces
+  lensName: Color Spaces
   lensDescriptors:
     []
   lensApplicability:
@@ -22,7 +22,7 @@ metaInfo:
   lensClientCompatibilities:
     - Spectacles
   platformBundlesEnabled: false
-  iconHash: ""
+  iconHash: eb864d2063760351207d3ead7df8f818
   videoPreviewHash: ""
   fromTemplateName: Default
   fromTemplateUrl: Lens Studio 5.4.0.24110404

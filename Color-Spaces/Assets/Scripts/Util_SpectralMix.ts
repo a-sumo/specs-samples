@@ -1,4 +1,3 @@
-// Util_SpectralMix.ts
 // Utility for testing spectral/Kubelka-Munk color mixing
 
 @component

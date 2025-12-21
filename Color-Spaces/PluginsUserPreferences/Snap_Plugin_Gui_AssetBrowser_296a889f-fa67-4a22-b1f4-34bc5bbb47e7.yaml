@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 835
+    size: 831
     values:
       - Images
       - Images/lab_color(1).png
@@ -17,6 +17,7 @@ CollapsedEntities:
       - Images/test_encoding/pos_x.png
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
+      - Materials
       - Materials/Color Gradient Opacity 2.mat
       - Materials/Color Gradient Opacity.mat
       - Materials/Color Gradient Opacity.ss_graph
@@ -67,6 +68,7 @@ CollapsedEntities:
       - RoundedRectangle.ss_graph
       - Scene.scene
       - Scripts
+      - Scripts/ColorSpacePlaneController.ts
       - Scripts/Encoder_FullRGB.ts
       - Scripts/Encoder_PigmentMix.ts
       - Scripts/Encoder_RGBCube.ts
@@ -74,21 +76,15 @@ CollapsedEntities:
       - Scripts/Projector_Gamut.ts
       - Scripts/Projector_Gamut_Mesh.ts
       - Scripts/RGBCubeGenerator.ts
-      - Scripts/RGBCubeLattice.ts
       - Scripts/SphereController.ts
-      - Scripts/SphereControllerComponent.ts
-      - Scripts/SphereControllerTest.ts
       - Scripts/Util_SpectralMix.ts
       - Shaders
       - Shaders/ColorSpaceTransform.js
       - Shaders/ProjectorGamutTransform.js
-      - SpectaclesInteractionKit.lspkg
-      - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerEndAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerStartAudioTrack.wav
-      - SpectaclesInteractionKit.lspkg/Assets/Materials
       - SpectaclesInteractionKit.lspkg/Assets/Materials/BaseHandVisualsMaterials
       - SpectaclesInteractionKit.lspkg/Assets/Materials/BaseHandVisualsMaterials/FingerHighlightLeft.mat
       - SpectaclesInteractionKit.lspkg/Assets/Materials/BaseHandVisualsMaterials/FingerHighlightRight.mat
