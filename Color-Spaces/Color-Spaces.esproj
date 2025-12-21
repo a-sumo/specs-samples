@@ -13,9 +13,9 @@ metaInfo:
     []
   tags:
     []
-  lensName: Eyedropper
+  lensName: Color-Spaces
   lensDescriptors:
-    - EXPERIMENTAL_API
+    []
   lensApplicability:
     - Front
     - Back
