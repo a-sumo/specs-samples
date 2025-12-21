@@ -2320,7 +2320,6 @@
     _circleSegments: true
     _capSegments: true
     _showGridLines: true
-    _capStyle: true
     _colorSpaceFrom: true
   ScriptTypesDefault:
     {}
@@ -2335,7 +2334,7 @@
       material: !<reference.Material> 481978cb-17c4-4e38-9fd7-6f96ba27c621
       _showWireframe: false
       _showGridLines: true
-      _capStyle: !<float> 2.000000
+      _capStyle: !<float> 1.000000
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 3.000000
       _blend: !<float> 1.000000
