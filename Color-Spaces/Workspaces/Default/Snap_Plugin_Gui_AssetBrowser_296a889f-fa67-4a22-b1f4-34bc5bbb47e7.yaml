@@ -1,9 +1,11 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 831
+    size: 836
     values:
       - Images
+      - Images/color_spaces_plane.png
+      - Images/cursor_tex.png
       - Images/lab_color(1).png
       - Images/lab_x(1).png
       - Images/lab_y(1).png
@@ -17,7 +19,6 @@ CollapsedEntities:
       - Images/test_encoding/pos_x.png
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
-      - Materials
       - Materials/Color Gradient Opacity 2.mat
       - Materials/Color Gradient Opacity.mat
       - Materials/Color Gradient Opacity.ss_graph
@@ -27,6 +28,10 @@ CollapsedEntities:
       - Materials/ColorSpaceTransforms 2.ss_graph
       - Materials/ColorSpaceTransforms.mat
       - Materials/ColorSpaceTransforms.ss_graph
+      - Materials/Cursor.mat
+      - Materials/Cursor.ss_graph
+      - Materials/CursorPlane.mat
+      - Materials/CursorPlane.ss_graph
       - Materials/LabEncoder.mat
       - Materials/LabEncoder.ss_graph
       - Materials/Pigment Gamut Encoder Hi Res.mat

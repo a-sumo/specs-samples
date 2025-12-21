@@ -1,3 +1,4 @@
+
 /**
  * Generates an RGB cube visualization with vertical lines
  * that can be mapped to different color spaces
