@@ -59,6 +59,7 @@ export class RGBCubeGenerator extends BaseScriptComponent {
       new ComboBoxItem("CIEXYZ", 2),
       new ComboBoxItem("Oklab", 3),
       new ComboBoxItem("CIELUV", 4),
+      new ComboBoxItem("HSL", 5),
     ])
   )
   @hint("Source color space (blend = 0)")
@@ -72,6 +73,7 @@ export class RGBCubeGenerator extends BaseScriptComponent {
       new ComboBoxItem("CIEXYZ", 2),
       new ComboBoxItem("Oklab", 3),
       new ComboBoxItem("CIELUV", 4),
+      new ComboBoxItem("HSL", 5),
     ])
   )
   @hint("Target color space (blend = 1)")
@@ -81,8 +83,16 @@ export class RGBCubeGenerator extends BaseScriptComponent {
   @hint("Interpolation: 0 = from space, 1 = to space")
   private _blend: number = 0.0;
 
+  @input
+  @hint("Text component to display active color space name")
+  colorSpaceText: Text;
+
   private meshBuilder!: MeshBuilder;
   private meshVisual!: RenderMeshVisual;
+
+  private static readonly COLOR_SPACE_NAMES = [
+    "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV", "HSL"
+  ];
 
   private readonly D65 = { X: 0.95047, Y: 1.0, Z: 1.08883 };
 
@@ -593,7 +603,7 @@ export class RGBCubeGenerator extends BaseScriptComponent {
   // PUBLIC API (use as event callbacks)
   // ============================================
 
-  private static readonly COLOR_SPACE_COUNT = 5;
+  private static readonly COLOR_SPACE_COUNT = 6;
 
   /** Set both color spaces and blend */
   public setColorSpace(from: number, to: number, blend: number = 1.0): void {
@@ -687,6 +697,19 @@ export class RGBCubeGenerator extends BaseScriptComponent {
       pass.blend = this._blend;
       pass.cubeSize = this._cubeSize;
     }
+    this.updateColorSpaceText();
+  }
+
+  private updateColorSpaceText(): void {
+    if (this.colorSpaceText) {
+      const name = RGBCubeGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+      this.colorSpaceText.text = name;
+    }
+  }
+
+  /** Get current color space name */
+  public getColorSpaceName(): string {
+    return RGBCubeGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
   }
 
   get tubeRadius(): number { return this._tubeRadius; }

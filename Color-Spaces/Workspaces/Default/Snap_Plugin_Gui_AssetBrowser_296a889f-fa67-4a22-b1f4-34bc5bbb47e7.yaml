@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 831
+    size: 833
     values:
       - ""
       - ColorSpaceTransforms 2.mat
@@ -53,6 +53,8 @@ CollapsedEntities:
       - Prefabs/Simple Mix Test.prefab
       - Prefabs/Spectral Mix Test.prefab
       - Prefabs/Test Encoder Decoder.prefab
+      - ProjectorGamutTransform.mat
+      - ProjectorGamutTransform.ss_graph
       - Rendering
       - Rendering/Device Camera Texture.deviceCameraTexture
       - Rendering/Echopark.hdr

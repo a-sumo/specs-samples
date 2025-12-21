@@ -33,6 +33,7 @@
     _gamutSampleSteps: false
     _projectionBlend: false
     _sampleSize: false
+    colorSpaceText: false
     material: false
     maxColors: false
     pig0Color: false
@@ -57,6 +58,7 @@
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 0.000000
       _blend: !<float> 0.000000
+      colorSpaceText: !<reference.Text> 00000000-0000-0000-0000-000000000000
       _gamutSampleSteps: !<float> 20.000000
       pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
       pig1Color: !<Vec3> {x: 0.080000, y: 0.080000, z: 0.080000}
@@ -73,9 +75,10 @@
     - '// @input float _sampleSize = 1 {"hint":"Size of each sample cube"}'
     - '// @input float _projectionBlend = 1 {"hint":"Projection blend: 0 = original input position/color, 1 = fully projected"}'
     - '// @input Asset.Material material {"hint":"Material for projected color cubes"}'
-    - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
-    - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}, {"label":"HSL", "value":5}]}'
+    - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}, {"label":"HSL", "value":5}]}'
     - '// @input float _blend {"hint":"Interpolation: 0 = from space, 1 = to space"}'
+    - '// @input Component.Text colorSpaceText {"hint":"Text component to display active color space name"}'
     - '// @input float _gamutSampleSteps = 20 {"hint":"Resolution of pigment mix sampling for gamut LUT"}'
     - '// @input vec3 pig0Color = {1,1,1} {"hint":"Pigment 0: White", "widget":"color"}'
     - '// @input vec3 pig1Color = {0.08,0.08,0.08} {"hint":"Pigment 1: Black", "widget":"color"}'

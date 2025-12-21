@@ -31,6 +31,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
             new ComboBoxItem("CIEXYZ", 2),
             new ComboBoxItem("Oklab", 3),
             new ComboBoxItem("CIELUV", 4),
+            new ComboBoxItem("HSL", 5),
         ])
     )
     @hint("Source color space (blend = 0)")
@@ -44,6 +45,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
             new ComboBoxItem("CIEXYZ", 2),
             new ComboBoxItem("Oklab", 3),
             new ComboBoxItem("CIELUV", 4),
+            new ComboBoxItem("HSL", 5),
         ])
     )
     @hint("Target color space (blend = 1)")
@@ -52,6 +54,10 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     @input
     @hint("Interpolation: 0 = from space, 1 = to space")
     private _blend: number = 0.0;
+
+    @input
+    @hint("Text component to display active color space name")
+    colorSpaceText: Text;
 
     // ============ GAMUT SETTINGS ============
 
@@ -98,6 +104,9 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     // ============ PRIVATE STATE ============
 
     private static readonly NUM_PIGMENTS = 6;
+    private static readonly COLOR_SPACE_NAMES = [
+        "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV", "HSL"
+    ];
     private readonly D65 = { X: 0.95047, Y: 1.0, Z: 1.08883 };
 
     private meshBuilder!: MeshBuilder;
@@ -144,6 +153,19 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
             pass.projectionBlend = this._projectionBlend;
             pass.cubeSize = this._cubeSize;
         }
+        this.updateColorSpaceText();
+    }
+
+    private updateColorSpaceText(): void {
+        if (this.colorSpaceText) {
+            const name = Projector_Gamut_Mesh.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+            this.colorSpaceText.text = name;
+        }
+    }
+
+    /** Get current color space name */
+    public getColorSpaceName(): string {
+        return Projector_Gamut_Mesh.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
     }
 
     private initializePigments(): void {
@@ -490,7 +512,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     // PUBLIC API (use as event callbacks)
     // ============================================
 
-    private static readonly COLOR_SPACE_COUNT = 5;
+    private static readonly COLOR_SPACE_COUNT = 6;
 
     public setInputColors(colors: vec3[]): void {
         this.inputColors = colors.slice();
