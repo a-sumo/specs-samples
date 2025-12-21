@@ -7,7 +7,7 @@ A collection of self-contained sample projects for [Lens Studio](https://develop
 | | | |
 |:--:|:--|:--:|
 | <img src="assets/eyedropper/preview.png" width="60"> | **Eyedropper**<br>A color picker tool that samples colors from the real world.<br>[`Eyedropper/`](Eyedropper/) | <img src="assets/eyedropper/demo.gif" width="150"> |
-| <img src="assets/color-spaces/preview.png" width="60"> | **Color Spaces**<br>Interactive visualization of RGB, CIELAB, CIEXYZ, Oklab, and CIELUV color spaces with smooth morphing transitions.<br>[`Color-Spaces/`](Color-Spaces/) | <img src="assets/color-spaces/demo.gif" width="150"> |
+| <img src="assets/color-spaces/preview.png" width="60"> | **Color Spaces**<br>Interactive visualization of various Color Spaces. Also demonstrates procedural mesh manipulation in Lens Studio.<br>[`Color-Spaces/`](Color-Spaces/) | <img src="assets/color-spaces/demo.gif" width="150"> |
 
 ---
 
