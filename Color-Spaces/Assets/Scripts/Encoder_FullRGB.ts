@@ -1,4 +1,3 @@
-// Encoder_FullRGB.ts
 // Encodes the full sRGB color space as LAB positions + RGB colors
 // Use this to visualize the entire visible gamut
 

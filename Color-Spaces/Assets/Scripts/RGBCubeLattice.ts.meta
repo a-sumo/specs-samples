@@ -1,0 +1,62 @@
+- !<AssetImportMetadata/e16e8ab3-8bcd-444c-9d6d-6ac1044543da>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 98fa5d1e-bc9e-4bb9-995d-1a704e0558a7
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 98fa5d1e-bc9e-4bb9-995d-1a704e0558a7
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> c504b93a-452d-44bc-9748-c9c080f0c683
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/c504b93a-452d-44bc-9748-c9c080f0c683>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 8895a302-7664-45e5-8a2e-d4de55090e24
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _circleSegments: false
+    _cubeSize: false
+    _gridDensity: false
+    _lineSegments: false
+    _transitionDuration: false
+    _tubeRadius: false
+    material: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - _cubeSize: !<float> 100.000000
+      _gridDensity: !<float> 5.000000
+      _lineSegments: !<float> 16.000000
+      _tubeRadius: !<float> 1.000000
+      _circleSegments: !<float> 6.000000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      _transitionDuration: 0.500000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float _cubeSize = 100 {"hint":"Size of the cube in scene units"}'
+    - '// @input float _gridDensity = 5 {"hint":"Number of lines per axis"}'
+    - '// @input float _lineSegments = 16 {"hint":"Number of segments per line"}'
+    - '// @input float _tubeRadius = 1 {"hint":"Radius of each tube"}'
+    - '// @input float _circleSegments = 6 {"hint":"Segments around tube circumference"}'
+    - '// @input Asset.Material material {"hint":"Material to apply"}'
+    - '// @input float _transitionDuration = 0.5 {"hint":"Transition duration in seconds"}'

@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 824
+    size: 825
     values:
       - Images
       - Images/lab_color(1).png
@@ -18,8 +18,7 @@ CollapsedEntities:
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
       - Materials
-      - Materials/Color Gradient.mat
-      - Materials/Color Gradient.ss_graph
+      - Materials/Color Gradient Opacity.ss_graph
       - Materials/Gamut Projection.mat
       - Materials/Gamut Projection.ss_graph
       - Materials/LabEncoder.mat
@@ -65,9 +64,11 @@ CollapsedEntities:
       - Scripts/Encoder_FullRGB.ts
       - Scripts/Encoder_PigmentMix.ts
       - Scripts/Encoder_RGBCube.ts
+      - Scripts/PigmentMixGamutGenerator.ts
       - Scripts/Projector_Controller.ts
       - Scripts/Projector_Gamut.ts
       - Scripts/RGBCubeGenerator.ts
+      - Scripts/RGBCubeLattice.ts
       - Scripts/Util_SpectralMix.ts
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
@@ -396,6 +397,7 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Core/SyncInteractor/SyncInteractor.ts
       - SpectaclesInteractionKit.lspkg/Decorators
       - SpectaclesInteractionKit.lspkg/Decorators/Singleton.ts
+      - SpectaclesInteractionKit.lspkg/Prefabs
       - SpectaclesInteractionKit.lspkg/Prefabs/ScrollViewListItem.prefab
       - SpectaclesInteractionKit.lspkg/Prefabs/SpectaclesInteractionKit.prefab
       - SpectaclesInteractionKit.lspkg/Providers
@@ -665,7 +667,6 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/SIK Examples.prefab
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
-      - SpectaclesUIKit.lspkg
       - SpectaclesUIKit.lspkg/Audio
       - SpectaclesUIKit.lspkg/Audio/HoverAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/SliderProgressionAudioTrack.wav
