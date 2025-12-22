@@ -1,0 +1,68 @@
+- !<AssetImportMetadata/e52a671e-738f-4899-874b-901e92b72936>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> b2b60834-7739-4d15-acc1-31eaf9e0c2f8
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> b2b60834-7739-4d15-acc1-31eaf9e0c2f8
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> d18ec958-13e7-423d-b66a-e72d1758df68
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/d18ec958-13e7-423d-b66a-e72d1758df68>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 5545d602-1068-4ccb-8ab7-a2de90b1fffb
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _b: false
+    _blend: false
+    _colorSpaceFrom: false
+    _colorSpaceTo: false
+    _displaySize: false
+    _g: false
+    _markerSize: false
+    _r: false
+    material: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - _r: !<float> 1.000000
+      _g: !<float> 0.000000
+      _b: !<float> 0.000000
+      _displaySize: !<float> 100.000000
+      _markerSize: !<float> 5.000000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      _colorSpaceFrom: !<float> 0.000000
+      _colorSpaceTo: !<float> 0.000000
+      _blend: !<float> 0.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float _r = 1 {"hint":"Red channel (0-1)", "widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input float _g {"hint":"Green channel (0-1)", "widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input float _b {"hint":"Blue channel (0-1)", "widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input float _displaySize = 100 {"hint":"Size of the display volume (should match other generators)"}'
+    - '// @input float _markerSize = 5 {"hint":"Size of the marker cube", "widget":"slider", "min":1, "max":20, "step":0.5}'
+    - '// @input Asset.Material material {"hint":"Material (use same as RGBCubeGenerator with ColorSpaceTransform)"}'
+    - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _blend {"hint":"Color space blend: 0 = source, 1 = target", "widget":"slider", "min":0, "max":1, "step":0.01}'

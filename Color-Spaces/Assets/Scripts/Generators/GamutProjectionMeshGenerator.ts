@@ -83,6 +83,20 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     @hint("Text component to display active color space name")
     colorSpaceText: Text;
 
+    // ============ REST TRANSFORM ============
+
+    @input
+    @hint("Rest position (world space) - leave at 0,0,0 to use initial position")
+    restPosition: vec3 = new vec3(0, 0, 0);
+
+    @input
+    @hint("Rest rotation (euler degrees) - leave at 0,0,0 to use initial rotation")
+    restRotation: vec3 = new vec3(0, 0, 0);
+
+    @input
+    @hint("Capture current transform as rest position on awake")
+    useCurrentAsRest: boolean = true;
+
     // ============ GAMUT ============
 
     @input
@@ -163,7 +177,19 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     private blendTweenDuration: number = 0.5;
     private blendTweenElapsed: number = 0;
 
+    // Transform tween state
+    private isTransformTweening: boolean = false;
+    private transformTweenStartPos: vec3 = new vec3(0, 0, 0);
+    private transformTweenEndPos: vec3 = new vec3(0, 0, 0);
+    private transformTweenStartRot: quat = quat.quatIdentity();
+    private transformTweenEndRot: quat = quat.quatIdentity();
+    private transformTweenDuration: number = 0.5;
+    private transformTweenElapsed: number = 0;
+    private storedRestPosition: vec3 = new vec3(0, 0, 0);
+    private storedRestRotation: quat = quat.quatIdentity();
+
     onAwake(): void {
+        this.captureRestTransform();
         this.initializePigments();
         this.buildGamutLUT();
         this.setupMeshVisual();
@@ -182,6 +208,22 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
             ]);
             this.updateMaterialParams();
         });
+    }
+
+    private captureRestTransform(): void {
+        const transform = this.sceneObject.getTransform();
+        if (this.useCurrentAsRest) {
+            this.storedRestPosition = transform.getWorldPosition();
+            this.storedRestRotation = transform.getWorldRotation();
+        } else {
+            this.storedRestPosition = this.restPosition;
+            const rad = Math.PI / 180;
+            this.storedRestRotation = quat.fromEulerAngles(
+                this.restRotation.x * rad,
+                this.restRotation.y * rad,
+                this.restRotation.z * rad
+            );
+        }
     }
 
     private updateMaterialParams(): void {
@@ -901,7 +943,7 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     }
 
     private onUpdate(): void {
-        if (!this.isTweening && !this.isBlendTweening) return;
+        if (!this.isTweening && !this.isBlendTweening && !this.isTransformTweening) return;
 
         const dt = getDeltaTime();
         let needsUpdate = false;
@@ -938,6 +980,29 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
                 this._blend = this.blendTweenStart + (this.blendTweenEnd - this.blendTweenStart) * eased;
             }
             needsUpdate = true;
+        }
+
+        // Handle transform tween
+        if (this.isTransformTweening) {
+            this.transformTweenElapsed += dt;
+            const transform = this.sceneObject.getTransform();
+
+            if (this.transformTweenElapsed >= this.transformTweenDuration) {
+                transform.setWorldPosition(this.transformTweenEndPos);
+                transform.setWorldRotation(this.transformTweenEndRot);
+                this.isTransformTweening = false;
+            } else {
+                const t = this.transformTweenElapsed / this.transformTweenDuration;
+                const eased = t < 0.5
+                    ? 4 * t * t * t
+                    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                const pos = vec3.lerp(this.transformTweenStartPos, this.transformTweenEndPos, eased);
+                transform.setWorldPosition(pos);
+
+                const rot = quat.slerp(this.transformTweenStartRot, this.transformTweenEndRot, eased);
+                transform.setWorldRotation(rot);
+            }
         }
 
         if (needsUpdate) {
@@ -1055,5 +1120,71 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     public stopAllTweens(): void {
         this.isTweening = false;
         this.isBlendTweening = false;
+        this.isTransformTweening = false;
+    }
+
+    // ============================================
+    // TRANSFORM TWEEN API
+    // ============================================
+
+    /** Tween SceneObject to rest transform (position + rotation) */
+    public tweenToRestTransform(duration: number = 0.5): void {
+        this.ensureUpdateEvent();
+        const transform = this.sceneObject.getTransform();
+        this.transformTweenStartPos = transform.getWorldPosition();
+        this.transformTweenStartRot = transform.getWorldRotation();
+        this.transformTweenEndPos = this.storedRestPosition;
+        this.transformTweenEndRot = this.storedRestRotation;
+        this.transformTweenDuration = duration;
+        this.transformTweenElapsed = 0;
+        this.isTransformTweening = true;
+    }
+
+    /** Instantly snap SceneObject to rest transform */
+    public snapToRestTransform(): void {
+        const transform = this.sceneObject.getTransform();
+        transform.setWorldPosition(this.storedRestPosition);
+        transform.setWorldRotation(this.storedRestRotation);
+        this.isTransformTweening = false;
+    }
+
+    /** Tween SceneObject to a specific world position/rotation */
+    public tweenToTransform(position: vec3, rotation: quat, duration: number = 0.5): void {
+        this.ensureUpdateEvent();
+        const transform = this.sceneObject.getTransform();
+        this.transformTweenStartPos = transform.getWorldPosition();
+        this.transformTweenStartRot = transform.getWorldRotation();
+        this.transformTweenEndPos = position;
+        this.transformTweenEndRot = rotation;
+        this.transformTweenDuration = duration;
+        this.transformTweenElapsed = 0;
+        this.isTransformTweening = true;
+    }
+
+    /** Get stored rest position */
+    public getRestPosition(): vec3 {
+        return this.storedRestPosition;
+    }
+
+    /** Get stored rest rotation */
+    public getRestRotation(): quat {
+        return this.storedRestRotation;
+    }
+
+    /** Update rest transform to current position */
+    public setCurrentAsRest(): void {
+        const transform = this.sceneObject.getTransform();
+        this.storedRestPosition = transform.getWorldPosition();
+        this.storedRestRotation = transform.getWorldRotation();
+    }
+
+    /** Check if transform is currently tweening */
+    public getIsTransformTweening(): boolean {
+        return this.isTransformTweening;
+    }
+
+    /** Stop transform tween */
+    public stopTransformTween(): void {
+        this.isTransformTweening = false;
     }
 }

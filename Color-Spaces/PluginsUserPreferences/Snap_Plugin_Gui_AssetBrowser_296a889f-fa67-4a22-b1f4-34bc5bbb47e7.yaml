@@ -20,7 +20,6 @@ CollapsedEntities:
       - Images/test_encoding/pos_x.png
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
-      - Materials
       - Materials/Encoders
       - Materials/Encoders/Gamut Projection.mat
       - Materials/Encoders/Gamut Projection.ss_graph
@@ -32,7 +31,6 @@ CollapsedEntities:
       - Materials/Encoders/Pigment Gamut Encoder.ss_graph
       - Materials/Encoders/RGB Encoder.mat
       - Materials/Encoders/RGB Encoder.ss_graph
-      - Materials/MeshTransforms
       - Materials/MeshTransforms/ColorSpaceTransforms 2.mat
       - Materials/MeshTransforms/ColorSpaceTransforms 2.ss_graph
       - Materials/MeshTransforms/ColorSpaceTransforms.mat
@@ -44,7 +42,6 @@ CollapsedEntities:
       - Materials/Tests/Color Mix Test.ss_graph
       - Materials/Tests/TestEncoder.mat
       - Materials/Tests/TestEncoder.ss_graph
-      - Materials/UI
       - Materials/UI/Color Gradient Opacity 2.mat
       - Materials/UI/Color Gradient Opacity.mat
       - Materials/UI/Color Gradient Opacity.ss_graph
@@ -56,6 +53,8 @@ CollapsedEntities:
       - Materials/UI/CursorPlane.ss_graph
       - Materials/UI/Remap Texture With Palette Colors.mat
       - Materials/UI/Remap Texture With Palette Colors.ss_graph
+      - Materials/UI/SingleColorMarker.mat
+      - Materials/UI/SingleColorMarker.ss_graph
       - Materials/UI/Spectral Mix.mat
       - Materials/UI/Spectral Mix.ss_graph
       - Prefabs
@@ -94,6 +93,7 @@ CollapsedEntities:
       - Scripts/Generators/GamutProjectionMeshGenerator.ts
       - Scripts/Generators/PigmentGamutMeshGenerator.ts
       - Scripts/Generators/RGBCubeGenerator.ts
+      - Scripts/Generators/SingleColorMarker.ts
       - Scripts/Utils
       - Scripts/Utils/SpectralMixUtil.ts
       - Shaders
