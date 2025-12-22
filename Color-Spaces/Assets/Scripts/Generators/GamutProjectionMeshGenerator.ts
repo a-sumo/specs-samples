@@ -6,7 +6,7 @@
 @component
 export class GamutProjectionMeshGenerator extends BaseScriptComponent {
 
-    // ============ GEOMETRY SETTINGS ============
+    // ============ GEOMETRY ============
 
     @input
     @hint("Size of the display volume in scene units")
@@ -14,28 +14,37 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
 
     @input
     @hint("Size of each voxel cube")
+    @widget(new SliderWidget(0.1, 10, 0.1))
     private _voxelSize: number = 1.0;
 
+    // ============ PROJECTION LINES ============
+
     @input
-    @hint("Show projection lines connecting input to projected positions")
+    @hint("Show lines connecting input to projected positions")
     private _showLines: boolean = true;
 
     @input
     @hint("Radius of projection line tubes")
-    @widget(new SliderWidget(0.01, 5, 0.1))
-    private _lineRadius: number = 0.03;
+    private _lineRadius: number = 0.3;
 
     @input
-    @hint("Number of segments around tube circumference")
+    @hint("Tube segments (3-12)")
     private _tubeSegments: number = 6;
 
-    @input
-    @hint("Projection blend: 0 = original input position/color, 1 = fully projected")
-    private _projectionBlend: number = 1.0;
+    // ============ PROJECTION ============
 
     @input
-    @hint("Material for projected color cubes")
+    @hint("Projection blend: 0 = input, 1 = projected")
+    @widget(new SliderWidget(0, 1, 0.01))
+    private _projectionBlend: number = 1.0;
+
+    // ============ MATERIAL ============
+
+    @input
+    @hint("Material for voxels")
     material: Material;
+
+    // ============ COLOR SPACE ============
 
     @input
     @widget(
@@ -64,20 +73,28 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     private _colorSpaceTo: number = 0;
 
     @input
-    @hint("Interpolation: 0 = from space, 1 = to space")
+    @hint("Color space blend: 0 = source, 1 = target")
+    @widget(new SliderWidget(0, 1, 0.01))
     private _blend: number = 0.0;
+
+    // ============ UI ============
 
     @input
     @hint("Text component to display active color space name")
     colorSpaceText: Text;
 
-    // ============ GAMUT SETTINGS ============
+    // ============ GAMUT ============
 
     @input
     @hint("Resolution of pigment mix sampling for gamut LUT")
+    @widget(new SliderWidget(5, 30, 1))
     private _gamutSampleSteps: number = 20;
 
-    // ============ PIGMENT COLORS ============
+    @input
+    @hint("Maximum input colors to support")
+    maxColors: number = 64;
+
+    // ============ PIGMENTS ============
 
     @input
     @hint("Pigment 0: White")
@@ -109,10 +126,6 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     @widget(new ColorWidget())
     pig5Color: vec3 = new vec3(0, 0.47, 0.44);
 
-    @input
-    @hint("Maximum input colors to support")
-    maxColors: number = 64;
-
     // ============ PRIVATE STATE ============
 
     private static readonly NUM_PIGMENTS = 6;
@@ -134,6 +147,21 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     private projectedLAB: vec3[] = [];
     private colorCount: number = 0;
     private mesh: RenderMesh | null = null;
+
+    // Projection tween state
+    private isTweening: boolean = false;
+    private tweenStartValue: number = 0;
+    private tweenEndValue: number = 1;
+    private tweenDuration: number = 0.5; // seconds
+    private tweenElapsed: number = 0;
+    private updateEvent: SceneEvent | null = null;
+
+    // Color space tween state (separate from projection tween)
+    private isBlendTweening: boolean = false;
+    private blendTweenStart: number = 0;
+    private blendTweenEnd: number = 1;
+    private blendTweenDuration: number = 0.5;
+    private blendTweenElapsed: number = 0;
 
     onAwake(): void {
         this.initializePigments();
@@ -859,5 +887,173 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     /** Set voxel size (convenience method for syncing across generators) */
     public setVoxelSize(size: number): void {
         this.voxelSize = size;
+    }
+
+    // ============================================
+    // TWEEN API
+    // ============================================
+
+    private ensureUpdateEvent(): void {
+        if (!this.updateEvent) {
+            this.updateEvent = this.createEvent("UpdateEvent");
+            this.updateEvent.bind(() => this.onUpdate());
+        }
+    }
+
+    private onUpdate(): void {
+        if (!this.isTweening && !this.isBlendTweening) return;
+
+        const dt = getDeltaTime();
+        let needsUpdate = false;
+
+        // Handle projection blend tween
+        if (this.isTweening) {
+            this.tweenElapsed += dt;
+
+            if (this.tweenElapsed >= this.tweenDuration) {
+                this._projectionBlend = this.tweenEndValue;
+                this.isTweening = false;
+            } else {
+                const t = this.tweenElapsed / this.tweenDuration;
+                const eased = t < 0.5
+                    ? 4 * t * t * t
+                    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                this._projectionBlend = this.tweenStartValue + (this.tweenEndValue - this.tweenStartValue) * eased;
+            }
+            needsUpdate = true;
+        }
+
+        // Handle color space blend tween
+        if (this.isBlendTweening) {
+            this.blendTweenElapsed += dt;
+
+            if (this.blendTweenElapsed >= this.blendTweenDuration) {
+                this._blend = this.blendTweenEnd;
+                this.isBlendTweening = false;
+            } else {
+                const t = this.blendTweenElapsed / this.blendTweenDuration;
+                const eased = t < 0.5
+                    ? 4 * t * t * t
+                    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                this._blend = this.blendTweenStart + (this.blendTweenEnd - this.blendTweenStart) * eased;
+            }
+            needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+            this.updateMaterialParams();
+        }
+    }
+
+    /**
+     * Tween projection blend to a target value
+     * @param target Target value (0 = input, 1 = projected)
+     * @param duration Duration in seconds (default 0.5)
+     */
+    public tweenProjectionTo(target: number, duration: number = 0.5): void {
+        this.ensureUpdateEvent();
+        this.tweenStartValue = this._projectionBlend;
+        this.tweenEndValue = Math.max(0, Math.min(1, target));
+        this.tweenDuration = duration;
+        this.tweenElapsed = 0;
+        this.isTweening = true;
+    }
+
+    /** Tween to fully projected state (projectionBlend = 1) */
+    public tweenToProjected(duration: number = 0.5): void {
+        this.tweenProjectionTo(1, duration);
+    }
+
+    /** Tween to input state (projectionBlend = 0) */
+    public tweenToInput(duration: number = 0.5): void {
+        this.tweenProjectionTo(0, duration);
+    }
+
+    /** Toggle between input and projected states with tween */
+    public toggleProjection(duration: number = 0.5): void {
+        // If currently tweening, reverse direction
+        if (this.isTweening) {
+            const temp = this.tweenStartValue;
+            this.tweenStartValue = this.tweenEndValue;
+            this.tweenEndValue = temp;
+            this.tweenElapsed = this.tweenDuration - this.tweenElapsed;
+        } else {
+            // Start new tween to opposite state
+            const target = this._projectionBlend < 0.5 ? 1 : 0;
+            this.tweenProjectionTo(target, duration);
+        }
+    }
+
+    /** Check if currently projected (projectionBlend >= 0.5) */
+    public isProjected(): boolean {
+        return this._projectionBlend >= 0.5;
+    }
+
+    /** Check if currently tweening */
+    public getIsTweening(): boolean {
+        return this.isTweening;
+    }
+
+    /** Stop any active tween */
+    public stopTween(): void {
+        this.isTweening = false;
+    }
+
+    // ============================================
+    // COLOR SPACE TWEEN API
+    // ============================================
+
+    /**
+     * Tween color space blend to a target value
+     * @param target Target blend value (0 = from space, 1 = to space)
+     * @param duration Duration in seconds (default 0.5)
+     */
+    public tweenBlendTo(target: number, duration: number = 0.5): void {
+        this.ensureUpdateEvent();
+        this.blendTweenStart = this._blend;
+        this.blendTweenEnd = Math.max(0, Math.min(1, target));
+        this.blendTweenDuration = duration;
+        this.blendTweenElapsed = 0;
+        this.isBlendTweening = true;
+    }
+
+    /**
+     * Tween back to RGB (rest position)
+     * Sets colorSpaceFrom to current colorSpaceTo, colorSpaceTo to RGB (0), and tweens blend to 1
+     * @param duration Duration in seconds (default 0.5)
+     */
+    public tweenToRest(duration: number = 0.5): void {
+        this._colorSpaceFrom = this._colorSpaceTo;
+        this._colorSpaceTo = 0; // RGB
+        this.tweenBlendTo(1, duration);
+    }
+
+    /**
+     * Tween to a specific color space
+     * Sets colorSpaceFrom to current colorSpaceTo, colorSpaceTo to target, resets blend to 0, then tweens to 1
+     * @param space Target color space index (0=RGB, 1=CIELAB, 2=CIEXYZ, 3=Oklab, 4=CIELUV)
+     * @param duration Duration in seconds (default 0.5)
+     */
+    public tweenToColorSpace(space: number, duration: number = 0.5): void {
+        this._colorSpaceFrom = this._colorSpaceTo;
+        this._colorSpaceTo = space;
+        this._blend = 0;
+        this.tweenBlendTo(1, duration);
+    }
+
+    /** Check if currently tweening color space blend */
+    public getIsBlendTweening(): boolean {
+        return this.isBlendTweening;
+    }
+
+    /** Stop color space blend tween */
+    public stopBlendTween(): void {
+        this.isBlendTweening = false;
+    }
+
+    /** Stop all tweens (projection and color space) */
+    public stopAllTweens(): void {
+        this.isTweening = false;
+        this.isBlendTweening = false;
     }
 }

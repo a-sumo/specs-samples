@@ -86,7 +86,8 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
 
     if (this.cursor) {
       this.cursorTransform = this.cursor.getTransform();
-      this.hideCursor();
+      // Position cursor at center (RGB) initially
+      this.positionCursorAtColorSpace(0);
     }
 
     if (this.interactable) {
@@ -119,15 +120,11 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
         this.isDragging = false;
 
         // Snap on release: if blend > 0.5, snap to full; otherwise snap to RGB
+        // snapToColorSpace also positions the cursor at the destination
         if (this.snapOnRelease) {
-          if (this.currentBlend > 0.5) {
-            this.snapToColorSpace(this.currentTargetSpace);
-          } else {
-            this.snapToColorSpace(0); // RGB
-          }
+          const targetSpace = this.currentBlend > 0.5 ? this.currentTargetSpace : 0;
+          this.snapToColorSpace(targetSpace);
         }
-
-        this.hideCursor();
       })
     );
   }
@@ -168,10 +165,49 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     this.cursorTransform.setWorldRotation(this.planeTransform.getWorldRotation());
   }
 
-  private hideCursor(): void {
-    if (this.cursorTransform) {
-      this.cursorTransform.setWorldPosition(new vec3(0, 10000, 0));
+  /** Convert UV coordinates to world position on the plane */
+  private uvToWorld(u: number, v: number): vec3 {
+    if (!this.planeTransform) return new vec3(0, 0, 0);
+
+    // Convert UV (0-1) to local coords based on uvOffset
+    const localX = u - this.uvOffset;
+    const localY = v - this.uvOffset;
+    const localPos = new vec3(localX, localY, 0);
+
+    // Transform to world space
+    return this.planeTransform.getWorldTransform().multiplyPoint(localPos);
+  }
+
+  /** Get UV position for a color space (center for RGB, edge for others) */
+  private getColorSpaceUV(space: number): vec2 {
+    if (space === 0) {
+      // RGB is at center
+      return new vec2(0.5, 0.5);
     }
+
+    // Find the preset for this space
+    for (const preset of this.presetAngles) {
+      if (preset.space === space) {
+        // Position at edge in the direction of this preset's angle
+        const edgeDist = 0.45; // Near edge but not quite at boundary
+        const u = 0.5 + Math.cos(preset.angle) * edgeDist;
+        const v = 0.5 + Math.sin(preset.angle) * edgeDist;
+        return new vec2(u, v);
+      }
+    }
+
+    return new vec2(0.5, 0.5);
+  }
+
+  /** Position cursor at the location for a given color space */
+  private positionCursorAtColorSpace(space: number): void {
+    if (!this.cursorTransform || !this.planeTransform) return;
+
+    const uv = this.getColorSpaceUV(space);
+    const worldPos = this.uvToWorld(uv.x, uv.y);
+
+    this.cursorTransform.setWorldPosition(worldPos);
+    this.cursorTransform.setWorldRotation(this.planeTransform.getWorldRotation());
   }
 
   // 4 non-RGB presets evenly spaced at 90° intervals
@@ -267,8 +303,7 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
 
   /** Reset to center (RGB) */
   public reset(): void {
-    this.processUV(0.5, 0.5);
-    this.hideCursor();
+    this.snapToColorSpace(0); // Also positions cursor at center
   }
 
   /** Check if currently dragging */
@@ -292,6 +327,9 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     if (this.projectorGamutMesh) {
       this.projectorGamutMesh.setColorSpace(0, space, this.currentBlend);
     }
+
+    // Position cursor at the snapped color space
+    this.positionCursorAtColorSpace(space);
 
     const name = ColorSpacePlaneController.SPACE_NAMES[space] || "Unknown";
     this.updateDebugText(`Snapped to ${name}`);

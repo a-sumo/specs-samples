@@ -1,8 +1,9 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 846
+    size: 854
     values:
+      - ""
       - Images
       - Images/color_spaces_plane.png
       - Images/cursor_tex.png
@@ -21,6 +22,8 @@ CollapsedEntities:
       - Images/test_encoding/pos_z.png
       - Materials
       - Materials/Encoders
+      - Materials/Encoders/Gamut Projection.mat
+      - Materials/Encoders/Gamut Projection.ss_graph
       - Materials/Encoders/LabEncoder.mat
       - Materials/Encoders/LabEncoder.ss_graph
       - Materials/Encoders/Pigment Gamut Encoder Hi Res.mat
@@ -29,6 +32,7 @@ CollapsedEntities:
       - Materials/Encoders/Pigment Gamut Encoder.ss_graph
       - Materials/Encoders/RGB Encoder.mat
       - Materials/Encoders/RGB Encoder.ss_graph
+      - Materials/MeshTransforms
       - Materials/MeshTransforms/ColorSpaceTransforms 2.mat
       - Materials/MeshTransforms/ColorSpaceTransforms 2.ss_graph
       - Materials/MeshTransforms/ColorSpaceTransforms.mat
@@ -56,6 +60,7 @@ CollapsedEntities:
       - Materials/UI/Spectral Mix.ss_graph
       - Prefabs
       - Prefabs/Color Slot.prefab
+      - Prefabs/Gamut Projector Interactable.prefab
       - Prefabs/LAB Encoder Decoder.prefab
       - Prefabs/LAB Space Interactable.prefab
       - Prefabs/Pigment Gamut Encoder Decoder Hi Res.prefab
@@ -92,13 +97,17 @@ CollapsedEntities:
       - Scripts/Utils
       - Scripts/Utils/SpectralMixUtil.ts
       - Shaders
+      - Shaders/CartoonCursor.js
+      - Shaders/CartoonCursorSimple.js
       - Shaders/ColorSpaceTransform.js
       - Shaders/ProjectorGamutTransform.js
       - SpectaclesInteractionKit.lspkg
+      - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerEndAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerStartAudioTrack.wav
+      - SpectaclesInteractionKit.lspkg/Assets/Materials
       - SpectaclesInteractionKit.lspkg/Assets/Materials/BaseHandVisualsMaterials
       - SpectaclesInteractionKit.lspkg/Assets/Materials/BaseHandVisualsMaterials/FingerHighlightLeft.mat
       - SpectaclesInteractionKit.lspkg/Assets/Materials/BaseHandVisualsMaterials/FingerHighlightRight.mat
@@ -737,9 +746,7 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Meshes/DefaultSwitchKnob.mesh
       - SpectaclesUIKit.lspkg/Meshes/StretchableCircle.mesh
       - SpectaclesUIKit.lspkg/Meshes/Unit Plane.mesh
-      - SpectaclesUIKit.lspkg/Prefabs
       - SpectaclesUIKit.lspkg/Prefabs/DropShadow.prefab
-      - SpectaclesUIKit.lspkg/Prefabs/ExampleInterface.prefab
       - SpectaclesUIKit.lspkg/Prefabs/FrameButton.prefab
       - SpectaclesUIKit.lspkg/Prefabs/ImageButton.prefab
       - SpectaclesUIKit.lspkg/Prefabs/LabelledButton.prefab
@@ -843,6 +850,7 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/package_dependencies.json
       - VFX
       - VFX/Decode From Texture File.vfxgraph
+      - VFX/Gamut Projector Decoder.vfxgraph
       - VFX/LAB Decoder.vfxgraph
       - VFX/Pigment Gamut Decoder Hi Res.vfxgraph
       - VFX/Pigment Gamut Decoder.vfxgraph

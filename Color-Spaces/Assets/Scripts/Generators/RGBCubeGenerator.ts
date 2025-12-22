@@ -7,12 +7,16 @@
  */
 @component
 export class RGBCubeGenerator extends BaseScriptComponent {
+
+  // ============ GEOMETRY ============
+
   @input
   @hint("Size of the display volume in scene units")
   private _displaySize: number = 100.0;
 
   @input
-  @hint("Number of samples per axis (e.g., 8 = 8x8x8 = 512 voxels)")
+  @hint("Samples per axis (e.g., 8 = 8³ = 512 voxels)")
+  @widget(new SliderWidget(2, 16, 1))
   private _gridResolution: number = 8;
 
   @input
@@ -20,9 +24,13 @@ export class RGBCubeGenerator extends BaseScriptComponent {
   @widget(new SliderWidget(0.1, 10, 0.1))
   private _voxelSize: number = 3.0;
 
+  // ============ MATERIAL ============
+
   @input
-  @hint("Material to apply to all voxels")
+  @hint("Material for voxels")
   public material!: Material;
+
+  // ============ COLOR SPACE ============
 
   @input
   @widget(
@@ -51,8 +59,11 @@ export class RGBCubeGenerator extends BaseScriptComponent {
   private _colorSpaceTo: number = 0;
 
   @input
-  @hint("Interpolation: 0 = from space, 1 = to space")
+  @hint("Color space blend: 0 = source, 1 = target")
+  @widget(new SliderWidget(0, 1, 0.01))
   private _blend: number = 0.0;
+
+  // ============ UI ============
 
   @input
   @hint("Text component to display active color space name")
@@ -67,6 +78,14 @@ export class RGBCubeGenerator extends BaseScriptComponent {
 
   private readonly D65 = { X: 0.95047, Y: 1.0, Z: 1.08883 };
   private sampleData: { center: vec3; r: number; g: number; b: number }[] = [];
+
+  // Tween state
+  private isTweening: boolean = false;
+  private tweenStartValue: number = 0;
+  private tweenEndValue: number = 1;
+  private tweenDuration: number = 0.5;
+  private tweenElapsed: number = 0;
+  private updateEvent: SceneEvent | null = null;
 
   onAwake(): void {
     this.setupMeshVisual();
@@ -391,5 +410,69 @@ export class RGBCubeGenerator extends BaseScriptComponent {
   /** Set grid resolution (convenience method for syncing across generators) */
   public setGridResolution(res: number): void {
     this.gridResolution = res;
+  }
+
+  // ============================================
+  // TWEEN API
+  // ============================================
+
+  private ensureUpdateEvent(): void {
+    if (!this.updateEvent) {
+      this.updateEvent = this.createEvent("UpdateEvent");
+      this.updateEvent.bind(() => this.onUpdate());
+    }
+  }
+
+  private onUpdate(): void {
+    if (!this.isTweening) return;
+
+    const dt = getDeltaTime();
+    this.tweenElapsed += dt;
+
+    if (this.tweenElapsed >= this.tweenDuration) {
+      this._blend = this.tweenEndValue;
+      this.isTweening = false;
+    } else {
+      const t = this.tweenElapsed / this.tweenDuration;
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      this._blend = this.tweenStartValue + (this.tweenEndValue - this.tweenStartValue) * eased;
+    }
+
+    this.updateMaterialParams();
+  }
+
+  /** Tween color space blend to a target value */
+  public tweenBlendTo(target: number, duration: number = 0.5): void {
+    this.ensureUpdateEvent();
+    this.tweenStartValue = this._blend;
+    this.tweenEndValue = Math.max(0, Math.min(1, target));
+    this.tweenDuration = duration;
+    this.tweenElapsed = 0;
+    this.isTweening = true;
+  }
+
+  /** Tween to rest position (RGB space, blend = 0) */
+  public tweenToRest(duration: number = 0.5): void {
+    this._colorSpaceFrom = this._colorSpaceTo;
+    this._colorSpaceTo = 0; // RGB
+    this.tweenBlendTo(1, duration);
+  }
+
+  /** Tween to a specific color space */
+  public tweenToColorSpace(space: number, duration: number = 0.5): void {
+    this._colorSpaceFrom = this._colorSpaceTo;
+    this._colorSpaceTo = space;
+    this._blend = 0;
+    this.tweenBlendTo(1, duration);
+  }
+
+  /** Check if currently tweening */
+  public getIsTweening(): boolean {
+    return this.isTweening;
+  }
+
+  /** Stop any active tween */
+  public stopTween(): void {
+    this.isTweening = false;
   }
 }
