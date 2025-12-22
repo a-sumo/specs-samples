@@ -32,7 +32,6 @@
     - !<own> 8b624250-8d50-4432-70c0-f4e7a3b5d105
     - !<own> 8a2eb00d-051a-48cc-4734-8340756f2c59
     - !<own> a24e633c-4abc-4c56-6d55-b57aeaecd670
-    - !<own> 7f604688-2390-488e-4a2e-e9a062184c6a
 - !<SceneObject/4c1fb752-4bff-4519-4da9-4f9636cd7a50>
   PrefabRemaps:
     []
@@ -53,32 +52,6 @@
     PackagePath: ""
     objects:
       - !<own> 299a164d-306c-4e50-485d-52526df6f6d9
-- !<ScriptComponent/7f604688-2390-488e-4a2e-e9a062184c6a>
-  PrefabRemaps:
-    []
-  Name: InteractableAudioFeedback
-  Enabled: true
-  ScriptAsset: !<reference> 1ad7da86-2c32-418c-bdf1-b7150c07c912
-  ScriptInputsDefault:
-    _playAudioOnHover: true
-    _hoverAudioTrack: true
-    _playAudioOnTriggerStart: true
-    _triggerStartAudioTrack: true
-    _playAudioOnTriggerEnd: true
-    _triggerEndAudioTrack: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      _playAudioOnHover: false
-      _hoverAudioTrack: !<reference.AudioTrackAsset> 97bf97ae-b2da-47d7-bde6-003f597fe888
-      _playAudioOnTriggerStart: true
-      _triggerStartAudioTrack: !<reference.AudioTrackAsset> edad7d53-55da-40b1-9025-fad0e7207862
-      _playAudioOnTriggerEnd: true
-      _triggerEndAudioTrack: !<reference.AudioTrackAsset> 82028831-1631-4d7b-b548-ff6be4e0a2ba
-  ScriptTypes:
-    "":
-      {}
 - !<ColliderComponent/8a2eb00d-051a-48cc-4734-8340756f2c59>
   PrefabRemaps:
     []
@@ -102,7 +75,7 @@
     []
   Name: Interactable
   Enabled: true
-  ScriptAsset: !<reference> 652e631a-22d0-4941-9f74-2943df59f34c
+  ScriptAsset: !<reference> fcc21a0e-721c-42bc-9832-96a0cd57227b
   ScriptInputsDefault:
     targetingMode: true
     targetingVisual: true
@@ -140,7 +113,7 @@
     []
   Name: InteractableManipulation
   Enabled: true
-  ScriptAsset: !<reference> 664b556b-1946-4c2c-866a-e675b4e86006
+  ScriptAsset: !<reference> b25767f5-b46f-44f0-a00f-3d0e67726ff1
   ScriptInputsDefault:
     manipulateRootSceneObject: true
     minimumScaleFactor: true
@@ -213,16 +186,14 @@
   Enabled: true
   ScriptAsset: !<reference> 7100dc9a-700e-49d8-8a1b-d3040a8fb5a5
   ScriptInputsDefault:
-    projectionMaterial: true
-    vfxComponent: true
     maxColors: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       encoder: !<reference.ScriptComponent> 7a878e16-7e28-490b-844e-a6c28260c933
-      projectionMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
-      vfxComponent: !<reference.VFXComponent> 00000000-0000-0000-0000-000000000000
+      projectionMaterial: !<reference.Material> 42decfe2-1dc6-4f65-8c66-2ffe83e2b25e
+      vfxComponent: !<reference.VFXComponent> a736cfb1-456e-408f-7f68-26e2dc0d0e15
       maxColors: !<float> 64.000000
       paletteController: !<reference.ScriptComponent> 734aea69-f183-4638-868d-fb871edfd11a
   ScriptTypes:

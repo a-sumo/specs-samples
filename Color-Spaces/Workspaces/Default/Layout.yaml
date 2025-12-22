@@ -18,7 +18,7 @@ dock:
               - persistentName: Snap.Plugin.Gui.AssetBrowser
                 Uuid: 296a889f-fa67-4a22-b1f4-34bc5bbb47e7
             type: section
-            current: 0
+            current: 1
         sizes:
           - 483
           - 285

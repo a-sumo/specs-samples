@@ -4,22 +4,24 @@ CollapsedEntities:
     size: 854
     values:
       - ""
-      - Images
+      - Images/Testing
+      - Images/Testing/LAB
+      - Images/Testing/LAB/lab_color.png
+      - Images/Testing/LAB/lab_x.png
+      - Images/Testing/LAB/lab_y.png
+      - Images/Testing/LAB/lab_z.png
+      - Images/Testing/RGB
+      - Images/Testing/RGB/rgb_color.png
+      - Images/Testing/RGB/rgb_x.png
+      - Images/Testing/RGB/rgb_y.png
+      - Images/Testing/RGB/rgb_z.png
+      - Images/Testing/minimal
+      - Images/Testing/minimal/color.png
+      - Images/Testing/minimal/pos_x.png
+      - Images/Testing/minimal/pos_y.png
+      - Images/Testing/minimal/pos_z.png
       - Images/color_spaces_plane.png
-      - Images/cursor_tex.png
-      - Images/lab_color(1).png
-      - Images/lab_x(1).png
-      - Images/lab_y(1).png
-      - Images/lab_z(1).png
-      - Images/rgb_color.png
-      - Images/rgb_x.png
-      - Images/rgb_y.png
-      - Images/rgb_z.png
-      - Images/test_encoding
-      - Images/test_encoding/color.png
-      - Images/test_encoding/pos_x.png
-      - Images/test_encoding/pos_y.png
-      - Images/test_encoding/pos_z.png
+      - Materials
       - Materials/Encoders
       - Materials/Encoders/Gamut Projection.mat
       - Materials/Encoders/Gamut Projection.ss_graph
@@ -76,8 +78,6 @@ CollapsedEntities:
       - Rendering/Echopark.hdr/Specular
       - Rendering/Render Target.renderTarget
       - Rendering/Screen Crop Texture.screenCropTexture
-      - RoundedRectangle.mat
-      - RoundedRectangle.ss_graph
       - Scene.scene
       - Scripts
       - Scripts/Controllers
