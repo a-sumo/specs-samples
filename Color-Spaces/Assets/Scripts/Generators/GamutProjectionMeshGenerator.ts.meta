@@ -66,33 +66,33 @@
       _blend: !<float> 0.000000
       colorSpaceText: !<reference.Text> 00000000-0000-0000-0000-000000000000
       _gamutSampleSteps: !<float> 20.000000
+      maxColors: !<float> 64.000000
       pig0Color: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
       pig1Color: !<Vec3> {x: 0.080000, y: 0.080000, z: 0.080000}
       pig2Color: !<Vec3> {x: 1.000000, y: 0.920000, z: 0.000000}
       pig3Color: !<Vec3> {x: 0.890000, y: 0.000000, z: 0.130000}
       pig4Color: !<Vec3> {x: 0.100000, y: 0.100000, z: 0.700000}
       pig5Color: !<Vec3> {x: 0.000000, y: 0.470000, z: 0.440000}
-      maxColors: !<float> 64.000000
   ScriptTypes:
     -
       {}
   InputLines:
     - '// @input float _displaySize = 100 {"hint":"Size of the display volume in scene units"}'
-    - '// @input float _voxelSize = 1 {"hint":"Size of each voxel cube"}'
-    - '// @input bool _showLines = true {"hint":"Show projection lines connecting input to projected positions"}'
-    - '// @input float _lineRadius = 0.03 {"hint":"Radius of projection line tubes", "widget":"slider", "min":0.01, "max":5, "step":0.1}'
-    - '// @input float _tubeSegments = 6 {"hint":"Number of segments around tube circumference"}'
-    - '// @input float _projectionBlend = 1 {"hint":"Projection blend: 0 = original input position/color, 1 = fully projected"}'
-    - '// @input Asset.Material material {"hint":"Material for projected color cubes"}'
+    - '// @input float _voxelSize = 1 {"hint":"Size of each voxel cube", "widget":"slider", "min":0.1, "max":10, "step":0.1}'
+    - '// @input bool _showLines = true {"hint":"Show lines connecting input to projected positions"}'
+    - '// @input float _lineRadius = 0.3 {"hint":"Radius of projection line tubes"}'
+    - '// @input float _tubeSegments = 6 {"hint":"Tube segments (3-12)"}'
+    - '// @input float _projectionBlend = 1 {"hint":"Projection blend: 0 = input, 1 = projected", "widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input Asset.Material material {"hint":"Material for voxels"}'
     - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
     - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
-    - '// @input float _blend {"hint":"Interpolation: 0 = from space, 1 = to space"}'
+    - '// @input float _blend {"hint":"Color space blend: 0 = source, 1 = target", "widget":"slider", "min":0, "max":1, "step":0.01}'
     - '// @input Component.Text colorSpaceText {"hint":"Text component to display active color space name"}'
-    - '// @input float _gamutSampleSteps = 20 {"hint":"Resolution of pigment mix sampling for gamut LUT"}'
+    - '// @input float _gamutSampleSteps = 20 {"hint":"Resolution of pigment mix sampling for gamut LUT", "widget":"slider", "min":5, "max":30, "step":1}'
+    - '// @input float maxColors = 64 {"hint":"Maximum input colors to support"}'
     - '// @input vec3 pig0Color = {1,1,1} {"hint":"Pigment 0: White", "widget":"color"}'
     - '// @input vec3 pig1Color = {0.08,0.08,0.08} {"hint":"Pigment 1: Black", "widget":"color"}'
     - '// @input vec3 pig2Color = {1,0.92,0} {"hint":"Pigment 2: Yellow", "widget":"color"}'
     - '// @input vec3 pig3Color = {0.89,0,0.13} {"hint":"Pigment 3: Red", "widget":"color"}'
     - '// @input vec3 pig4Color = {0.1,0.1,0.7} {"hint":"Pigment 4: Blue", "widget":"color"}'
     - '// @input vec3 pig5Color = {0,0.47,0.44} {"hint":"Pigment 5: Green", "widget":"color"}'
-    - '// @input float maxColors = 64 {"hint":"Maximum input colors to support"}'

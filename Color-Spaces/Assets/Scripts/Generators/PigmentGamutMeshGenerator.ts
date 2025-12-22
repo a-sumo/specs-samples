@@ -8,23 +8,29 @@
 @component
 export class PigmentGamutMeshGenerator extends BaseScriptComponent {
 
-  // ============ GEOMETRY SETTINGS ============
+  // ============ GEOMETRY ============
 
   @input
   @hint("Size of the display volume in scene units")
   private _displaySize: number = 100.0;
 
   @input
-  @hint("Number of samples per axis (e.g., 10 = 10x10x10 grid)")
+  @hint("Samples per axis (e.g., 10 = 10³ grid)")
+  @widget(new SliderWidget(2, 20, 1))
   private _gridResolution: number = 10;
 
   @input
   @hint("Size of each voxel cube")
+  @widget(new SliderWidget(0.1, 10, 0.1))
   private _voxelSize: number = 2.0;
 
+  // ============ MATERIAL ============
+
   @input
-  @hint("Material for sample cubes")
+  @hint("Material for voxels")
   public material!: Material;
+
+  // ============ COLOR SPACE ============
 
   @input
   @widget(
@@ -53,24 +59,29 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   private _colorSpaceTo: number = 0;
 
   @input
-  @hint("Interpolation: 0 = from space, 1 = to space")
+  @hint("Color space blend: 0 = source, 1 = target")
+  @widget(new SliderWidget(0, 1, 0.01))
   private _blend: number = 0.0;
+
+  // ============ UI ============
 
   @input
   @hint("Text component to display active color space name")
   colorSpaceText: Text;
 
-  // ============ GAMUT SETTINGS ============
+  // ============ GAMUT ============
 
   @input
-  @hint("Tolerance for matching RGB to achievable gamut (0-1)")
+  @hint("Tolerance for matching RGB to achievable gamut")
+  @widget(new SliderWidget(0.01, 0.2, 0.01))
   private _gamutTolerance: number = 0.05;
 
   @input
   @hint("Resolution of pigment mix sampling for gamut LUT")
+  @widget(new SliderWidget(5, 30, 1))
   private _gamutSampleSteps: number = 20;
 
-  // ============ PIGMENT COLORS ============
+  // ============ PIGMENTS ============
 
   @input
   @hint("Pigment 0: White")
@@ -116,6 +127,14 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   private currentPigments: vec3[] = [];
   private gamutLUT: vec3[] = [];
   private sampleData: { center: vec3; r: number; g: number; b: number }[] = [];
+
+  // Tween state
+  private isTweening: boolean = false;
+  private tweenStartValue: number = 0;
+  private tweenEndValue: number = 1;
+  private tweenDuration: number = 0.5;
+  private tweenElapsed: number = 0;
+  private updateEvent: SceneEvent | null = null;
 
   // Precomputed achievability grid for fast lookups
   private static readonly ACHIEV_GRID_RES = 32; // Resolution of precomputed grid
@@ -605,5 +624,69 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   /** Set grid resolution (convenience method for syncing across generators) */
   public setGridResolution(res: number): void {
     this.gridResolution = res;
+  }
+
+  // ============================================
+  // TWEEN API
+  // ============================================
+
+  private ensureUpdateEvent(): void {
+    if (!this.updateEvent) {
+      this.updateEvent = this.createEvent("UpdateEvent");
+      this.updateEvent.bind(() => this.onUpdate());
+    }
+  }
+
+  private onUpdate(): void {
+    if (!this.isTweening) return;
+
+    const dt = getDeltaTime();
+    this.tweenElapsed += dt;
+
+    if (this.tweenElapsed >= this.tweenDuration) {
+      this._blend = this.tweenEndValue;
+      this.isTweening = false;
+    } else {
+      const t = this.tweenElapsed / this.tweenDuration;
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      this._blend = this.tweenStartValue + (this.tweenEndValue - this.tweenStartValue) * eased;
+    }
+
+    this.updateMaterialParams();
+  }
+
+  /** Tween color space blend to a target value */
+  public tweenBlendTo(target: number, duration: number = 0.5): void {
+    this.ensureUpdateEvent();
+    this.tweenStartValue = this._blend;
+    this.tweenEndValue = Math.max(0, Math.min(1, target));
+    this.tweenDuration = duration;
+    this.tweenElapsed = 0;
+    this.isTweening = true;
+  }
+
+  /** Tween to rest position (RGB space, blend = 0) */
+  public tweenToRest(duration: number = 0.5): void {
+    this._colorSpaceFrom = this._colorSpaceTo;
+    this._colorSpaceTo = 0; // RGB
+    this.tweenBlendTo(1, duration);
+  }
+
+  /** Tween to a specific color space */
+  public tweenToColorSpace(space: number, duration: number = 0.5): void {
+    this._colorSpaceFrom = this._colorSpaceTo;
+    this._colorSpaceTo = space;
+    this._blend = 0;
+    this.tweenBlendTo(1, duration);
+  }
+
+  /** Check if currently tweening */
+  public getIsTweening(): boolean {
+    return this.isTweening;
+  }
+
+  /** Stop any active tween */
+  public stopTween(): void {
+    this.isTweening = false;
   }
 }
