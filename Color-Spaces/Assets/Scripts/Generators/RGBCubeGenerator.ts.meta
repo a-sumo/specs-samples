@@ -1,0 +1,65 @@
+- !<AssetImportMetadata/a1eaa09a-7342-4ad2-a632-8b34ad01b352>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 91ba6ad5-f382-4591-8224-ab513cb93428
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 91ba6ad5-f382-4591-8224-ab513cb93428
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> d4466db2-60ce-4a22-bcf1-035e7f5583a4
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/d4466db2-60ce-4a22-bcf1-035e7f5583a4>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 98809633-709a-4bb0-9d32-75facce0070f
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _blend: false
+    _colorSpaceFrom: false
+    _colorSpaceTo: false
+    _displaySize: false
+    _gridResolution: false
+    _voxelSize: false
+    colorSpaceText: false
+    material: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - _displaySize: !<float> 100.000000
+      _gridResolution: !<float> 8.000000
+      _voxelSize: !<float> 3.000000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      _colorSpaceFrom: !<float> 0.000000
+      _colorSpaceTo: !<float> 0.000000
+      _blend: !<float> 0.000000
+      colorSpaceText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float _displaySize = 100 {"hint":"Size of the display volume in scene units"}'
+    - '// @input float _gridResolution = 8 {"hint":"Number of samples per axis (e.g., 8 = 8x8x8 = 512 voxels)"}'
+    - '// @input float _voxelSize = 3 {"hint":"Size of each voxel cube", "widget":"slider", "min":0.1, "max":10, "step":0.1}'
+    - '// @input Asset.Material material {"hint":"Material to apply to all voxels"}'
+    - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
+    - '// @input float _blend {"hint":"Interpolation: 0 = from space, 1 = to space"}'
+    - '// @input Component.Text colorSpaceText {"hint":"Text component to display active color space name"}'

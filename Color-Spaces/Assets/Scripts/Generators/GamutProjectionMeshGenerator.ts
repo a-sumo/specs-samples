@@ -1,20 +1,33 @@
-// Projector_Gamut_Mesh.ts
+// GamutProjectionMeshGenerator.ts
 // Mesh-based gamut projection - finds nearest achievable pigment mix for each input color
 // Creates cube meshes at projected positions in the chosen color space
 
 
 @component
-export class Projector_Gamut_Mesh extends BaseScriptComponent {
+export class GamutProjectionMeshGenerator extends BaseScriptComponent {
 
     // ============ GEOMETRY SETTINGS ============
 
     @input
-    @hint("Size of the display space in scene units")
-    private _cubeSize: number = 100.0;
+    @hint("Size of the display volume in scene units")
+    private _displaySize: number = 100.0;
 
     @input
-    @hint("Size of each sample cube")
-    private _sampleSize: number = 1.0;
+    @hint("Size of each voxel cube")
+    private _voxelSize: number = 1.0;
+
+    @input
+    @hint("Show projection lines connecting input to projected positions")
+    private _showLines: boolean = true;
+
+    @input
+    @hint("Radius of projection line tubes")
+    @widget(new SliderWidget(0.01, 5, 0.1))
+    private _lineRadius: number = 0.03;
+
+    @input
+    @hint("Number of segments around tube circumference")
+    private _tubeSegments: number = 6;
 
     @input
     @hint("Projection blend: 0 = original input position/color, 1 = fully projected")
@@ -150,21 +163,21 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
             pass.colorSpaceTo = this._colorSpaceTo;
             pass.blend = this._blend;
             pass.projectionBlend = this._projectionBlend;
-            pass.cubeSize = this._cubeSize;
+            pass.cubeSize = this._displaySize;
         }
         this.updateColorSpaceText();
     }
 
     private updateColorSpaceText(): void {
         if (this.colorSpaceText) {
-            const name = Projector_Gamut_Mesh.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+            const name = GamutProjectionMeshGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
             this.colorSpaceText.text = name;
         }
     }
 
     /** Get current color space name */
     public getColorSpaceName(): string {
-        return Projector_Gamut_Mesh.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+        return GamutProjectionMeshGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
     }
 
     private initializePigments(): void {
@@ -245,7 +258,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     private buildGamutLUT(): void {
         this.gamutLUT = [];
         const steps = this._gamutSampleSteps;
-        const n = Projector_Gamut_Mesh.NUM_PIGMENTS;
+        const n = GamutProjectionMeshGenerator.NUM_PIGMENTS;
 
         // Pure pigments
         for (let i = 0; i < n; i++) {
@@ -361,7 +374,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     // Always generate in RGB space - shader handles color space transformation
     private rgbToDisplayPosition(r: number, g: number, b: number): vec3 {
-        const size = this._cubeSize;
+        const size = this._displaySize;
         return new vec3(
             (r - 0.5) * size,
             (b - 0.5) * size,
@@ -427,22 +440,32 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         this.meshBuilder.topology = MeshTopology.Triangles;
         this.meshBuilder.indexType = MeshIndexType.UInt16;
 
-        const size = this._sampleSize;
-
         // Generate cubes in RGB space using INPUT colors (shader handles transformation)
         for (let i = 0; i < this.projectedColors.length; i++) {
             const inputRGB = this.inputColors[i];
             const projectedRGB = this.projectedColors[i];
 
             // Position in RGB space based on input color
-            const pos = this.rgbToDisplayPosition(inputRGB.x, inputRGB.y, inputRGB.z);
+            const inputPos = this.rgbToDisplayPosition(inputRGB.x, inputRGB.y, inputRGB.z);
 
             this.generateCube(
-                pos.x, pos.y, pos.z,
+                inputPos.x, inputPos.y, inputPos.z,
                 inputRGB.x, inputRGB.y, inputRGB.z,
                 projectedRGB.x, projectedRGB.y, projectedRGB.z,
-                size
+                this._voxelSize
             );
+
+            // Generate tube connecting input to projected position
+            if (this._showLines) {
+                const projectedPos = this.rgbToDisplayPosition(projectedRGB.x, projectedRGB.y, projectedRGB.z);
+                this.generateTube(
+                    inputPos, projectedPos,
+                    inputRGB.x, inputRGB.y, inputRGB.z,
+                    projectedRGB.x, projectedRGB.y, projectedRGB.z,
+                    this._lineRadius,
+                    this._tubeSegments
+                );
+            }
         }
 
         if (this.meshBuilder.isValid()) {
@@ -507,6 +530,112 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
         }
     }
 
+    /**
+     * Generate a tube connecting two positions
+     * Input end: vertices stay at input position (prRGB = inRGB)
+     * Projected end: vertices stay at projected position (inRGB = prRGB)
+     */
+    private generateTube(
+        startPos: vec3, endPos: vec3,
+        inR: number, inG: number, inB: number,
+        prR: number, prG: number, prB: number,
+        radius: number,
+        segments: number
+    ): void {
+        // Direction from start to end
+        const dir = new vec3(
+            endPos.x - startPos.x,
+            endPos.y - startPos.y,
+            endPos.z - startPos.z
+        );
+        const length = Math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
+        if (length < 0.001) return; // Skip if too short
+
+        // Normalize direction
+        const dirN = new vec3(dir.x / length, dir.y / length, dir.z / length);
+
+        // Find perpendicular vectors for tube cross-section
+        let perpA: vec3;
+        if (Math.abs(dirN.y) < 0.9) {
+            // Cross with up vector
+            perpA = new vec3(
+                dirN.z * 0 - dirN.y * 0,
+                dirN.x * 0 - dirN.z * 1,
+                dirN.y * 1 - dirN.x * 0
+            );
+        } else {
+            // Cross with right vector
+            perpA = new vec3(
+                dirN.z * 0 - dirN.y * 0,
+                dirN.x * 0 - dirN.z * 0,
+                dirN.y * 0 - dirN.x * 1
+            );
+        }
+        // Normalize perpA
+        const lenA = Math.sqrt(perpA.x * perpA.x + perpA.y * perpA.y + perpA.z * perpA.z);
+        perpA = new vec3(perpA.x / lenA, perpA.y / lenA, perpA.z / lenA);
+
+        // perpB = dir x perpA
+        const perpB = new vec3(
+            dirN.y * perpA.z - dirN.z * perpA.y,
+            dirN.z * perpA.x - dirN.x * perpA.z,
+            dirN.x * perpA.y - dirN.y * perpA.x
+        );
+
+        const startIndex = this.meshBuilder.getVerticesCount();
+        const TWO_PI = Math.PI * 2;
+
+        // Generate vertices for both rings
+        for (let ring = 0; ring < 2; ring++) {
+            const center = ring === 0 ? startPos : endPos;
+            // Input end: prRGB = inRGB (stays at input position)
+            // Projected end: inRGB = prRGB (stays at projected position)
+            const uvInR = ring === 0 ? inR : prR;
+            const uvInG = ring === 0 ? inG : prG;
+            const uvInB = ring === 0 ? inB : prB;
+            const uvPrR = ring === 0 ? inR : prR;  // Same as input for ring 0
+            const uvPrG = ring === 0 ? inG : prG;
+            const uvPrB = ring === 0 ? inB : prB;
+
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * TWO_PI;
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+
+                // Normal points outward from tube center
+                const nx = perpA.x * cos + perpB.x * sin;
+                const ny = perpA.y * cos + perpB.y * sin;
+                const nz = perpA.z * cos + perpB.z * sin;
+
+                // Position on ring
+                const px = center.x + nx * radius;
+                const py = center.y + ny * radius;
+                const pz = center.z + nz * radius;
+
+                this.meshBuilder.appendVerticesInterleaved([
+                    px, py, pz,
+                    nx, ny, nz,
+                    uvInR, uvInG,
+                    uvInB, uvPrR,
+                    uvPrG, uvPrB,
+                ]);
+            }
+        }
+
+        // Generate triangles connecting the two rings
+        const vertsPerRing = segments + 1;
+        for (let i = 0; i < segments; i++) {
+            const a = startIndex + i;
+            const b = startIndex + i + 1;
+            const c = startIndex + vertsPerRing + i;
+            const d = startIndex + vertsPerRing + i + 1;
+
+            // Two triangles per quad
+            this.meshBuilder.appendIndices([a, c, b]);
+            this.meshBuilder.appendIndices([b, c, d]);
+        }
+    }
+
     // ============================================
     // PUBLIC API (use as event callbacks)
     // ============================================
@@ -543,7 +672,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     /** Cycle to next color space */
     public nextColorSpace(): void {
-        const next = (this._colorSpaceTo + 1) % Projector_Gamut_Mesh.COLOR_SPACE_COUNT;
+        const next = (this._colorSpaceTo + 1) % GamutProjectionMeshGenerator.COLOR_SPACE_COUNT;
         this._colorSpaceFrom = next;
         this._colorSpaceTo = next;
         this._blend = 1.0;
@@ -552,7 +681,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     /** Cycle to previous color space */
     public prevColorSpace(): void {
-        const prev = (this._colorSpaceTo - 1 + Projector_Gamut_Mesh.COLOR_SPACE_COUNT) % Projector_Gamut_Mesh.COLOR_SPACE_COUNT;
+        const prev = (this._colorSpaceTo - 1 + GamutProjectionMeshGenerator.COLOR_SPACE_COUNT) % GamutProjectionMeshGenerator.COLOR_SPACE_COUNT;
         this._colorSpaceFrom = prev;
         this._colorSpaceTo = prev;
         this._blend = 1.0;
@@ -637,18 +766,18 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     // ============ PROPERTY ACCESSORS ============
 
-    get cubeSize(): number { return this._cubeSize; }
-    set cubeSize(value: number) {
-        this._cubeSize = value;
+    get displaySize(): number { return this._displaySize; }
+    set displaySize(value: number) {
+        this._displaySize = value;
         if (this.projectedColors.length > 0) {
             this.generateMesh();
             this.updateMaterialParams();
         }
     }
 
-    get sampleSize(): number { return this._sampleSize; }
-    set sampleSize(value: number) {
-        this._sampleSize = value;
+    get voxelSize(): number { return this._voxelSize; }
+    set voxelSize(value: number) {
+        this._voxelSize = value;
         if (this.projectedColors.length > 0) {
             this.generateMesh();
         }
@@ -686,5 +815,49 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     set projectionBlend(value: number) {
         this._projectionBlend = Math.max(0, Math.min(1, value));
         this.updateMaterialParams();
+    }
+
+    get showLines(): boolean { return this._showLines; }
+    set showLines(value: boolean) {
+        this._showLines = value;
+        if (this.projectedColors.length > 0) {
+            this.generateMesh();
+        }
+    }
+
+    get lineRadius(): number { return this._lineRadius; }
+    set lineRadius(value: number) {
+        this._lineRadius = value;
+        if (this._showLines && this.projectedColors.length > 0) {
+            this.generateMesh();
+        }
+    }
+
+    get tubeSegments(): number { return this._tubeSegments; }
+    set tubeSegments(value: number) {
+        this._tubeSegments = Math.max(3, value);
+        if (this._showLines && this.projectedColors.length > 0) {
+            this.generateMesh();
+        }
+    }
+
+    /** Toggle projection lines visibility */
+    public setShowLines(show: boolean): void {
+        this.showLines = show;
+    }
+
+    /** Set line radius */
+    public setLineRadius(radius: number): void {
+        this.lineRadius = radius;
+    }
+
+    /** Set display size (convenience method for syncing across generators) */
+    public setDisplaySize(size: number): void {
+        this.displaySize = size;
+    }
+
+    /** Set voxel size (convenience method for syncing across generators) */
+    public setVoxelSize(size: number): void {
+        this.voxelSize = size;
     }
 }

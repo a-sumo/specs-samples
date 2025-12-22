@@ -174,7 +174,7 @@
 - !<ScriptComponent/b8c81e4e-b901-44d4-7118-a53b5cd2ea8c>
   PrefabRemaps:
     []
-  Name: Encoder_FullRGB
+  Name: FullRGBParticleEncoder
   Enabled: true
   ScriptAsset: !<reference> 2d57b839-30be-46f0-b491-d7a3bc219be2
   ScriptInputsDefault:

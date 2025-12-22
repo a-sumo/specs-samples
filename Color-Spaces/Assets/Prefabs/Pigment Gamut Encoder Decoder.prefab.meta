@@ -68,7 +68,7 @@
 - !<ScriptComponent/29eddb77-12c9-41a5-4e1e-a6b871838413>
   PrefabRemaps:
     []
-  Name: Encoder_PigmentMix
+  Name: PigmentMixParticleEncoder
   Enabled: true
   ScriptAsset: !<reference> 48ceee92-eb88-445f-8ae2-fa7b9ee1c680
   ScriptInputsDefault:

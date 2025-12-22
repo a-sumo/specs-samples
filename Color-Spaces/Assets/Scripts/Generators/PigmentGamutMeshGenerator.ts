@@ -1,30 +1,26 @@
 
 /**
- * PigmentMixGamutGenerator.ts
+ * PigmentGamutMeshGenerator.ts
  *
  * Generates an RGB cube visualization showing only achievable colors via pigment mixing.
  * Uses small cubes at each achievable sample point.
  */
 @component
-export class PigmentMixGamutGenerator extends BaseScriptComponent {
+export class PigmentGamutMeshGenerator extends BaseScriptComponent {
 
   // ============ GEOMETRY SETTINGS ============
 
   @input
-  @hint("Size of the overall cube in scene units")
-  private _cubeSize: number = 100.0;
+  @hint("Size of the display volume in scene units")
+  private _displaySize: number = 100.0;
 
   @input
-  @hint("Number of sample lines per axis (density of RGB sampling)")
-  private _gridDensity: number = 10;
+  @hint("Number of samples per axis (e.g., 10 = 10x10x10 grid)")
+  private _gridResolution: number = 10;
 
   @input
-  @hint("Number of samples per line")
-  private _lineSegments: number = 32;
-
-  @input
-  @hint("Size of each sample cube")
-  private _sampleSize: number = 2.0;
+  @hint("Size of each voxel cube")
+  private _voxelSize: number = 2.0;
 
   @input
   @hint("Material for sample cubes")
@@ -112,6 +108,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   private static readonly COLOR_SPACE_NAMES = [
     "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"
   ];
+  private static readonly COLOR_SPACE_COUNT = 5;
   private readonly D65 = { X: 0.95047, Y: 1.0, Z: 1.08883 };
 
   private meshBuilder!: MeshBuilder;
@@ -119,6 +116,10 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   private currentPigments: vec3[] = [];
   private gamutLUT: vec3[] = [];
   private sampleData: { center: vec3; r: number; g: number; b: number }[] = [];
+
+  // Precomputed achievability grid for fast lookups
+  private static readonly ACHIEV_GRID_RES = 32; // Resolution of precomputed grid
+  private achievabilityGrid: boolean[] = [];
 
   onAwake(): void {
     this.initializePigments();
@@ -207,7 +208,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   private buildGamutLUT(): void {
     this.gamutLUT = [];
     const steps = this._gamutSampleSteps;
-    const n = PigmentMixGamutGenerator.NUM_PIGMENTS;
+    const n = PigmentGamutMeshGenerator.NUM_PIGMENTS;
 
     // Pure pigments
     for (let i = 0; i < n; i++) {
@@ -249,24 +250,46 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
       }
     }
 
-    print(`PigmentMixGamut: Built LUT with ${this.gamutLUT.length} achievable colors`);
+    // Build precomputed achievability grid for fast lookups
+    this.buildAchievabilityGrid();
+
+    print(`PigmentGamutMeshGenerator: Built LUT with ${this.gamutLUT.length} achievable colors`);
+  }
+
+  private buildAchievabilityGrid(): void {
+    const res = PigmentGamutMeshGenerator.ACHIEV_GRID_RES;
+    const total = res * res * res;
+    this.achievabilityGrid = new Array(total).fill(false);
+
+    const tol = this._gamutTolerance;
+
+    // Mark all grid cells that contain achievable colors
+    for (const c of this.gamutLUT) {
+      // Find grid cells within tolerance of this color
+      const minR = Math.max(0, Math.floor((c.x - tol) * res));
+      const maxR = Math.min(res - 1, Math.floor((c.x + tol) * res));
+      const minG = Math.max(0, Math.floor((c.y - tol) * res));
+      const maxG = Math.min(res - 1, Math.floor((c.y + tol) * res));
+      const minB = Math.max(0, Math.floor((c.z - tol) * res));
+      const maxB = Math.min(res - 1, Math.floor((c.z + tol) * res));
+
+      for (let ri = minR; ri <= maxR; ri++) {
+        for (let gi = minG; gi <= maxG; gi++) {
+          for (let bi = minB; bi <= maxB; bi++) {
+            this.achievabilityGrid[ri * res * res + gi * res + bi] = true;
+          }
+        }
+      }
+    }
   }
 
   private isColorAchievable(r: number, g: number, b: number): boolean {
-    const tolSq = this._gamutTolerance * this._gamutTolerance;
-
-    for (const c of this.gamutLUT) {
-      const dr = r - c.x;
-      const dg = g - c.y;
-      const db = b - c.z;
-      const distSq = dr * dr + dg * dg + db * db;
-
-      if (distSq <= tolSq) {
-        return true;
-      }
-    }
-
-    return false;
+    // Fast O(1) lookup using precomputed grid
+    const res = PigmentGamutMeshGenerator.ACHIEV_GRID_RES;
+    const ri = Math.min(res - 1, Math.max(0, Math.floor(r * res)));
+    const gi = Math.min(res - 1, Math.max(0, Math.floor(g * res)));
+    const bi = Math.min(res - 1, Math.max(0, Math.floor(b * res)));
+    return this.achievabilityGrid[ri * res * res + gi * res + bi];
   }
 
   // ============================================
@@ -328,7 +351,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
 
   // Always generate in RGB space - shader handles color space transformation
   private rgbToDisplayPosition(r: number, g: number, b: number): vec3 {
-    const size = this._cubeSize;
+    const size = this._displaySize;
     return new vec3(
       (r - 0.5) * size,
       (b - 0.5) * size,
@@ -342,21 +365,21 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
       pass.colorSpaceFrom = this._colorSpaceFrom;
       pass.colorSpaceTo = this._colorSpaceTo;
       pass.blend = this._blend;
-      pass.cubeSize = this._cubeSize;
+      pass.cubeSize = this._displaySize;
     }
     this.updateColorSpaceText();
   }
 
   private updateColorSpaceText(): void {
     if (this.colorSpaceText) {
-      const name = PigmentMixGamutGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+      const name = PigmentGamutMeshGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
       this.colorSpaceText.text = name;
     }
   }
 
   /** Get current color space name */
   public getColorSpaceName(): string {
-    return PigmentMixGamutGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+    return PigmentGamutMeshGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
   }
 
   // ============================================
@@ -365,16 +388,14 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
 
   private collectSampleData(): void {
     this.sampleData = [];
-    const density = this._gridDensity;
-    const segments = this._lineSegments;
+    const res = this._gridResolution;
 
-    for (let ri = 0; ri <= density; ri++) {
-      for (let gi = 0; gi <= density; gi++) {
-        const r = ri / density;
-        const g = gi / density;
-
-        for (let bi = 0; bi <= segments; bi++) {
-          const b = bi / segments;
+    for (let ri = 0; ri <= res; ri++) {
+      for (let gi = 0; gi <= res; gi++) {
+        for (let bi = 0; bi <= res; bi++) {
+          const r = ri / res;
+          const g = gi / res;
+          const b = bi / res;
 
           if (!this.isColorAchievable(r, g, b)) continue;
 
@@ -384,7 +405,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
       }
     }
 
-    print(`PigmentMixGamut: ${this.sampleData.length} achievable samples`);
+    print(`PigmentGamutMeshGenerator: ${this.sampleData.length} achievable voxels (from ${(res + 1) ** 3} tested)`);
   }
 
   private generateMesh(): void {
@@ -398,10 +419,8 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     this.meshBuilder.topology = MeshTopology.Triangles;
     this.meshBuilder.indexType = MeshIndexType.UInt16;
 
-    const size = this._sampleSize;
-
     for (const sample of this.sampleData) {
-      this.generateCube(sample.center, sample.r, sample.g, sample.b, size);
+      this.generateCube(sample.center, sample.r, sample.g, sample.b, this._voxelSize);
     }
 
     if (this.meshBuilder.isValid()) {
@@ -466,8 +485,6 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   // PUBLIC API (use as event callbacks)
   // ============================================
 
-  private static readonly COLOR_SPACE_COUNT = 6;
-
   public refresh(): void {
     this.initializePigments();
     this.buildGamutLUT();
@@ -478,7 +495,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
 
   /** Cycle to next color space */
   public nextColorSpace(): void {
-    const next = (this._colorSpaceTo + 1) % PigmentMixGamutGenerator.COLOR_SPACE_COUNT;
+    const next = (this._colorSpaceTo + 1) % PigmentGamutMeshGenerator.COLOR_SPACE_COUNT;
     this._colorSpaceFrom = next;
     this._colorSpaceTo = next;
     this._blend = 1.0;
@@ -487,7 +504,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
 
   /** Cycle to previous color space */
   public prevColorSpace(): void {
-    const prev = (this._colorSpaceTo - 1 + PigmentMixGamutGenerator.COLOR_SPACE_COUNT) % PigmentMixGamutGenerator.COLOR_SPACE_COUNT;
+    const prev = (this._colorSpaceTo - 1 + PigmentGamutMeshGenerator.COLOR_SPACE_COUNT) % PigmentGamutMeshGenerator.COLOR_SPACE_COUNT;
     this._colorSpaceFrom = prev;
     this._colorSpaceTo = prev;
     this._blend = 1.0;
@@ -528,31 +545,24 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   // PROPERTY ACCESSORS
   // ============================================
 
-  get cubeSize(): number { return this._cubeSize; }
-  set cubeSize(value: number) {
-    this._cubeSize = value;
+  get displaySize(): number { return this._displaySize; }
+  set displaySize(value: number) {
+    this._displaySize = value;
     this.collectSampleData();
     this.generateMesh();
     this.updateMaterialParams();
   }
 
-  get gridDensity(): number { return this._gridDensity; }
-  set gridDensity(value: number) {
-    this._gridDensity = value;
+  get gridResolution(): number { return this._gridResolution; }
+  set gridResolution(value: number) {
+    this._gridResolution = Math.max(1, Math.floor(value));
     this.collectSampleData();
     this.generateMesh();
   }
 
-  get lineSegments(): number { return this._lineSegments; }
-  set lineSegments(value: number) {
-    this._lineSegments = value;
-    this.collectSampleData();
-    this.generateMesh();
-  }
-
-  get sampleSize(): number { return this._sampleSize; }
-  set sampleSize(value: number) {
-    this._sampleSize = value;
+  get voxelSize(): number { return this._voxelSize; }
+  set voxelSize(value: number) {
+    this._voxelSize = value;
     this.generateMesh();
   }
 
@@ -577,8 +587,23 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   get gamutTolerance(): number { return this._gamutTolerance; }
   set gamutTolerance(value: number) {
     this._gamutTolerance = value;
-    this.buildGamutLUT();
+    this.buildAchievabilityGrid(); // Rebuild grid with new tolerance
     this.collectSampleData();
     this.generateMesh();
+  }
+
+  /** Set display size (convenience method for syncing across generators) */
+  public setDisplaySize(size: number): void {
+    this.displaySize = size;
+  }
+
+  /** Set voxel size (convenience method for syncing across generators) */
+  public setVoxelSize(size: number): void {
+    this.voxelSize = size;
+  }
+
+  /** Set grid resolution (convenience method for syncing across generators) */
+  public setGridResolution(res: number): void {
+    this.gridResolution = res;
   }
 }

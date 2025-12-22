@@ -16,6 +16,9 @@
     - Port_FinalColor3_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_GSplatPointSize_N004:
         typeIdx: 1
         value: 0.000000
@@ -23,6 +26,9 @@
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
     - Port_GSplatScale_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Input1_N007:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_PrevWorldPosition_N004:
@@ -40,19 +46,34 @@
     - Port_WorldTangent_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 1.000000}
+    - Port_blend_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_colorSpaceFrom_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_colorSpaceTo_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_cubeSize_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_projectionBlend_N000:
+        typeIdx: 1
+        value: 0.000000
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
   TwoSided: false
   ColorMask: {x: true, y: true, z: true, w: true}
-  CullMode: Back
+  CullMode: Front
   PolygonOffset: {x: 0.000000, y: 0.000000}
-  FrustumCulling: Auto
-  FrustumCullPad: 0.000000
+  FrustumCulling: Extend
+  FrustumCullPad: 10.000000
   InstanceCount: 1
   Defines:
     []
-  BlendMode: Disabled
+  BlendMode: PremultipliedAlphaAuto
   Properties:
     PreviewEnabled:
       typeIdx: 0

@@ -52,7 +52,7 @@
     -
       {}
   InputLines:
-    - '// @input Component.ScriptComponent gamutProjector {"hint":"Reference to Projector_Gamut script"}'
+    - '// @input Component.ScriptComponent gamutProjector {"hint":"Reference to GamutProjectionParticleEncoder script"}'
     - '// @input SceneObject[] targetObjects {"hint":"SceneObjects to position (one per projected color)"}'
     - '// @input vec3 scale = {100,100,100} {"hint":"Scale factor for LAB space (same as VFX)"}'
     - '// @input vec3 rotation = {0,0,0} {"hint":"Rotation in degrees (same as VFX)"}'

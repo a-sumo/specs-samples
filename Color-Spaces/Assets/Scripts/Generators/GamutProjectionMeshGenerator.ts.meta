@@ -29,10 +29,13 @@
     _blend: false
     _colorSpaceFrom: false
     _colorSpaceTo: false
-    _cubeSize: false
+    _displaySize: false
     _gamutSampleSteps: false
+    _lineRadius: false
     _projectionBlend: false
-    _sampleSize: false
+    _showLines: false
+    _tubeSegments: false
+    _voxelSize: false
     colorSpaceText: false
     material: false
     maxColors: false
@@ -51,8 +54,11 @@
   Attachments:
     []
   DefaultScriptInputs:
-    - _cubeSize: !<float> 100.000000
-      _sampleSize: !<float> 4.000000
+    - _displaySize: !<float> 100.000000
+      _voxelSize: !<float> 1.000000
+      _showLines: true
+      _lineRadius: 0.300000
+      _tubeSegments: !<float> 6.000000
       _projectionBlend: !<float> 1.000000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
       _colorSpaceFrom: !<float> 0.000000
@@ -71,8 +77,11 @@
     -
       {}
   InputLines:
-    - '// @input float _cubeSize = 100 {"hint":"Size of the display space in scene units"}'
-    - '// @input float _sampleSize = 1 {"hint":"Size of each sample cube"}'
+    - '// @input float _displaySize = 100 {"hint":"Size of the display volume in scene units"}'
+    - '// @input float _voxelSize = 1 {"hint":"Size of each voxel cube"}'
+    - '// @input bool _showLines = true {"hint":"Show projection lines connecting input to projected positions"}'
+    - '// @input float _lineRadius = 0.03 {"hint":"Radius of projection line tubes", "widget":"slider", "min":0.01, "max":5, "step":0.1}'
+    - '// @input float _tubeSegments = 6 {"hint":"Number of segments around tube circumference"}'
     - '// @input float _projectionBlend = 1 {"hint":"Projection blend: 0 = original input position/color, 1 = fully projected"}'
     - '// @input Asset.Material material {"hint":"Material for projected color cubes"}'
     - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'

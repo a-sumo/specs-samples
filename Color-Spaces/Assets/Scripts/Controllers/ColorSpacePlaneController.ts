@@ -1,8 +1,8 @@
 import { Interactable } from "SpectaclesInteractionKit.lspkg/Components/Interaction/Interactable/Interactable";
 import { DragInteractorEvent } from "SpectaclesInteractionKit.lspkg/Core/Interactor/InteractorEvent";
-import { RGBCubeGenerator } from "./RGBCubeGenerator";
-import { PigmentMixGamutGenerator } from "./PigmentMixGamutGenerator";
-import { Projector_Gamut_Mesh } from "./Projector_Gamut_Mesh";
+import { RGBCubeGenerator } from "../Generators/RGBCubeGenerator";
+import { PigmentGamutMeshGenerator } from "../Generators/PigmentGamutMeshGenerator";
+import { GamutProjectionMeshGenerator } from "../Generators/GamutProjectionMeshGenerator";
 
 /**
  * Interactive plane for color space selection.
@@ -32,6 +32,18 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   deadZone: number = 0.15;
 
   @input
+  @hint("Blend threshold for snapping to full color space (0.85 = snap when 85%+ toward target)")
+  snapThreshold: number = 0.85;
+
+  @input
+  @hint("Enable snapping to full color space when above threshold")
+  enableSnapping: boolean = true;
+
+  @input
+  @hint("Snap to nearest color space on drag release")
+  snapOnRelease: boolean = true;
+
+  @input
   @hint("Text for debug display")
   debugText: Text;
 
@@ -44,12 +56,12 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   rgbCubeGenerator: RGBCubeGenerator;
 
   @input
-  @hint("PigmentMixGamutGenerator to update")
-  pigmentMixGenerator: PigmentMixGamutGenerator;
+  @hint("PigmentGamutMeshGenerator to update")
+  pigmentMixGenerator: PigmentGamutMeshGenerator;
 
   @input
-  @hint("Projector_Gamut_Mesh to update")
-  projectorGamutMesh: Projector_Gamut_Mesh;
+  @hint("GamutProjectionMeshGenerator to update")
+  projectorGamutMesh: GamutProjectionMeshGenerator;
 
   private static readonly SPACE_NAMES = ["RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"];
 
@@ -57,6 +69,11 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   private cursorTransform: Transform | null = null;
   private interactable: Interactable | null = null;
   private isDragging: boolean = false;
+
+  // Current selection state
+  private currentTargetSpace: number = 0;
+  private currentBlend: number = 0;
+  private isSnapped: boolean = false;
 
   // Cleanup
   private unsubscribeEvents: (() => void)[] = [];
@@ -100,6 +117,16 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     this.unsubscribeEvents.push(
       this.interactable.onDragEnd.add(() => {
         this.isDragging = false;
+
+        // Snap on release: if blend > 0.5, snap to full; otherwise snap to RGB
+        if (this.snapOnRelease) {
+          if (this.currentBlend > 0.5) {
+            this.snapToColorSpace(this.currentTargetSpace);
+          } else {
+            this.snapToColorSpace(0); // RGB
+          }
+        }
+
         this.hideCursor();
       })
     );
@@ -188,12 +215,30 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
       blend = (dist - this.deadZone) / (1 - this.deadZone);
     }
 
-    // Always transition from RGB (0) to the nearest preset
-    this.updateColorSpaceSimple(nearestPreset.space, blend);
+    // Track current state for snap-on-release
+    this.currentTargetSpace = nearestPreset.space;
+    this.currentBlend = blend;
 
-    // Debug
+    // Apply snapping if enabled
+    let effectiveBlend = blend;
+    this.isSnapped = false;
+
+    if (this.enableSnapping && blend >= this.snapThreshold) {
+      effectiveBlend = 1.0;
+      this.isSnapped = true;
+    } else if (blend < this.deadZone * 0.5) {
+      // Snap to center (RGB) when very close
+      effectiveBlend = 0;
+      this.isSnapped = true;
+    }
+
+    // Always transition from RGB (0) to the nearest preset
+    this.updateColorSpaceSimple(nearestPreset.space, effectiveBlend);
+
+    // Debug with snap indicator
     const angleDeg = (angle * 180 / Math.PI).toFixed(0);
-    this.updateDebugText(`UV: ${u.toFixed(2)}, ${v.toFixed(2)} | ${angleDeg}° | RGB→${nearestPreset.name} ${(blend * 100).toFixed(0)}%`);
+    const snapIndicator = this.isSnapped ? " [SNAP]" : "";
+    this.updateDebugText(`${angleDeg}° | RGB→${nearestPreset.name} ${(effectiveBlend * 100).toFixed(0)}%${snapIndicator}`);
   }
 
   private updateColorSpaceSimple(targetSpace: number, blend: number): void {
@@ -229,5 +274,75 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   /** Check if currently dragging */
   public getIsDragging(): boolean {
     return this.isDragging;
+  }
+
+  /** Snap to a specific color space (0=RGB, 1=CIELAB, 2=CIEXYZ, 3=Oklab, 4=CIELUV) */
+  public snapToColorSpace(space: number): void {
+    this.currentTargetSpace = space;
+    this.currentBlend = space === 0 ? 0 : 1;
+    this.isSnapped = true;
+
+    // Update all generators
+    if (this.rgbCubeGenerator) {
+      this.rgbCubeGenerator.setColorSpace(0, space, this.currentBlend);
+    }
+    if (this.pigmentMixGenerator) {
+      this.pigmentMixGenerator.setColorSpace(0, space, this.currentBlend);
+    }
+    if (this.projectorGamutMesh) {
+      this.projectorGamutMesh.setColorSpace(0, space, this.currentBlend);
+    }
+
+    const name = ColorSpacePlaneController.SPACE_NAMES[space] || "Unknown";
+    this.updateDebugText(`Snapped to ${name}`);
+  }
+
+  /** Get currently selected color space index */
+  public getCurrentColorSpace(): number {
+    return this.currentBlend >= 0.5 ? this.currentTargetSpace : 0;
+  }
+
+  /** Get current blend value */
+  public getCurrentBlend(): number {
+    return this.currentBlend;
+  }
+
+  /** Check if currently snapped to a color space */
+  public getIsSnapped(): boolean {
+    return this.isSnapped;
+  }
+
+  /** Set snapping enabled/disabled */
+  public setSnappingEnabled(enabled: boolean): void {
+    this.enableSnapping = enabled;
+  }
+
+  /** Set snap threshold (0-1) */
+  public setSnapThreshold(threshold: number): void {
+    this.snapThreshold = Math.max(0, Math.min(1, threshold));
+  }
+
+  // ============================================
+  // SYNC METHODS - apply to all generators
+  // ============================================
+
+  /** Sync display size across all generators */
+  public syncDisplaySize(size: number): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.setDisplaySize(size);
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.setDisplaySize(size);
+    if (this.projectorGamutMesh) this.projectorGamutMesh.setDisplaySize(size);
+  }
+
+  /** Sync voxel size across all generators */
+  public syncVoxelSize(size: number): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.setVoxelSize(size);
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.setVoxelSize(size);
+    if (this.projectorGamutMesh) this.projectorGamutMesh.setVoxelSize(size);
+  }
+
+  /** Sync grid resolution across RGBCubeGenerator and PigmentGamutMeshGenerator */
+  public syncGridResolution(res: number): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.setGridResolution(res);
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.setGridResolution(res);
   }
 }

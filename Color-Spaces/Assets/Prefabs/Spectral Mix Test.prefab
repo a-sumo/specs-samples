@@ -27,7 +27,7 @@
 - !<ScriptComponent/ccb937ab-a4ae-40a4-92d2-8571bc02d6db>
   PrefabRemaps:
     []
-  Name: Util_SpectralMix
+  Name: SpectralMixUtil
   Enabled: true
   ScriptAsset: !<reference> 3fa02e69-5303-45dc-badf-c10ad8fec573
   ScriptInputsDefault:

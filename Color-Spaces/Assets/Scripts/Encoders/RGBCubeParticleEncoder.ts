@@ -1,5 +1,8 @@
+// RGBCubeParticleEncoder.ts
+// Encodes RGB cube data to textures for VFX particle visualization
+
 @component
-export class Encoder_RGBCube extends BaseScriptComponent {
+export class RGBCubeParticleEncoder extends BaseScriptComponent {
     
     @input
     @hint("Material with encoder Code Node")

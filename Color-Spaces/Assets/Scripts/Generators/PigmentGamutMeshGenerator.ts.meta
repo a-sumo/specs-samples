@@ -29,12 +29,11 @@
     _blend: false
     _colorSpaceFrom: false
     _colorSpaceTo: false
-    _cubeSize: false
+    _displaySize: false
     _gamutSampleSteps: false
     _gamutTolerance: false
-    _gridDensity: false
-    _lineSegments: false
-    _sampleSize: false
+    _gridResolution: false
+    _voxelSize: false
     colorSpaceText: false
     material: false
     pig0Color: false
@@ -52,10 +51,9 @@
   Attachments:
     []
   DefaultScriptInputs:
-    - _cubeSize: !<float> 100.000000
-      _gridDensity: !<float> 5.000000
-      _lineSegments: !<float> 24.000000
-      _sampleSize: !<float> 2.000000
+    - _displaySize: !<float> 100.000000
+      _gridResolution: !<float> 16.000000
+      _voxelSize: !<float> 2.000000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 0.000000
@@ -73,10 +71,9 @@
     -
       {}
   InputLines:
-    - '// @input float _cubeSize = 100 {"hint":"Size of the overall cube in scene units"}'
-    - '// @input float _gridDensity = 10 {"hint":"Number of sample lines per axis (density of RGB sampling)"}'
-    - '// @input float _lineSegments = 32 {"hint":"Number of samples per line"}'
-    - '// @input float _sampleSize = 2 {"hint":"Size of each sample cube"}'
+    - '// @input float _displaySize = 100 {"hint":"Size of the display volume in scene units"}'
+    - '// @input float _gridResolution = 10 {"hint":"Number of samples per axis (e.g., 10 = 10x10x10 grid)"}'
+    - '// @input float _voxelSize = 2 {"hint":"Size of each voxel cube"}'
     - '// @input Asset.Material material {"hint":"Material for sample cubes"}'
     - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
     - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'

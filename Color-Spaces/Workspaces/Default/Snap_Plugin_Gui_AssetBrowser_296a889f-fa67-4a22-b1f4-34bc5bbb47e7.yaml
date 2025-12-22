@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 836
+    size: 846
     values:
       - Images
       - Images/color_spaces_plane.png
@@ -19,38 +19,41 @@ CollapsedEntities:
       - Images/test_encoding/pos_x.png
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
-      - Materials/Color Gradient Opacity 2.mat
-      - Materials/Color Gradient Opacity.mat
-      - Materials/Color Gradient Opacity.ss_graph
-      - Materials/Color Gradient.mat
-      - Materials/Color Gradient.ss_graph
-      - Materials/ColorSpaceTransforms 2.mat
-      - Materials/ColorSpaceTransforms 2.ss_graph
-      - Materials/ColorSpaceTransforms.mat
-      - Materials/ColorSpaceTransforms.ss_graph
-      - Materials/Cursor.mat
-      - Materials/Cursor.ss_graph
-      - Materials/CursorPlane.mat
-      - Materials/CursorPlane.ss_graph
-      - Materials/LabEncoder.mat
-      - Materials/LabEncoder.ss_graph
-      - Materials/Pigment Gamut Encoder Hi Res.mat
-      - Materials/Pigment Gamut Encoder Hi Res.ss_graph
-      - Materials/Pigment Gamut Encoder.mat
-      - Materials/Pigment Gamut Encoder.ss_graph
-      - Materials/ProjectorGamutTransform.mat
-      - Materials/ProjectorGamutTransform.ss_graph
-      - Materials/RGB Encoder.mat
-      - Materials/RGB Encoder.ss_graph
-      - Materials/Remap Texture With Palette Colors.mat
-      - Materials/Remap Texture With Palette Colors.ss_graph
-      - Materials/Spectral Mix.mat
-      - Materials/Spectral Mix.ss_graph
+      - Materials
+      - Materials/Encoders
+      - Materials/Encoders/LabEncoder.mat
+      - Materials/Encoders/LabEncoder.ss_graph
+      - Materials/Encoders/Pigment Gamut Encoder Hi Res.mat
+      - Materials/Encoders/Pigment Gamut Encoder Hi Res.ss_graph
+      - Materials/Encoders/Pigment Gamut Encoder.mat
+      - Materials/Encoders/Pigment Gamut Encoder.ss_graph
+      - Materials/Encoders/RGB Encoder.mat
+      - Materials/Encoders/RGB Encoder.ss_graph
+      - Materials/MeshTransforms/ColorSpaceTransforms 2.mat
+      - Materials/MeshTransforms/ColorSpaceTransforms 2.ss_graph
+      - Materials/MeshTransforms/ColorSpaceTransforms.mat
+      - Materials/MeshTransforms/ColorSpaceTransforms.ss_graph
+      - Materials/MeshTransforms/ProjectorGamutTransform.mat
+      - Materials/MeshTransforms/ProjectorGamutTransform.ss_graph
       - Materials/Tests
       - Materials/Tests/Color Mix Test.mat
       - Materials/Tests/Color Mix Test.ss_graph
       - Materials/Tests/TestEncoder.mat
       - Materials/Tests/TestEncoder.ss_graph
+      - Materials/UI
+      - Materials/UI/Color Gradient Opacity 2.mat
+      - Materials/UI/Color Gradient Opacity.mat
+      - Materials/UI/Color Gradient Opacity.ss_graph
+      - Materials/UI/Color Gradient.mat
+      - Materials/UI/Color Gradient.ss_graph
+      - Materials/UI/Cursor.mat
+      - Materials/UI/Cursor.ss_graph
+      - Materials/UI/CursorPlane.mat
+      - Materials/UI/CursorPlane.ss_graph
+      - Materials/UI/Remap Texture With Palette Colors.mat
+      - Materials/UI/Remap Texture With Palette Colors.ss_graph
+      - Materials/UI/Spectral Mix.mat
+      - Materials/UI/Spectral Mix.ss_graph
       - Prefabs
       - Prefabs/Color Slot.prefab
       - Prefabs/LAB Encoder Decoder.prefab
@@ -73,19 +76,25 @@ CollapsedEntities:
       - RoundedRectangle.ss_graph
       - Scene.scene
       - Scripts
-      - Scripts/ColorSpacePlaneController.ts
-      - Scripts/Encoder_FullRGB.ts
-      - Scripts/Encoder_PigmentMix.ts
-      - Scripts/Encoder_RGBCube.ts
-      - Scripts/PigmentMixGamutGenerator.ts
-      - Scripts/Projector_Gamut.ts
-      - Scripts/Projector_Gamut_Mesh.ts
-      - Scripts/RGBCubeGenerator.ts
-      - Scripts/SphereController.ts
-      - Scripts/Util_SpectralMix.ts
+      - Scripts/Controllers
+      - Scripts/Controllers/ColorSpacePlaneController.ts
+      - Scripts/Controllers/ProjectedPositionController.ts
+      - Scripts/Controllers/SphereController.ts
+      - Scripts/Encoders
+      - Scripts/Encoders/FullRGBParticleEncoder.ts
+      - Scripts/Encoders/GamutProjectionParticleEncoder.ts
+      - Scripts/Encoders/PigmentMixParticleEncoder.ts
+      - Scripts/Encoders/RGBCubeParticleEncoder.ts
+      - Scripts/Generators
+      - Scripts/Generators/GamutProjectionMeshGenerator.ts
+      - Scripts/Generators/PigmentGamutMeshGenerator.ts
+      - Scripts/Generators/RGBCubeGenerator.ts
+      - Scripts/Utils
+      - Scripts/Utils/SpectralMixUtil.ts
       - Shaders
       - Shaders/ColorSpaceTransform.js
       - Shaders/ProjectorGamutTransform.js
+      - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerEndAudioTrack.wav
@@ -685,6 +694,7 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Audio/SliderProgressionAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/TriggerEndAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/TriggerStartAudioTrack.wav
+      - SpectaclesUIKit.lspkg/Materials
       - SpectaclesUIKit.lspkg/Materials/BaseRoundedRectangle.mat
       - SpectaclesUIKit.lspkg/Materials/BaseRoundedRectangle.ss_graph
       - SpectaclesUIKit.lspkg/Materials/CapsuleSphere.mat
