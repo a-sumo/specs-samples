@@ -29,10 +29,13 @@
     cursor: false
     deadZone: false
     debugText: false
+    enableSnapping: false
     pigmentMixGenerator: false
     plane: false
     projectorGamutMesh: false
     rgbCubeGenerator: false
+    snapOnRelease: false
+    snapThreshold: false
     uvOffset: false
   ScriptTypesHidden:
     {}
@@ -46,6 +49,9 @@
     - plane: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       cursor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       deadZone: 0.150000
+      snapThreshold: 0.850000
+      enableSnapping: true
+      snapOnRelease: true
       debugText: !<reference.Text> 00000000-0000-0000-0000-000000000000
       uvOffset: 0.500000
       rgbCubeGenerator: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
@@ -58,6 +64,9 @@
     - '// @input SceneObject plane {"hint":"The plane SceneObject with Interactable"}'
     - '// @input SceneObject cursor {"hint":"Visual cursor/handle that follows hover position"}'
     - '// @input float deadZone = 0.15 {"hint":"Dead zone radius in center (0-1, where 0.15 = 15%)"}'
+    - '// @input float snapThreshold = 0.85 {"hint":"Blend threshold for snapping to full color space (0.85 = snap when 85%+ toward target)"}'
+    - '// @input bool enableSnapping = true {"hint":"Enable snapping to full color space when above threshold"}'
+    - '// @input bool snapOnRelease = true {"hint":"Snap to nearest color space on drag release"}'
     - '// @input Component.Text debugText {"hint":"Text for debug display"}'
     - '// @input float uvOffset = 0.5 {"hint":"UV offset for plane local coords (0.5 for -0.5..0.5 planes, 0 for 0..1 planes)"}'
     - '// @input AssignableType rgbCubeGenerator {"hint":"RGBCubeGenerator to update"}'

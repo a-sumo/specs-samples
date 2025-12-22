@@ -17,6 +17,19 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     private _sampleSize: number = 1.0;
 
     @input
+    @hint("Show projection lines connecting input to projected positions")
+    private _showLines: boolean = true;
+
+    @input
+    @hint("Radius of projection line tubes")
+    @widget(new SliderWidget(0.01, 5, 0.1))
+    private _lineRadius: number = 0.03;
+
+    @input
+    @hint("Number of segments around tube circumference")
+    private _tubeSegments: number = 6;
+
+    @input
     @hint("Projection blend: 0 = original input position/color, 1 = fully projected")
     private _projectionBlend: number = 1.0;
 
@@ -435,14 +448,26 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
             const projectedRGB = this.projectedColors[i];
 
             // Position in RGB space based on input color
-            const pos = this.rgbToDisplayPosition(inputRGB.x, inputRGB.y, inputRGB.z);
+            const inputPos = this.rgbToDisplayPosition(inputRGB.x, inputRGB.y, inputRGB.z);
 
             this.generateCube(
-                pos.x, pos.y, pos.z,
+                inputPos.x, inputPos.y, inputPos.z,
                 inputRGB.x, inputRGB.y, inputRGB.z,
                 projectedRGB.x, projectedRGB.y, projectedRGB.z,
                 size
             );
+
+            // Generate tube connecting input to projected position
+            if (this._showLines) {
+                const projectedPos = this.rgbToDisplayPosition(projectedRGB.x, projectedRGB.y, projectedRGB.z);
+                this.generateTube(
+                    inputPos, projectedPos,
+                    inputRGB.x, inputRGB.y, inputRGB.z,
+                    projectedRGB.x, projectedRGB.y, projectedRGB.z,
+                    this._lineRadius,
+                    this._tubeSegments
+                );
+            }
         }
 
         if (this.meshBuilder.isValid()) {
@@ -504,6 +529,112 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
                 faceStart, faceStart + 1, faceStart + 2,
                 faceStart, faceStart + 2, faceStart + 3,
             ]);
+        }
+    }
+
+    /**
+     * Generate a tube connecting two positions
+     * Input end: vertices stay at input position (prRGB = inRGB)
+     * Projected end: vertices stay at projected position (inRGB = prRGB)
+     */
+    private generateTube(
+        startPos: vec3, endPos: vec3,
+        inR: number, inG: number, inB: number,
+        prR: number, prG: number, prB: number,
+        radius: number,
+        segments: number
+    ): void {
+        // Direction from start to end
+        const dir = new vec3(
+            endPos.x - startPos.x,
+            endPos.y - startPos.y,
+            endPos.z - startPos.z
+        );
+        const length = Math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
+        if (length < 0.001) return; // Skip if too short
+
+        // Normalize direction
+        const dirN = new vec3(dir.x / length, dir.y / length, dir.z / length);
+
+        // Find perpendicular vectors for tube cross-section
+        let perpA: vec3;
+        if (Math.abs(dirN.y) < 0.9) {
+            // Cross with up vector
+            perpA = new vec3(
+                dirN.z * 0 - dirN.y * 0,
+                dirN.x * 0 - dirN.z * 1,
+                dirN.y * 1 - dirN.x * 0
+            );
+        } else {
+            // Cross with right vector
+            perpA = new vec3(
+                dirN.z * 0 - dirN.y * 0,
+                dirN.x * 0 - dirN.z * 0,
+                dirN.y * 0 - dirN.x * 1
+            );
+        }
+        // Normalize perpA
+        const lenA = Math.sqrt(perpA.x * perpA.x + perpA.y * perpA.y + perpA.z * perpA.z);
+        perpA = new vec3(perpA.x / lenA, perpA.y / lenA, perpA.z / lenA);
+
+        // perpB = dir x perpA
+        const perpB = new vec3(
+            dirN.y * perpA.z - dirN.z * perpA.y,
+            dirN.z * perpA.x - dirN.x * perpA.z,
+            dirN.x * perpA.y - dirN.y * perpA.x
+        );
+
+        const startIndex = this.meshBuilder.getVerticesCount();
+        const TWO_PI = Math.PI * 2;
+
+        // Generate vertices for both rings
+        for (let ring = 0; ring < 2; ring++) {
+            const center = ring === 0 ? startPos : endPos;
+            // Input end: prRGB = inRGB (stays at input position)
+            // Projected end: inRGB = prRGB (stays at projected position)
+            const uvInR = ring === 0 ? inR : prR;
+            const uvInG = ring === 0 ? inG : prG;
+            const uvInB = ring === 0 ? inB : prB;
+            const uvPrR = ring === 0 ? inR : prR;  // Same as input for ring 0
+            const uvPrG = ring === 0 ? inG : prG;
+            const uvPrB = ring === 0 ? inB : prB;
+
+            for (let i = 0; i <= segments; i++) {
+                const angle = (i / segments) * TWO_PI;
+                const cos = Math.cos(angle);
+                const sin = Math.sin(angle);
+
+                // Normal points outward from tube center
+                const nx = perpA.x * cos + perpB.x * sin;
+                const ny = perpA.y * cos + perpB.y * sin;
+                const nz = perpA.z * cos + perpB.z * sin;
+
+                // Position on ring
+                const px = center.x + nx * radius;
+                const py = center.y + ny * radius;
+                const pz = center.z + nz * radius;
+
+                this.meshBuilder.appendVerticesInterleaved([
+                    px, py, pz,
+                    nx, ny, nz,
+                    uvInR, uvInG,
+                    uvInB, uvPrR,
+                    uvPrG, uvPrB,
+                ]);
+            }
+        }
+
+        // Generate triangles connecting the two rings
+        const vertsPerRing = segments + 1;
+        for (let i = 0; i < segments; i++) {
+            const a = startIndex + i;
+            const b = startIndex + i + 1;
+            const c = startIndex + vertsPerRing + i;
+            const d = startIndex + vertsPerRing + i + 1;
+
+            // Two triangles per quad
+            this.meshBuilder.appendIndices([a, c, b]);
+            this.meshBuilder.appendIndices([b, c, d]);
         }
     }
 
@@ -686,5 +817,39 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     set projectionBlend(value: number) {
         this._projectionBlend = Math.max(0, Math.min(1, value));
         this.updateMaterialParams();
+    }
+
+    get showLines(): boolean { return this._showLines; }
+    set showLines(value: boolean) {
+        this._showLines = value;
+        if (this.projectedColors.length > 0) {
+            this.generateMesh();
+        }
+    }
+
+    get lineRadius(): number { return this._lineRadius; }
+    set lineRadius(value: number) {
+        this._lineRadius = value;
+        if (this._showLines && this.projectedColors.length > 0) {
+            this.generateMesh();
+        }
+    }
+
+    get tubeSegments(): number { return this._tubeSegments; }
+    set tubeSegments(value: number) {
+        this._tubeSegments = Math.max(3, value);
+        if (this._showLines && this.projectedColors.length > 0) {
+            this.generateMesh();
+        }
+    }
+
+    /** Toggle projection lines visibility */
+    public setShowLines(show: boolean): void {
+        this.showLines = show;
+    }
+
+    /** Set line radius */
+    public setLineRadius(radius: number): void {
+        this.lineRadius = radius;
     }
 }
