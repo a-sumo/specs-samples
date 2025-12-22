@@ -181,7 +181,7 @@
 - !<ScriptComponent/e0d43a62-a48c-42c6-5883-fab8dec61a74>
   PrefabRemaps:
     []
-  Name: Encoder_RGBCube
+  Name: RGBCubeParticleEncoder
   Enabled: true
   ScriptAsset: !<reference> bc289aba-0faf-420e-a73a-58eee3a8683b
   ScriptInputsDefault:

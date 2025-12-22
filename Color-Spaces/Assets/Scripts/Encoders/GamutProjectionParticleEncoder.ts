@@ -1,9 +1,10 @@
-// Projector_Gamut.ts
+// GamutProjectionParticleEncoder.ts
 // GPU-based gamut projection - finds nearest achievable color for each input
 // Standalone component that can receive colors from any source via setInputColors()
+// Outputs to textures for VFX particle visualization
 
 @component
-export class Projector_Gamut extends BaseScriptComponent {
+export class GamutProjectionParticleEncoder extends BaseScriptComponent {
 
     // ============ INPUTS ============
 

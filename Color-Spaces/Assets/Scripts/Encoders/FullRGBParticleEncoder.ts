@@ -1,8 +1,9 @@
+// FullRGBParticleEncoder.ts
 // Encodes the full sRGB color space as LAB positions + RGB colors
-// Use this to visualize the entire visible gamut
+// Use this to visualize the entire visible gamut via VFX particles
 
 @component
-export class Encoder_FullRGB extends BaseScriptComponent {
+export class FullRGBParticleEncoder extends BaseScriptComponent {
 	@input
 	@hint("Material with LAB encoder Code Node (outputs labPos and rgbCol)")
 	encoderMaterial: Material;

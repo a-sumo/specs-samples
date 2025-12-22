@@ -1,8 +1,8 @@
 import { Interactable } from "SpectaclesInteractionKit.lspkg/Components/Interaction/Interactable/Interactable";
 import { DragInteractorEvent } from "SpectaclesInteractionKit.lspkg/Core/Interactor/InteractorEvent";
-import { RGBCubeGenerator } from "./RGBCubeGenerator";
-import { PigmentMixGamutGenerator } from "./PigmentMixGamutGenerator";
-import { Projector_Gamut_Mesh } from "./Projector_Gamut_Mesh";
+import { RGBCubeGenerator } from "../Generators/RGBCubeGenerator";
+import { PigmentGamutMeshGenerator } from "../Generators/PigmentGamutMeshGenerator";
+import { GamutProjectionMeshGenerator } from "../Generators/GamutProjectionMeshGenerator";
 
 /**
  * Interactive plane for color space selection.
@@ -44,12 +44,12 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   rgbCubeGenerator: RGBCubeGenerator;
 
   @input
-  @hint("PigmentMixGamutGenerator to update")
-  pigmentMixGenerator: PigmentMixGamutGenerator;
+  @hint("PigmentGamutMeshGenerator to update")
+  pigmentMixGenerator: PigmentGamutMeshGenerator;
 
   @input
-  @hint("Projector_Gamut_Mesh to update")
-  projectorGamutMesh: Projector_Gamut_Mesh;
+  @hint("GamutProjectionMeshGenerator to update")
+  projectorGamutMesh: GamutProjectionMeshGenerator;
 
   private static readonly SPACE_NAMES = ["RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"];
 

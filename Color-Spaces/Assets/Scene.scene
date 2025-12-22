@@ -9,8 +9,8 @@
     - !<own> 7070560f-1971-457f-86de-893d6a73f94b
     - !<own> a2c9dccc-74f5-4154-a0fd-2bbbac38747f
     - !<own> 3076a67d-d683-45c7-8bf4-1b8714d3b742
-    - !<own> a5a06066-7505-46a9-8427-7fda64b178a0
     - !<own> 5d0459e9-3b88-41d6-a9c6-75fe1e3ce5a7
+    - !<own> a5a06066-7505-46a9-8427-7fda64b178a0
     - !<own> 7281adc0-9a78-4804-9b5e-1413e88ffa2a
     - !<own> 4719aff4-223f-4812-828f-2ae20aabfc35
     - !<own> 942d226c-58b8-4d1a-83e8-aaee4ffc113b
@@ -947,7 +947,7 @@
 - !<ScriptComponent/2f0d4687-a430-4a76-bfd1-c88f4e27f1bd>
   PrefabRemaps:
     []
-  Name: PigmentMixGamutGenerator
+  Name: PigmentGamutMeshGenerator
   Enabled: true
   ScriptAsset: !<reference> a519bb72-442a-4dc1-b394-f2e240a47203
   ScriptInputsDefault:
@@ -1008,7 +1008,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -10.000000, z: -50.000000}
+    Position: {x: 0.000000, y: -13.000000, z: -100.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -1497,7 +1497,7 @@
 - !<ScriptComponent/3c424957-eb93-4da8-822d-e383c7f6094d>
   PrefabRemaps:
     []
-  Name: Encoder_FullRGB
+  Name: FullRGBParticleEncoder
   Enabled: true
   ScriptAsset: !<reference> 2d57b839-30be-46f0-b491-d7a3bc219be2
   ScriptInputsDefault:
@@ -1931,7 +1931,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 10.000000, z: -50.000000}
+    Position: {x: 0.000000, y: 10.000000, z: -100.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -2547,12 +2547,10 @@
     []
   Name: RGBCubeGenerator
   Enabled: true
-  ScriptAsset: !<reference> 549a30a3-5c5b-4705-8931-f8ec5830295c
+  ScriptAsset: !<reference> 91ba6ad5-f382-4591-8224-ab513cb93428
   ScriptInputsDefault:
-    _lineSegments: true
-    _circleSegments: true
-    _capSegments: true
-    _showGridLines: true
+    _gridDensity: true
+    _blueDensity: true
     _colorSpaceFrom: true
   ScriptTypesDefault:
     {}
@@ -2560,14 +2558,9 @@
     "":
       _cubeSize: !<float> 5.000000
       _gridDensity: !<float> 10.000000
-      _lineSegments: !<float> 24.000000
-      _tubeRadius: 0.050000
-      _circleSegments: !<float> 8.000000
-      _capSegments: !<float> 4.000000
+      _blueDensity: !<float> 8.000000
+      _voxelSize: 0.200000
       material: !<reference.Material> 481978cb-17c4-4e38-9fd7-6f96ba27c621
-      _showWireframe: false
-      _showGridLines: true
-      _capStyle: !<float> 1.000000
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 3.000000
       _blend: !<float> 1.000000
@@ -2661,7 +2654,7 @@
 - !<ScriptComponent/7a878e16-7e28-490b-844e-a6c28260c933>
   PrefabRemaps:
     []
-  Name: Encoder_PigmentMix
+  Name: PigmentMixParticleEncoder
   Enabled: true
   ScriptAsset: !<reference> 48ceee92-eb88-445f-8ae2-fa7b9ee1c680
   ScriptInputsDefault:
@@ -4341,7 +4334,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: -50.000000}
+    Position: {x: 0.000000, y: 0.000000, z: -100.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -5523,7 +5516,7 @@
 - !<ScriptComponent/da75c262-34ac-4f12-b315-feec6f184ff1>
   PrefabRemaps:
     []
-  Name: Projector_Gamut_Mesh
+  Name: GamutProjectionMeshGenerator
   Enabled: true
   ScriptAsset: !<reference> 8e3edd20-c99e-49fb-9c27-29bd05e77516
   ScriptInputsDefault:
@@ -5699,7 +5692,7 @@
 - !<ScriptComponent/e6022c88-92cb-488f-b6e6-8f5208967fe0>
   PrefabRemaps:
     []
-  Name: Projector_Gamut
+  Name: GamutProjectionParticleEncoder
   Enabled: true
   ScriptAsset: !<reference> 7100dc9a-700e-49d8-8a1b-d3040a8fb5a5
   ScriptInputsDefault:

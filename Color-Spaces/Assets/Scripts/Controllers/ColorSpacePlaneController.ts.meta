@@ -61,5 +61,5 @@
     - '// @input Component.Text debugText {"hint":"Text for debug display"}'
     - '// @input float uvOffset = 0.5 {"hint":"UV offset for plane local coords (0.5 for -0.5..0.5 planes, 0 for 0..1 planes)"}'
     - '// @input AssignableType rgbCubeGenerator {"hint":"RGBCubeGenerator to update"}'
-    - '// @input AssignableType_1 pigmentMixGenerator {"hint":"PigmentMixGamutGenerator to update"}'
-    - '// @input AssignableType_2 projectorGamutMesh {"hint":"Projector_Gamut_Mesh to update"}'
+    - '// @input AssignableType_1 pigmentMixGenerator {"hint":"PigmentGamutMeshGenerator to update"}'
+    - '// @input AssignableType_2 projectorGamutMesh {"hint":"GamutProjectionMeshGenerator to update"}'

@@ -1,11 +1,11 @@
-// Projector_Controller.ts
-// Moves SceneObjects to match projected LAB positions from Projector_Gamut
+// ProjectedPositionController.ts
+// Moves SceneObjects to match projected LAB positions from GamutProjectionParticleEncoder
 
 @component
-export class Projector_Controller extends BaseScriptComponent {
+export class ProjectedPositionController extends BaseScriptComponent {
 
     @input
-    @hint("Reference to Projector_Gamut script")
+    @hint("Reference to GamutProjectionParticleEncoder script")
     gamutProjector: ScriptComponent;
     
     @input
@@ -67,7 +67,7 @@ export class Projector_Controller extends BaseScriptComponent {
         try {
             this.readProjectedData();
             this.isInitialized = true;
-            print(`ProjectedPositionController initialized with ${this.positions.length} positions`);
+            print(`ProjectedPositionController: initialized with ${this.positions.length} positions`);
             this.updatePositions();
         } catch (e) {
             // Not ready yet

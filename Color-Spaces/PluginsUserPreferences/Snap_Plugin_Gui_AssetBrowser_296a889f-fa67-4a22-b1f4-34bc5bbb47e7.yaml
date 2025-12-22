@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 836
+    size: 840
     values:
       - Images
       - Images/color_spaces_plane.png
@@ -19,6 +19,7 @@ CollapsedEntities:
       - Images/test_encoding/pos_x.png
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
+      - Materials
       - Materials/Color Gradient Opacity 2.mat
       - Materials/Color Gradient Opacity.mat
       - Materials/Color Gradient Opacity.ss_graph
@@ -72,17 +73,20 @@ CollapsedEntities:
       - RoundedRectangle.mat
       - RoundedRectangle.ss_graph
       - Scene.scene
-      - Scripts
-      - Scripts/ColorSpacePlaneController.ts
-      - Scripts/Encoder_FullRGB.ts
-      - Scripts/Encoder_PigmentMix.ts
-      - Scripts/Encoder_RGBCube.ts
-      - Scripts/PigmentMixGamutGenerator.ts
-      - Scripts/Projector_Gamut.ts
-      - Scripts/Projector_Gamut_Mesh.ts
-      - Scripts/RGBCubeGenerator.ts
-      - Scripts/SphereController.ts
-      - Scripts/Util_SpectralMix.ts
+      - Scripts/Controllers
+      - Scripts/Controllers/ColorSpacePlaneController.ts
+      - Scripts/Controllers/ProjectedPositionController.ts
+      - Scripts/Controllers/SphereController.ts
+      - Scripts/Encoders
+      - Scripts/Encoders/FullRGBParticleEncoder.ts
+      - Scripts/Encoders/GamutProjectionParticleEncoder.ts
+      - Scripts/Encoders/PigmentMixParticleEncoder.ts
+      - Scripts/Encoders/RGBCubeParticleEncoder.ts
+      - Scripts/Generators/GamutProjectionMeshGenerator.ts
+      - Scripts/Generators/PigmentGamutMeshGenerator.ts
+      - Scripts/Generators/RGBCubeGenerator.ts
+      - Scripts/Utils
+      - Scripts/Utils/SpectralMixUtil.ts
       - Shaders
       - Shaders/ColorSpaceTransform.js
       - Shaders/ProjectorGamutTransform.js

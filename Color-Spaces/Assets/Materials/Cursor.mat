@@ -10,14 +10,14 @@
   DepthFunction: LessEqual
   TwoSided: false
   ColorMask: {x: true, y: true, z: true, w: true}
-  CullMode: Back
+  CullMode: FrontAndBack
   PolygonOffset: {x: 0.000000, y: 0.000000}
   FrustumCulling: Auto
   FrustumCullPad: 0.000000
   InstanceCount: 1
   Defines:
     []
-  BlendMode: PremultipliedAlphaAuto
+  BlendMode: PremultipliedAlpha
   Properties:
     PreviewEnabled:
       typeIdx: 0

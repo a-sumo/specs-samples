@@ -1,33 +1,31 @@
 
 /**
- * PigmentMixGamutGenerator.ts
+ * RGBCubeGenerator.ts
  *
- * Generates an RGB cube visualization showing only achievable colors via pigment mixing.
- * Uses small cubes at each achievable sample point.
+ * Generates an RGB cube visualization using small voxel cubes
+ * that can be mapped to different color spaces
  */
 @component
-export class PigmentMixGamutGenerator extends BaseScriptComponent {
-
-  // ============ GEOMETRY SETTINGS ============
-
+export class RGBCubeGenerator extends BaseScriptComponent {
   @input
   @hint("Size of the overall cube in scene units")
   private _cubeSize: number = 100.0;
 
   @input
-  @hint("Number of sample lines per axis (density of RGB sampling)")
-  private _gridDensity: number = 10;
+  @hint("Number of sample points per axis (density of RGB sampling)")
+  private _gridDensity: number = 8;
 
   @input
-  @hint("Number of samples per line")
-  private _lineSegments: number = 32;
+  @hint("Number of samples along Blue axis (third dimension)")
+  private _blueDensity: number = 8;
 
   @input
-  @hint("Size of each sample cube")
-  private _sampleSize: number = 2.0;
+  @hint("Size of each voxel cube")
+  @widget(new SliderWidget(0.1, 10, 0.1))
+  private _voxelSize: number = 3.0;
 
   @input
-  @hint("Material for sample cubes")
+  @hint("Material to apply to all voxels")
   public material!: Material;
 
   @input
@@ -64,214 +62,39 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   @hint("Text component to display active color space name")
   colorSpaceText: Text;
 
-  // ============ GAMUT SETTINGS ============
+  private meshBuilder!: MeshBuilder;
+  private meshVisual!: RenderMeshVisual;
 
-  @input
-  @hint("Tolerance for matching RGB to achievable gamut (0-1)")
-  private _gamutTolerance: number = 0.05;
-
-  @input
-  @hint("Resolution of pigment mix sampling for gamut LUT")
-  private _gamutSampleSteps: number = 20;
-
-  // ============ PIGMENT COLORS ============
-
-  @input
-  @hint("Pigment 0: White")
-  @widget(new ColorWidget())
-  pig0Color: vec3 = new vec3(1, 1, 1);
-
-  @input
-  @hint("Pigment 1: Black")
-  @widget(new ColorWidget())
-  pig1Color: vec3 = new vec3(0.08, 0.08, 0.08);
-
-  @input
-  @hint("Pigment 2: Yellow")
-  @widget(new ColorWidget())
-  pig2Color: vec3 = new vec3(1, 0.92, 0);
-
-  @input
-  @hint("Pigment 3: Red")
-  @widget(new ColorWidget())
-  pig3Color: vec3 = new vec3(0.89, 0, 0.13);
-
-  @input
-  @hint("Pigment 4: Blue")
-  @widget(new ColorWidget())
-  pig4Color: vec3 = new vec3(0.1, 0.1, 0.7);
-
-  @input
-  @hint("Pigment 5: Green")
-  @widget(new ColorWidget())
-  pig5Color: vec3 = new vec3(0, 0.47, 0.44);
-
-  // ============ PRIVATE STATE ============
-
-  private static readonly NUM_PIGMENTS = 6;
   private static readonly COLOR_SPACE_NAMES = [
     "RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"
   ];
-  private readonly D65 = { X: 0.95047, Y: 1.0, Z: 1.08883 };
 
-  private meshBuilder!: MeshBuilder;
-  private meshVisual!: RenderMeshVisual;
-  private currentPigments: vec3[] = [];
-  private gamutLUT: vec3[] = [];
+  private readonly D65 = { X: 0.95047, Y: 1.0, Z: 1.08883 };
   private sampleData: { center: vec3; r: number; g: number; b: number }[] = [];
 
   onAwake(): void {
-    this.initializePigments();
-    this.buildGamutLUT();
     this.setupMeshVisual();
     this.collectSampleData();
     this.generateMesh();
     this.updateMaterialParams();
   }
 
-  private initializePigments(): void {
-    this.currentPigments = [
-      this.pig0Color,
-      this.pig1Color,
-      this.pig2Color,
-      this.pig3Color,
-      this.pig4Color,
-      this.pig5Color,
-    ];
-  }
-
   private setupMeshVisual(): void {
-    this.meshVisual = this.sceneObject.createComponent("Component.RenderMeshVisual");
+    this.meshVisual = this.sceneObject.createComponent(
+      "Component.RenderMeshVisual"
+    );
     if (this.material) {
       this.meshVisual.mainMaterial = this.material;
     }
   }
 
   // ============================================
-  // KUBELKA-MUNK PIGMENT MIXING
+  // COLOR SPACE CONVERSIONS (kept for reference)
   // ============================================
 
   private srgbToLinear(c: number): number {
     return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
   }
-
-  private linearToSrgb(c: number): number {
-    return c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
-  }
-
-  private reflectanceToKS(R: number): number {
-    R = Math.max(0.001, Math.min(0.999, R));
-    return ((1 - R) * (1 - R)) / (2 * R);
-  }
-
-  private ksToReflectance(ks: number): number {
-    return 1 + ks - Math.sqrt(ks * ks + 2 * ks);
-  }
-
-  private mixPigments(weights: number[]): vec3 {
-    const ksSum = new vec3(0, 0, 0);
-
-    for (let i = 0; i < this.currentPigments.length; i++) {
-      if (weights[i] <= 0) continue;
-
-      const c = this.currentPigments[i];
-      const lin = new vec3(
-        this.srgbToLinear(c.x),
-        this.srgbToLinear(c.y),
-        this.srgbToLinear(c.z)
-      );
-      const ks = new vec3(
-        this.reflectanceToKS(lin.x),
-        this.reflectanceToKS(lin.y),
-        this.reflectanceToKS(lin.z)
-      );
-
-      ksSum.x += ks.x * weights[i];
-      ksSum.y += ks.y * weights[i];
-      ksSum.z += ks.z * weights[i];
-    }
-
-    const linMix = new vec3(
-      this.ksToReflectance(ksSum.x),
-      this.ksToReflectance(ksSum.y),
-      this.ksToReflectance(ksSum.z)
-    );
-
-    return new vec3(
-      Math.max(0, Math.min(1, this.linearToSrgb(linMix.x))),
-      Math.max(0, Math.min(1, this.linearToSrgb(linMix.y))),
-      Math.max(0, Math.min(1, this.linearToSrgb(linMix.z)))
-    );
-  }
-
-  private buildGamutLUT(): void {
-    this.gamutLUT = [];
-    const steps = this._gamutSampleSteps;
-    const n = PigmentMixGamutGenerator.NUM_PIGMENTS;
-
-    // Pure pigments
-    for (let i = 0; i < n; i++) {
-      this.gamutLUT.push(this.currentPigments[i]);
-    }
-
-    // Two-way mixes
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        for (let s = 1; s < steps; s++) {
-          const t = s / steps;
-          const weights = new Array(n).fill(0);
-          weights[i] = 1 - t;
-          weights[j] = t;
-          this.gamutLUT.push(this.mixPigments(weights));
-        }
-      }
-    }
-
-    // Three-way mixes
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        for (let k = j + 1; k < n; k++) {
-          for (let si = 1; si < steps - 1; si++) {
-            for (let sj = 1; sj < steps - si; sj++) {
-              const wi = si / steps;
-              const wj = sj / steps;
-              const wk = 1 - wi - wj;
-              if (wk > 0) {
-                const weights = new Array(n).fill(0);
-                weights[i] = wi;
-                weights[j] = wj;
-                weights[k] = wk;
-                this.gamutLUT.push(this.mixPigments(weights));
-              }
-            }
-          }
-        }
-      }
-    }
-
-    print(`PigmentMixGamut: Built LUT with ${this.gamutLUT.length} achievable colors`);
-  }
-
-  private isColorAchievable(r: number, g: number, b: number): boolean {
-    const tolSq = this._gamutTolerance * this._gamutTolerance;
-
-    for (const c of this.gamutLUT) {
-      const dr = r - c.x;
-      const dg = g - c.y;
-      const db = b - c.z;
-      const distSq = dr * dr + dg * dg + db * db;
-
-      if (distSq <= tolSq) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  // ============================================
-  // COLOR SPACE CONVERSIONS
-  // ============================================
 
   private linearRgbToXyz(r: number, g: number, b: number): vec3 {
     return new vec3(
@@ -296,9 +119,10 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
 
   private xyzToLuv(x: number, y: number, z: number): vec3 {
     const yr = y / this.D65.Y;
-    const L = yr > Math.pow(6 / 29, 3)
-      ? 116 * Math.pow(yr, 1 / 3) - 16
-      : Math.pow(29 / 3, 3) * yr;
+    const L =
+      yr > Math.pow(6 / 29, 3)
+        ? 116 * Math.pow(yr, 1 / 3) - 16
+        : Math.pow(29 / 3, 3) * yr;
 
     const denom = x + 15 * y + 3 * z;
     if (denom === 0) return new vec3(L, 0, 0);
@@ -317,7 +141,9 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
     const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
 
-    const l_ = Math.cbrt(l), m_ = Math.cbrt(m), s_ = Math.cbrt(s);
+    const l_ = Math.cbrt(l),
+      m_ = Math.cbrt(m),
+      s_ = Math.cbrt(s);
 
     return new vec3(
       0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_,
@@ -336,38 +162,16 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     );
   }
 
-  private updateMaterialParams(): void {
-    if (this.material) {
-      const pass = this.material.mainPass;
-      pass.colorSpaceFrom = this._colorSpaceFrom;
-      pass.colorSpaceTo = this._colorSpaceTo;
-      pass.blend = this._blend;
-      pass.cubeSize = this._cubeSize;
-    }
-    this.updateColorSpaceText();
-  }
-
-  private updateColorSpaceText(): void {
-    if (this.colorSpaceText) {
-      const name = PigmentMixGamutGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
-      this.colorSpaceText.text = name;
-    }
-  }
-
-  /** Get current color space name */
-  public getColorSpaceName(): string {
-    return PigmentMixGamutGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
-  }
-
   // ============================================
-  // MESH GENERATION - SAMPLE CUBES
+  // MESH GENERATION - VOXEL CUBES
   // ============================================
 
   private collectSampleData(): void {
     this.sampleData = [];
     const density = this._gridDensity;
-    const segments = this._lineSegments;
+    const segments = this._blueDensity;
 
+    // Generate a grid of sample points throughout the RGB cube
     for (let ri = 0; ri <= density; ri++) {
       for (let gi = 0; gi <= density; gi++) {
         const r = ri / density;
@@ -375,16 +179,13 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
 
         for (let bi = 0; bi <= segments; bi++) {
           const b = bi / segments;
-
-          if (!this.isColorAchievable(r, g, b)) continue;
-
           const center = this.rgbToDisplayPosition(r, g, b);
           this.sampleData.push({ center, r, g, b });
         }
       }
     }
 
-    print(`PigmentMixGamut: ${this.sampleData.length} achievable samples`);
+    print(`RGBCubeMeshGenerator: ${this.sampleData.length} sample points`);
   }
 
   private generateMesh(): void {
@@ -398,10 +199,10 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     this.meshBuilder.topology = MeshTopology.Triangles;
     this.meshBuilder.indexType = MeshIndexType.UInt16;
 
-    const size = this._sampleSize;
+    const size = this._voxelSize;
 
     for (const sample of this.sampleData) {
-      this.generateCube(sample.center, sample.r, sample.g, sample.b, size);
+      this.generateVoxelCube(sample.center, sample.r, sample.g, sample.b, size);
     }
 
     if (this.meshBuilder.isValid()) {
@@ -412,11 +213,10 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   }
 
   /**
-   * Generate a cube at the given center position
+   * Generate a voxel cube at the given center position
    */
-  private generateCube(center: vec3, r: number, g: number, b: number, size: number): void {
+  private generateVoxelCube(center: vec3, r: number, g: number, b: number, size: number): void {
     const half = size * 0.5;
-    const startIndex = this.meshBuilder.getVerticesCount();
 
     // 8 corners of the cube
     const corners = [
@@ -466,28 +266,28 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   // PUBLIC API (use as event callbacks)
   // ============================================
 
-  private static readonly COLOR_SPACE_COUNT = 6;
+  private static readonly COLOR_SPACE_COUNT = 5;
 
-  public refresh(): void {
-    this.initializePigments();
-    this.buildGamutLUT();
-    this.collectSampleData();
-    this.generateMesh();
+  /** Set both color spaces and blend */
+  public setColorSpace(from: number, to: number, blend: number = 1.0): void {
+    this._colorSpaceFrom = from;
+    this._colorSpaceTo = to;
+    this._blend = blend;
     this.updateMaterialParams();
   }
 
-  /** Cycle to next color space */
+  /** Cycle to next color space (keeps from/to in sync, blend=1) */
   public nextColorSpace(): void {
-    const next = (this._colorSpaceTo + 1) % PigmentMixGamutGenerator.COLOR_SPACE_COUNT;
+    const next = (this._colorSpaceTo + 1) % RGBCubeGenerator.COLOR_SPACE_COUNT;
     this._colorSpaceFrom = next;
     this._colorSpaceTo = next;
     this._blend = 1.0;
     this.updateMaterialParams();
   }
 
-  /** Cycle to previous color space */
+  /** Cycle to previous color space (keeps from/to in sync, blend=1) */
   public prevColorSpace(): void {
-    const prev = (this._colorSpaceTo - 1 + PigmentMixGamutGenerator.COLOR_SPACE_COUNT) % PigmentMixGamutGenerator.COLOR_SPACE_COUNT;
+    const prev = (this._colorSpaceTo - 1 + RGBCubeGenerator.COLOR_SPACE_COUNT) % RGBCubeGenerator.COLOR_SPACE_COUNT;
     this._colorSpaceFrom = prev;
     this._colorSpaceTo = prev;
     this._blend = 1.0;
@@ -508,7 +308,7 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     this.updateMaterialParams();
   }
 
-  /** Start transition: set from=current, to=target, blend=0 */
+  /** Start transition: set from=current, to=target, blend=0 (then animate blend to 1) */
   public startTransition(targetSpace: number): void {
     this._colorSpaceFrom = this._colorSpaceTo;
     this._colorSpaceTo = targetSpace;
@@ -516,17 +316,11 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     this.updateMaterialParams();
   }
 
-  /** Set both color spaces and blend */
-  public setColorSpace(from: number, to: number, blend: number = 1.0): void {
-    this._colorSpaceFrom = from;
-    this._colorSpaceTo = to;
-    this._blend = blend;
+  public refresh(): void {
+    this.collectSampleData();
+    this.generateMesh();
     this.updateMaterialParams();
   }
-
-  // ============================================
-  // PROPERTY ACCESSORS
-  // ============================================
 
   get cubeSize(): number { return this._cubeSize; }
   set cubeSize(value: number) {
@@ -540,19 +334,6 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
   set gridDensity(value: number) {
     this._gridDensity = value;
     this.collectSampleData();
-    this.generateMesh();
-  }
-
-  get lineSegments(): number { return this._lineSegments; }
-  set lineSegments(value: number) {
-    this._lineSegments = value;
-    this.collectSampleData();
-    this.generateMesh();
-  }
-
-  get sampleSize(): number { return this._sampleSize; }
-  set sampleSize(value: number) {
-    this._sampleSize = value;
     this.generateMesh();
   }
 
@@ -574,10 +355,38 @@ export class PigmentMixGamutGenerator extends BaseScriptComponent {
     this.updateMaterialParams();
   }
 
-  get gamutTolerance(): number { return this._gamutTolerance; }
-  set gamutTolerance(value: number) {
-    this._gamutTolerance = value;
-    this.buildGamutLUT();
+  private updateMaterialParams(): void {
+    if (this.material) {
+      const pass = this.material.mainPass;
+      pass.colorSpaceFrom = this._colorSpaceFrom;
+      pass.colorSpaceTo = this._colorSpaceTo;
+      pass.blend = this._blend;
+      pass.cubeSize = this._cubeSize;
+    }
+    this.updateColorSpaceText();
+  }
+
+  private updateColorSpaceText(): void {
+    if (this.colorSpaceText) {
+      const name = RGBCubeGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+      this.colorSpaceText.text = name;
+    }
+  }
+
+  /** Get current color space name */
+  public getColorSpaceName(): string {
+    return RGBCubeGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+  }
+
+  get voxelSize(): number { return this._voxelSize; }
+  set voxelSize(value: number) {
+    this._voxelSize = value;
+    this.generateMesh();
+  }
+
+  get blueDensity(): number { return this._blueDensity; }
+  set blueDensity(value: number) {
+    this._blueDensity = value;
     this.collectSampleData();
     this.generateMesh();
   }

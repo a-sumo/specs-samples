@@ -1,20 +1,20 @@
-- !<AssetImportMetadata/fed6be00-fecb-4790-97b2-00ccb96537ca>
+- !<AssetImportMetadata/a1eaa09a-7342-4ad2-a632-8b34ad01b352>
   ImportedAssetIds:
-    TypeScriptAsset: !<reference> 549a30a3-5c5b-4705-8931-f8ec5830295c
+    TypeScriptAsset: !<reference> 91ba6ad5-f382-4591-8224-ab513cb93428
   ImporterName: TypeScriptAssetImporter
-  PrimaryAsset: !<reference> 549a30a3-5c5b-4705-8931-f8ec5830295c
+  PrimaryAsset: !<reference> 91ba6ad5-f382-4591-8224-ab513cb93428
   PackageType: NotAPackage
   LegacyPackagePolicy: ~
   ExtraData:
     {}
   AssetDataMap:
-    TypeScriptAsset: !<own> dd91a701-bee7-444b-b62f-3b55d7aaa511
+    TypeScriptAsset: !<own> d4466db2-60ce-4a22-bcf1-035e7f5583a4
   DependentFiles:
     []
   ImporterSettings: !<AssetImporterSettings>
     {}
   CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
-- !<TypeScriptAssetData/dd91a701-bee7-444b-b62f-3b55d7aaa511>
+- !<TypeScriptAssetData/d4466db2-60ce-4a22-bcf1-035e7f5583a4>
   SvgIcon: ""
   SetupScript:
     code: ""
@@ -22,22 +22,17 @@
   VersionMajor: 0
   VersionMinor: 0
   VersionPatch: 0
-  ComponentUid: e019ed23-7303-4b30-9a39-0c6c42be9f5f
+  ComponentUid: 98809633-709a-4bb0-9d32-75facce0070f
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     _blend: false
-    _capSegments: false
-    _capStyle: false
-    _circleSegments: false
+    _blueDensity: false
     _colorSpaceFrom: false
     _colorSpaceTo: false
     _cubeSize: false
     _gridDensity: false
-    _lineSegments: false
-    _showGridLines: false
-    _showWireframe: false
-    _tubeRadius: false
+    _voxelSize: false
     colorSpaceText: false
     material: false
   ScriptTypesHidden:
@@ -50,15 +45,10 @@
     []
   DefaultScriptInputs:
     - _cubeSize: !<float> 100.000000
-      _gridDensity: !<float> 5.000000
-      _lineSegments: !<float> 24.000000
-      _tubeRadius: !<float> 1.000000
-      _circleSegments: !<float> 8.000000
-      _capSegments: !<float> 4.000000
+      _gridDensity: !<float> 10.000000
+      _blueDensity: !<float> 8.000000
+      _voxelSize: !<float> 3.000000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
-      _showWireframe: true
-      _showGridLines: true
-      _capStyle: !<float> 2.000000
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 0.000000
       _blend: !<float> 0.000000
@@ -67,16 +57,11 @@
     -
       {}
   InputLines:
-    - '// @input float _cubeSize = 100 {"hint":"Size of the cube in scene units"}'
-    - '// @input float _gridDensity = 5 {"hint":"Number of lines per axis (e.g., 5 = 5x5 grid of vertical lines)"}'
-    - '// @input float _lineSegments = 24 {"hint":"Number of segments per line (for smooth curves when transformed)"}'
-    - '// @input float _tubeRadius = 1 {"hint":"Radius of each tube"}'
-    - '// @input float _circleSegments = 8 {"hint":"Number of segments around tube circumference"}'
-    - '// @input float _capSegments = 4 {"hint":"Number of latitude rings on hemisphere caps"}'
-    - '// @input Asset.Material material {"hint":"Material to apply to all lines"}'
-    - '// @input bool _showWireframe = true {"hint":"Draw the wireframe edges of the cube"}'
-    - '// @input bool _showGridLines = true {"hint":"Draw the grid of vertical lines"}'
-    - '// @input float _capStyle = 2 {"hint":"End cap style for tubes", "widget":"combobox", "values":[{"label":"None", "value":0}, {"label":"Flat", "value":1}, {"label":"Rounded", "value":2}]}'
+    - '// @input float _cubeSize = 100 {"hint":"Size of the overall cube in scene units"}'
+    - '// @input float _gridDensity = 8 {"hint":"Number of sample points per axis (density of RGB sampling)"}'
+    - '// @input float _blueDensity = 8 {"hint":"Number of samples along Blue axis (third dimension)"}'
+    - '// @input float _voxelSize = 3 {"hint":"Size of each voxel cube", "widget":"slider", "min":0.1, "max":10, "step":0.1}'
+    - '// @input Asset.Material material {"hint":"Material to apply to all voxels"}'
     - '// @input float _colorSpaceFrom {"hint":"Source color space (blend = 0)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
     - '// @input float _colorSpaceTo {"hint":"Target color space (blend = 1)", "widget":"combobox", "values":[{"label":"RGB", "value":0}, {"label":"CIELAB", "value":1}, {"label":"CIEXYZ", "value":2}, {"label":"Oklab", "value":3}, {"label":"CIELUV", "value":4}]}'
     - '// @input float _blend {"hint":"Interpolation: 0 = from space, 1 = to space"}'

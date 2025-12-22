@@ -1,10 +1,10 @@
-// Projector_Gamut_Mesh.ts
+// GamutProjectionMeshGenerator.ts
 // Mesh-based gamut projection - finds nearest achievable pigment mix for each input color
 // Creates cube meshes at projected positions in the chosen color space
 
 
 @component
-export class Projector_Gamut_Mesh extends BaseScriptComponent {
+export class GamutProjectionMeshGenerator extends BaseScriptComponent {
 
     // ============ GEOMETRY SETTINGS ============
 
@@ -157,14 +157,14 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     private updateColorSpaceText(): void {
         if (this.colorSpaceText) {
-            const name = Projector_Gamut_Mesh.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+            const name = GamutProjectionMeshGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
             this.colorSpaceText.text = name;
         }
     }
 
     /** Get current color space name */
     public getColorSpaceName(): string {
-        return Projector_Gamut_Mesh.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
+        return GamutProjectionMeshGenerator.COLOR_SPACE_NAMES[this._colorSpaceTo] || "Unknown";
     }
 
     private initializePigments(): void {
@@ -245,7 +245,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
     private buildGamutLUT(): void {
         this.gamutLUT = [];
         const steps = this._gamutSampleSteps;
-        const n = Projector_Gamut_Mesh.NUM_PIGMENTS;
+        const n = GamutProjectionMeshGenerator.NUM_PIGMENTS;
 
         // Pure pigments
         for (let i = 0; i < n; i++) {
@@ -543,7 +543,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     /** Cycle to next color space */
     public nextColorSpace(): void {
-        const next = (this._colorSpaceTo + 1) % Projector_Gamut_Mesh.COLOR_SPACE_COUNT;
+        const next = (this._colorSpaceTo + 1) % GamutProjectionMeshGenerator.COLOR_SPACE_COUNT;
         this._colorSpaceFrom = next;
         this._colorSpaceTo = next;
         this._blend = 1.0;
@@ -552,7 +552,7 @@ export class Projector_Gamut_Mesh extends BaseScriptComponent {
 
     /** Cycle to previous color space */
     public prevColorSpace(): void {
-        const prev = (this._colorSpaceTo - 1 + Projector_Gamut_Mesh.COLOR_SPACE_COUNT) % Projector_Gamut_Mesh.COLOR_SPACE_COUNT;
+        const prev = (this._colorSpaceTo - 1 + GamutProjectionMeshGenerator.COLOR_SPACE_COUNT) % GamutProjectionMeshGenerator.COLOR_SPACE_COUNT;
         this._colorSpaceFrom = prev;
         this._colorSpaceTo = prev;
         this._blend = 1.0;

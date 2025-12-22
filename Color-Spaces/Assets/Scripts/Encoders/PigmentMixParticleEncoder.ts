@@ -1,9 +1,9 @@
-// Encoder_PigmentMix.ts
+// PigmentMixParticleEncoder.ts
 // Encodes the achievable gamut from mixing physical pigments (Kubelka-Munk)
-// Gets pigment colors from PaletteController
+// Gets pigment colors from PaletteController for VFX particle visualization
 
 @component
-export class Encoder_PigmentMix extends BaseScriptComponent {
+export class PigmentMixParticleEncoder extends BaseScriptComponent {
 
     @input
     @hint("Material with PigmentGamutEncoder shader")
@@ -72,7 +72,7 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
 
     onAwake(): void {
         if (!this.encoderMaterial) {
-            print("Encoder_PigmentMix: ERROR - encoderMaterial not set");
+            print("PigmentMixParticleEncoder: ERROR - encoderMaterial not set");
             return;
         }
 
@@ -88,7 +88,7 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
 
         // Create pigment texture
         this.pigmentTexture = ProceduralTextureProvider.createWithFormat(
-            Encoder_PigmentMix.NUM_PIGMENTS,
+            PigmentMixParticleEncoder.NUM_PIGMENTS,
             1,
             TextureFormat.RGBA8Unorm
         );
@@ -102,8 +102,8 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
         // Clone and configure material
         const material = this.encoderMaterial.clone();
         material.mainPass.pigmentTex = this.pigmentTexture;
-        material.mainPass.numPigments = Encoder_PigmentMix.NUM_PIGMENTS;
-        material.mainPass.texWidth = Encoder_PigmentMix.NUM_PIGMENTS;
+        material.mainPass.numPigments = PigmentMixParticleEncoder.NUM_PIGMENTS;
+        material.mainPass.texWidth = PigmentMixParticleEncoder.NUM_PIGMENTS;
         material.mainPass.texSize = this.texSize;
         material.mainPass.mixSteps = this.mixSteps;
 
@@ -122,13 +122,13 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
         this.createEvent("OnStartEvent").bind(() => {
             this.setupPaletteListener();
             this.initialized = true;
-            print("Encoder_PigmentMix: Ready (palette listener connected)");
+            print("PigmentMixParticleEncoder: Ready (palette listener connected)");
         });
     }
 
     private setupPaletteListener(): void {
         if (!this.paletteController) {
-            print("Encoder_PigmentMix: No PaletteController assigned, using fallback colors");
+            print("PigmentMixParticleEncoder: No PaletteController assigned, using fallback colors");
             return;
         }
 
@@ -139,10 +139,10 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
             controller.onPresetChanged.add((event: any) => {
                 if (event.colors) {
                     this.onPaletteColorsChanged(event.colors);
-                    print(`Encoder_PigmentMix: Preset '${event.presetName}' applied with ${event.colors.length} colors`);
+                    print(`PigmentMixParticleEncoder: Preset '${event.presetName}' applied with ${event.colors.length} colors`);
                 }
             });
-            print("Encoder_PigmentMix: Listening for preset changes");
+            print("PigmentMixParticleEncoder: Listening for preset changes");
         }
 
         // Listen for manual color changes (when user samples colors, edits individual slots)
@@ -150,10 +150,10 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
             controller.onColorsManuallyChanged.add((colors: any) => {
                 if (colors && colors.length > 0) {
                     this.onPaletteColorsChanged(colors);
-                    print(`Encoder_PigmentMix: Manual color change, updated ${colors.length} colors`);
+                    print(`PigmentMixParticleEncoder: Manual color change, updated ${colors.length} colors`);
                 }
             });
-            print("Encoder_PigmentMix: Listening for manual color changes");
+            print("PigmentMixParticleEncoder: Listening for manual color changes");
         }
 
         // Listen for palette restored (undo, deselect preset)
@@ -161,10 +161,10 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
             controller.onPaletteRestored.add((colors: any) => {
                 if (colors && colors.length > 0) {
                     this.onPaletteColorsChanged(colors);
-                    print(`Encoder_PigmentMix: Palette restored with ${colors.length} colors`);
+                    print(`PigmentMixParticleEncoder: Palette restored with ${colors.length} colors`);
                 }
             });
-            print("Encoder_PigmentMix: Listening for palette restore");
+            print("PigmentMixParticleEncoder: Listening for palette restore");
         }
 
         // Get initial colors if available
@@ -172,7 +172,7 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
             const colors = controller.getAllColors();
             if (colors && colors.length > 0) {
                 this.onPaletteColorsChanged(colors);
-                print(`Encoder_PigmentMix: Got ${colors.length} initial colors from PaletteController`);
+                print(`PigmentMixParticleEncoder: Got ${colors.length} initial colors from PaletteController`);
             }
         }
     }
@@ -181,7 +181,7 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
         if (!colors || colors.length === 0) return;
 
         // Update current pigments from palette colors (convert vec4 to vec3)
-        for (let i = 0; i < Math.min(colors.length, Encoder_PigmentMix.NUM_PIGMENTS); i++) {
+        for (let i = 0; i < Math.min(colors.length, PigmentMixParticleEncoder.NUM_PIGMENTS); i++) {
             const c = colors[i];
             this.currentPigments[i] = new vec3(c.r, c.g, c.b);
         }
@@ -190,9 +190,9 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
     }
 
     private updatePigmentTexture(): void {
-        const pixels = new Uint8Array(Encoder_PigmentMix.NUM_PIGMENTS * 4);
+        const pixels = new Uint8Array(PigmentMixParticleEncoder.NUM_PIGMENTS * 4);
 
-        for (let i = 0; i < Encoder_PigmentMix.NUM_PIGMENTS; i++) {
+        for (let i = 0; i < PigmentMixParticleEncoder.NUM_PIGMENTS; i++) {
             const pigment = this.currentPigments[i] || new vec3(0.5, 0.5, 0.5);
             const idx = i * 4;
             pixels[idx + 0] = Math.round(pigment.x * 255);
@@ -202,7 +202,7 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
         }
 
         (this.pigmentTexture.control as ProceduralTextureProvider).setPixels(
-            0, 0, Encoder_PigmentMix.NUM_PIGMENTS, 1, pixels
+            0, 0, PigmentMixParticleEncoder.NUM_PIGMENTS, 1, pixels
         );
     }
 
@@ -285,7 +285,7 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
      * Set pigment colors directly (alternative to PaletteController)
      */
     setPigmentColors(colors: vec3[]): void {
-        for (let i = 0; i < Math.min(colors.length, Encoder_PigmentMix.NUM_PIGMENTS); i++) {
+        for (let i = 0; i < Math.min(colors.length, PigmentMixParticleEncoder.NUM_PIGMENTS); i++) {
             this.currentPigments[i] = colors[i];
         }
     }
@@ -298,7 +298,7 @@ export class Encoder_PigmentMix extends BaseScriptComponent {
     }
 
     getGamutValidCount(): number {
-        const n = Encoder_PigmentMix.NUM_PIGMENTS;
+        const n = PigmentMixParticleEncoder.NUM_PIGMENTS;
         const steps = this.mixSteps;
 
         const purePigments = n;

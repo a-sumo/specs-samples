@@ -202,7 +202,7 @@
 - !<ScriptComponent/abb38042-af65-41a1-9af8-d7a8fd3ca041>
   PrefabRemaps:
     []
-  Name: Projector_Gamut
+  Name: GamutProjectionParticleEncoder
   Enabled: true
   ScriptAsset: !<reference> 7100dc9a-700e-49d8-8a1b-d3040a8fb5a5
   ScriptInputsDefault:

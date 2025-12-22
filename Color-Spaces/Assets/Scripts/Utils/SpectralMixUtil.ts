@@ -1,7 +1,8 @@
+// SpectralMixUtil.ts
 // Utility for testing spectral/Kubelka-Munk color mixing
 
 @component
-export class Util_SpectralMix extends BaseScriptComponent {
+export class SpectralMixUtil extends BaseScriptComponent {
     
     @input
     material: Material;
@@ -55,7 +56,7 @@ export class Util_SpectralMix extends BaseScriptComponent {
     
     onAwake(): void {
         if (!this.material) {
-            print("Util_SpectralMix: No material assigned!");
+            print("SpectralMixUtil: No material assigned!");
             return;
         }
         
@@ -63,25 +64,25 @@ export class Util_SpectralMix extends BaseScriptComponent {
         
         // Create procedural texture (6x1, RGBA)
         this.proceduralTexture = ProceduralTextureProvider.createWithFormat(
-            Util_SpectralMix.NUM_PIGMENTS, 
+            SpectralMixUtil.NUM_PIGMENTS, 
             1, 
             TextureFormat.RGBA8Unorm
         );
         
         // Assign to material
         this.mainPass.pigmentTex = this.proceduralTexture;
-        this.mainPass.numPigments = Util_SpectralMix.NUM_PIGMENTS;
-        this.mainPass.texWidth = Util_SpectralMix.NUM_PIGMENTS;
+        this.mainPass.numPigments = SpectralMixUtil.NUM_PIGMENTS;
+        this.mainPass.texWidth = SpectralMixUtil.NUM_PIGMENTS;
         
         this.rebuildPixels();
         
         this.createEvent("UpdateEvent").bind(() => this.rebuildPixels());
         
-        print("Util_SpectralMix initialized");
+        print("SpectralMixUtil: initialized");
     }
     
     private rebuildPixels(): void {
-        const pixels = new Uint8Array(Util_SpectralMix.NUM_PIGMENTS * 4);
+        const pixels = new Uint8Array(SpectralMixUtil.NUM_PIGMENTS * 4);
         
         const pigments = [
             { color: this.pig0Color, conc: this.pig0Conc },
@@ -92,7 +93,7 @@ export class Util_SpectralMix extends BaseScriptComponent {
             { color: this.pig5Color, conc: this.pig5Conc },
         ];
         
-        for (let i = 0; i < Util_SpectralMix.NUM_PIGMENTS; i++) {
+        for (let i = 0; i < SpectralMixUtil.NUM_PIGMENTS; i++) {
             const idx = i * 4;
             pixels[idx + 0] = Math.round(pigments[i].color.x * 255);
             pixels[idx + 1] = Math.round(pigments[i].color.y * 255);
@@ -101,7 +102,7 @@ export class Util_SpectralMix extends BaseScriptComponent {
         }
         
         (this.proceduralTexture.control as ProceduralTextureProvider).setPixels(
-            0, 0, Util_SpectralMix.NUM_PIGMENTS, 1, pixels
+            0, 0, SpectralMixUtil.NUM_PIGMENTS, 1, pixels
         );
     }
 }
