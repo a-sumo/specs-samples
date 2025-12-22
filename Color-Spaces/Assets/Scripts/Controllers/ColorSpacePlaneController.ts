@@ -321,4 +321,28 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   public setSnapThreshold(threshold: number): void {
     this.snapThreshold = Math.max(0, Math.min(1, threshold));
   }
+
+  // ============================================
+  // SYNC METHODS - apply to all generators
+  // ============================================
+
+  /** Sync display size across all generators */
+  public syncDisplaySize(size: number): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.setDisplaySize(size);
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.setDisplaySize(size);
+    if (this.projectorGamutMesh) this.projectorGamutMesh.setDisplaySize(size);
+  }
+
+  /** Sync voxel size across all generators */
+  public syncVoxelSize(size: number): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.setVoxelSize(size);
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.setVoxelSize(size);
+    if (this.projectorGamutMesh) this.projectorGamutMesh.setVoxelSize(size);
+  }
+
+  /** Sync grid resolution across RGBCubeGenerator and PigmentGamutMeshGenerator */
+  public syncGridResolution(res: number): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.setGridResolution(res);
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.setGridResolution(res);
+  }
 }

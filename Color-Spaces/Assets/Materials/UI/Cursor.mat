@@ -25,7 +25,7 @@
     planeMap:
       typeIdx: 9
       value:
-        id: 90d140d9-071b-45ce-84b6-01651fb50abf
+        id: 00000000-0000-0000-0000-000000000000
         sampler:
           filteringMode: Bilinear
           wrapModeU: ClampToEdge

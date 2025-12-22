@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 845
+    size: 846
     values:
       - Images
       - Images/color_spaces_plane.png
@@ -19,6 +19,7 @@ CollapsedEntities:
       - Images/test_encoding/pos_x.png
       - Images/test_encoding/pos_y.png
       - Images/test_encoding/pos_z.png
+      - Materials
       - Materials/Encoders
       - Materials/Encoders/LabEncoder.mat
       - Materials/Encoders/LabEncoder.ss_graph
@@ -688,12 +689,12 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/SIK Examples.prefab
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
-      - SpectaclesUIKit.lspkg
       - SpectaclesUIKit.lspkg/Audio
       - SpectaclesUIKit.lspkg/Audio/HoverAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/SliderProgressionAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/TriggerEndAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/TriggerStartAudioTrack.wav
+      - SpectaclesUIKit.lspkg/Materials
       - SpectaclesUIKit.lspkg/Materials/BaseRoundedRectangle.mat
       - SpectaclesUIKit.lspkg/Materials/BaseRoundedRectangle.ss_graph
       - SpectaclesUIKit.lspkg/Materials/CapsuleSphere.mat

@@ -8,16 +8,12 @@
 @component
 export class RGBCubeGenerator extends BaseScriptComponent {
   @input
-  @hint("Size of the overall cube in scene units")
-  private _cubeSize: number = 100.0;
+  @hint("Size of the display volume in scene units")
+  private _displaySize: number = 100.0;
 
   @input
-  @hint("Number of sample points per axis (density of RGB sampling)")
-  private _gridDensity: number = 8;
-
-  @input
-  @hint("Number of samples along Blue axis (third dimension)")
-  private _blueDensity: number = 8;
+  @hint("Number of samples per axis (e.g., 8 = 8x8x8 = 512 voxels)")
+  private _gridResolution: number = 8;
 
   @input
   @hint("Size of each voxel cube")
@@ -154,7 +150,7 @@ export class RGBCubeGenerator extends BaseScriptComponent {
 
   // Always generate in RGB space - shader handles color space transformation
   private rgbToDisplayPosition(r: number, g: number, b: number): vec3 {
-    const size = this._cubeSize;
+    const size = this._displaySize;
     return new vec3(
       (r - 0.5) * size,
       (b - 0.5) * size,
@@ -168,24 +164,22 @@ export class RGBCubeGenerator extends BaseScriptComponent {
 
   private collectSampleData(): void {
     this.sampleData = [];
-    const density = this._gridDensity;
-    const segments = this._blueDensity;
+    const res = this._gridResolution;
 
-    // Generate a grid of sample points throughout the RGB cube
-    for (let ri = 0; ri <= density; ri++) {
-      for (let gi = 0; gi <= density; gi++) {
-        const r = ri / density;
-        const g = gi / density;
-
-        for (let bi = 0; bi <= segments; bi++) {
-          const b = bi / segments;
+    // Generate a uniform grid of sample points throughout the RGB cube
+    for (let ri = 0; ri <= res; ri++) {
+      for (let gi = 0; gi <= res; gi++) {
+        for (let bi = 0; bi <= res; bi++) {
+          const r = ri / res;
+          const g = gi / res;
+          const b = bi / res;
           const center = this.rgbToDisplayPosition(r, g, b);
           this.sampleData.push({ center, r, g, b });
         }
       }
     }
 
-    print(`RGBCubeMeshGenerator: ${this.sampleData.length} sample points`);
+    print(`RGBCubeGenerator: ${this.sampleData.length} voxels (${res + 1}³)`);
   }
 
   private generateMesh(): void {
@@ -322,17 +316,17 @@ export class RGBCubeGenerator extends BaseScriptComponent {
     this.updateMaterialParams();
   }
 
-  get cubeSize(): number { return this._cubeSize; }
-  set cubeSize(value: number) {
-    this._cubeSize = value;
+  get displaySize(): number { return this._displaySize; }
+  set displaySize(value: number) {
+    this._displaySize = value;
     this.collectSampleData();
     this.generateMesh();
     this.updateMaterialParams();
   }
 
-  get gridDensity(): number { return this._gridDensity; }
-  set gridDensity(value: number) {
-    this._gridDensity = value;
+  get gridResolution(): number { return this._gridResolution; }
+  set gridResolution(value: number) {
+    this._gridResolution = Math.max(1, Math.floor(value));
     this.collectSampleData();
     this.generateMesh();
   }
@@ -361,7 +355,7 @@ export class RGBCubeGenerator extends BaseScriptComponent {
       pass.colorSpaceFrom = this._colorSpaceFrom;
       pass.colorSpaceTo = this._colorSpaceTo;
       pass.blend = this._blend;
-      pass.cubeSize = this._cubeSize;
+      pass.cubeSize = this._displaySize;
     }
     this.updateColorSpaceText();
   }
@@ -384,10 +378,18 @@ export class RGBCubeGenerator extends BaseScriptComponent {
     this.generateMesh();
   }
 
-  get blueDensity(): number { return this._blueDensity; }
-  set blueDensity(value: number) {
-    this._blueDensity = value;
-    this.collectSampleData();
-    this.generateMesh();
+  /** Set display size (convenience method for syncing across generators) */
+  public setDisplaySize(size: number): void {
+    this.displaySize = size;
+  }
+
+  /** Set voxel size (convenience method for syncing across generators) */
+  public setVoxelSize(size: number): void {
+    this.voxelSize = size;
+  }
+
+  /** Set grid resolution (convenience method for syncing across generators) */
+  public setGridResolution(res: number): void {
+    this.gridResolution = res;
   }
 }

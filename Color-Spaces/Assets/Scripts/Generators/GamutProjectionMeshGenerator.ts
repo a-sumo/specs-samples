@@ -9,12 +9,12 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     // ============ GEOMETRY SETTINGS ============
 
     @input
-    @hint("Size of the display space in scene units")
-    private _cubeSize: number = 100.0;
+    @hint("Size of the display volume in scene units")
+    private _displaySize: number = 100.0;
 
     @input
-    @hint("Size of each sample cube")
-    private _sampleSize: number = 1.0;
+    @hint("Size of each voxel cube")
+    private _voxelSize: number = 1.0;
 
     @input
     @hint("Show projection lines connecting input to projected positions")
@@ -163,7 +163,7 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
             pass.colorSpaceTo = this._colorSpaceTo;
             pass.blend = this._blend;
             pass.projectionBlend = this._projectionBlend;
-            pass.cubeSize = this._cubeSize;
+            pass.cubeSize = this._displaySize;
         }
         this.updateColorSpaceText();
     }
@@ -374,7 +374,7 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
 
     // Always generate in RGB space - shader handles color space transformation
     private rgbToDisplayPosition(r: number, g: number, b: number): vec3 {
-        const size = this._cubeSize;
+        const size = this._displaySize;
         return new vec3(
             (r - 0.5) * size,
             (b - 0.5) * size,
@@ -440,8 +440,6 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
         this.meshBuilder.topology = MeshTopology.Triangles;
         this.meshBuilder.indexType = MeshIndexType.UInt16;
 
-        const size = this._sampleSize;
-
         // Generate cubes in RGB space using INPUT colors (shader handles transformation)
         for (let i = 0; i < this.projectedColors.length; i++) {
             const inputRGB = this.inputColors[i];
@@ -454,7 +452,7 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
                 inputPos.x, inputPos.y, inputPos.z,
                 inputRGB.x, inputRGB.y, inputRGB.z,
                 projectedRGB.x, projectedRGB.y, projectedRGB.z,
-                size
+                this._voxelSize
             );
 
             // Generate tube connecting input to projected position
@@ -768,18 +766,18 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
 
     // ============ PROPERTY ACCESSORS ============
 
-    get cubeSize(): number { return this._cubeSize; }
-    set cubeSize(value: number) {
-        this._cubeSize = value;
+    get displaySize(): number { return this._displaySize; }
+    set displaySize(value: number) {
+        this._displaySize = value;
         if (this.projectedColors.length > 0) {
             this.generateMesh();
             this.updateMaterialParams();
         }
     }
 
-    get sampleSize(): number { return this._sampleSize; }
-    set sampleSize(value: number) {
-        this._sampleSize = value;
+    get voxelSize(): number { return this._voxelSize; }
+    set voxelSize(value: number) {
+        this._voxelSize = value;
         if (this.projectedColors.length > 0) {
             this.generateMesh();
         }
@@ -851,5 +849,15 @@ export class GamutProjectionMeshGenerator extends BaseScriptComponent {
     /** Set line radius */
     public setLineRadius(radius: number): void {
         this.lineRadius = radius;
+    }
+
+    /** Set display size (convenience method for syncing across generators) */
+    public setDisplaySize(size: number): void {
+        this.displaySize = size;
+    }
+
+    /** Set voxel size (convenience method for syncing across generators) */
+    public setVoxelSize(size: number): void {
+        this.voxelSize = size;
     }
 }

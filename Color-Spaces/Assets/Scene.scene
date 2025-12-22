@@ -951,7 +951,9 @@
   Enabled: true
   ScriptAsset: !<reference> a519bb72-442a-4dc1-b394-f2e240a47203
   ScriptInputsDefault:
-    _lineSegments: true
+    _displaySize: true
+    _gridResolution: true
+    _voxelSize: true
     _colorSpaceFrom: true
     _colorSpaceTo: true
     _blend: true
@@ -966,10 +968,9 @@
     {}
   ScriptInputs:
     "":
-      _cubeSize: !<float> 10.000000
-      _gridDensity: !<float> 10.000000
-      _lineSegments: !<float> 24.000000
-      _sampleSize: 0.400000
+      _displaySize: !<float> 100.000000
+      _gridResolution: !<float> 16.000000
+      _voxelSize: !<float> 2.000000
       material: !<reference.Material> 08483bad-552c-40d5-8a98-c7be515f0378
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 0.000000
@@ -2628,17 +2629,16 @@
   Enabled: true
   ScriptAsset: !<reference> 91ba6ad5-f382-4591-8224-ab513cb93428
   ScriptInputsDefault:
-    _gridDensity: true
-    _blueDensity: true
+    _displaySize: true
+    _gridResolution: true
     _colorSpaceFrom: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
-      _cubeSize: !<float> 10.000000
-      _gridDensity: !<float> 10.000000
-      _blueDensity: !<float> 8.000000
-      _voxelSize: 0.200000
+      _displaySize: !<float> 100.000000
+      _gridResolution: !<float> 8.000000
+      _voxelSize: !<float> 1.000000
       material: !<reference.Material> 481978cb-17c4-4e38-9fd7-6f96ba27c621
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 3.000000
@@ -3527,7 +3527,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Position: {x: 0.000000, y: 0.000000, z: 0.020000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -4547,12 +4547,13 @@
   ShadowDensity: 1.000000
   Materials:
     - !<reference> c1e111c5-de0a-41ec-9bbe-7f7b986b5a38
-  Mesh: !<reference> 77606c41-6c92-47b8-abab-eba5120e266d
+  Mesh: !<reference> ee06c70a-ca3f-459c-8883-dcfcac1553d2
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
   BlendNormals: false
   BlendShapes:
-    {}
+    Pinch: 0.000000
+    Z depth: 1.000000
 - !<SceneObject/ad7e942c-597c-40f8-9f2c-1d8931f837e2>
   PrefabRemaps:
     []
@@ -5637,6 +5638,8 @@
   Enabled: true
   ScriptAsset: !<reference> 8e3edd20-c99e-49fb-9c27-29bd05e77516
   ScriptInputsDefault:
+    _displaySize: true
+    _voxelSize: true
     _showLines: true
     _tubeSegments: true
     _colorSpaceFrom: true
@@ -5654,8 +5657,8 @@
     {}
   ScriptInputs:
     "":
-      _cubeSize: !<float> 10.000000
-      _sampleSize: 0.400000
+      _displaySize: !<float> 100.000000
+      _voxelSize: !<float> 1.000000
       _showLines: true
       _lineRadius: 0.030000
       _tubeSegments: !<float> 6.000000
