@@ -433,7 +433,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -10.000000, y: -4.000000, z: 5.000000}
+    Position: {x: 10.000000, y: -4.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -1062,7 +1062,7 @@
 - !<SceneObject/213fc50a-9fbd-490b-9295-c1c34a33cc4f>
   PrefabRemaps:
     []
-  Name: Button Rest
+  Name: Button Return
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -1777,7 +1777,9 @@
   MeshShadowMode: None
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
-  Text: Back to Rest
+  Text: |
+    Return
+
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
@@ -2170,7 +2172,7 @@
   MeshShadowMode: None
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
-  Text: Back to Rest
+  Text: Return
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
@@ -2272,7 +2274,7 @@
 - !<SceneObject/51c7b1af-7ff9-4a15-b90e-d86fa3ea8582>
   PrefabRemaps:
     []
-  Name: Button Rest
+  Name: Button Return
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -2853,11 +2855,11 @@
 - !<SceneObject/724f434e-9951-4837-93f6-ad2e3aa2d0b6>
   PrefabRemaps:
     []
-  Name: Button Rest
+  Name: Button Return
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 18.000000, y: 0.000000, z: 0.000000}
+    Position: {x: 10.000000, y: 4.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -3654,7 +3656,7 @@
   MeshShadowMode: None
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
-  Text: Back to Rest
+  Text: Return
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
@@ -5565,7 +5567,6 @@
   ScriptInputsDefault:
     _showLines: true
     _tubeSegments: true
-    _projectionBlend: true
     _colorSpaceFrom: true
     _colorSpaceTo: true
     _blend: true
@@ -5589,7 +5590,7 @@
       _showLines: true
       _lineRadius: 0.030000
       _tubeSegments: !<float> 6.000000
-      _projectionBlend: !<float> 1.000000
+      _projectionBlend: !<float> 0.000000
       material: !<reference.Material> 015473a5-c5c0-4d35-ba6d-b4e5d3d62678
       _colorSpaceFrom: !<float> 0.000000
       _colorSpaceTo: !<float> 0.000000
