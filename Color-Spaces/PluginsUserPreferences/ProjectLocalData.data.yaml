@@ -1,10 +1,10 @@
 data:
   externalSources:
+    - 092d5f33-0b75-4654-82a2-cb7f73aa1b85: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 0aee8283-84e0-4f9c-b031-afb427f5d91f: /Users/armand/Downloads/mont/Mont_Specimen.pdf
     - 1006e2f7-7f9e-4981-a93a-3143739ba4e3: /Users/armand/Downloads/galter/Galter.ttf
     - 1667e9de-3e65-4d14-9936-4373e61f6108: /Users/armand/Downloads/galter/Galter.otf
     - 2cf800ba-2218-4adc-881c-f2afcd40b01e: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
-    - 308ce17d-2ac1-4a0c-b06a-788d588da270: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 42bd210e-7587-4c74-997b-849cd19fd6cf: /Users/armand/Downloads/color_spaces_plane(2).png
     - 52c1731c-8567-4c78-bc37-ebcfb1da2984: /Users/armand/Downloads/mont/EULA Free Font License Ver. 2.0.pdf
     - 5f7b467b-1977-41fc-9a32-4f2558cfdc95: /Users/armand/Documents/Spectacles-Sample/Crop/Assets/Color-Space.lspkg/VFX/LAB Decoder.vfxgraph

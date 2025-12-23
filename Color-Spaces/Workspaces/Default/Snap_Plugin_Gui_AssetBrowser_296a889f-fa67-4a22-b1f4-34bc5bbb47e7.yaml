@@ -1,18 +1,27 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 843
+    size: 836
     values:
+      - ""
       - Fonts
       - Fonts/galter
       - Fonts/galter/Galter.otf
       - Fonts/galter/Galter.ttf
+      - Fonts/louis_george_cafe
+      - Fonts/louis_george_cafe/License.txt
+      - Fonts/louis_george_cafe/Louis George Cafe Bold Italic.ttf
+      - Fonts/louis_george_cafe/Louis George Cafe Bold.ttf
+      - Fonts/louis_george_cafe/Louis George Cafe Italic.ttf
+      - Fonts/louis_george_cafe/Louis George Cafe Light Italic.ttf
+      - Fonts/louis_george_cafe/Louis George Cafe Light.ttf
+      - Fonts/louis_george_cafe/Louis George Cafe.ttf
+      - Fonts/louis_george_cafe/Louis George Café.png
       - Fonts/mont
       - Fonts/mont/EULA Free Font License Ver. 2.0.pdf
       - Fonts/mont/Mont-ExtraLightDEMO.otf
       - Fonts/mont/Mont-HeavyDEMO.otf
       - Fonts/mont/Mont_Specimen.pdf
-      - Images
       - Images/Testing
       - Images/Testing/LAB
       - Images/Testing/LAB/lab_color.png
@@ -29,6 +38,7 @@ CollapsedEntities:
       - Images/Testing/minimal/pos_x.png
       - Images/Testing/minimal/pos_y.png
       - Images/Testing/minimal/pos_z.png
+      - Images/color_cloud.png
       - Images/color_spaces_plane.png
       - Materials/Encoders
       - Materials/Encoders/Gamut Projection.mat
@@ -53,6 +63,8 @@ CollapsedEntities:
       - Materials/Tests/Spectral Color Mixing.ss_graph
       - Materials/Tests/TestEncoder.mat
       - Materials/Tests/TestEncoder.ss_graph
+      - Materials/UI/BG.mat
+      - Materials/UI/BG.ss_graph
       - Materials/UI/Cursor.mat
       - Materials/UI/Cursor.ss_graph
       - Materials/UI/CursorPlane.mat
@@ -61,11 +73,12 @@ CollapsedEntities:
       - Materials/UI/Remap Texture With Palette Colors.ss_graph
       - Materials/UI/SingleColorMarker.mat
       - Materials/UI/SingleColorMarker.ss_graph
-      - Materials/UI/Title Background.mat
-      - Materials/UI/Title Background.ss_graph
       - Prefabs
       - Prefabs/Tests
+      - Prefabs/Tests/Spectral Mix Test.prefab
       - "Prefabs/[LEGACY] VFX-Based Encoder-Decoders"
+      - "Prefabs/[LEGACY] VFX-Based Encoder-Decoders/LAB Space Interactable.prefab"
+      - "Prefabs/[LEGACY] VFX-Based Encoder-Decoders/Pigment Mix Encoder Decoder.prefab"
       - Rendering
       - Rendering/Device Camera Texture.deviceCameraTexture
       - Rendering/Echopark.hdr
@@ -91,13 +104,13 @@ CollapsedEntities:
       - Scripts/Utils/BreathingMotion.ts
       - Scripts/Utils/KeepUpright.ts
       - Scripts/Utils/SpectralMixUtil.ts
+      - Scripts/Utils/render_color_cloud.py
       - Shaders
       - Shaders/CartoonCursor.js
       - Shaders/ColorCloud.js
       - Shaders/ColorSpaceTransform.js
       - Shaders/Marker.js
       - Shaders/ProjectorGamutTransform.js
-      - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
@@ -228,6 +241,7 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Assets/Shaders/ToggleOn.ss_graph
       - SpectaclesInteractionKit.lspkg/Assets/Shaders/ToggleOnSelect.ss_graph
       - SpectaclesInteractionKit.lspkg/Assets/Shaders/simple_pbr.ss_graph
+      - SpectaclesInteractionKit.lspkg/Assets/Textures
       - SpectaclesInteractionKit.lspkg/Assets/Textures/2DBitmojiAvatar.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Base.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/BaseHandVisualsTextures
@@ -252,9 +266,9 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Rectangle-Active.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Rectangle-Inactive.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Rectangle.png
+      - SpectaclesInteractionKit.lspkg/Assets/Textures/SIKContainerExampleImage.jpg
       - SpectaclesInteractionKit.lspkg/Assets/Textures/SIKLogo.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/ScrollBarRectangle.png
-      - SpectaclesInteractionKit.lspkg/Components
       - SpectaclesInteractionKit.lspkg/Components/Helpers
       - SpectaclesInteractionKit.lspkg/Components/Helpers/ButtonFeedback.ts
       - SpectaclesInteractionKit.lspkg/Components/Helpers/CapsuleMeshCustomizer.ts
@@ -310,12 +324,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Components/Interaction/InteractorLineVisual/InteractorLineVisual.ts
       - SpectaclesInteractionKit.lspkg/Components/Interaction/InteractorRayVisual
       - SpectaclesInteractionKit.lspkg/Components/Interaction/InteractorRayVisual/InteractorRayVisual.ts
-      - SpectaclesInteractionKit.lspkg/Components/UI
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/ContainerFrame.ts
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/FrameMaterial.mat
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/FrameMaterial.ss_graph
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/Ghost Material.mat
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/Ghost Material.ss_graph
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/Image.mat
@@ -323,15 +331,9 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/container-button.mat
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/container-button.ss_graph
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Materials/flat.ss_graph
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Meshes
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Meshes/Frame.mesh
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Meshes/Frame_High.mesh
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Meshes/Frame_Mid.mesh
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Meshes/SphereButton.mesh
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Meshes/SysSettings_settings_button.mesh
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Meshes/pinch-depth-button.mesh
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Prefabs
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Prefabs/FramePrefab.prefab
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Prefabs/container-button.prefab
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/README.md
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Textures
@@ -345,10 +347,8 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Textures/reflection-map-1.jpg
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/Textures/soft-reflection.jpg
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/container-ui.png
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/modules
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/modules/CursorHandler.ts
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/modules/ForceContainerParent.ts
-      - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/modules/FrameInputHandler.ts
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/modules/HoverBehavior.ts
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/modules/LabeledPinchButton.ts
       - SpectaclesInteractionKit.lspkg/Components/UI/ContainerFrame/modules/SimpleLODRenderMeshVisual
@@ -518,6 +518,7 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/package.native
       - SpectaclesInteractionKit.lspkg/tsconfig.json
       - SpectaclesInteractionKitExamples.lspkg
+      - SpectaclesInteractionKitExamples.lspkg/Examples
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials/Icons
@@ -688,15 +689,14 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/Top_Rocket_Trail.mat
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/Top_Rocket_Trail.ss_graph
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/stripe_noise 2.png
+      - SpectaclesInteractionKitExamples.lspkg/Examples/SIK Examples.prefab
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
-      - SpectaclesUIKit.lspkg
       - SpectaclesUIKit.lspkg/Audio
       - SpectaclesUIKit.lspkg/Audio/HoverAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/SliderProgressionAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/TriggerEndAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/TriggerStartAudioTrack.wav
-      - SpectaclesUIKit.lspkg/Materials
       - SpectaclesUIKit.lspkg/Materials/BaseRoundedRectangle.mat
       - SpectaclesUIKit.lspkg/Materials/BaseRoundedRectangle.ss_graph
       - SpectaclesUIKit.lspkg/Materials/CapsuleSphere.mat
@@ -722,8 +722,6 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Materials/DefaultSwitchKnob.ss_graph
       - SpectaclesUIKit.lspkg/Materials/FragRoundedRectangle.mat
       - SpectaclesUIKit.lspkg/Materials/FragRoundedRectangle.ss_graph
-      - SpectaclesUIKit.lspkg/Materials/Frame.mat
-      - SpectaclesUIKit.lspkg/Materials/Frame.ss_graph
       - SpectaclesUIKit.lspkg/Materials/Image.mat
       - SpectaclesUIKit.lspkg/Materials/ImageShader.ss_graph
       - SpectaclesUIKit.lspkg/Materials/RoundedRectangleStroke.mat
@@ -740,26 +738,20 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Meshes/StretchableCircle.mesh
       - SpectaclesUIKit.lspkg/Meshes/Unit Plane.mesh
       - SpectaclesUIKit.lspkg/Prefabs/DropShadow.prefab
-      - SpectaclesUIKit.lspkg/Prefabs/FrameButton.prefab
+      - SpectaclesUIKit.lspkg/Prefabs/ExampleInterface.prefab
       - SpectaclesUIKit.lspkg/Prefabs/ImageButton.prefab
       - SpectaclesUIKit.lspkg/Prefabs/LabelledButton.prefab
       - SpectaclesUIKit.lspkg/Prefabs/LabelledToggle.prefab
       - SpectaclesUIKit.lspkg/README.md
       - SpectaclesUIKit.lspkg/Scripts/BackPlate.ts
-      - SpectaclesUIKit.lspkg/Scripts/Components
       - SpectaclesUIKit.lspkg/Scripts/Components/Button
       - SpectaclesUIKit.lspkg/Scripts/Components/Button/BaseButton.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Button/CapsuleButton.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Button/RectangleButton.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Button/RoundButton.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Element.ts
-      - SpectaclesUIKit.lspkg/Scripts/Components/Frame
-      - SpectaclesUIKit.lspkg/Scripts/Components/Frame/Frame.ts
-      - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules
       - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules/ButtonHandler.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules/CursorHandler.ts
-      - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules/FrameButton.ts
-      - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules/FrameInputHandler.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules/HoverBehavior.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules/SmoothFollow.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/Frame/modules/SnappingHandler.ts
@@ -782,6 +774,7 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Scripts/Components/Toggle/Toggleable.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/VisualElement.ts
       - SpectaclesUIKit.lspkg/Scripts/DropShadow.ts
+      - SpectaclesUIKit.lspkg/Scripts/Example
       - SpectaclesUIKit.lspkg/Scripts/Example/Capsule3D
       - SpectaclesUIKit.lspkg/Scripts/Example/Capsule3D/Capsule3DButton.ts
       - SpectaclesUIKit.lspkg/Scripts/Example/Capsule3D/Visual

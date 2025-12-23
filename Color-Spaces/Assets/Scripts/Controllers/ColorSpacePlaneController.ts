@@ -110,6 +110,7 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     this.unsubscribeEvents.push(
       this.interactable.onDragStart.add((e: DragInteractorEvent) => {
         this.isDragging = true;
+        this.isSnapped = false;
         this.handleDrag(e);
       })
     );
@@ -414,20 +415,22 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     if (this.projectorGamutMesh) this.projectorGamutMesh.snapToRestTransform();
   }
 
-  /** Align pigment gamut with projector (tween to projector's position) */
+  /** Align pigment gamut with projector (tween to projector's current position) */
   public alignPigmentWithProjector(duration: number = 0.5): void {
     if (this.pigmentMixGenerator && this.projectorGamutMesh) {
-      const projPos = this.projectorGamutMesh.getRestPosition();
-      const projRot = this.projectorGamutMesh.getRestRotation();
+      const projTransform = this.projectorGamutMesh.getSceneObject().getTransform();
+      const projPos = projTransform.getWorldPosition();
+      const projRot = projTransform.getWorldRotation();
       this.pigmentMixGenerator.tweenToTransform(projPos, projRot, duration);
     }
   }
 
-  /** Align projector with pigment gamut (tween to pigment's position) */
+  /** Align projector with pigment gamut (tween to pigment's current position) */
   public alignProjectorWithPigment(duration: number = 0.5): void {
     if (this.pigmentMixGenerator && this.projectorGamutMesh) {
-      const pigPos = this.pigmentMixGenerator.getRestPosition();
-      const pigRot = this.pigmentMixGenerator.getRestRotation();
+      const pigTransform = this.pigmentMixGenerator.getSceneObject().getTransform();
+      const pigPos = pigTransform.getWorldPosition();
+      const pigRot = pigTransform.getWorldRotation();
       this.projectorGamutMesh.tweenToTransform(pigPos, pigRot, duration);
     }
   }
