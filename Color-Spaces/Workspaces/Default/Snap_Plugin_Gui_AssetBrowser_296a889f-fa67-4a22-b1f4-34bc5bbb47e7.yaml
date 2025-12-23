@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 827
+    size: 831
     values:
       - Images
       - Images/Testing
@@ -30,7 +30,6 @@ CollapsedEntities:
       - Materials/Encoders/Pigment Gamut Encoder.ss_graph
       - Materials/Encoders/RGB Encoder.mat
       - Materials/Encoders/RGB Encoder.ss_graph
-      - Materials/MeshTransforms
       - Materials/MeshTransforms/ColorSpaceTransforms 2.mat
       - Materials/MeshTransforms/ColorSpaceTransforms 2.ss_graph
       - Materials/MeshTransforms/ColorSpaceTransforms.mat
@@ -82,7 +81,10 @@ CollapsedEntities:
       - Shaders
       - Shaders/CartoonCursor.js
       - Shaders/ColorSpaceTransform.js
+      - Shaders/Marker.js
       - Shaders/ProjectorGamutTransform.js
+      - SpectaclesInteractionKit.lspkg
+      - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerEndAudioTrack.wav
@@ -501,6 +503,7 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/VersionNumber.ts
       - SpectaclesInteractionKit.lspkg/package.native
       - SpectaclesInteractionKit.lspkg/tsconfig.json
+      - SpectaclesInteractionKitExamples.lspkg
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials/Icons
@@ -673,6 +676,7 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/stripe_noise 2.png
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
+      - SpectaclesUIKit.lspkg
       - SpectaclesUIKit.lspkg/Audio
       - SpectaclesUIKit.lspkg/Audio/HoverAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/SliderProgressionAudioTrack.wav

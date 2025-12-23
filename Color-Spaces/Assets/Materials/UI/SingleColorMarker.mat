@@ -40,6 +40,33 @@
     - Port_WorldTangent_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 1.000000}
+    - Port_outlineThreshold_N008:
+        typeIdx: 1
+        value: 0.000000
+    - Port_specularIntensity_N008:
+        typeIdx: 1
+        value: 0.000000
+    - Port_specularPower_N008:
+        typeIdx: 1
+        value: 0.000000
+    - brightnessBoost:
+        typeIdx: 1
+        value: 1.000000
+    - outlineSharpness:
+        typeIdx: 1
+        value: 0.000000
+    - outlineThreshold:
+        typeIdx: 1
+        value: 0.010000
+    - outlineWidth:
+        typeIdx: 1
+        value: 0.000000
+    - specularIntensity:
+        typeIdx: 1
+        value: 1.000000
+    - specularPower:
+        typeIdx: 1
+        value: 1.000000
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
@@ -68,5 +95,5 @@
       value: 1.000000
     cubeSize:
       typeIdx: 1
-      value: 0.200000
-  Pass: !<reference> 2149f7c7-ed35-4c4c-8e03-0e584238bbe1
+      value: 1.000000
+  Pass: !<reference> a876b1d3-e2a8-43f4-ab95-400492a494ca

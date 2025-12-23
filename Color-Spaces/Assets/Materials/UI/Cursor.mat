@@ -140,10 +140,10 @@
       value: 0
     baseColor:
       typeIdx: 5
-      value: {x: 0.672099, y: 0.727962, z: 0.919448, w: 1.000000}
+      value: {x: 0.000000, y: 0.077073, z: 1.000000, w: 1.000000}
     fresnelIntensity:
       typeIdx: 1
-      value: 1.000000
+      value: 2.000000
     fresnelPower:
       typeIdx: 1
       value: 1.000000
