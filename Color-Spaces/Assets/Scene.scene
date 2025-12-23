@@ -267,13 +267,13 @@
     Enabled: true
     Fill: !<TextFill>
       Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Color: {x: 0.228122, y: 0.228122, z: 0.228122, w: 1.000000}
       Texture: !<reference> 00000000-0000-0000-0000-000000000000
       ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       TileCount: 5.000000
       TileZone: Rect
       TextureStretch: FitWidth
-    Size: 0.250000
+    Size: 0.570000
   Dropshadow: !<DropshadowSettings>
     Enabled: false
     Fill: !<TextFill>
@@ -360,7 +360,7 @@
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
   Children:
-    []
+    - !<own> 84d2af49-cbcc-4de4-938f-81eb2e4da4bf
   Components:
     - !<own> bffb4668-a9d8-41f7-885e-a2298d07976c
 - !<Text/056b41c5-a54d-445a-9f0e-96d3f2351821>
@@ -1587,6 +1587,23 @@
     []
   Components:
     - !<own> 7a61213f-0543-42e7-985e-01e4c5f1f397
+- !<ScriptComponent/32d8c15f-fe69-45f5-946f-ca11f346de93>
+  PrefabRemaps:
+    []
+  Name: BreathingMotion
+  Enabled: true
+  ScriptAsset: !<reference> f75689bf-9129-4053-a8f2-8d65a0cd1aa7
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      amplitude: 0.200000
+      speed: !<float> 10.000000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/33c71acc-e3c9-440d-ad9d-5dedc529cb6f>
   PrefabRemaps:
     []
@@ -2750,16 +2767,13 @@
   MeshShadowMode: None
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
-  Text: |
-    Increment 
-    Projector
-
+  Text: Text
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
   SizeToFit: false
   FontSize: 32
-  Font: !<reference> 00000000-0000-0000-0000-000000000000
+  Font: !<reference> 114e54e2-3215-417e-922d-9eb0ef62f34d
   LayoutRect:
     left: -7.500000
     bottom: -2.250000
@@ -3505,6 +3519,21 @@
     []
   Components:
     - !<own> 9a09f0c2-46a8-4111-b912-cc737cac24b1
+- !<SceneObject/84d2af49-cbcc-4de4-938f-81eb2e4da4bf>
+  PrefabRemaps:
+    []
+  Name: BG Mesh
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.500000, z: -2.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 15.000000, y: 15.000000, z: 15.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> fb67f5c4-ba87-4256-b74a-c98fd4130ca6
 - !<RenderMeshVisual/850f04bd-478c-4caf-9221-79a32d7da0cb>
   PrefabRemaps:
     []
@@ -3596,13 +3625,13 @@
     Enabled: true
     Fill: !<TextFill>
       Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Color: {x: 0.228122, y: 0.228122, z: 0.228122, w: 1.000000}
       Texture: !<reference> 00000000-0000-0000-0000-000000000000
       ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       TileCount: 5.000000
       TileZone: Rect
       TextureStretch: FitWidth
-    Size: 0.250000
+    Size: 0.570000
   Dropshadow: !<DropshadowSettings>
     Enabled: false
     Fill: !<TextFill>
@@ -4208,13 +4237,13 @@
     Enabled: true
     Fill: !<TextFill>
       Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Color: {x: 0.228122, y: 0.228122, z: 0.228122, w: 1.000000}
       Texture: !<reference> 00000000-0000-0000-0000-000000000000
       ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       TileCount: 5.000000
       TileZone: Rect
       TextureStretch: FitWidth
-    Size: 0.250000
+    Size: 0.570000
   Dropshadow: !<DropshadowSettings>
     Enabled: false
     Fill: !<TextFill>
@@ -4889,6 +4918,7 @@
     - !<own> 1ba38832-da8f-4342-8f2a-209465bcf9db
   Components:
     - !<own> 353b4af4-b313-4655-bc19-78aa7d0e58f8
+    - !<own> 32d8c15f-fe69-45f5-946f-ca11f346de93
 - !<DeviceTracking/b75a7331-f6c9-4be7-8927-1ffb5efb626d>
   PrefabRemaps:
     []
@@ -5079,7 +5109,7 @@
 - !<SceneObject/bdaf19e0-813c-40b4-853d-46a4dc3e4114>
   PrefabRemaps:
     []
-  Name: Color Space
+  Name: Text
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -5103,17 +5133,13 @@
   MeshShadowMode: None
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
-  Text: |
-    Top: Color Projection on Gamut
-    Middle: Gamut of a set of pigments
-    Bottom: Full Color Space
-
+  Text: Color Space Explorer
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
   SizeToFit: false
-  FontSize: 48
-  Font: !<reference> 00000000-0000-0000-0000-000000000000
+  FontSize: 60
+  Font: !<reference> 90a8c760-156c-48b4-a85d-f2abb2e17d72
   LayoutRect:
     left: -7.500000
     bottom: -2.250000
@@ -5131,16 +5157,16 @@
     TextureStretch: FitWidth
   BlendMode: PremultipliedAlpha
   Outline: !<OutlineSettings>
-    Enabled: false
+    Enabled: true
     Fill: !<TextFill>
       Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Color: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       Texture: !<reference> 00000000-0000-0000-0000-000000000000
       ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       TileCount: 5.000000
       TileZone: Rect
       TextureStretch: FitWidth
-    Size: 0.250000
+    Size: 0.070000
   Dropshadow: !<DropshadowSettings>
     Enabled: false
     Fill: !<TextFill>
@@ -5298,13 +5324,13 @@
     Enabled: true
     Fill: !<TextFill>
       Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Color: {x: 0.228122, y: 0.228122, z: 0.228122, w: 1.000000}
       Texture: !<reference> 00000000-0000-0000-0000-000000000000
       ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       TileCount: 5.000000
       TileZone: Rect
       TextureStretch: FitWidth
-    Size: 0.250000
+    Size: 0.570000
   Dropshadow: !<DropshadowSettings>
     Enabled: false
     Fill: !<TextFill>
@@ -5984,10 +6010,7 @@
   MeshShadowMode: None
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
-  Text: |
-    Increment 
-    Projector
-
+  Text: Text
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
@@ -6365,7 +6388,7 @@
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000001, y: 6.000000, z: -0.000008}
-    Rotation: {x: 0.000000, y: -0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 2.500000, y: 2.500000, z: 2.500000}
     HasSegmentScaleCompensation: false
   Children:
@@ -6564,13 +6587,13 @@
     Enabled: true
     Fill: !<TextFill>
       Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Color: {x: 0.228122, y: 0.228122, z: 0.228122, w: 1.000000}
       Texture: !<reference> 00000000-0000-0000-0000-000000000000
       ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       TileCount: 5.000000
       TileZone: Rect
       TextureStretch: FitWidth
-    Size: 0.250000
+    Size: 0.570000
   Dropshadow: !<DropshadowSettings>
     Enabled: false
     Fill: !<TextFill>
@@ -6618,10 +6641,7 @@
   MeshShadowMode: None
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
-  Text: |
-    Increment 
-    Projector
-
+  Text: Text
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
@@ -6705,6 +6725,26 @@
     - !<own> c859609a-8904-42cd-87f8-d5bbc2ccd4b3
   Components:
     []
+- !<RenderMeshVisual/fb67f5c4-ba87-4256-b74a-c98fd4130ca6>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> 494872b9-4b55-4c4e-b240-133b4bd6232d
+  Mesh: !<reference> 177459c0-51d4-4374-9e15-6cbda2f0631a
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
 - !<ScriptComponent/fbac9d52-113d-4b7a-a456-9b63a4d623b0>
   PrefabRemaps:
     []

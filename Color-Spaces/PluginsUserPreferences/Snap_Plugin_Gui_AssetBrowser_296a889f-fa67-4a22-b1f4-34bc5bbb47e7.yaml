@@ -1,8 +1,17 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 831
+    size: 843
     values:
+      - Fonts
+      - Fonts/galter
+      - Fonts/galter/Galter.otf
+      - Fonts/galter/Galter.ttf
+      - Fonts/mont
+      - Fonts/mont/EULA Free Font License Ver. 2.0.pdf
+      - Fonts/mont/Mont-ExtraLightDEMO.otf
+      - Fonts/mont/Mont-HeavyDEMO.otf
+      - Fonts/mont/Mont_Specimen.pdf
       - Images
       - Images/Testing
       - Images/Testing/LAB
@@ -30,6 +39,7 @@ CollapsedEntities:
       - Materials/Encoders/Pigment Gamut Encoder.ss_graph
       - Materials/Encoders/RGB Encoder.mat
       - Materials/Encoders/RGB Encoder.ss_graph
+      - Materials/MeshTransforms
       - Materials/MeshTransforms/ColorSpaceTransforms 2.mat
       - Materials/MeshTransforms/ColorSpaceTransforms 2.ss_graph
       - Materials/MeshTransforms/ColorSpaceTransforms.mat
@@ -51,6 +61,8 @@ CollapsedEntities:
       - Materials/UI/Remap Texture With Palette Colors.ss_graph
       - Materials/UI/SingleColorMarker.mat
       - Materials/UI/SingleColorMarker.ss_graph
+      - Materials/UI/Title Background.mat
+      - Materials/UI/Title Background.ss_graph
       - Prefabs
       - Prefabs/Tests
       - "Prefabs/[LEGACY] VFX-Based Encoder-Decoders"
@@ -76,10 +88,12 @@ CollapsedEntities:
       - Scripts/Generators/RGBCubeGenerator.ts
       - Scripts/Generators/SingleColorMarker.ts
       - Scripts/Utils
+      - Scripts/Utils/BreathingMotion.ts
       - Scripts/Utils/KeepUpright.ts
       - Scripts/Utils/SpectralMixUtil.ts
       - Shaders
       - Shaders/CartoonCursor.js
+      - Shaders/ColorCloud.js
       - Shaders/ColorSpaceTransform.js
       - Shaders/Marker.js
       - Shaders/ProjectorGamutTransform.js
@@ -826,12 +840,10 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
       - VFX
-      - VFX/Decode From Texture File.vfxgraph
       - VFX/Gamut Projector Decoder.vfxgraph
       - VFX/LAB Decoder.vfxgraph
-      - VFX/Pigment Gamut Decoder Hi Res.vfxgraph
       - VFX/Pigment Gamut Decoder.vfxgraph
       - VFX/RGB Decoder.vfxgraph
-      - VFX/Test Particle Encoding.vfxgraph
-      - VFX/TestDecoder.vfxgraph
+      - VFX/Tests
+      - VFX/Tests/Test Particle Decoding.vfxgraph
   options: 4
