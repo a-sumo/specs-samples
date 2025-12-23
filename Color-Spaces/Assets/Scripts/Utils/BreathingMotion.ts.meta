@@ -1,0 +1,47 @@
+- !<AssetImportMetadata/c712d5b7-b8cc-4128-8302-52b8123a4a45>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> f75689bf-9129-4053-a8f2-8d65a0cd1aa7
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> f75689bf-9129-4053-a8f2-8d65a0cd1aa7
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> c24479de-5ebb-4e87-b028-ffb5c6d0e955
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/c24479de-5ebb-4e87-b028-ffb5c6d0e955>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: d5c42221-0f2f-4db9-acef-58ceaa98cb24
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    amplitude: false
+    speed: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - amplitude: !<float> 2.000000
+      speed: !<float> 8.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float amplitude = 2 {"hint":"Vertical motion distance"}'
+    - '// @input float speed = 8 {"hint":"Cycles per minute"}'

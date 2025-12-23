@@ -1,13 +1,20 @@
 data:
   externalSources:
+    - 0aee8283-84e0-4f9c-b031-afb427f5d91f: /Users/armand/Downloads/mont/Mont_Specimen.pdf
+    - 1006e2f7-7f9e-4981-a93a-3143739ba4e3: /Users/armand/Downloads/galter/Galter.ttf
+    - 1667e9de-3e65-4d14-9936-4373e61f6108: /Users/armand/Downloads/galter/Galter.otf
     - 2cf800ba-2218-4adc-881c-f2afcd40b01e: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - 308ce17d-2ac1-4a0c-b06a-788d588da270: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 42bd210e-7587-4c74-997b-849cd19fd6cf: /Users/armand/Downloads/color_spaces_plane(2).png
+    - 52c1731c-8567-4c78-bc37-ebcfb1da2984: /Users/armand/Downloads/mont/EULA Free Font License Ver. 2.0.pdf
     - 5f7b467b-1977-41fc-9a32-4f2558cfdc95: /Users/armand/Documents/Spectacles-Sample/Crop/Assets/Color-Space.lspkg/VFX/LAB Decoder.vfxgraph
     - 76e71b5e-182d-49f1-88a8-6543100bf1a0: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 88e4c541-1d5b-4b63-be87-ab9dcf507243: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/SpectaclesInteractionKit@0.15.0/SpectaclesInteractionKit.lspkg
     - 8df0806e-8a72-45db-8098-033a8cd95c06: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - 9bea3263-e60f-4c8c-b1fa-3127d7fcd7b9: /Users/armand/Downloads/mont/Mont-HeavyDEMO.otf
     - a429ed5d-6a9a-4814-aafb-578f1e46c656: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/ColorSpaceTransforms 2.ss_graph
     - b3b4705d-e5ce-4b03-a68b-22e6452dacbc: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/ColorSpaceTransforms.ss_graph
     - c614024d-6813-4d19-9136-e904e91639dd: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/Materials/CursorPlane.ss_graph
     - df71d496-fa03-4f7a-8dae-2fbba9cf5fc0: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - ec0170e3-fa97-449a-aa37-279046e30410: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - f7045ba7-ef56-4b3a-8cb8-48195eaa675c: /Users/armand/Downloads/mont/Mont-ExtraLightDEMO.otf

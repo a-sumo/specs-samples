@@ -1,8 +1,8 @@
-- !<Material/16739f0a-1b2b-4ee4-89e9-9e056174374c>
+- !<Material/494872b9-4b55-4c4e-b240-133b4bd6232d>
   PackagePath: ""
   PassesInfo:
-    - !<own> b277f318-6d0f-4f7f-9cbf-1856f0b1f50a
-- !<PassInfo/b277f318-6d0f-4f7f-9cbf-1856f0b1f50a>
+    - !<own> d05c17b9-190f-451b-8d65-034671f7891d
+- !<PassInfo/d05c17b9-190f-451b-8d65-034671f7891d>
   CachedProperties:
     - Port_Depth_N004:
         typeIdx: 1
@@ -14,6 +14,9 @@
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_FinalColor3_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_GSplatPointSize_N004:
@@ -34,39 +37,21 @@
     - Port_RayOrigin_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Value1_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value2_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_WorldNormal_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 1.000000, z: 0.000000}
+    - Port_WorldPosition_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_WorldTangent_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 1.000000}
-    - Port_outlineThreshold_N008:
-        typeIdx: 1
-        value: 0.000000
-    - Port_specularIntensity_N008:
-        typeIdx: 1
-        value: 0.000000
-    - Port_specularPower_N008:
-        typeIdx: 1
-        value: 0.000000
-    - brightnessBoost:
-        typeIdx: 1
-        value: 1.000000
-    - outlineSharpness:
-        typeIdx: 1
-        value: 0.000000
-    - outlineThreshold:
-        typeIdx: 1
-        value: 0.010000
-    - outlineWidth:
-        typeIdx: 1
-        value: 0.000000
-    - specularIntensity:
-        typeIdx: 1
-        value: 1.000000
-    - specularPower:
-        typeIdx: 1
-        value: 1.000000
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
@@ -79,21 +64,9 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: Disabled
+  BlendMode: PremultipliedAlphaAuto
   Properties:
     PreviewEnabled:
       typeIdx: 0
       value: 0
-    blend:
-      typeIdx: 1
-      value: 1.000000
-    colorSpaceFrom:
-      typeIdx: 1
-      value: 1.000000
-    colorSpaceTo:
-      typeIdx: 1
-      value: 1.000000
-    cubeSize:
-      typeIdx: 1
-      value: 1.000000
-  Pass: !<reference> a876b1d3-e2a8-43f4-ab95-400492a494ca
+  Pass: !<reference> 27d01d8c-0b92-4ed4-a18e-971edb90ea47

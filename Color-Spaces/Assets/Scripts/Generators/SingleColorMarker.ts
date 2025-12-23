@@ -118,7 +118,7 @@ export class SingleColorMarker extends BaseScriptComponent {
         this.meshBuilder.indexType = MeshIndexType.UInt16;
 
         const center = this.rgbToDisplayPosition(this._r, this._g, this._b);
-        this.generateCube(center, this._r, this._g, this._b, this._markerSize);
+        this.generateSphere(center, this._r, this._g, this._b, this._markerSize * 0.5);
 
         if (this.meshBuilder.isValid()) {
             this.mesh = this.meshBuilder.getMesh();
@@ -127,46 +127,49 @@ export class SingleColorMarker extends BaseScriptComponent {
         }
     }
 
-    private generateCube(center: vec3, r: number, g: number, b: number, size: number): void {
-        const half = size * 0.5;
+    private generateSphere(center: vec3, r: number, g: number, b: number, radius: number): void {
+        const segments = 16;
+        const rings = 12;
 
-        const corners = [
-            new vec3(center.x - half, center.y - half, center.z - half),
-            new vec3(center.x + half, center.y - half, center.z - half),
-            new vec3(center.x + half, center.y + half, center.z - half),
-            new vec3(center.x - half, center.y + half, center.z - half),
-            new vec3(center.x - half, center.y - half, center.z + half),
-            new vec3(center.x + half, center.y - half, center.z + half),
-            new vec3(center.x + half, center.y + half, center.z + half),
-            new vec3(center.x - half, center.y + half, center.z + half),
-        ];
+        const startIndex = this.meshBuilder.getVerticesCount();
 
-        const faces = [
-            { normal: new vec3(0, 0, -1), verts: [0, 1, 2, 3] },
-            { normal: new vec3(0, 0, 1), verts: [5, 4, 7, 6] },
-            { normal: new vec3(-1, 0, 0), verts: [4, 0, 3, 7] },
-            { normal: new vec3(1, 0, 0), verts: [1, 5, 6, 2] },
-            { normal: new vec3(0, -1, 0), verts: [4, 5, 1, 0] },
-            { normal: new vec3(0, 1, 0), verts: [3, 2, 6, 7] },
-        ];
+        for (let ring = 0; ring <= rings; ring++) {
+            const phi = (ring / rings) * Math.PI;
+            const sinPhi = Math.sin(phi);
+            const cosPhi = Math.cos(phi);
 
-        for (const face of faces) {
-            const faceStartIndex = this.meshBuilder.getVerticesCount();
+            for (let seg = 0; seg <= segments; seg++) {
+                const theta = (seg / segments) * 2.0 * Math.PI;
+                const sinTheta = Math.sin(theta);
+                const cosTheta = Math.cos(theta);
 
-            for (const vi of face.verts) {
-                const pos = corners[vi];
+                const nx = sinPhi * cosTheta;
+                const ny = cosPhi;
+                const nz = sinPhi * sinTheta;
+
+                const px = center.x + radius * nx;
+                const py = center.y + radius * ny;
+                const pz = center.z + radius * nz;
+
                 this.meshBuilder.appendVerticesInterleaved([
-                    pos.x, pos.y, pos.z,
-                    face.normal.x, face.normal.y, face.normal.z,
+                    px, py, pz,
+                    nx, ny, nz,
                     r, g,
                     b, 1.0,
                 ]);
             }
+        }
 
-            this.meshBuilder.appendIndices([
-                faceStartIndex, faceStartIndex + 1, faceStartIndex + 2,
-                faceStartIndex, faceStartIndex + 2, faceStartIndex + 3,
-            ]);
+        for (let ring = 0; ring < rings; ring++) {
+            for (let seg = 0; seg < segments; seg++) {
+                const curr = startIndex + ring * (segments + 1) + seg;
+                const next = curr + segments + 1;
+
+                this.meshBuilder.appendIndices([
+                    curr, next, curr + 1,
+                    curr + 1, next, next + 1,
+                ]);
+            }
         }
     }
 

@@ -1,8 +1,17 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 829
+    size: 843
     values:
+      - Fonts
+      - Fonts/galter
+      - Fonts/galter/Galter.otf
+      - Fonts/galter/Galter.ttf
+      - Fonts/mont
+      - Fonts/mont/EULA Free Font License Ver. 2.0.pdf
+      - Fonts/mont/Mont-ExtraLightDEMO.otf
+      - Fonts/mont/Mont-HeavyDEMO.otf
+      - Fonts/mont/Mont_Specimen.pdf
       - Images
       - Images/Testing
       - Images/Testing/LAB
@@ -21,7 +30,6 @@ CollapsedEntities:
       - Images/Testing/minimal/pos_y.png
       - Images/Testing/minimal/pos_z.png
       - Images/color_spaces_plane.png
-      - Materials
       - Materials/Encoders
       - Materials/Encoders/Gamut Projection.mat
       - Materials/Encoders/Gamut Projection.ss_graph
@@ -45,7 +53,6 @@ CollapsedEntities:
       - Materials/Tests/Spectral Color Mixing.ss_graph
       - Materials/Tests/TestEncoder.mat
       - Materials/Tests/TestEncoder.ss_graph
-      - Materials/UI
       - Materials/UI/Cursor.mat
       - Materials/UI/Cursor.ss_graph
       - Materials/UI/CursorPlane.mat
@@ -54,6 +61,8 @@ CollapsedEntities:
       - Materials/UI/Remap Texture With Palette Colors.ss_graph
       - Materials/UI/SingleColorMarker.mat
       - Materials/UI/SingleColorMarker.ss_graph
+      - Materials/UI/Title Background.mat
+      - Materials/UI/Title Background.ss_graph
       - Prefabs
       - Prefabs/Tests
       - "Prefabs/[LEGACY] VFX-Based Encoder-Decoders"
@@ -79,12 +88,17 @@ CollapsedEntities:
       - Scripts/Generators/RGBCubeGenerator.ts
       - Scripts/Generators/SingleColorMarker.ts
       - Scripts/Utils
+      - Scripts/Utils/BreathingMotion.ts
       - Scripts/Utils/KeepUpright.ts
       - Scripts/Utils/SpectralMixUtil.ts
       - Shaders
       - Shaders/CartoonCursor.js
+      - Shaders/ColorCloud.js
       - Shaders/ColorSpaceTransform.js
+      - Shaders/Marker.js
       - Shaders/ProjectorGamutTransform.js
+      - SpectaclesInteractionKit.lspkg
+      - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerEndAudioTrack.wav
@@ -503,6 +517,7 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/VersionNumber.ts
       - SpectaclesInteractionKit.lspkg/package.native
       - SpectaclesInteractionKit.lspkg/tsconfig.json
+      - SpectaclesInteractionKitExamples.lspkg
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials/Icons
@@ -675,6 +690,7 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/stripe_noise 2.png
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
+      - SpectaclesUIKit.lspkg
       - SpectaclesUIKit.lspkg/Audio
       - SpectaclesUIKit.lspkg/Audio/HoverAudioTrack.wav
       - SpectaclesUIKit.lspkg/Audio/SliderProgressionAudioTrack.wav
@@ -824,12 +840,10 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
       - VFX
-      - VFX/Decode From Texture File.vfxgraph
       - VFX/Gamut Projector Decoder.vfxgraph
       - VFX/LAB Decoder.vfxgraph
-      - VFX/Pigment Gamut Decoder Hi Res.vfxgraph
       - VFX/Pigment Gamut Decoder.vfxgraph
       - VFX/RGB Decoder.vfxgraph
-      - VFX/Test Particle Encoding.vfxgraph
-      - VFX/TestDecoder.vfxgraph
+      - VFX/Tests
+      - VFX/Tests/Test Particle Decoding.vfxgraph
   options: 4
