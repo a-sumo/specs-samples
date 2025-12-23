@@ -422,4 +422,13 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
       this.pigmentMixGenerator.tweenToTransform(projPos, projRot, duration);
     }
   }
+
+  /** Align projector with pigment gamut (tween to pigment's position) */
+  public alignProjectorWithPigment(duration: number = 0.5): void {
+    if (this.pigmentMixGenerator && this.projectorGamutMesh) {
+      const pigPos = this.pigmentMixGenerator.getRestPosition();
+      const pigRot = this.pigmentMixGenerator.getRestRotation();
+      this.projectorGamutMesh.tweenToTransform(pigPos, pigRot, duration);
+    }
+  }
 }

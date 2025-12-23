@@ -195,7 +195,6 @@
       projectionMaterial: !<reference.Material> 42decfe2-1dc6-4f65-8c66-2ffe83e2b25e
       vfxComponent: !<reference.VFXComponent> a736cfb1-456e-408f-7f68-26e2dc0d0e15
       maxColors: !<float> 64.000000
-      paletteController: !<reference.ScriptComponent> 734aea69-f183-4638-868d-fb871edfd11a
   ScriptTypes:
     "":
       {}

@@ -47,10 +47,10 @@
             type: Texture2D
         texWidth:
           typeIdx: 1
-          value: 1.000000
+          value: 8.000000
         texHeight:
           typeIdx: 1
-          value: 1.000000
+          value: 8.000000
         inputPosMap:
           typeIdx: 9
           value:

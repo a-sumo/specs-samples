@@ -140,7 +140,7 @@
       value: 0
     baseColor:
       typeIdx: 5
-      value: {x: 0.000000, y: 0.057816, z: 0.902174, w: 1.000000}
+      value: {x: 0.672099, y: 0.727962, z: 0.919448, w: 1.000000}
     fresnelIntensity:
       typeIdx: 1
       value: 2.000000
@@ -149,5 +149,5 @@
       value: 1.000000
     outlineWidth:
       typeIdx: 1
-      value: 1.000000
+      value: 0.000000
   Pass: !<reference> e1c918d7-efa8-4dd7-8c40-813a52202495

@@ -1,9 +1,9 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 854
+    size: 829
     values:
-      - ""
+      - Images
       - Images/Testing
       - Images/Testing/LAB
       - Images/Testing/LAB/lab_color.png
@@ -21,18 +21,16 @@ CollapsedEntities:
       - Images/Testing/minimal/pos_y.png
       - Images/Testing/minimal/pos_z.png
       - Images/color_spaces_plane.png
-      - Materials
       - Materials/Encoders
       - Materials/Encoders/Gamut Projection.mat
       - Materials/Encoders/Gamut Projection.ss_graph
       - Materials/Encoders/LabEncoder.mat
       - Materials/Encoders/LabEncoder.ss_graph
-      - Materials/Encoders/Pigment Gamut Encoder Hi Res.mat
-      - Materials/Encoders/Pigment Gamut Encoder Hi Res.ss_graph
       - Materials/Encoders/Pigment Gamut Encoder.mat
       - Materials/Encoders/Pigment Gamut Encoder.ss_graph
       - Materials/Encoders/RGB Encoder.mat
       - Materials/Encoders/RGB Encoder.ss_graph
+      - Materials/MeshTransforms
       - Materials/MeshTransforms/ColorSpaceTransforms 2.mat
       - Materials/MeshTransforms/ColorSpaceTransforms 2.ss_graph
       - Materials/MeshTransforms/ColorSpaceTransforms.mat
@@ -59,18 +57,7 @@ CollapsedEntities:
       - Materials/UI/SingleColorMarker.ss_graph
       - Materials/UI/Spectral Mix.mat
       - Materials/UI/Spectral Mix.ss_graph
-      - Prefabs
-      - Prefabs/Color Slot.prefab
       - Prefabs/Gamut Projector Interactable.prefab
-      - Prefabs/LAB Encoder Decoder.prefab
-      - Prefabs/LAB Space Interactable.prefab
-      - Prefabs/Pigment Gamut Encoder Decoder Hi Res.prefab
-      - Prefabs/Pigment Gamut Encoder Decoder.prefab
-      - Prefabs/Pigment Mix.prefab
-      - Prefabs/RGB Encoder Decoder.prefab
-      - Prefabs/Simple Mix Test.prefab
-      - Prefabs/Spectral Mix Test.prefab
-      - Prefabs/Test Encoder Decoder.prefab
       - Rendering
       - Rendering/Device Camera Texture.deviceCameraTexture
       - Rendering/Echopark.hdr
@@ -79,11 +66,8 @@ CollapsedEntities:
       - Rendering/Render Target.renderTarget
       - Rendering/Screen Crop Texture.screenCropTexture
       - Scene.scene
-      - Scripts
       - Scripts/Controllers
       - Scripts/Controllers/ColorSpacePlaneController.ts
-      - Scripts/Controllers/ProjectedPositionController.ts
-      - Scripts/Controllers/SphereController.ts
       - Scripts/Encoders
       - Scripts/Encoders/FullRGBParticleEncoder.ts
       - Scripts/Encoders/GamutProjectionParticleEncoder.ts
@@ -95,14 +79,13 @@ CollapsedEntities:
       - Scripts/Generators/RGBCubeGenerator.ts
       - Scripts/Generators/SingleColorMarker.ts
       - Scripts/Utils
+      - Scripts/Utils/KeepUpright.ts
       - Scripts/Utils/SpectralMixUtil.ts
       - Shaders
       - Shaders/CartoonCursor.js
       - Shaders/CartoonCursorSimple.js
       - Shaders/ColorSpaceTransform.js
       - Shaders/ProjectorGamutTransform.js
-      - SpectaclesInteractionKit.lspkg
-      - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
       - SpectaclesInteractionKit.lspkg/Assets/Audio/TriggerEndAudioTrack.wav
@@ -232,7 +215,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Assets/Shaders/ToggleOn.ss_graph
       - SpectaclesInteractionKit.lspkg/Assets/Shaders/ToggleOnSelect.ss_graph
       - SpectaclesInteractionKit.lspkg/Assets/Shaders/simple_pbr.ss_graph
-      - SpectaclesInteractionKit.lspkg/Assets/Textures
       - SpectaclesInteractionKit.lspkg/Assets/Textures/2DBitmojiAvatar.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Base.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/BaseHandVisualsTextures
@@ -257,7 +239,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Rectangle-Active.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Rectangle-Inactive.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/Rectangle.png
-      - SpectaclesInteractionKit.lspkg/Assets/Textures/SIKContainerExampleImage.jpg
       - SpectaclesInteractionKit.lspkg/Assets/Textures/SIKLogo.png
       - SpectaclesInteractionKit.lspkg/Assets/Textures/ScrollBarRectangle.png
       - SpectaclesInteractionKit.lspkg/Components
@@ -523,8 +504,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/VersionNumber.ts
       - SpectaclesInteractionKit.lspkg/package.native
       - SpectaclesInteractionKit.lspkg/tsconfig.json
-      - SpectaclesInteractionKitExamples.lspkg
-      - SpectaclesInteractionKitExamples.lspkg/Examples
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/Materials/Icons
@@ -695,7 +674,6 @@ CollapsedEntities:
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/Top_Rocket_Trail.mat
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/Top_Rocket_Trail.ss_graph
       - SpectaclesInteractionKitExamples.lspkg/Examples/RocketWorkshop/VFX/Rocket Sparks/stripe_noise 2.png
-      - SpectaclesInteractionKitExamples.lspkg/Examples/SIK Examples.prefab
       - SpectaclesInteractionKitExamples.lspkg/package.native
       - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
       - SpectaclesUIKit.lspkg/Audio
@@ -752,7 +730,6 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Prefabs/LabelledButton.prefab
       - SpectaclesUIKit.lspkg/Prefabs/LabelledToggle.prefab
       - SpectaclesUIKit.lspkg/README.md
-      - SpectaclesUIKit.lspkg/Scripts
       - SpectaclesUIKit.lspkg/Scripts/BackPlate.ts
       - SpectaclesUIKit.lspkg/Scripts/Components
       - SpectaclesUIKit.lspkg/Scripts/Components/Button
@@ -790,7 +767,6 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Scripts/Components/Toggle/Toggleable.ts
       - SpectaclesUIKit.lspkg/Scripts/Components/VisualElement.ts
       - SpectaclesUIKit.lspkg/Scripts/DropShadow.ts
-      - SpectaclesUIKit.lspkg/Scripts/Example
       - SpectaclesUIKit.lspkg/Scripts/Example/Capsule3D
       - SpectaclesUIKit.lspkg/Scripts/Example/Capsule3D/Capsule3DButton.ts
       - SpectaclesUIKit.lspkg/Scripts/Example/Capsule3D/Visual
@@ -848,7 +824,6 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Textures/test-image.jpg
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
-      - VFX
       - VFX/Decode From Texture File.vfxgraph
       - VFX/Gamut Projector Decoder.vfxgraph
       - VFX/LAB Decoder.vfxgraph

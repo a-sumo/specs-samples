@@ -1,3 +1,9 @@
+INSTRUCTIONS:
+NO inline comments for input and output variables.
+NO early returns. 
+
+SPECIFICATION:
+
 // Input Output Global Types
 global_float GlobalFloat;
 global_vec2 GlobalVec2;
