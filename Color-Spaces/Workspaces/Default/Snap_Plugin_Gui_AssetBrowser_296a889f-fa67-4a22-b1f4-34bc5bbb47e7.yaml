@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 829
+    size: 830
     values:
       - Images
       - Images/Testing
@@ -21,6 +21,7 @@ CollapsedEntities:
       - Images/Testing/minimal/pos_y.png
       - Images/Testing/minimal/pos_z.png
       - Images/color_spaces_plane.png
+      - Materials
       - Materials/Encoders
       - Materials/Encoders/Gamut Projection.mat
       - Materials/Encoders/Gamut Projection.ss_graph
@@ -38,15 +39,13 @@ CollapsedEntities:
       - Materials/MeshTransforms/ProjectorGamutTransform.mat
       - Materials/MeshTransforms/ProjectorGamutTransform.ss_graph
       - Materials/Tests
-      - Materials/Tests/Color Mix Test.mat
-      - Materials/Tests/Color Mix Test.ss_graph
+      - Materials/Tests/Additive Color Mixing.mat
+      - Materials/Tests/Additive Color Mixing.ss_graph
+      - Materials/Tests/Spectral Color Mixing.mat
+      - Materials/Tests/Spectral Color Mixing.ss_graph
       - Materials/Tests/TestEncoder.mat
       - Materials/Tests/TestEncoder.ss_graph
-      - Materials/UI/Color Gradient Opacity 2.mat
-      - Materials/UI/Color Gradient Opacity.mat
-      - Materials/UI/Color Gradient Opacity.ss_graph
-      - Materials/UI/Color Gradient.mat
-      - Materials/UI/Color Gradient.ss_graph
+      - Materials/UI
       - Materials/UI/Cursor.mat
       - Materials/UI/Cursor.ss_graph
       - Materials/UI/CursorPlane.mat
@@ -55,9 +54,9 @@ CollapsedEntities:
       - Materials/UI/Remap Texture With Palette Colors.ss_graph
       - Materials/UI/SingleColorMarker.mat
       - Materials/UI/SingleColorMarker.ss_graph
-      - Materials/UI/Spectral Mix.mat
-      - Materials/UI/Spectral Mix.ss_graph
-      - Prefabs/Gamut Projector Interactable.prefab
+      - Prefabs
+      - Prefabs/Tests
+      - "Prefabs/[LEGACY] VFX-Based Encoder-Decoders"
       - Rendering
       - Rendering/Device Camera Texture.deviceCameraTexture
       - Rendering/Echopark.hdr
@@ -66,6 +65,7 @@ CollapsedEntities:
       - Rendering/Render Target.renderTarget
       - Rendering/Screen Crop Texture.screenCropTexture
       - Scene.scene
+      - Scripts
       - Scripts/Controllers
       - Scripts/Controllers/ColorSpacePlaneController.ts
       - Scripts/Encoders
@@ -824,6 +824,7 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Textures/test-image.jpg
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
+      - VFX
       - VFX/Decode From Texture File.vfxgraph
       - VFX/Gamut Projector Decoder.vfxgraph
       - VFX/LAB Decoder.vfxgraph

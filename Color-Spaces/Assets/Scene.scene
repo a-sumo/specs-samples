@@ -4771,7 +4771,7 @@
 - !<SceneObject/b5b60e1d-038b-4eaf-892b-ba2bf579e61a>
   PrefabRemaps:
     []
-  Name: Frame
+  Name: Main Frame
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
