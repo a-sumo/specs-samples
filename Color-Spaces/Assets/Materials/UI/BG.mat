@@ -4,6 +4,9 @@
     - !<own> 2ebe01e4-ce15-4060-89f8-6e5eff40cf88
 - !<PassInfo/2ebe01e4-ce15-4060-89f8-6e5eff40cf88>
   CachedProperties:
+    - Port_Default_N008:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
@@ -40,13 +43,37 @@
     - Port_RayOrigin_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Switch_N008:
+        typeIdx: 1
+        value: 0.000000
     - Port_UVCoord_N000:
         typeIdx: 3
         value: {x: 0.000000, y: 0.000000}
+    - Port_Value0_N008:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_Value1_N000:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value1_N001:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value1_N007:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value1_N008:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_Value2_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value2_N001:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value2_N007:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value2_N008:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_WorldNormal_N004:
@@ -58,6 +85,30 @@
     - Port_WorldTangent_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 1.000000}
+    - Port_columns_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_fps_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_rows_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_totalFrames_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Tweak_N0:
+        typeIdx: 9
+        value:
+          id: 9cbb8846-54b9-4a71-9fa8-21f9a84d5d0f
+          sampler:
+            filteringMode: Nearest
+            wrapModeU: ClampToEdge
+            wrapModeV: ClampToEdge
+            wrapModeW: Repeat
+            borderColor: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+            mipmaps: false
+          type: Texture2D
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
@@ -70,15 +121,24 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: Disabled
+  BlendMode: PremultipliedAlphaAuto
   Properties:
     PreviewEnabled:
       typeIdx: 0
       value: 0
-    Tweak_N0:
+    columns:
+      typeIdx: 1
+      value: 12.000000
+    fps:
+      typeIdx: 1
+      value: 12.000000
+    rows:
+      typeIdx: 1
+      value: 10.000000
+    spriteSheet:
       typeIdx: 9
       value:
-        id: 18d2ab2b-a5b9-4fbb-882e-29391d2af4fd
+        id: 82ed0710-f4d4-4e5f-8816-bfce89626067
         sampler:
           filteringMode: Trilinear
           wrapModeU: Repeat
@@ -87,4 +147,10 @@
           borderColor: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
           mipmaps: false
         type: Texture2D
+    totalFrames:
+      typeIdx: 1
+      value: 120.000000
+    useMeshGradient:
+      typeIdx: 0
+      value: 0
   Pass: !<reference> 63b542cf-8730-4b8d-b19d-1ad6b15ae1fd

@@ -10,7 +10,6 @@
     - !<own> 3076a67d-d683-45c7-8bf4-1b8714d3b742
     - !<own> b5b60e1d-038b-4eaf-892b-ba2bf579e61a
     - !<own> 3f619256-2a41-4174-829e-baf396629fdb
-    - !<own> 2e949ecb-9a27-415a-acad-e239e707f051
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       - |
@@ -361,7 +360,7 @@
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
   Children:
-    []
+    - !<own> 2e949ecb-9a27-415a-acad-e239e707f051
   Components:
     - !<own> bffb4668-a9d8-41f7-885e-a2298d07976c
 - !<Text/056b41c5-a54d-445a-9f0e-96d3f2351821>
@@ -1338,13 +1337,13 @@
 - !<SceneObject/2e949ecb-9a27-415a-acad-e239e707f051>
   PrefabRemaps:
     []
-  Name: Object 0
+  Name: Gradient BG
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Position: {x: 0.000000, y: 1.000000, z: -5.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Scale: {x: 20.000000, y: 20.000000, z: 20.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
