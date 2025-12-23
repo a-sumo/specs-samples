@@ -5,28 +5,28 @@
  * Uses the same material as RGBCubeGenerator (ColorSpaceTransform shader).
  * The marker's displayed color automatically matches its RGB position.
  *
- * Connect R, G, B sliders from Spectacles UI Kit to setR(), setG(), setB()
- * or use setRGB() to set all at once.
+ * Connect H, S, V sliders from Spectacles UI Kit to setH(), setS(), setV()
+ * or use setHSV() to set all at once.
  */
 @component
 export class SingleColorMarker extends BaseScriptComponent {
 
-    // ============ COLOR ============
+    // ============ COLOR (HSV) ============
 
     @input
-    @hint("Red channel (0-1)")
+    @hint("Hue (0-1)")
     @widget(new SliderWidget(0, 1, 0.01))
-    private _r: number = 1.0;
+    private _h: number = 0.0;
 
     @input
-    @hint("Green channel (0-1)")
+    @hint("Saturation (0-1)")
     @widget(new SliderWidget(0, 1, 0.01))
-    private _g: number = 0.0;
+    private _s: number = 1.0;
 
     @input
-    @hint("Blue channel (0-1)")
+    @hint("Value (0-1)")
     @widget(new SliderWidget(0, 1, 0.01))
-    private _b: number = 0.0;
+    private _v: number = 1.0;
 
     // ============ GEOMETRY ============
 
@@ -35,7 +35,7 @@ export class SingleColorMarker extends BaseScriptComponent {
     private _displaySize: number = 100.0;
 
     @input
-    @hint("Size of the marker cube")
+    @hint("Size of the marker sphere")
     @widget(new SliderWidget(1, 20, 0.5))
     private _markerSize: number = 5.0;
 
@@ -84,10 +84,44 @@ export class SingleColorMarker extends BaseScriptComponent {
     private meshVisual!: RenderMeshVisual;
     private mesh: RenderMesh | null = null;
 
+    // Computed RGB from HSV
+    private _r: number = 1.0;
+    private _g: number = 0.0;
+    private _b: number = 0.0;
+
     onAwake(): void {
+        this.updateRGBFromHSV();
         this.setupMeshVisual();
         this.generateMesh();
         this.updateMaterialParams();
+    }
+
+    private hsvToRgb(h: number, s: number, v: number): { r: number; g: number; b: number } {
+        let r = 0, g = 0, b = 0;
+
+        const i = Math.floor(h * 6);
+        const f = h * 6 - i;
+        const p = v * (1 - s);
+        const q = v * (1 - f * s);
+        const t = v * (1 - (1 - f) * s);
+
+        switch (i % 6) {
+            case 0: r = v; g = t; b = p; break;
+            case 1: r = q; g = v; b = p; break;
+            case 2: r = p; g = v; b = t; break;
+            case 3: r = p; g = q; b = v; break;
+            case 4: r = t; g = p; b = v; break;
+            case 5: r = v; g = p; b = q; break;
+        }
+
+        return { r, g, b };
+    }
+
+    private updateRGBFromHSV(): void {
+        const rgb = this.hsvToRgb(this._h, this._s, this._v);
+        this._r = rgb.r;
+        this._g = rgb.g;
+        this._b = rgb.b;
     }
 
     private setupMeshVisual(): void {
@@ -184,52 +218,56 @@ export class SingleColorMarker extends BaseScriptComponent {
     }
 
     // ============================================
-    // PUBLIC API - RGB CONTROL
+    // PUBLIC API - HSV CONTROL
     // ============================================
 
-    /** Set red channel (0-1) - call from slider callback */
-    public setR(value: number): void {
-        this._r = Math.max(0, Math.min(1, value));
+    /** Set hue (0-1) - call from slider callback */
+    public setH(value: number): void {
+        this._h = Math.max(0, Math.min(1, value));
+        this.updateRGBFromHSV();
         this.generateMesh();
     }
 
-    /** Set green channel (0-1) - call from slider callback */
-    public setG(value: number): void {
-        this._g = Math.max(0, Math.min(1, value));
+    /** Set saturation (0-1) - call from slider callback */
+    public setS(value: number): void {
+        this._s = Math.max(0, Math.min(1, value));
+        this.updateRGBFromHSV();
         this.generateMesh();
     }
 
-    /** Set blue channel (0-1) - call from slider callback */
-    public setB(value: number): void {
-        this._b = Math.max(0, Math.min(1, value));
+    /** Set value/brightness (0-1) - call from slider callback */
+    public setV(value: number): void {
+        this._v = Math.max(0, Math.min(1, value));
+        this.updateRGBFromHSV();
         this.generateMesh();
     }
 
-    /** Set all RGB channels at once (0-1 each) */
-    public setRGB(r: number, g: number, b: number): void {
-        this._r = Math.max(0, Math.min(1, r));
-        this._g = Math.max(0, Math.min(1, g));
-        this._b = Math.max(0, Math.min(1, b));
+    /** Set all HSV channels at once (0-1 each) */
+    public setHSV(h: number, s: number, v: number): void {
+        this._h = Math.max(0, Math.min(1, h));
+        this._s = Math.max(0, Math.min(1, s));
+        this._v = Math.max(0, Math.min(1, v));
+        this.updateRGBFromHSV();
         this.generateMesh();
     }
 
-    /** Set RGB from vec3 (components 0-1) */
-    public setColor(color: vec3): void {
-        this.setRGB(color.x, color.y, color.z);
-    }
+    /** Get current H value */
+    public getH(): number { return this._h; }
 
-    /** Get current R value */
-    public getR(): number { return this._r; }
+    /** Get current S value */
+    public getS(): number { return this._s; }
 
-    /** Get current G value */
-    public getG(): number { return this._g; }
+    /** Get current V value */
+    public getV(): number { return this._v; }
 
-    /** Get current B value */
-    public getB(): number { return this._b; }
-
-    /** Get current color as vec3 */
+    /** Get current color as RGB vec3 */
     public getColor(): vec3 {
         return new vec3(this._r, this._g, this._b);
+    }
+
+    /** Get current RGB values */
+    public getRGB(): { r: number; g: number; b: number } {
+        return { r: this._r, g: this._g, b: this._b };
     }
 
     // ============================================
@@ -269,7 +307,7 @@ export class SingleColorMarker extends BaseScriptComponent {
         this.updateMaterialParams();
     }
 
-    /** Set marker cube size */
+    /** Set marker sphere size */
     public setMarkerSize(size: number): void {
         this._markerSize = size;
         this.generateMesh();
@@ -285,14 +323,14 @@ export class SingleColorMarker extends BaseScriptComponent {
     // PROPERTY ACCESSORS
     // ============================================
 
-    get r(): number { return this._r; }
-    set r(value: number) { this.setR(value); }
+    get h(): number { return this._h; }
+    set h(value: number) { this.setH(value); }
 
-    get g(): number { return this._g; }
-    set g(value: number) { this.setG(value); }
+    get s(): number { return this._s; }
+    set s(value: number) { this.setS(value); }
 
-    get b(): number { return this._b; }
-    set b(value: number) { this.setB(value); }
+    get v(): number { return this._v; }
+    set v(value: number) { this.setV(value); }
 
     get displaySize(): number { return this._displaySize; }
     set displaySize(value: number) { this.setDisplaySize(value); }
