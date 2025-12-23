@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 144
+    size: 143
     values:
       - 00000000-0000-0065-0000-000000000064
       - 0005641c-028d-459a-0000-000000014b4d
@@ -25,7 +25,6 @@ CollapsedEntities:
       - 1d021bb8-a733-4471-8610-321a47b5aeb6
       - 1dd79e38-dcae-4731-b376-c8df90b9e3c8
       - 1de191cd-40e0-4051-a730-fdceb36a8b82
-      - 1eef2bb4-0322-41bd-b8d5-f703656a20df
       - 221c712a-bb46-4299-bbd2-b8db01e321f3
       - 2272c1ba-b3cf-45d0-89c5-e703bdaabd0f
       - 22b5aacb-541e-4242-bc82-3b50cb926d55
