@@ -61,6 +61,30 @@
     - Port_baseColor_N001:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_fresnelIntensity;_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_fresnelIntensity_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_fresnelPower;_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_fresnelPower_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_outlineThreshold;_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_outlineThreshold_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_outlineWidth;_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_outlineWidth_N001:
+        typeIdx: 1
+        value: 0.000000
     - Port_rimPower_N001:
         typeIdx: 1
         value: 0.000000
@@ -76,6 +100,9 @@
     - Tweak_N3:
         typeIdx: 1
         value: 1.000000
+    - mainColor:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - planeMap:
         typeIdx: 9
         value:
@@ -88,6 +115,12 @@
             borderColor: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
             mipmaps: false
           type: Texture2D
+    - rimPower:
+        typeIdx: 1
+        value: 20.000000
+    - rimStrength:
+        typeIdx: 1
+        value: 0.000000
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
@@ -107,11 +140,14 @@
       value: 0
     baseColor:
       typeIdx: 5
-      value: {x: 0.619257, y: 0.687907, z: 0.992935, w: 1.000000}
-    rimPower:
+      value: {x: 0.672099, y: 0.727962, z: 0.919448, w: 1.000000}
+    fresnelIntensity:
       typeIdx: 1
-      value: 20.000000
-    rimStrength:
+      value: 2.000000
+    fresnelPower:
+      typeIdx: 1
+      value: 1.000000
+    outlineWidth:
       typeIdx: 1
       value: 0.000000
   Pass: !<reference> e1c918d7-efa8-4dd7-8c40-813a52202495

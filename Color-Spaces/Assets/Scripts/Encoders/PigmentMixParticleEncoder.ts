@@ -1,6 +1,6 @@
 // PigmentMixParticleEncoder.ts
 // Encodes the achievable gamut from mixing physical pigments (Kubelka-Munk)
-// Gets pigment colors from PaletteController for VFX particle visualization
+// Uses preset palettes for VFX particle visualization
 
 @component
 export class PigmentMixParticleEncoder extends BaseScriptComponent {
@@ -14,8 +14,19 @@ export class PigmentMixParticleEncoder extends BaseScriptComponent {
     vfxComponent: VFXComponent;
 
     @input
-    @hint("PaletteController to get pigment colors from")
-    paletteController: ScriptComponent;
+    @widget(
+        new ComboBoxWidget([
+            new ComboBoxItem("CMYK + White/Black", 0),
+            new ComboBoxItem("Primary (RGB + CMY)", 1),
+            new ComboBoxItem("Earth Tones", 2),
+            new ComboBoxItem("Pastels", 3),
+            new ComboBoxItem("Warm", 4),
+            new ComboBoxItem("Cool", 5),
+            new ComboBoxItem("Custom", 6),
+        ])
+    )
+    @hint("Pigment palette preset")
+    palettePreset: number = 0;
 
     @input
     @hint("Output texture size (64 = 4096 pixels)")
@@ -29,46 +40,105 @@ export class PigmentMixParticleEncoder extends BaseScriptComponent {
     @hint("Scale for VFX positions")
     scale: number = 100;
 
-    // Fallback pigment colors (used if no PaletteController assigned)
+    // Custom pigment colors (used when palettePreset = Custom)
     @input
-    @hint("Fallback: White pigment")
+    @hint("Custom: Pigment 0")
     @widget(new ColorWidget())
     pig0Color: vec3 = new vec3(1, 1, 1);
 
     @input
-    @hint("Fallback: Black pigment")
+    @hint("Custom: Pigment 1")
     @widget(new ColorWidget())
     pig1Color: vec3 = new vec3(0.08, 0.08, 0.08);
 
     @input
-    @hint("Fallback: Yellow pigment")
+    @hint("Custom: Pigment 2")
     @widget(new ColorWidget())
     pig2Color: vec3 = new vec3(1, 0.92, 0);
 
     @input
-    @hint("Fallback: Red pigment")
+    @hint("Custom: Pigment 3")
     @widget(new ColorWidget())
     pig3Color: vec3 = new vec3(0.89, 0, 0.13);
 
     @input
-    @hint("Fallback: Blue pigment")
+    @hint("Custom: Pigment 4")
     @widget(new ColorWidget())
     pig4Color: vec3 = new vec3(0.1, 0.1, 0.7);
 
     @input
-    @hint("Fallback: Green pigment")
+    @hint("Custom: Pigment 5")
     @widget(new ColorWidget())
     pig5Color: vec3 = new vec3(0, 0.47, 0.44);
 
     private static readonly NUM_PIGMENTS = 6;
+
+    // Preset palettes
+    private static readonly PRESETS: { [key: number]: vec3[] } = {
+        // 0: CMYK + White/Black (traditional print)
+        0: [
+            new vec3(1, 1, 1),           // White
+            new vec3(0.08, 0.08, 0.08),  // Black
+            new vec3(0, 1, 1),           // Cyan
+            new vec3(1, 0, 1),           // Magenta
+            new vec3(1, 1, 0),           // Yellow
+            new vec3(0, 0.47, 0.44),     // Teal
+        ],
+        // 1: Primary (RGB + CMY)
+        1: [
+            new vec3(1, 0, 0),           // Red
+            new vec3(0, 1, 0),           // Green
+            new vec3(0, 0, 1),           // Blue
+            new vec3(0, 1, 1),           // Cyan
+            new vec3(1, 0, 1),           // Magenta
+            new vec3(1, 1, 0),           // Yellow
+        ],
+        // 2: Earth Tones
+        2: [
+            new vec3(0.96, 0.93, 0.87),  // Cream
+            new vec3(0.24, 0.15, 0.10),  // Dark brown
+            new vec3(0.72, 0.53, 0.35),  // Tan
+            new vec3(0.55, 0.27, 0.07),  // Sienna
+            new vec3(0.33, 0.42, 0.18),  // Olive
+            new vec3(0.76, 0.60, 0.42),  // Buff
+        ],
+        // 3: Pastels
+        3: [
+            new vec3(1, 1, 1),           // White
+            new vec3(1, 0.85, 0.85),     // Pink
+            new vec3(0.85, 0.92, 1),     // Light blue
+            new vec3(0.85, 1, 0.85),     // Mint
+            new vec3(1, 0.95, 0.8),      // Cream
+            new vec3(0.9, 0.85, 1),      // Lavender
+        ],
+        // 4: Warm
+        4: [
+            new vec3(1, 1, 1),           // White
+            new vec3(0.2, 0.1, 0.05),    // Dark brown
+            new vec3(1, 0.85, 0),        // Golden yellow
+            new vec3(1, 0.5, 0),         // Orange
+            new vec3(0.8, 0.2, 0.1),     // Red-orange
+            new vec3(0.6, 0.1, 0.1),     // Deep red
+        ],
+        // 5: Cool
+        5: [
+            new vec3(1, 1, 1),           // White
+            new vec3(0.1, 0.1, 0.2),     // Dark blue
+            new vec3(0, 0.6, 0.8),       // Cyan
+            new vec3(0.2, 0.4, 0.8),     // Blue
+            new vec3(0.4, 0.2, 0.6),     // Purple
+            new vec3(0.1, 0.5, 0.5),     // Teal
+        ],
+    };
 
     private posRenderTarget: Texture;
     private colorRenderTarget: Texture;
     private pigmentTexture: Texture;
     private initialized: boolean = false;
 
-    // Current pigment colors (from PaletteController or fallback)
+    // Current pigment colors
     private currentPigments: vec3[] = [];
+    private currentPreset: number = -1;
 
     onAwake(): void {
         if (!this.encoderMaterial) {
@@ -76,15 +146,8 @@ export class PigmentMixParticleEncoder extends BaseScriptComponent {
             return;
         }
 
-        // Initialize with fallback colors
-        this.currentPigments = [
-            this.pig0Color,
-            this.pig1Color,
-            this.pig2Color,
-            this.pig3Color,
-            this.pig4Color,
-            this.pig5Color,
-        ];
+        // Apply selected preset (or custom colors)
+        this.applyPreset(this.palettePreset);
 
         // Create pigment texture
         this.pigmentTexture = ProceduralTextureProvider.createWithFormat(
@@ -118,75 +181,40 @@ export class PigmentMixParticleEncoder extends BaseScriptComponent {
         // Update pigments every frame (reads from currentPigments)
         this.createEvent("UpdateEvent").bind(() => this.updatePigmentTexture());
 
-        // Defer palette listener setup to OnStartEvent (after PaletteController initializes)
         this.createEvent("OnStartEvent").bind(() => {
-            this.setupPaletteListener();
             this.initialized = true;
-            print("PigmentMixParticleEncoder: Ready (palette listener connected)");
+            const presetName = this.getPresetName(this.palettePreset);
+            print(`PigmentMixParticleEncoder: Ready (palette: ${presetName})`);
         });
     }
 
-    private setupPaletteListener(): void {
-        if (!this.paletteController) {
-            print("PigmentMixParticleEncoder: No PaletteController assigned, using fallback colors");
-            return;
-        }
-
-        const controller = this.paletteController as any;
-
-        // Listen for preset changes (includes colors array)
-        if (controller.onPresetChanged) {
-            controller.onPresetChanged.add((event: any) => {
-                if (event.colors) {
-                    this.onPaletteColorsChanged(event.colors);
-                    print(`PigmentMixParticleEncoder: Preset '${event.presetName}' applied with ${event.colors.length} colors`);
-                }
-            });
-            print("PigmentMixParticleEncoder: Listening for preset changes");
-        }
-
-        // Listen for manual color changes (when user samples colors, edits individual slots)
-        if (controller.onColorsManuallyChanged) {
-            controller.onColorsManuallyChanged.add((colors: any) => {
-                if (colors && colors.length > 0) {
-                    this.onPaletteColorsChanged(colors);
-                    print(`PigmentMixParticleEncoder: Manual color change, updated ${colors.length} colors`);
-                }
-            });
-            print("PigmentMixParticleEncoder: Listening for manual color changes");
-        }
-
-        // Listen for palette restored (undo, deselect preset)
-        if (controller.onPaletteRestored) {
-            controller.onPaletteRestored.add((colors: any) => {
-                if (colors && colors.length > 0) {
-                    this.onPaletteColorsChanged(colors);
-                    print(`PigmentMixParticleEncoder: Palette restored with ${colors.length} colors`);
-                }
-            });
-            print("PigmentMixParticleEncoder: Listening for palette restore");
-        }
-
-        // Get initial colors if available
-        if (typeof controller.getAllColors === 'function') {
-            const colors = controller.getAllColors();
-            if (colors && colors.length > 0) {
-                this.onPaletteColorsChanged(colors);
-                print(`PigmentMixParticleEncoder: Got ${colors.length} initial colors from PaletteController`);
-            }
-        }
+    private getPresetName(index: number): string {
+        const names = ["CMYK + White/Black", "Primary (RGB + CMY)", "Earth Tones", "Pastels", "Warm", "Cool", "Custom"];
+        return names[index] || "Unknown";
     }
 
-    private onPaletteColorsChanged(colors: vec4[]): void {
-        if (!colors || colors.length === 0) return;
-
-        // Update current pigments from palette colors (convert vec4 to vec3)
-        for (let i = 0; i < Math.min(colors.length, PigmentMixParticleEncoder.NUM_PIGMENTS); i++) {
-            const c = colors[i];
-            this.currentPigments[i] = new vec3(c.r, c.g, c.b);
+    private applyPreset(presetIndex: number): void {
+        if (presetIndex === 6) {
+            // Custom: use the pig*Color inputs
+            this.currentPigments = [
+                this.pig0Color,
+                this.pig1Color,
+                this.pig2Color,
+                this.pig3Color,
+                this.pig4Color,
+                this.pig5Color,
+            ];
+        } else {
+            // Use preset
+            const preset = PigmentMixParticleEncoder.PRESETS[presetIndex];
+            if (preset) {
+                this.currentPigments = preset.map(c => new vec3(c.x, c.y, c.z));
+            } else {
+                // Fallback to CMYK
+                this.currentPigments = PigmentMixParticleEncoder.PRESETS[0].map(c => new vec3(c.x, c.y, c.z));
+            }
         }
-
-        // Pigment texture will be updated in next frame's updatePigmentTexture()
+        this.currentPreset = presetIndex;
     }
 
     private updatePigmentTexture(): void {
@@ -282,9 +310,39 @@ export class PigmentMixParticleEncoder extends BaseScriptComponent {
     }
 
     /**
-     * Set pigment colors directly (alternative to PaletteController)
+     * Set palette preset by index
+     * 0 = CMYK + White/Black, 1 = Primary, 2 = Earth Tones,
+     * 3 = Pastels, 4 = Warm, 5 = Cool, 6 = Custom
+     */
+    setPreset(presetIndex: number): void {
+        this.palettePreset = presetIndex;
+        this.applyPreset(presetIndex);
+        print(`PigmentMixParticleEncoder: Switched to ${this.getPresetName(presetIndex)}`);
+    }
+
+    /** Get current preset index */
+    getPreset(): number {
+        return this.currentPreset;
+    }
+
+    /** Cycle to next preset */
+    nextPreset(): void {
+        const next = (this.currentPreset + 1) % 7;
+        this.setPreset(next);
+    }
+
+    /** Cycle to previous preset */
+    prevPreset(): void {
+        const prev = (this.currentPreset - 1 + 7) % 7;
+        this.setPreset(prev);
+    }
+
+    /**
+     * Set pigment colors directly (switches to Custom mode)
      */
     setPigmentColors(colors: vec3[]): void {
+        this.palettePreset = 6; // Custom
+        this.currentPreset = 6;
         for (let i = 0; i < Math.min(colors.length, PigmentMixParticleEncoder.NUM_PIGMENTS); i++) {
             this.currentPigments[i] = colors[i];
         }
@@ -313,5 +371,10 @@ export class PigmentMixParticleEncoder extends BaseScriptComponent {
         const threeWayMixes = (n * (n - 1) * (n - 2) / 6) * threeWaySteps;
 
         return purePigments + twoWayMixes + threeWayMixes;
+    }
+
+    /** Get list of available preset names */
+    static getPresetNames(): string[] {
+        return ["CMYK + White/Black", "Primary (RGB + CMY)", "Earth Tones", "Pastels", "Warm", "Cool", "Custom"];
     }
 }

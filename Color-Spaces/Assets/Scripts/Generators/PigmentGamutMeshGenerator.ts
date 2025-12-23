@@ -69,6 +69,20 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   @hint("Text component to display active color space name")
   colorSpaceText: Text;
 
+  // ============ REST TRANSFORM ============
+
+  @input
+  @hint("Rest position (world space) - leave at 0,0,0 to use initial position")
+  restPosition: vec3 = new vec3(0, 0, 0);
+
+  @input
+  @hint("Rest rotation (euler degrees) - leave at 0,0,0 to use initial rotation")
+  restRotation: vec3 = new vec3(0, 0, 0);
+
+  @input
+  @hint("Capture current transform as rest position on awake")
+  useCurrentAsRest: boolean = true;
+
   // ============ GAMUT ============
 
   @input
@@ -128,7 +142,7 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   private gamutLUT: vec3[] = [];
   private sampleData: { center: vec3; r: number; g: number; b: number }[] = [];
 
-  // Tween state
+  // Tween state (color space blend)
   private isTweening: boolean = false;
   private tweenStartValue: number = 0;
   private tweenEndValue: number = 1;
@@ -136,17 +150,45 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   private tweenElapsed: number = 0;
   private updateEvent: SceneEvent | null = null;
 
+  // Transform tween state
+  private isTransformTweening: boolean = false;
+  private transformTweenStartPos: vec3 = new vec3(0, 0, 0);
+  private transformTweenEndPos: vec3 = new vec3(0, 0, 0);
+  private transformTweenStartRot: quat = quat.quatIdentity();
+  private transformTweenEndRot: quat = quat.quatIdentity();
+  private transformTweenDuration: number = 0.5;
+  private transformTweenElapsed: number = 0;
+  private storedRestPosition: vec3 = new vec3(0, 0, 0);
+  private storedRestRotation: quat = quat.quatIdentity();
+
   // Precomputed achievability grid for fast lookups
   private static readonly ACHIEV_GRID_RES = 32; // Resolution of precomputed grid
   private achievabilityGrid: boolean[] = [];
 
   onAwake(): void {
+    this.captureRestTransform();
     this.initializePigments();
     this.buildGamutLUT();
     this.setupMeshVisual();
     this.collectSampleData();
     this.generateMesh();
     this.updateMaterialParams();
+  }
+
+  private captureRestTransform(): void {
+    const transform = this.sceneObject.getTransform();
+    if (this.useCurrentAsRest) {
+      this.storedRestPosition = transform.getWorldPosition();
+      this.storedRestRotation = transform.getWorldRotation();
+    } else {
+      this.storedRestPosition = this.restPosition;
+      const rad = Math.PI / 180;
+      this.storedRestRotation = quat.fromEulerAngles(
+        this.restRotation.x * rad,
+        this.restRotation.y * rad,
+        this.restRotation.z * rad
+      );
+    }
   }
 
   private initializePigments(): void {
@@ -638,21 +680,44 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   }
 
   private onUpdate(): void {
-    if (!this.isTweening) return;
+    if (!this.isTweening && !this.isTransformTweening) return;
 
     const dt = getDeltaTime();
-    this.tweenElapsed += dt;
 
-    if (this.tweenElapsed >= this.tweenDuration) {
-      this._blend = this.tweenEndValue;
-      this.isTweening = false;
-    } else {
-      const t = this.tweenElapsed / this.tweenDuration;
-      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      this._blend = this.tweenStartValue + (this.tweenEndValue - this.tweenStartValue) * eased;
+    // Handle color space blend tween
+    if (this.isTweening) {
+      this.tweenElapsed += dt;
+      if (this.tweenElapsed >= this.tweenDuration) {
+        this._blend = this.tweenEndValue;
+        this.isTweening = false;
+      } else {
+        const t = this.tweenElapsed / this.tweenDuration;
+        const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        this._blend = this.tweenStartValue + (this.tweenEndValue - this.tweenStartValue) * eased;
+      }
+      this.updateMaterialParams();
     }
 
-    this.updateMaterialParams();
+    // Handle transform tween
+    if (this.isTransformTweening) {
+      this.transformTweenElapsed += dt;
+      const transform = this.sceneObject.getTransform();
+
+      if (this.transformTweenElapsed >= this.transformTweenDuration) {
+        transform.setWorldPosition(this.transformTweenEndPos);
+        transform.setWorldRotation(this.transformTweenEndRot);
+        this.isTransformTweening = false;
+      } else {
+        const t = this.transformTweenElapsed / this.transformTweenDuration;
+        const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        const pos = vec3.lerp(this.transformTweenStartPos, this.transformTweenEndPos, eased);
+        transform.setWorldPosition(pos);
+
+        const rot = quat.slerp(this.transformTweenStartRot, this.transformTweenEndRot, eased);
+        transform.setWorldRotation(rot);
+      }
+    }
   }
 
   /** Tween color space blend to a target value */
@@ -688,5 +753,76 @@ export class PigmentGamutMeshGenerator extends BaseScriptComponent {
   /** Stop any active tween */
   public stopTween(): void {
     this.isTweening = false;
+  }
+
+  // ============================================
+  // TRANSFORM TWEEN API
+  // ============================================
+
+  /** Tween SceneObject to rest transform (position + rotation) */
+  public tweenToRestTransform(duration: number = 0.5): void {
+    this.ensureUpdateEvent();
+    const transform = this.sceneObject.getTransform();
+    this.transformTweenStartPos = transform.getWorldPosition();
+    this.transformTweenStartRot = transform.getWorldRotation();
+    this.transformTweenEndPos = this.storedRestPosition;
+    this.transformTweenEndRot = this.storedRestRotation;
+    this.transformTweenDuration = duration;
+    this.transformTweenElapsed = 0;
+    this.isTransformTweening = true;
+  }
+
+  /** Instantly snap SceneObject to rest transform */
+  public snapToRestTransform(): void {
+    const transform = this.sceneObject.getTransform();
+    transform.setWorldPosition(this.storedRestPosition);
+    transform.setWorldRotation(this.storedRestRotation);
+    this.isTransformTweening = false;
+  }
+
+  /** Tween SceneObject to a specific world position/rotation */
+  public tweenToTransform(position: vec3, rotation: quat, duration: number = 0.5): void {
+    this.ensureUpdateEvent();
+    const transform = this.sceneObject.getTransform();
+    this.transformTweenStartPos = transform.getWorldPosition();
+    this.transformTweenStartRot = transform.getWorldRotation();
+    this.transformTweenEndPos = position;
+    this.transformTweenEndRot = rotation;
+    this.transformTweenDuration = duration;
+    this.transformTweenElapsed = 0;
+    this.isTransformTweening = true;
+  }
+
+  /** Get stored rest position */
+  public getRestPosition(): vec3 {
+    return this.storedRestPosition;
+  }
+
+  /** Get stored rest rotation */
+  public getRestRotation(): quat {
+    return this.storedRestRotation;
+  }
+
+  /** Update rest transform to current position */
+  public setCurrentAsRest(): void {
+    const transform = this.sceneObject.getTransform();
+    this.storedRestPosition = transform.getWorldPosition();
+    this.storedRestRotation = transform.getWorldRotation();
+  }
+
+  /** Check if transform is currently tweening */
+  public getIsTransformTweening(): boolean {
+    return this.isTransformTweening;
+  }
+
+  /** Stop transform tween */
+  public stopTransformTween(): void {
+    this.isTransformTweening = false;
+  }
+
+  /** Stop all tweens (color space and transform) */
+  public stopAllTweens(): void {
+    this.isTweening = false;
+    this.isTransformTweening = false;
   }
 }

@@ -3,6 +3,7 @@ import { DragInteractorEvent } from "SpectaclesInteractionKit.lspkg/Core/Interac
 import { RGBCubeGenerator } from "../Generators/RGBCubeGenerator";
 import { PigmentGamutMeshGenerator } from "../Generators/PigmentGamutMeshGenerator";
 import { GamutProjectionMeshGenerator } from "../Generators/GamutProjectionMeshGenerator";
+import { SingleColorMarker } from "../Generators/SingleColorMarker";
 
 /**
  * Interactive plane for color space selection.
@@ -62,6 +63,10 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   @input
   @hint("GamutProjectionMeshGenerator to update")
   projectorGamutMesh: GamutProjectionMeshGenerator;
+
+  @input
+  @hint("SingleColorMarker to update")
+  singleColorMarker: SingleColorMarker;
 
   private static readonly SPACE_NAMES = ["RGB", "CIELAB", "CIEXYZ", "Oklab", "CIELUV"];
 
@@ -288,6 +293,9 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     if (this.projectorGamutMesh) {
       this.projectorGamutMesh.setColorSpace(0, targetSpace, blend);
     }
+    if (this.singleColorMarker) {
+      this.singleColorMarker.setColorSpace(0, targetSpace, blend);
+    }
   }
 
   private updateDebugText(message: string): void {
@@ -326,6 +334,9 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     }
     if (this.projectorGamutMesh) {
       this.projectorGamutMesh.setColorSpace(0, space, this.currentBlend);
+    }
+    if (this.singleColorMarker) {
+      this.singleColorMarker.setColorSpace(0, space, this.currentBlend);
     }
 
     // Position cursor at the snapped color space
@@ -369,6 +380,7 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
     if (this.rgbCubeGenerator) this.rgbCubeGenerator.setDisplaySize(size);
     if (this.pigmentMixGenerator) this.pigmentMixGenerator.setDisplaySize(size);
     if (this.projectorGamutMesh) this.projectorGamutMesh.setDisplaySize(size);
+    if (this.singleColorMarker) this.singleColorMarker.setDisplaySize(size);
   }
 
   /** Sync voxel size across all generators */
@@ -382,5 +394,41 @@ export class ColorSpacePlaneController extends BaseScriptComponent {
   public syncGridResolution(res: number): void {
     if (this.rgbCubeGenerator) this.rgbCubeGenerator.setGridResolution(res);
     if (this.pigmentMixGenerator) this.pigmentMixGenerator.setGridResolution(res);
+  }
+
+  // ============================================
+  // TRANSFORM SYNC METHODS
+  // ============================================
+
+  /** Tween all generators to their rest transforms */
+  public tweenAllToRestTransform(duration: number = 0.5): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.tweenToRestTransform(duration);
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.tweenToRestTransform(duration);
+    if (this.projectorGamutMesh) this.projectorGamutMesh.tweenToRestTransform(duration);
+  }
+
+  /** Snap all generators to their rest transforms */
+  public snapAllToRestTransform(): void {
+    if (this.rgbCubeGenerator) this.rgbCubeGenerator.snapToRestTransform();
+    if (this.pigmentMixGenerator) this.pigmentMixGenerator.snapToRestTransform();
+    if (this.projectorGamutMesh) this.projectorGamutMesh.snapToRestTransform();
+  }
+
+  /** Align pigment gamut with projector (tween to projector's position) */
+  public alignPigmentWithProjector(duration: number = 0.5): void {
+    if (this.pigmentMixGenerator && this.projectorGamutMesh) {
+      const projPos = this.projectorGamutMesh.getRestPosition();
+      const projRot = this.projectorGamutMesh.getRestRotation();
+      this.pigmentMixGenerator.tweenToTransform(projPos, projRot, duration);
+    }
+  }
+
+  /** Align projector with pigment gamut (tween to pigment's position) */
+  public alignProjectorWithPigment(duration: number = 0.5): void {
+    if (this.pigmentMixGenerator && this.projectorGamutMesh) {
+      const pigPos = this.pigmentMixGenerator.getRestPosition();
+      const pigRot = this.pigmentMixGenerator.getRestRotation();
+      this.projectorGamutMesh.tweenToTransform(pigPos, pigRot, duration);
+    }
   }
 }

@@ -1,20 +1,20 @@
-- !<AssetImportMetadata/45e2fc46-abf2-4535-9ff0-444c3756ada5>
+- !<AssetImportMetadata/bb308965-260d-448f-b88c-61de9649c97c>
   ImportedAssetIds:
-    JavaScriptAsset: !<reference> 705299ea-cfc2-4d58-abd9-a82eaeede995
-  ImporterName: JavaScriptAssetImporter
-  PrimaryAsset: !<reference> 705299ea-cfc2-4d58-abd9-a82eaeede995
+    TypeScriptAsset: !<reference> 3594baaa-5cc2-4d0d-b5f2-3f5c652fb640
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 3594baaa-5cc2-4d0d-b5f2-3f5c652fb640
   PackageType: NotAPackage
   LegacyPackagePolicy: ~
   ExtraData:
     {}
   AssetDataMap:
-    JavaScriptAsset: !<own> 5738382c-9181-4cec-91b5-8768e3ea9045
+    TypeScriptAsset: !<own> 51eb19df-6c5d-4fe3-ae4e-bf68cbb238e5
   DependentFiles:
     []
   ImporterSettings: !<AssetImporterSettings>
     {}
   CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
-- !<ScriptAssetData/5738382c-9181-4cec-91b5-8768e3ea9045>
+- !<TypeScriptAssetData/51eb19df-6c5d-4fe3-ae4e-bf68cbb238e5>
   SvgIcon: ""
   SetupScript:
     code: ""
@@ -22,11 +22,12 @@
   VersionMajor: 0
   VersionMinor: 0
   VersionPatch: 0
-  ComponentUid: c91032d3-b3a1-46d5-8c4b-6b9b641ba17c
+  ComponentUid: 4c60d0b7-db65-459f-8fc3-e0755c91fcda
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
-    {}
+    lockRotation: false
+    lockScale: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -36,8 +37,11 @@
   Attachments:
     []
   DefaultScriptInputs:
-    -
-      {}
+    - lockRotation: true
+      lockScale: true
   ScriptTypes:
     -
       {}
+  InputLines:
+    - '// @input bool lockRotation = true {"hint":"Lock rotation to initial value"}'
+    - '// @input bool lockScale = true {"hint":"Lock scale to initial value"}'

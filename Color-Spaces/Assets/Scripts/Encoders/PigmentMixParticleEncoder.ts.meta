@@ -28,7 +28,7 @@
   ScriptInputsHidden:
     encoderMaterial: false
     mixSteps: false
-    paletteController: false
+    palettePreset: false
     pig0Color: false
     pig1Color: false
     pig2Color: false
@@ -49,7 +49,7 @@
   DefaultScriptInputs:
     - encoderMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
       vfxComponent: !<reference.VFXComponent> 00000000-0000-0000-0000-000000000000
-      paletteController: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      palettePreset: !<float> 0.000000
       texSize: !<float> 64.000000
       mixSteps: !<float> 20.000000
       scale: !<float> 100.000000
@@ -65,13 +65,13 @@
   InputLines:
     - '// @input Asset.Material encoderMaterial {"hint":"Material with PigmentGamutEncoder shader"}'
     - '// @input Component.VFXComponent vfxComponent {"hint":"VFX component to receive textures"}'
-    - '// @input Component.ScriptComponent paletteController {"hint":"PaletteController to get pigment colors from"}'
+    - '// @input float palettePreset {"hint":"Pigment palette preset", "widget":"combobox", "values":[{"label":"CMYK + White/Black", "value":0}, {"label":"Primary (RGB + CMY)", "value":1}, {"label":"Earth Tones", "value":2}, {"label":"Pastels", "value":3}, {"label":"Warm", "value":4}, {"label":"Cool", "value":5}, {"label":"Custom", "value":6}]}'
     - '// @input float texSize = 64 {"hint":"Output texture size (64 = 4096 pixels)"}'
     - '// @input float mixSteps = 20 {"hint":"Mix steps between pigments"}'
     - '// @input float scale = 100 {"hint":"Scale for VFX positions"}'
-    - '// @input vec3 pig0Color = {1,1,1} {"hint":"Fallback: White pigment", "widget":"color"}'
-    - '// @input vec3 pig1Color = {0.08,0.08,0.08} {"hint":"Fallback: Black pigment", "widget":"color"}'
-    - '// @input vec3 pig2Color = {1,0.92,0} {"hint":"Fallback: Yellow pigment", "widget":"color"}'
-    - '// @input vec3 pig3Color = {0.89,0,0.13} {"hint":"Fallback: Red pigment", "widget":"color"}'
-    - '// @input vec3 pig4Color = {0.1,0.1,0.7} {"hint":"Fallback: Blue pigment", "widget":"color"}'
-    - '// @input vec3 pig5Color = {0,0.47,0.44} {"hint":"Fallback: Green pigment", "widget":"color"}'
+    - '// @input vec3 pig0Color = {1,1,1} {"hint":"Custom: Pigment 0", "widget":"color"}'
+    - '// @input vec3 pig1Color = {0.08,0.08,0.08} {"hint":"Custom: Pigment 1", "widget":"color"}'
+    - '// @input vec3 pig2Color = {1,0.92,0} {"hint":"Custom: Pigment 2", "widget":"color"}'
+    - '// @input vec3 pig3Color = {0.89,0,0.13} {"hint":"Custom: Pigment 3", "widget":"color"}'
+    - '// @input vec3 pig4Color = {0.1,0.1,0.7} {"hint":"Custom: Pigment 4", "widget":"color"}'
+    - '// @input vec3 pig5Color = {0,0.47,0.44} {"hint":"Custom: Pigment 5", "widget":"color"}'
