@@ -3059,7 +3059,7 @@
 - !<SceneObject/73b880fa-55f5-4b97-906e-224fe7a52e5d>
   PrefabRemaps:
     []
-  Name: RGB
+  Name: sRGB
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -3565,7 +3565,7 @@
   ShadowDensity: 1.000000
   Materials:
     - !<reference> 24129baa-ac02-47cc-8605-a784e7b26798
-  Mesh: !<reference> 177459c0-51d4-4374-9e15-6cbda2f0631a
+  Mesh: !<reference> dae0aeb8-cc96-4907-8715-fd721fd00735
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
   BlendNormals: false
@@ -3632,7 +3632,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Text: |
-    RGB
+    sRGB
 
   Editable: false
   ShowEditingPreview: true
@@ -4878,7 +4878,7 @@
   ShadowDensity: 1.000000
   Materials:
     - !<reference> c1e111c5-de0a-41ec-9bbe-7f7b986b5a38
-  Mesh: !<reference> ee06c70a-ca3f-459c-8883-dcfcac1553d2
+  Mesh: !<reference> 93d3b0ec-4957-4448-a133-13a797a81c97
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: false
   BlendNormals: false
@@ -4963,7 +4963,7 @@
   ShadowDensity: 1.000000
   Materials:
     - !<reference> bebf204b-109d-4190-8d97-a1f5294a97e2
-  Mesh: !<reference> 177459c0-51d4-4374-9e15-6cbda2f0631a
+  Mesh: !<reference> dae0aeb8-cc96-4907-8715-fd721fd00735
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
   BlendNormals: false

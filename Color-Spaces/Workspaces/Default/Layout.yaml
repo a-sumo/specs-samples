@@ -34,7 +34,7 @@ dock:
           - persistentName: Snap.Plugin.AssistantAI.Panel
             Uuid: d5dd60b0-1fed-4dec-9b2c-2e40dc54bbad
         type: section
-        current: 1
+        current: 0
       - items:
           - persistentName: Snap.Plugin.Gui.InspectorPanel
             Uuid: 780d9164-e681-4de1-b586-5213ed5523b9
@@ -43,8 +43,8 @@ dock:
         type: section
         current: 0
     sizes:
-      - 689
-      - 427
+      - 672
+      - 444
       - 314
     type: splitter
     orientation: horizontal

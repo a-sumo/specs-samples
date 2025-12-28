@@ -1,12 +1,11 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 817
+    size: 815
     values:
-      - ""
-      - Camera Object.prefab
       - CaptureVisual.mat
       - CaptureVisual.ss_graph
+      - EYEDROPPER
       - Image-Processing/3DModels
       - Image-Processing/3DModels/Unit Plane.mesh
       - Image-Processing/Images
@@ -34,7 +33,6 @@ CollapsedEntities:
       - Image-Processing/Materials/Sampled Color Material.mat
       - Image-Processing/Materials/Sampled Color Material.ss_graph
       - Image-Processing/Materials/Shapes
-      - Image-Processing/Materials/Shapes/Rounded Corners
       - Image-Processing/Materials/Shapes/Rounded Corners/Rounded Corner Construction.png
       - Image-Processing/Materials/Shapes/Rounded Corners/Rounded Corners.ss_graph
       - Image-Processing/Materials/Shapes/Rounded Rectangle Fill
@@ -43,8 +41,8 @@ CollapsedEntities:
       - Image-Processing/Materials/Shapes/Rounded Stroke/Rounded Square Stroke.ss_graph
       - Image-Processing/Materials/TextureSampleGrid.mat
       - Image-Processing/Materials/TextureSampleGrid.ss_graph
+      - Image-Processing/Prefabs/Camera Object.prefab
       - Image-Processing/Prefabs/Color Slot.prefab
-      - Image-Processing/Prefabs/Scanner.prefab
       - Image-Processing/Scripts
       - Image-Processing/Scripts/CameraService.ts
       - Image-Processing/Scripts/CaptionBehavior.ts
