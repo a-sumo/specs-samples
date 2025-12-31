@@ -20,7 +20,7 @@ dock:
               - persistentName: Snap.Plugin.Gui.AssetBrowser
                 Uuid: 296a889f-fa67-4a22-b1f4-34bc5bbb47e7
             type: section
-            current: 1
+            current: 0
         sizes:
           - 483
           - 285
@@ -34,7 +34,7 @@ dock:
           - persistentName: Snap.Plugin.AssistantAI.Panel
             Uuid: d5dd60b0-1fed-4dec-9b2c-2e40dc54bbad
         type: section
-        current: 0
+        current: 1
       - items:
           - persistentName: Snap.Plugin.Gui.InspectorPanel
             Uuid: 780d9164-e681-4de1-b586-5213ed5523b9

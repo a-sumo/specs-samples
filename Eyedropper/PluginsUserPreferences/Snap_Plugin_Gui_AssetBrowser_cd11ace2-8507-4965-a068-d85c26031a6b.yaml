@@ -1,58 +1,61 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 815
+    size: 810
     values:
-      - CaptureVisual.mat
-      - CaptureVisual.ss_graph
-      - EYEDROPPER
-      - Image-Processing/3DModels
-      - Image-Processing/3DModels/Unit Plane.mesh
-      - Image-Processing/Images
-      - Image-Processing/Images/PicMask.png
-      - Image-Processing/Images/PicOutline.png
-      - Image-Processing/Images/SWIS_frame.jpg
-      - Image-Processing/Images/grey_square.png
-      - Image-Processing/Images/thinOutline.png
-      - Image-Processing/Images/webIcon.png
-      - Image-Processing/Materials
-      - Image-Processing/Materials/Background Material.mat
-      - Image-Processing/Materials/Background Material.ss_graph
-      - Image-Processing/Materials/Base Unlit.ss_graph
-      - Image-Processing/Materials/CaptureVisual.mat
-      - Image-Processing/Materials/CaptureVisual.ss_graph
-      - Image-Processing/Materials/CaptureVisualOpacityMask.mat
-      - Image-Processing/Materials/CaptureVisualOpacityMask.ss_graph
-      - Image-Processing/Materials/Colored Slot.mat
-      - Image-Processing/Materials/Colored Square.mat
-      - Image-Processing/Materials/Corners.mat
-      - Image-Processing/Materials/Corners.ss_graph
-      - Image-Processing/Materials/Palette Color.mat
-      - Image-Processing/Materials/Rectangle Border.mat
-      - Image-Processing/Materials/Rectangle Border.ss_graph
-      - Image-Processing/Materials/Sampled Color Material.mat
-      - Image-Processing/Materials/Sampled Color Material.ss_graph
-      - Image-Processing/Materials/Shapes
-      - Image-Processing/Materials/Shapes/Rounded Corners/Rounded Corner Construction.png
-      - Image-Processing/Materials/Shapes/Rounded Corners/Rounded Corners.ss_graph
-      - Image-Processing/Materials/Shapes/Rounded Rectangle Fill
-      - Image-Processing/Materials/Shapes/Rounded Rectangle Fill/Rounded Rectangle Fill.ss_graph
-      - Image-Processing/Materials/Shapes/Rounded Stroke
-      - Image-Processing/Materials/Shapes/Rounded Stroke/Rounded Square Stroke.ss_graph
-      - Image-Processing/Materials/TextureSampleGrid.mat
-      - Image-Processing/Materials/TextureSampleGrid.ss_graph
-      - Image-Processing/Prefabs/Camera Object.prefab
-      - Image-Processing/Prefabs/Color Slot.prefab
-      - Image-Processing/Scripts
-      - Image-Processing/Scripts/CameraService.ts
-      - Image-Processing/Scripts/CaptionBehavior.ts
-      - Image-Processing/Scripts/CropAreaSelector.ts
-      - Image-Processing/Scripts/CropRegion.ts
-      - Image-Processing/Scripts/CursorPlaneController.ts
-      - Image-Processing/Scripts/PaletteController.ts
-      - Image-Processing/Scripts/PictureBehavior.ts
-      - Image-Processing/Scripts/PictureController.ts
-      - Palette Color.mat
+      - ""
+      - EYEDROPPER/3DModels
+      - EYEDROPPER/3DModels/Unit Plane.mesh
+      - EYEDROPPER/Images
+      - EYEDROPPER/Images/PicMask.png
+      - EYEDROPPER/Images/PicOutline.png
+      - EYEDROPPER/Images/SWIS_frame.jpg
+      - EYEDROPPER/Images/grey_square.png
+      - EYEDROPPER/Images/thinOutline.png
+      - EYEDROPPER/Images/webIcon.png
+      - EYEDROPPER/Materials
+      - EYEDROPPER/Materials/Background Material.mat
+      - EYEDROPPER/Materials/Background Material.ss_graph
+      - EYEDROPPER/Materials/Base Unlit.ss_graph
+      - EYEDROPPER/Materials/CaptureVisual 2.mat
+      - EYEDROPPER/Materials/CaptureVisual 2.ss_graph
+      - EYEDROPPER/Materials/CaptureVisual.mat
+      - EYEDROPPER/Materials/CaptureVisual.ss_graph
+      - EYEDROPPER/Materials/CaptureVisualOpacityMask.mat
+      - EYEDROPPER/Materials/CaptureVisualOpacityMask.ss_graph
+      - EYEDROPPER/Materials/Colored Slot.mat
+      - EYEDROPPER/Materials/Colored Square.mat
+      - EYEDROPPER/Materials/Corners.mat
+      - EYEDROPPER/Materials/Corners.ss_graph
+      - EYEDROPPER/Materials/Palette Color 2.mat
+      - EYEDROPPER/Materials/Palette Color.mat
+      - EYEDROPPER/Materials/Rectangle Border.mat
+      - EYEDROPPER/Materials/Rectangle Border.ss_graph
+      - EYEDROPPER/Materials/Sampled Color Material.mat
+      - EYEDROPPER/Materials/Sampled Color Material.ss_graph
+      - EYEDROPPER/Materials/Shapes
+      - EYEDROPPER/Materials/Shapes/Rounded Corners
+      - EYEDROPPER/Materials/Shapes/Rounded Corners/Rounded Corner Construction.png
+      - EYEDROPPER/Materials/Shapes/Rounded Corners/Rounded Corners.ss_graph
+      - EYEDROPPER/Materials/Shapes/Rounded Rectangle Fill
+      - EYEDROPPER/Materials/Shapes/Rounded Rectangle Fill/Rounded Rectangle Fill.ss_graph
+      - EYEDROPPER/Materials/Shapes/Rounded Stroke
+      - EYEDROPPER/Materials/Shapes/Rounded Stroke/Rounded Square Stroke.ss_graph
+      - EYEDROPPER/Materials/TextureSampleGrid.mat
+      - EYEDROPPER/Materials/TextureSampleGrid.ss_graph
+      - EYEDROPPER/Prefabs/Camera Object.prefab
+      - EYEDROPPER/Prefabs/Scanner.prefab
+      - EYEDROPPER/Scene.scene
+      - EYEDROPPER/Scripts
+      - EYEDROPPER/Scripts/CameraService.ts
+      - EYEDROPPER/Scripts/CaptionBehavior.ts
+      - EYEDROPPER/Scripts/CropAreaSelector.ts
+      - EYEDROPPER/Scripts/CropRegion.ts
+      - EYEDROPPER/Scripts/CursorPlaneController.ts
+      - EYEDROPPER/Scripts/PaletteController.ts
+      - EYEDROPPER/Scripts/PictureBehavior.ts
+      - EYEDROPPER/Scripts/PictureController.ts
+      - Image-Processing
       - Rendering
       - Rendering/Device Camera Texture.deviceCameraTexture
       - Rendering/Echopark.hdr
@@ -60,7 +63,6 @@ CollapsedEntities:
       - Rendering/Echopark.hdr/Specular
       - Rendering/Render Target.renderTarget
       - Rendering/Screen Crop Texture.screenCropTexture
-      - Scene.scene
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
@@ -811,11 +813,4 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Textures/test-image.jpg
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
-      - Text Logger V2.lspkg
-      - Text Logger V2.lspkg/Scripts
-      - Text Logger V2.lspkg/Scripts/TextLogger.js
-      - Text Logger V2.lspkg/Scripts/TextLoggerExample.js
-      - Text Logger V2.lspkg/Scripts/TextLoggerModule.js
-      - Text Logger V2.lspkg/TextLogger__PLACE_IN_SCENE.prefab
-      - Text Logger V2.lspkg/package.native
   options: 4

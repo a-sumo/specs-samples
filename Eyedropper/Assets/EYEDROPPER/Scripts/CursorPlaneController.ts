@@ -36,6 +36,7 @@ export class CursorPlaneController extends BaseScriptComponent {
 	cursorPlane: SceneObject;
 
 	@input
+	@allowUndefined
 	@hint("The region hover plane SceneObject (positioned at hit with normal offset)")
 	regionHoverPlane: SceneObject;
 

@@ -1,8 +1,9 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 2912
+    size: 2913
     values:
+      - COLOR-SPACES
       - COLOR-SPACES/Fonts
       - COLOR-SPACES/Fonts/galter
       - COLOR-SPACES/Fonts/galter/Galter.otf
@@ -70,6 +71,7 @@ CollapsedEntities:
       - COLOR-SPACES/Rendering/Echopark.hdr/Specular
       - COLOR-SPACES/Rendering/Render Target.renderTarget
       - COLOR-SPACES/Rendering/Screen Crop Texture.screenCropTexture
+      - COLOR-SPACES/Scene.scene
       - COLOR-SPACES/Scripts
       - COLOR-SPACES/Scripts/Controllers
       - COLOR-SPACES/Scripts/Controllers/ColorSpacePlaneController.ts
@@ -2173,7 +2175,6 @@ CollapsedEntities:
       - COLOR-SPACES/Shaders/ColorSpaceTransform.js
       - COLOR-SPACES/Shaders/Marker.js
       - COLOR-SPACES/Shaders/ProjectorGamutTransform.js
-      - Scene.scene
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
