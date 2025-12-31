@@ -47,8 +47,10 @@ sRGB, XYZ, CIELAB, CIELUV, OkLab.
 
 Their second role is to control materials, located at `Color-Spaces/Assets/Materials/MeshTransforms/`. These materials will take the input position of the geometry and add a transform to it in order to move from a origin color space to a destination color space. They use a blend parameter to interpolate between those positions. 
 
-Finally, I needed an interface to morph between such color spaces. I really didn't want to use Sliders, as I felt it would bring down the UX. So I implemented a ColorSpacePlaneController `Color-Spaces/Assets/Scripts/Controllers/ColorSpacePlaneController.ts`. 
+Finally, I needed an interface to morph between such color spaces. I wanted to experiment with something different than sliders, so I implemented a ColorSpacePlaneController `Color-Spaces/Assets/Scripts/Controllers/ColorSpacePlaneController.ts`. 
+First, it lays out color space presets in radial coordinates (distance from center, and angle value). Then, it uses the Hover interaction on a plane to get Hit position UV coordinates which are then converted into radial coordinates and those radial coordinates into a blending value between two spaces. 
 
+Because hover interaction can be quite noisy, I added snapping, because I realized that it was unlikely for the user to want to work in some hybrid color space, though they might appreciate smooth transitions between color spaces.
 
 Built with **Lens Studio 5.15** targeting **2024 Spectacles Augmented Reality Glasses**.
 
