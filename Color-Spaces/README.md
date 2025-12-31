@@ -25,7 +25,6 @@
 
 ## Overview
 
-This project visualizes how colors map across different perceptual color spaces in real-time 3D. Watch an RGB cube morph into CIELAB, Oklab, CIEXYZ, and CIELUV — see why some color spaces are more perceptually uniform than others.
 
 Built with **Lens Studio 5.15** targeting **2024 Spectacles Augmented Reality Glasses**.
 
