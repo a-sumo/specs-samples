@@ -53,12 +53,14 @@ First, color space presets are laid out in radial coordinates (distance from cen
 Because hover interaction can be quite noisy, I added snapping. It occured to me that it was unlikely for the user to want to remain in some hybrid color space, though they might appreciate smooth transitions between color space presets.
 
 The `Color-Spaces/Assets/Scripts/Generators/PigmentGamutMeshGenerator.ts` uses Kubelka Munk theory (https://en.wikipedia.org/wiki/Kubelka%E2%80%93Munk_theory ) to mix colors in a way that's physically accurate and create a gamut based on those mixes. 
-For the Lens Studio implementation, I've taken inspiration from the Spectral.js library https://github.com/rvanwijnen/spectral.js. The script creates a lookup table that stores an achievability flag for every color of the space based on two or three-way color mixing of some input pigments. The visualizer then simply does not render the geometry for the colors that are not achievable.
+For the Lens Studio implementation, I've taken inspiration from the Spectral.js library https://github.com/rvanwijnen/spectral.js. 
+
+The script computes a lookup table that stores an achievability flag for every color of the space based on two or three-way color mixing of some input pigments. The visualizer then simply does not render the geometry for the colors that are not achievable.
 
 Finally, the `Color-Spaces/Assets/Scripts/Generators/GamutProjectionMeshGenerator.ts` finds the closest point in the color gamut to an input point. This allows in essence to project a target color onto the space of achievable colors. 
 
 ## UX
 
-I wanted the Lens to feel relaxing, so I added a  script `Color-Spaces/Assets/Scripts/Utils/BreathingMotion.ts` that can be added to any component, and simulates a verical cyclic motion similar to breathing. 
+I wanted the Lens to feel relaxing, so I added a  script `Color-Spaces/Assets/Scripts/Utils/BreathingMotion.ts` that can be added to any component, and simulates a vertical cyclic motion similar to breathing. 
 I also added an animated meshgradient gif to the Lens title's background. Running such a shader in real-time would be too expensive, so I did it in Python and output a gif which I brougth in Lens Studio. The implementation can be found at Color-Spaces/Assets/Scripts/Utils/render_color_cloud.py
-Finally, a added a little utility file called Color-Spaces/Assets/Scripts/Utils/KeepUpright.ts that allows to preserve the orientation of text elements such as labels even when they're attached to moving objects.
+Finally, I added a little utility file called `Color-Spaces/Assets/Scripts/Utils/KeepUpright.ts` that allows to preserve the orientation of text elements such as labels even when they're attached to moving objects.
