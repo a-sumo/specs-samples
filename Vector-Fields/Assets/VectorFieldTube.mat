@@ -46,6 +46,9 @@
     - Port_FinalColor_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FlowSpeed_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_GSplatPointSize_N004:
         typeIdx: 1
         value: 0.000000
@@ -124,9 +127,6 @@
     - Speed:
         typeIdx: 1
         value: 1.000000
-    - Time:
-        typeIdx: 1
-        value: 1.000000
     - TrackedPosition:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
@@ -177,6 +177,9 @@
     FieldScale:
       typeIdx: 1
       value: 1.000000
+    FlowSpeed:
+      typeIdx: 1
+      value: 1.000000
     NumSteps:
       typeIdx: 1
       value: 1.000000
@@ -192,6 +195,9 @@
     TargetPosition:
       typeIdx: 4
       value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Time:
+      typeIdx: 1
+      value: 1.000000
     TubeRadius:
       typeIdx: 1
       value: 1.000000

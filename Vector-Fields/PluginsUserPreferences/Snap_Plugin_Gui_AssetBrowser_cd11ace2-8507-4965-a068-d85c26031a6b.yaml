@@ -10,6 +10,8 @@ CollapsedEntities:
       - Echopark.hdr/Specular
       - Render Target.renderTarget
       - Scene.scene
+      - Shaders/TubeTestShader.js
+      - Shaders/VectorFieldTubesShader.js
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
@@ -588,9 +590,7 @@ CollapsedEntities:
       - TestTubeShader.mat
       - TestTubeShader.ss_graph
       - TubeTest.ts
-      - TubeTestShader.js
       - Vector-Field.mat
       - Vector-Field.ss_graph
       - VectorFieldTubes.ts
-      - VectorFieldTubesShader.js
   options: 4

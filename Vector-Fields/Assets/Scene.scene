@@ -2996,6 +2996,7 @@
   ScriptInputsDefault:
     _radius: true
     _gridSize: true
+    _flowSpeed: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -3007,6 +3008,7 @@
       _gridSpacing: 0.900000
       _stepSize: 0.500000
       _fieldScale: 0.500000
+      _flowSpeed: !<float> 2.000000
       _preset: !<float> 2.000000
       trackedObject: !<reference.SceneObject> 98ef9586-1be1-4c72-b3c2-994c212b2031
       fieldCollider: !<reference.ColliderComponent> 39d54326-d6cf-48e0-95aa-9eacc028e17d

@@ -46,6 +46,11 @@ export class VectorFieldTubes extends BaseScriptComponent {
     @hint("Field noise/frequency scale")
     private _fieldScale: number = 1.0;
 
+    @input
+    @widget(new SliderWidget(0.0, 10.0, 0.5))
+    @hint("Speed at which tubes flow along field lines")
+    private _flowSpeed: number = 2.0;
+
     // ============ PRESET ============
 
     @input
@@ -125,6 +130,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.NumSteps = this._lengthSegments;
         this.mainPass.FieldScale = this._fieldScale;
         this.mainPass.Preset = this._preset;
+        this.mainPass.Time = getTime();
+        this.mainPass.FlowSpeed = this._flowSpeed;
 
         // Only update target position if inside collider bounds
         if (this.trackedObject) {
@@ -313,6 +320,14 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this._radius = 0.01 + value * 0.19;
     }
 
+    /**
+     * Set flow speed from normalized value (0-1)
+     * Maps to range 0.0-10.0
+     */
+    public setFlowSpeedNormalized(value: number): void {
+        this._flowSpeed = value * 10.0;
+    }
+
     // Property accessors
     get lengthSegments(): number { return this._lengthSegments; }
     set lengthSegments(value: number) {
@@ -349,6 +364,11 @@ export class VectorFieldTubes extends BaseScriptComponent {
     get fieldScale(): number { return this._fieldScale; }
     set fieldScale(value: number) {
         this._fieldScale = value;
+    }
+
+    get flowSpeed(): number { return this._flowSpeed; }
+    set flowSpeed(value: number) {
+        this._flowSpeed = value;
     }
 
     get preset(): number { return this._preset; }

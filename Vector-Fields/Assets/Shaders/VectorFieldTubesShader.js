@@ -15,6 +15,8 @@ input_float NumSteps;
 input_float FieldScale;
 input_int Preset;
 input_vec3 TargetPosition;
+input_float Time;
+input_float FlowSpeed;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
@@ -252,6 +254,23 @@ void main() {
     // ========================================
     vec3 pos = vec3(startX, startY, startZ);
     vec3 prevPos = pos;
+
+    // ========================================
+    // TIME-BASED FLOW: Pre-integrate to shift starting point
+    // This makes the tube "flow" along the field line
+    // ========================================
+    float flowOffset = Time * FlowSpeed;
+    int preSteps = int(flowOffset);
+    float fractional = fract(flowOffset);
+
+    // Pre-integrate to move the effective starting position
+    for (int i = 0; i < 64; i++) {
+        if (i >= preSteps) break;
+        pos += getField(pos) * StepSize;
+    }
+    // Fractional step for smooth motion
+    pos += getField(pos) * StepSize * fractional;
+    prevPos = pos;
 
     // ========================================
     // INTEGRATE THROUGH VECTOR FIELD
