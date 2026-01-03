@@ -1948,8 +1948,8 @@
       material: !<reference.Material> 06598390-3698-4de8-ae96-21316ae6e046
       _lengthSegments: !<float> 52.000000
       _radialSegments: !<float> 12.000000
-      _radius: 0.280000
-      _length: 1.500000
+      _radius: 0.050000
+      _length: !<float> 10.000000
   ScriptTypes:
     "":
       {}

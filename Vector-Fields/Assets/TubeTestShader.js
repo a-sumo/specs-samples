@@ -2,12 +2,10 @@
 // GPU sine deformation with CPU-defined tube frame
 //
 // Vertex encoding from TubeTest.ts:
-//   position.x = localX (cos(theta) - circular frame, pre-computed on CPU)
 //   position.y = t (0-1 along tube length)
-//   position.z = localY (sin(theta) - circular frame, pre-computed on CPU)
-//   normal.x = localX (for surface normal)
-//   normal.y = localY (for surface normal)
 //   normal.z = 1 for tube vertices, 0 for cap centers
+//   texture0.x = localX (cos(theta) - circular frame)
+//   texture0.y = localY (sin(theta) - circular frame)
 
 input_float TubeRadius;
 input_float TubeLength;
@@ -34,26 +32,40 @@ void main() {
     float tubeLen = TubeLength > 0.0 ? TubeLength : 5.0;
 
     // ========================================
-    // DEBUG: Simple straight tube along Z axis
-    // No deformation - just test if circle is preserved
+    // STEP 1: Compute tube CENTER along sine wave path
+    // Path: P(t) = (sin(z * freq + time) * amp, 0, z)
     // ========================================
     float z = t * tubeLen;
-    vec3 center = vec3(0.0, 0.0, z);
+    float waveFreq = 1.5;
+    float waveAmp = 0.5;
 
-    // Fixed frame for straight tube along Z:
-    // X axis = (1, 0, 0)
-    // Y axis = (0, 1, 0)
-    vec3 frameNormal = vec3(1.0, 0.0, 0.0);
+    float cx = sin(z * waveFreq + time) * waveAmp;
+    float cy = 0.0;
+    float cz = z;
+    vec3 center = vec3(cx, cy, cz);
+
+    // ========================================
+    // STEP 2: Compute TANGENT (derivative of path)
+    // dP/dz = (cos(z * freq + time) * amp * freq, 0, 1)
+    // ========================================
+    float dxdz = cos(z * waveFreq + time) * waveAmp * waveFreq;
+    vec3 tangent = normalize(vec3(dxdz, 0.0, 1.0));
+
+    // ========================================
+    // STEP 3: Build perpendicular frame
+    // frameNormal: perpendicular to tangent in XZ plane
+    // frameBinormal: Y axis (always perpendicular to XZ plane)
+    // ========================================
+    vec3 frameNormal = vec3(-tangent.z, 0.0, tangent.x);
     vec3 frameBinormal = vec3(0.0, 1.0, 0.0);
 
     // ========================================
-    // Transform CPU's circular frame to world space
-    // localX = cos(theta), localY = sin(theta) from CPU
+    // STEP 4: Transform CPU's circular frame to world space
     // ========================================
     vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
     vec3 finalPos = center + offset;
 
-    // Surface normal (for lighting if needed)
+    // Surface normal
     vec3 surfaceNormal = normalize(localX * frameNormal + localY * frameBinormal);
 
     // ========================================
