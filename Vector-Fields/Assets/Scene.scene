@@ -889,6 +889,7 @@
     _inactive: true
     _defaultValue: true
     snapToTriggerPosition: true
+    segmented: true
     numberOfSegments: true
     hasTrackVisual: true
     customKnobSize: true
@@ -904,7 +905,7 @@
       _playAudio: true
       _defaultValue: !<float> 0.000000
       snapToTriggerPosition: false
-      segmented: true
+      segmented: false
       numberOfSegments: !<float> 5.000000
       hasTrackVisual: true
       customKnobSize: false
