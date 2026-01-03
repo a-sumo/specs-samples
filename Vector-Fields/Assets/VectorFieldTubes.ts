@@ -30,7 +30,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
     private _gridSize: number = 5;
 
     @input
-    @widget(new SliderWidget(0.5, 5.0, 0.1))
+    @widget(new SliderWidget(0.1, 5.0, 0.1))
     @hint("Spacing between tube start positions")
     private _gridSpacing: number = 1.0;
 
@@ -47,7 +47,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
     private _fieldScale: number = 1.0;
 
     @input
-    @widget(new SliderWidget(0.0, 10.0, 0.5))
+    @widget(new SliderWidget(0.0, 30.0, 0.5))
     @hint("Speed at which tubes flow along field lines")
     private _flowSpeed: number = 2.0;
 
@@ -134,10 +134,13 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.FlowSpeed = this._flowSpeed;
 
         // Only update target position if inside collider bounds
+        // Convert to local space since tube positions are in local space
         if (this.trackedObject) {
-            const pos = this.trackedObject.getTransform().getWorldPosition();
-            if (this.isInsideCollider(pos)) {
-                this.lastValidTargetPos = pos;
+            const worldPos = this.trackedObject.getTransform().getWorldPosition();
+            if (this.isInsideCollider(worldPos)) {
+                // Transform world position to local space
+                const invWorld = this.sceneObject.getTransform().getInvertedWorldTransform();
+                this.lastValidTargetPos = invWorld.multiplyPoint(worldPos);
             }
         }
         this.mainPass.TargetPosition = this.lastValidTargetPos;
@@ -325,7 +328,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
      * Maps to range 0.0-10.0
      */
     public setFlowSpeedNormalized(value: number): void {
-        this._flowSpeed = value * 10.0;
+        this._flowSpeed = value * 30.0;
     }
 
     // Property accessors

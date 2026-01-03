@@ -258,13 +258,19 @@ void main() {
     // ========================================
     // TIME-BASED FLOW: Pre-integrate to shift starting point
     // This makes the tube "flow" along the field line
+    // Wraps around to create continuous looping flow
     // ========================================
-    float flowOffset = Time * FlowSpeed;
+    float maxPreSteps = 32.0; // Loop after this many steps
+
+    // Per-tube phase offset based on starting position (0 to maxPreSteps)
+    float tubePhase = fract(sin(dot(vec3(startX, startY, startZ), vec3(12.9898, 78.233, 45.164))) * 43758.5453) * maxPreSteps;
+
+    float flowOffset = mod(Time * FlowSpeed + tubePhase, maxPreSteps);
     int preSteps = int(flowOffset);
     float fractional = fract(flowOffset);
 
     // Pre-integrate to move the effective starting position
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 32; i++) {
         if (i >= preSteps) break;
         pos += getField(pos) * StepSize;
     }
@@ -272,11 +278,37 @@ void main() {
     pos += getField(pos) * StepSize * fractional;
     prevPos = pos;
 
+    // Growth + fade near wrap point for smoother transition
+    float growZone = 10.0; // Steps to grow over
+    float shrinkZone = 18.0; // Steps to shrink over (larger = fade out earlier, before jitter)
+
+    // Growth factor: 0 at wrap point, 1 when fully grown
+    float growthFactor = smoothstep(0.0, growZone, flowOffset);
+
+    // Shrink factor: 1 normally, 0 as approaching wrap (starts earlier)
+    float shrinkFactor = smoothstep(0.0, shrinkZone, maxPreSteps - flowOffset);
+
+    // BIRTH: Tube grows from start (t=0) toward end (t=1)
+    // Clamp t to growth factor - vertices beyond are collapsed to the growing tip
+    float clampedT = min(t, growthFactor);
+    int clampedStepIndex = int(clampedT * NumSteps + 0.5);
+
+    // DEATH: Fade from end (t=1) toward start (t=0)
+    // Vertices with high t fade out first
+    float deathFade = 1.0 - smoothstep(shrinkFactor - 0.15, shrinkFactor, t);
+
+    // Birth fade: vertices fade in as they become part of the visible tube
+    float birthFade = smoothstep(growthFactor - 0.15, growthFactor, t);
+    birthFade = 1.0 - birthFade; // Invert: visible when t < growthFactor
+
+    // Combined opacity
+    float flowFade = birthFade * deathFade;
+
     // ========================================
     // INTEGRATE THROUGH VECTOR FIELD
     // ========================================
     for (int i = 0; i < 64; i++) {
-        if (i >= stepIndex) break;
+        if (i >= clampedStepIndex) break;
         prevPos = pos;
         pos += getField(pos) * StepSize;
     }
@@ -311,9 +343,9 @@ void main() {
     vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
     vec3 finalPos = pos + offset;
 
-    // Color
+    // Color with flow fade applied
     vec3 color = getColor(vel, t);
 
     transformedPosition = finalPos;
-    vertexColor = vec4(color, 1.0);
+    vertexColor = vec4(color, flowFade);
 }
