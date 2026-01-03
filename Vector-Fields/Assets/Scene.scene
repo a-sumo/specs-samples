@@ -1327,24 +1327,23 @@
   ScriptAsset: !<reference> 285bda02-acc2-4ba9-a938-046eb13d1a50
   ScriptInputsDefault:
     _numTrails: true
-    _preset: true
     autoAnimate: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
-      _fieldSize: !<float> 1.000000
+      _fieldSize: !<float> 2.000000
       _numTrails: !<float> 400.000000
       _segmentsPerTrail: !<float> 36.000000
-      _lineWidth: 3.500000
+      _lineWidth: 4.900000
       material: !<reference.Material> fe5ea0e7-e546-4875-b330-5b58e0748cbb
-      _preset: !<float> 0.000000
+      _preset: !<float> 4.000000
       _speed: !<float> 3.000000
-      _fieldScale: !<float> 3.000000
+      _fieldScale: 0.200000
       _stepSize: 0.270000
       _brightness: 2.500000
       _fadeStart: !<float> 1.000000
-      _trailLength: !<float> 1.000000
+      _trailLength: 0.150000
       autoAnimate: true
       timeMultiplier: !<float> 5.000000
   ScriptTypes:

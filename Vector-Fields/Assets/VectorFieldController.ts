@@ -157,14 +157,14 @@ export class VectorFieldController extends BaseScriptComponent {
     // ============================================
 
     private generateMesh(): void {
-        // Create mesh with position, normal, and two texture coordinate sets
-        // texture0.xy = normalized start position x, y (0-1 range)
-        // texture1.xy = normalized start position z, step index (0-1 range)
+        // Encode ALL data in position - this definitely works
+        // position.x = seed.x
+        // position.y = segmentIndex (0-1) - shader will use this to integrate
+        // position.z = seed.z + ribbonSide * 0.001 (tiny offset for ribbon)
+        // We pass seed.y via normal.x
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
             { name: "normal", components: 3 },
-            { name: "texture0", components: 2 },
-            { name: "texture1", components: 2 },
         ]);
 
         this.meshBuilder.topology = MeshTopology.Triangles;
@@ -188,33 +188,33 @@ export class VectorFieldController extends BaseScriptComponent {
     }
 
     /**
-     * Generate a ribbon (2-triangle-wide strip) for a single trail.
-     * Following the HTML pattern: ALL vertices have position = seed position.
-     * texture0.x = segment index (0-1)
-     * texture0.y = ribbon side (-1 or 1)
-     * texture1.x = line index (for phase offset)
+     * Generate a ribbon for a single trail.
+     * Encoding in POSITION (which definitely works):
+     *   position.x = seed.x
+     *   position.y = segmentIndex (0-1) - this varies per vertex!
+     *   position.z = seed.z
+     * Encoding in NORMAL:
+     *   normal.x = seed.y (the original Y we displaced)
+     *   normal.y = ribbonSide (-1 or 1)
+     *   normal.z = lineIndex normalized
      */
     private generateTrailRibbon(startPos: vec3, trailIndex: number, numSegments: number): void {
         const startVertexIndex = this.meshBuilder.getVerticesCount();
+        const lineIndexNorm = trailIndex / Math.max(1, this._numTrails - 1);
 
-        // ALL vertices start at the seed position - shader moves them via integration
         for (let i = 0; i <= numSegments; i++) {
             const segmentIndex = i / numSegments; // 0 to 1
 
-            // Left vertex
+            // Left vertex - segmentIndex goes in position.y
             this.meshBuilder.appendVerticesInterleaved([
-                startPos.x, startPos.y, startPos.z,  // position = seed (shader will move)
-                0, 0, 1,                              // normal
-                segmentIndex, -1.0,                   // texture0: segmentIndex, ribbonSide
-                trailIndex, 0,                        // texture1: lineIndex, unused
+                startPos.x, segmentIndex, startPos.z,    // position: x, SEGMENT_INDEX, z
+                startPos.y, -1.0, lineIndexNorm          // normal: seed.y, ribbonSide, lineIndex
             ]);
 
             // Right vertex
             this.meshBuilder.appendVerticesInterleaved([
-                startPos.x, startPos.y, startPos.z,  // position = seed
-                0, 0, 1,                              // normal
-                segmentIndex, 1.0,                    // texture0: segmentIndex, ribbonSide
-                trailIndex, 0,                        // texture1: lineIndex, unused
+                startPos.x, segmentIndex, startPos.z,    // position: x, SEGMENT_INDEX, z
+                startPos.y, 1.0, lineIndexNorm           // normal: seed.y, ribbonSide, lineIndex
             ]);
         }
 

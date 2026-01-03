@@ -323,75 +323,32 @@ vec3 getPresetColor(int preset) {
 // ============================================================
 
 void main() {
-    // Position IS the seed position
-    vec3 seedPosition = system.getSurfacePositionObjectSpace();
+    // Get vertex data - using the encoding from TypeScript:
+    // position.x = seed.x, position.y = segmentIndex (0-1), position.z = seed.z
+    // normal.x = seed.y, normal.y = ribbonSide, normal.z = lineIndex normalized
+    vec3 inPos = system.getSurfacePositionObjectSpace();
+    vec3 inNormal = system.getSurfaceNormalObjectSpace();
 
-    // texture0.x = segmentIndex (0-1), texture0.y = ribbonSide (-1 or 1)
-    // texture1.x = lineIndex (for phase offset)
-    vec2 uv0 = system.getSurfaceUVCoord0();
-    vec2 uv1 = system.getSurfaceUVCoord1();
-    float segmentIndex = uv0.x;
-    float ribbonSide = uv0.y;
-    float lineIndex = uv1.x;
+    float t = inPos.y;                              // segmentIndex 0-1
+    vec3 seedPosition = vec3(inPos.x, inNormal.x, inPos.z);
+    float ribbonSide = inNormal.y;
+    float lineIndex = inNormal.z * 400.0;
 
-    // Get parameters (with fallbacks)
     float time = system.getTimeElapsed();
-    float speed = Speed > 0.0 ? Speed : 1.0;
-    float scale = FieldScale > 0.0 ? FieldScale : 1.0;
-    float stepSize = StepSize > 0.0 ? StepSize : 0.06;
-    float numSteps = NumSteps > 0.0 ? NumSteps : 48.0;
-    float trailLen = TrailLength > 0.0 ? TrailLength : 0.4;
-    float brightness = Brightness > 0.0 ? Brightness : 1.0;
-    float fadeStart = FadeStart;
-    int preset = int(Preset);
 
-    // Animation timing (matching HTML)
-    float timeOffset = time * speed * 0.25;
-    float linePhase = lineIndex * 0.0137;
+    // MINIMAL SINE TEST with per-line phase variation
+    float phase = seedPosition.x * 0.5 + seedPosition.z * 0.3 + time;
 
-    // Animate seed position along field
-    vec3 seed = seedPosition;
-    float cycle = mod(timeOffset + linePhase, 5.0);
-    seed += getField(seedPosition, 0.0, preset, scale) * cycle * 1.5;
+    vec3 pos = seedPosition;
+    pos.x += sin(t * 6.28 + phase) * 0.5;
+    pos.y += t * 2.0;
 
-    // Integrate through the vector field
-    vec3 pos = seed;
-    int steps = int(segmentIndex * numSteps);
+    // Simple ribbon
+    vec3 finalPos = pos + vec3(ribbonSide * 0.02, 0.0, 0.0);
 
-    for (int i = 0; i < 64; i++) {
-        if (i >= steps) break;
-        pos += getField(pos, time * 0.15, preset, scale) * stepSize;
-    }
-
-    // Trail visibility (matching HTML)
-    float headPos = fract(timeOffset * 0.35 + linePhase);
-    float dist = segmentIndex - headPos;
-    if (dist < 0.0) dist += 1.0;
-
-    float visibility = 1.0 - dist / trailLen;
-    visibility = clamp(visibility, 0.0, 1.0);
-    visibility = smoothstep(0.0, 0.2, visibility);
-    visibility *= smoothstep(0.0, 0.02, segmentIndex);
-
-    // Ribbon width based on visibility
-    float width = LineWidth > 0.0 ? LineWidth * 0.01 : 0.02;
-    width *= visibility;
-
-    // Calculate ribbon offset perpendicular to velocity
-    vec3 vel = getField(pos, time * 0.15, preset, scale);
-    vec3 viewDir = vec3(0.0, 0.0, 1.0); // Approximate view direction
-    vec3 right = normalize(cross(vel + vec3(0.001), viewDir));
-    vec3 finalPos = pos + right * ribbonSide * width;
-
-    // Color based on preset and velocity
-    vec3 baseColor = getPresetColor(preset);
-    vec3 velColor = abs(normalize(vel + 0.001)) * 0.3;
-    vec3 color = mix(baseColor, baseColor + velColor, 0.5);
-
-    // Add brightness at head
-    color += smoothstep(0.6, 1.0, visibility) * 0.6;
-    color *= brightness;
+    // Color shows t gradient
+    vec3 color = vec3(t, sin(phase) * 0.5 + 0.5, 0.5);
 
     transformedPosition = finalPos;
-    vertexColor = vec4(color, visibility * 0.85);
+    vertexColor = vec4(color, 1.0);
 }

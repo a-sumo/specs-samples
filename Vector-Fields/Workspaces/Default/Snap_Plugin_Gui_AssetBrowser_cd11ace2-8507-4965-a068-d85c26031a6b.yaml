@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 428
+    size: 427
     values:
       - ""
       - SpectaclesInteractionKit.lspkg
@@ -430,5 +430,4 @@ CollapsedEntities:
       - Vector-Field.ss_graph
       - VectorFieldController.ts
       - VectorFieldTransform.js
-      - temp.go
   options: 4
