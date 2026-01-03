@@ -81,17 +81,17 @@ export class TubeTest extends BaseScriptComponent {
         // - Encode parametric data + grid position in vertices
         // - GPU computes actual positions via unique sine path per tube
         //
-        // Encoding:
-        //   position.x = gridX (grid index)
-        //   position.y = gridY (grid index)
+        // Encoding (position/normal get distorted, use UVs for data):
         //   position.z = t (0-1 along tube length)
         //   normal.z = 1 for tube vertices, 0 for cap centers
         //   texture0 = (localX, localY) unit circle coords
+        //   texture1 = (gridX, gridY) grid indices
 
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
             { name: "normal", components: 3 },
             { name: "texture0", components: 2 },
+            { name: "texture1", components: 2 },
         ]);
 
         this.meshBuilder.topology = MeshTopology.Triangles;
@@ -135,9 +135,10 @@ export class TubeTest extends BaseScriptComponent {
                 const localY = Math.sin(theta);
 
                 this.meshBuilder.appendVerticesInterleaved([
-                    gridX, gridY, t,       // position: gridX, gridY, t
-                    localX, localY, 1.0,   // normal: localX, localY, isTube=1
-                    localX, localY         // texture0: unit circle coords
+                    0.0, 0.0, t,           // position: unused, unused, t
+                    0.0, 0.0, 1.0,         // normal: unused, unused, isTube=1
+                    localX, localY,        // texture0: unit circle coords
+                    gridX, gridY           // texture1: grid indices
                 ]);
             }
         }
@@ -167,9 +168,10 @@ export class TubeTest extends BaseScriptComponent {
         // START CAP (at t = 0)
         const startCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
-            gridX, gridY, 0.0,     // position: gridX, gridY, t=0
-            0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
-            0.0, 0.0               // texture0: center
+            0.0, 0.0, 0.0,         // position: unused, unused, t=0
+            0.0, 0.0, 0.0,         // normal: unused, unused, isCap=0
+            0.0, 0.0,              // texture0: center
+            gridX, gridY           // texture1: grid indices
         ]);
 
         for (let i = 0; i < circleSegments; i++) {
@@ -181,9 +183,10 @@ export class TubeTest extends BaseScriptComponent {
         // END CAP (at t = 1)
         const endCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
-            gridX, gridY, 1.0,     // position: gridX, gridY, t=1
-            0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
-            0.0, 0.0               // texture0: center
+            0.0, 0.0, 1.0,         // position: unused, unused, t=1
+            0.0, 0.0, 0.0,         // normal: unused, unused, isCap=0
+            0.0, 0.0,              // texture0: center
+            gridX, gridY           // texture1: grid indices
         ]);
 
         const lastRingStart = startVertexIndex + (pathLength - 1) * circleSegments;

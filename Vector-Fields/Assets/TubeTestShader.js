@@ -1,18 +1,19 @@
 // TubeTestShader.js
-// GPU sine deformation with parametric tube encoding
-// Transform applied via uniforms to avoid position attribute distortion
+// GPU sine deformation for grid of instanced tubes
+// Each tube has a unique sine curve based on its grid position
 //
 // Vertex encoding from TubeTest.ts:
-//   position.z = t (0-1 along tube length, parametric)
-//   normal.xy = (localX, localY) unit circle coords
+//   position.z = t (0-1 along tube length)
 //   normal.z = 1 for tube vertices, 0 for cap centers
 //   texture0 = (localX, localY) unit circle coords
+//   texture1 = (gridX, gridY) grid indices
 
-input_float TubeRadius;   // { "default": 0.1 }
-input_float TubeLength;   // { "default": 5.0 }
-input_vec3 ObjectPosition;  // { "default": [0, 0, 0] }
-input_vec3 ObjectRotation;  // { "default": [0, 0, 0] } // Euler angles in degrees
-input_vec3 ObjectScale;     // { "default": [1, 1, 1] }
+input_float TubeRadius;
+input_float TubeLength;
+input_float GridSpacing;
+input_vec3 ObjectPosition;
+input_vec3 ObjectRotation;
+input_vec3 ObjectScale;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
@@ -36,68 +37,99 @@ vec3 rotateByEuler(vec3 v, vec3 eulerDeg) {
     return v;
 }
 
+// Simple hash for pseudo-random values from grid position
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
 void main() {
     vec3 inPos = system.getSurfacePositionObjectSpace();
     vec3 inNormal = system.getSurfaceNormalObjectSpace();
-    vec2 inUV = system.getSurfaceUVCoord0();
+    vec2 inUV0 = system.getSurfaceUVCoord0();
+    vec2 inUV1 = system.getSurfaceUVCoord1();
 
-    // Decode parametric data
+    // Decode grid position and parametric data
+    float gridX = inUV1.x;                // Grid index from UV1
+    float gridY = inUV1.y;                // Grid index from UV1
     float t = inPos.z;                    // Parametric position (0-1 along tube)
-    float z = t * TubeLength;             // Actual Z position
-    float localX = inUV.x;                // cos(theta) - unit circle
-    float localY = inUV.y;                // sin(theta) - unit circle
+    float z = t * TubeLength;             // Actual Z position along tube
+    float localX = inUV0.x;               // cos(theta) - unit circle
+    float localY = inUV0.y;               // sin(theta) - unit circle
     float radius = TubeRadius;
 
-    // Cap centers have localX=localY=0
+    // Cap centers have normal.z < 0.5
     bool isCapCenter = (inNormal.z < 0.5);
     if (isCapCenter) {
         localX = 0.0;
         localY = 0.0;
-        radius = 0.001;  // Tiny radius for cap centers
+        radius = 0.001;
     }
+
+    // Base position from grid
+    float baseX = gridX * GridSpacing;
+    float baseY = gridY * GridSpacing;
 
     float time = system.getTimeElapsed();
 
     // ========================================
-    // STEP 1: Compute sine wave displacement
-    // The tube center moves in X based on z position
+    // UNIQUE SINE PARAMETERS PER TUBE
+    // Use grid position as seed for variation
     // ========================================
-    float waveFreq = 1.5;
-    float waveAmp = 0.5;
+    vec2 gridSeed = vec2(gridX, gridY);
+    float h1 = hash(gridSeed);
+    float h2 = hash(gridSeed + vec2(17.3, 29.1));
+    float h3 = hash(gridSeed + vec2(41.7, 53.3));
+    float h4 = hash(gridSeed + vec2(67.9, 73.1));
 
-    float sineDisplacement = sin(z * waveFreq + time) * waveAmp;
-    vec3 center = vec3(sineDisplacement, 0.0, z);
-
-    // ========================================
-    // STEP 2: Compute TANGENT (derivative of path)
-    // ========================================
-    float dxdz = cos(z * waveFreq + time) * waveAmp * waveFreq;
-    vec3 tangent = normalize(vec3(dxdz, 0.0, 1.0));
-
-    // ========================================
-    // STEP 3: Build perpendicular frame
-    // ========================================
-    vec3 frameNormal = vec3(-tangent.z, 0.0, tangent.x);
-    vec3 frameBinormal = vec3(0.0, 1.0, 0.0);
+    // Vary wave parameters per tube
+    float waveFreq = 1.0 + h1 * 1.5;           // 1.0 to 2.5
+    float waveAmp = 0.3 + h2 * 0.4;            // 0.3 to 0.7
+    float wavePhase = h3 * 6.283185;           // 0 to 2*PI
+    float waveDir = h4 * 6.283185;             // Direction angle for 2D displacement
 
     // ========================================
-    // STEP 4: Transform circular cross-section to deformed frame
+    // SINE WAVE DISPLACEMENT (unique per tube)
+    // Displacement in XY plane based on waveDir
+    // ========================================
+    float sineValue = sin(z * waveFreq + time + wavePhase) * waveAmp;
+    float dispX = cos(waveDir) * sineValue;
+    float dispY = sin(waveDir) * sineValue;
+
+    vec3 center = vec3(baseX + dispX, baseY + dispY, z);
+
+    // ========================================
+    // TANGENT (derivative of path)
+    // ========================================
+    float dSinedz = cos(z * waveFreq + time + wavePhase) * waveAmp * waveFreq;
+    float dxdz = cos(waveDir) * dSinedz;
+    float dydz = sin(waveDir) * dSinedz;
+    vec3 tangent = normalize(vec3(dxdz, dydz, 1.0));
+
+    // ========================================
+    // PERPENDICULAR FRAME
+    // For tubes along Z with XY displacement
+    // ========================================
+    vec3 frameNormal = normalize(vec3(-tangent.z, 0.0, tangent.x));
+    vec3 frameBinormal = normalize(cross(tangent, frameNormal));
+
+    // ========================================
+    // TRANSFORM CIRCULAR CROSS-SECTION
     // ========================================
     vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
     vec3 localPos = center + offset;
 
     // ========================================
-    // STEP 5: Apply object transform (scale, rotate, translate)
+    // APPLY OBJECT TRANSFORM
     // ========================================
     vec3 scaledPos = localPos * ObjectScale;
     vec3 rotatedPos = rotateByEuler(scaledPos, ObjectRotation);
     vec3 finalPos = rotatedPos + ObjectPosition;
 
-    // Debug coloring
+    // Color based on circular position and tube progress
     vec3 color = vec3(
-        localX * 0.5 + 0.5,   // Red = localX remapped
-        localY * 0.5 + 0.5,   // Green = localY remapped
-        t                      // Blue = position along tube
+        localX * 0.5 + 0.5,   // Red = around circumference
+        localY * 0.5 + 0.5,   // Green = around circumference
+        t                     // Blue = along tube length
     );
 
     transformedPosition = finalPos;
