@@ -43,27 +43,12 @@
     - Port_Import_N017:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
-    - Port_Import_N019:
-        typeIdx: 1
-        value: 0.000000
-    - Port_Import_N021:
-        typeIdx: 1
-        value: 100.000000
-    - Port_Import_N023:
-        typeIdx: 1
-        value: 81.000000
     - Port_Input0_N013:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_Input1_N013:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
-    - Port_Input1_N022:
-        typeIdx: 1
-        value: 0.010000
-    - Port_Input1_N024:
-        typeIdx: 1
-        value: 0.010000
     - Port_LineWidth_N000:
         typeIdx: 1
         value: 0.000000
@@ -79,18 +64,6 @@
     - Port_PrevWorldPosition_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
-    - Port_RangeMaxA_N020:
-        typeIdx: 1
-        value: 180.000000
-    - Port_RangeMaxB_N020:
-        typeIdx: 1
-        value: 0.500000
-    - Port_RangeMinA_N020:
-        typeIdx: 1
-        value: -180.000000
-    - Port_RangeMinB_N020:
-        typeIdx: 1
-        value: -0.500000
     - Port_RayDirection_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 1.000000, z: 0.000000}
@@ -107,6 +80,9 @@
         typeIdx: 1
         value: 0.000000
     - Port_TrailLength_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_TubeRadius_N000:
         typeIdx: 1
         value: 0.000000
     - Port_Value1_N000:
@@ -133,6 +109,9 @@
     - Port_WorldTangent_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 1.000000}
+    - TubeRadius:
+        typeIdx: 1
+        value: 1.000000
     - Tweak_N1:
         typeIdx: 1
         value: 1.000000
@@ -213,6 +192,33 @@
     FieldScale:
       typeIdx: 1
       value: 1.000000
+    Port_Import_N019:
+      typeIdx: 1
+      value: 0.000000
+    Port_Import_N021:
+      typeIdx: 1
+      value: 23.000000
+    Port_Import_N023:
+      typeIdx: 1
+      value: 81.000000
+    Port_Input1_N022:
+      typeIdx: 1
+      value: 0.010000
+    Port_Input1_N024:
+      typeIdx: 1
+      value: 0.010000
+    Port_RangeMaxA_N020:
+      typeIdx: 1
+      value: 180.000000
+    Port_RangeMaxB_N020:
+      typeIdx: 1
+      value: 0.500000
+    Port_RangeMinA_N020:
+      typeIdx: 1
+      value: -180.000000
+    Port_RangeMinB_N020:
+      typeIdx: 1
+      value: -0.500000
     Preset:
       typeIdx: 1
       value: 1.000000

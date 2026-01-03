@@ -1,9 +1,8 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 427
+    size: 444
     values:
-      - ""
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
@@ -426,8 +425,26 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/VersionNumber.ts
       - SpectaclesInteractionKit.lspkg/package.native
       - SpectaclesInteractionKit.lspkg/tsconfig.json
+      - TestTubeShader.mat
+      - TestTubeShader.ss_graph
+      - TubeTest.ts
+      - TubeTestShader.js
       - Vector-Field.mat
       - Vector-Field.ss_graph
       - VectorFieldController.ts
       - VectorFieldTransform.js
+      - VolumetricLine.lspkg/Materials
+      - VolumetricLine.lspkg/Materials/PBR.mat
+      - VolumetricLine.lspkg/Materials/Rainbow.mat
+      - VolumetricLine.lspkg/README.md
+      - VolumetricLine.lspkg/Scripts/VolumetricLine.ts
+      - VolumetricLine.lspkg/Shaders
+      - VolumetricLine.lspkg/Shaders/Rainbow.ss_graph
+      - VolumetricLine.lspkg/Shaders/pbr.ss_graph
+      - VolumetricLine.lspkg/Textures
+      - VolumetricLine.lspkg/Textures/Base.png
+      - VolumetricLine.lspkg/Textures/MaterialParams.png
+      - VolumetricLine.lspkg/Textures/Normal.png
+      - VolumetricLine.lspkg/VolumetricLine__PLACE_IN_SCENE.prefab
+      - VolumetricLine.lspkg/package.native
   options: 4
