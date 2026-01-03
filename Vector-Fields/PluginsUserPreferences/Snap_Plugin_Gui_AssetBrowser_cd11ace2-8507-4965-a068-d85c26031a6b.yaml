@@ -1,17 +1,15 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 859
+    size: 858
     values:
-      - ""
+      - Custom Sphere.mesh
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
       - Render Target.renderTarget
       - Scene.scene
-      - SpectaclesInteractionKit 2.lspkg
-      - SpectaclesInteractionKit 2.lspkg/Assets
       - SpectaclesInteractionKit 2.lspkg/Assets/Audio
       - SpectaclesInteractionKit 2.lspkg/Assets/Audio/HoverAudioTrack.wav
       - SpectaclesInteractionKit 2.lspkg/Assets/Audio/TriggerEndAudioTrack.wav
@@ -70,7 +68,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit 2.lspkg/Assets/Materials/SpritePreset.mat
       - SpectaclesInteractionKit 2.lspkg/Assets/Materials/TargetOutlineMaterial.mat
       - SpectaclesInteractionKit 2.lspkg/Assets/Materials/Text3DDefault.mat
-      - SpectaclesInteractionKit 2.lspkg/Assets/Meshes
       - SpectaclesInteractionKit 2.lspkg/Assets/Meshes/BoxMesh.mesh
       - SpectaclesInteractionKit 2.lspkg/Assets/Meshes/ButtonCapsuleMesh.mesh
       - SpectaclesInteractionKit 2.lspkg/Assets/Meshes/ButtonSphereMesh.mesh
@@ -854,6 +851,8 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/VersionNumber.ts
       - SpectaclesInteractionKit.lspkg/package.native
       - SpectaclesInteractionKit.lspkg/tsconfig.json
+      - Sphere.mat
+      - Sphere.ss_graph
       - TestTubeShader.mat
       - TestTubeShader.ss_graph
       - TubeTest.ts

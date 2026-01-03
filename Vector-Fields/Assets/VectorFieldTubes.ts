@@ -55,32 +55,23 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     @input
     @widget(new ComboBoxWidget([
-        new ComboBoxItem("Curl Noise", 0),
-        new ComboBoxItem("Tornado", 1),
-        new ComboBoxItem("Attractor", 2),
-        new ComboBoxItem("Waves", 3),
-        new ComboBoxItem("Lorenz", 4),
-        new ComboBoxItem("Torus Flow", 5),
-        new ComboBoxItem("Sink/Source", 6),
-        new ComboBoxItem("Turbulence", 7),
-        new ComboBoxItem("Helix", 8),
-        new ComboBoxItem("Galaxy", 9)
+        new ComboBoxItem("Waves", 0),
+        new ComboBoxItem("Vortex", 1)
     ]))
-    @hint("Vector field type")
+    @hint("Vector field type - move target object to animate")
     private _preset: number = 0;
 
-    @input
-    @widget(new SliderWidget(0.1, 3.0, 0.1))
-    @hint("Animation speed")
-    private _speed: number = 1.0;
-
-    // ============ ANIMATION ============
+    // ============ TARGET OBJECT ============
 
     @input
-    @hint("Auto-animate time")
-    autoAnimate: boolean = true;
+    @hint("Target object - field centers/orients around this object")
+    targetObject: SceneObject;
 
-    private elapsedTime: number = 0;
+    // ============ FIELD BOUNDS ============
+
+    @input
+    @hint("Box collider defining field bounds - field only active inside")
+    fieldCollider: ColliderComponent;
 
     // ============ MATERIAL ============
 
@@ -115,10 +106,34 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.TubeRadius = this._radius;
         this.mainPass.StepSize = this._stepSize;
         this.mainPass.NumSteps = this._lengthSegments;
-        this.mainPass.Time = this.elapsedTime;
-        this.mainPass.Speed = this._speed;
         this.mainPass.FieldScale = this._fieldScale;
         this.mainPass.Preset = this._preset;
+
+        // Pass target position to shader - moving this animates the field
+        if (this.targetObject) {
+            this.mainPass.TargetPosition = this.targetObject.getTransform().getWorldPosition();
+        } else {
+            this.mainPass.TargetPosition = new vec3(0, 0, 0);
+        }
+
+        // Pass collider bounds to shader
+        if (this.fieldCollider) {
+            const colliderTransform = this.fieldCollider.getSceneObject().getTransform();
+            this.mainPass.ColliderCenter = colliderTransform.getWorldPosition();
+
+            // Get box shape size, apply world scale, convert to half-extents
+            const shape = this.fieldCollider.shape as BoxShape;
+            const worldScale = colliderTransform.getWorldScale();
+            this.mainPass.ColliderHalfExtents = new vec3(
+                shape.size.x * 0.5 * worldScale.x,
+                shape.size.y * 0.5 * worldScale.y,
+                shape.size.z * 0.5 * worldScale.z
+            );
+        } else {
+            // No collider = field everywhere (huge bounds)
+            this.mainPass.ColliderCenter = new vec3(0, 0, 0);
+            this.mainPass.ColliderHalfExtents = new vec3(1000, 1000, 1000);
+        }
     }
 
     private generateMesh(): void {
@@ -239,9 +254,6 @@ export class VectorFieldTubes extends BaseScriptComponent {
     }
 
     private onUpdate(): void {
-        if (this.autoAnimate) {
-            this.elapsedTime += getDeltaTime();
-        }
         this.updateMaterialParams();
     }
 
@@ -256,25 +268,18 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     /**
      * Set preset from normalized value (0-1)
-     * Maps to presets 0-9
+     * Maps to presets 0-1 (Waves, Vortex)
      */
     public setPresetNormalized(value: number): void {
-        this._preset = Math.floor(Math.min(0.999, Math.max(0, value)) * 10);
+        this._preset = Math.floor(Math.min(0.999, Math.max(0, value)) * 2);
     }
 
     /**
-     * Set preset by index (0-9)
+     * Set preset by index (0-1)
+     * 0=Waves, 1=Vortex
      */
     public setPreset(index: number): void {
-        this._preset = Math.floor(Math.min(9, Math.max(0, index)));
-    }
-
-    /**
-     * Set speed from normalized value (0-1)
-     * Maps to speed range 0.1-3.0
-     */
-    public setSpeedNormalized(value: number): void {
-        this._speed = 0.1 + value * 2.9;
+        this._preset = Math.floor(Math.min(1, Math.max(0, index)));
     }
 
     /**
@@ -348,10 +353,5 @@ export class VectorFieldTubes extends BaseScriptComponent {
     get preset(): number { return this._preset; }
     set preset(value: number) {
         this._preset = value;
-    }
-
-    get speed(): number { return this._speed; }
-    set speed(value: number) {
-        this._speed = value;
     }
 }

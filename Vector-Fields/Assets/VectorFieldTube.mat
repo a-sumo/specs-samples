@@ -4,6 +4,12 @@
     - !<own> f95f928d-9c3b-4080-8128-1a43caebb8f6
 - !<PassInfo/f95f928d-9c3b-4080-8128-1a43caebb8f6>
   CachedProperties:
+    - InfluenceRadius:
+        typeIdx: 1
+        value: 1.000000
+    - ObjectPosition:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
@@ -31,9 +37,18 @@
     - Port_GSplatScale_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_InfluenceRadius_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_NumSteps_N000:
         typeIdx: 1
         value: 0.000000
+    - Port_ObjectPosition_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Output_N014:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_Preset_N000:
         typeIdx: 1
         value: 0.000000
@@ -52,7 +67,19 @@
     - Port_StepSize_N000:
         typeIdx: 1
         value: 0.000000
+    - Port_TargetPosition_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_Time_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_TrackedPosition_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_TrackedVelocity_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_TrackingBlend_N000:
         typeIdx: 1
         value: 0.000000
     - Port_TubeRadius_N000:
@@ -76,6 +103,27 @@
     - Port_WorldTangent_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 1.000000}
+    - Speed:
+        typeIdx: 1
+        value: 1.000000
+    - Time:
+        typeIdx: 1
+        value: 1.000000
+    - TrackedPosition:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - TrackedVelocity:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - TrackingBlend:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N12:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N13:
+        typeIdx: 1
+        value: 1.000000
     - Tweak_N2:
         typeIdx: 1
         value: 1.000000
@@ -114,15 +162,12 @@
     PreviewEnabled:
       typeIdx: 0
       value: 0
-    Speed:
-      typeIdx: 1
-      value: 1.000000
     StepSize:
       typeIdx: 1
       value: 1.000000
-    Time:
-      typeIdx: 1
-      value: 1.000000
+    TargetPosition:
+      typeIdx: 4
+      value: {x: 1.000000, y: 1.000000, z: 1.000000}
     TubeRadius:
       typeIdx: 1
       value: 1.000000

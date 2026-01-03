@@ -34,10 +34,10 @@
     _preset: false
     _radialSegments: false
     _radius: false
-    _speed: false
     _stepSize: false
-    autoAnimate: false
+    fieldCollider: false
     material: false
+    targetObject: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -56,8 +56,8 @@
       _stepSize: 0.100000
       _fieldScale: !<float> 1.000000
       _preset: !<float> 0.000000
-      _speed: !<float> 1.000000
-      autoAnimate: true
+      targetObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      fieldCollider: !<reference.ColliderComponent> 00000000-0000-0000-0000-000000000000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
@@ -71,7 +71,7 @@
     - '// @input float _gridSpacing = 1 {"hint":"Spacing between tube start positions", "widget":"slider", "min":0.5, "max":5, "step":0.1}'
     - '// @input float _stepSize = 0.1 {"hint":"Step size for vector field integration", "widget":"slider", "min":0.01, "max":0.5, "step":0.01}'
     - '// @input float _fieldScale = 1 {"hint":"Field noise/frequency scale", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
-    - '// @input float _preset {"hint":"Vector field type", "widget":"combobox", "values":[{"label":"Curl Noise", "value":0}, {"label":"Tornado", "value":1}, {"label":"Attractor", "value":2}, {"label":"Waves", "value":3}, {"label":"Lorenz", "value":4}, {"label":"Torus Flow", "value":5}, {"label":"Sink/Source", "value":6}, {"label":"Turbulence", "value":7}, {"label":"Helix", "value":8}, {"label":"Galaxy", "value":9}]}'
-    - '// @input float _speed = 1 {"hint":"Animation speed", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
-    - '// @input bool autoAnimate = true {"hint":"Auto-animate time"}'
+    - '// @input float _preset {"hint":"Vector field type - move target object to animate", "widget":"combobox", "values":[{"label":"Waves", "value":0}, {"label":"Vortex", "value":1}]}'
+    - '// @input SceneObject targetObject {"hint":"Target object - field centers/orients around this object"}'
+    - '// @input Component.ColliderComponent fieldCollider {"hint":"Box collider defining field bounds - field only active inside"}'
     - '// @input Asset.Material material {"hint":"Material with VectorFieldTubesShader.js"}'
