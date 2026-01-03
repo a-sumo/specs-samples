@@ -47,7 +47,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
     private _fieldScale: number = 1.0;
 
     @input
-    @widget(new SliderWidget(0.0, 30.0, 0.5))
+    @widget(new SliderWidget(0.0, 50.0, 0.5))
     @hint("Speed at which tubes flow along field lines")
     private _flowSpeed: number = 2.0;
 
@@ -328,7 +328,16 @@ export class VectorFieldTubes extends BaseScriptComponent {
      * Maps to range 0.0-10.0
      */
     public setFlowSpeedNormalized(value: number): void {
-        this._flowSpeed = value * 30.0;
+        this._flowSpeed = value * 50.0;
+    }
+
+    /**
+     * Set length segments from normalized value (0-1)
+     * Maps to range 8-64
+     */
+    public setLengthSegmentsNormalized(value: number): void {
+        this._lengthSegments = Math.floor(8 + value * 56);
+        this.refresh();
     }
 
     // Property accessors
