@@ -60,21 +60,25 @@ export class VectorFieldTubes extends BaseScriptComponent {
         new ComboBoxItem("Attractor", 2),
         new ComboBoxItem("Waves", 3),
         new ComboBoxItem("Lorenz", 4),
-        new ComboBoxItem("Helix", 5)
+        new ComboBoxItem("Torus Flow", 5),
+        new ComboBoxItem("Sink/Source", 6),
+        new ComboBoxItem("Turbulence", 7),
+        new ComboBoxItem("Helix", 8),
+        new ComboBoxItem("Galaxy", 9)
     ]))
     @hint("Vector field type")
     private _preset: number = 0;
+
+    @input
+    @widget(new SliderWidget(0.1, 3.0, 0.1))
+    @hint("Animation speed")
+    private _speed: number = 1.0;
 
     // ============ ANIMATION ============
 
     @input
     @hint("Auto-animate time")
     autoAnimate: boolean = true;
-
-    @input
-    @widget(new SliderWidget(0.1, 3.0, 0.1))
-    @hint("Animation speed")
-    private _timeSpeed: number = 1.0;
 
     private elapsedTime: number = 0;
 
@@ -112,6 +116,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.StepSize = this._stepSize;
         this.mainPass.NumSteps = this._lengthSegments;
         this.mainPass.Time = this.elapsedTime;
+        this.mainPass.Speed = this._speed;
         this.mainPass.FieldScale = this._fieldScale;
         this.mainPass.Preset = this._preset;
     }
@@ -235,7 +240,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     private onUpdate(): void {
         if (this.autoAnimate) {
-            this.elapsedTime += getDeltaTime() * this._timeSpeed;
+            this.elapsedTime += getDeltaTime();
         }
         this.updateMaterialParams();
     }
@@ -243,6 +248,57 @@ export class VectorFieldTubes extends BaseScriptComponent {
     public refresh(): void {
         this.generateMesh();
         this.updateMaterialParams();
+    }
+
+    // ============================================
+    // PUBLIC API
+    // ============================================
+
+    /**
+     * Set preset from normalized value (0-1)
+     * Maps to presets 0-9
+     */
+    public setPresetNormalized(value: number): void {
+        this._preset = Math.floor(Math.min(0.999, Math.max(0, value)) * 10);
+    }
+
+    /**
+     * Set preset by index (0-9)
+     */
+    public setPreset(index: number): void {
+        this._preset = Math.floor(Math.min(9, Math.max(0, index)));
+    }
+
+    /**
+     * Set speed from normalized value (0-1)
+     * Maps to speed range 0.1-3.0
+     */
+    public setSpeedNormalized(value: number): void {
+        this._speed = 0.1 + value * 2.9;
+    }
+
+    /**
+     * Set field scale from normalized value (0-1)
+     * Maps to scale range 0.1-3.0
+     */
+    public setFieldScaleNormalized(value: number): void {
+        this._fieldScale = 0.1 + value * 2.9;
+    }
+
+    /**
+     * Set step size from normalized value (0-1)
+     * Maps to range 0.01-0.5
+     */
+    public setStepSizeNormalized(value: number): void {
+        this._stepSize = 0.01 + value * 0.49;
+    }
+
+    /**
+     * Set tube radius from normalized value (0-1)
+     * Maps to range 0.01-0.2
+     */
+    public setRadiusNormalized(value: number): void {
+        this._radius = 0.01 + value * 0.19;
     }
 
     // Property accessors
@@ -294,8 +350,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this._preset = value;
     }
 
-    get timeSpeed(): number { return this._timeSpeed; }
-    set timeSpeed(value: number) {
-        this._timeSpeed = value;
+    get speed(): number { return this._speed; }
+    set speed(value: number) {
+        this._speed = value;
     }
 }
