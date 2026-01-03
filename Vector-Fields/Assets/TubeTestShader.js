@@ -11,31 +11,9 @@
 input_float TubeRadius;
 input_float TubeLength;
 input_float GridSpacing;
-input_vec3 ObjectPosition;
-input_vec3 ObjectRotation;
-input_vec3 ObjectScale;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
-
-// Rotate by Euler angles (XYZ order, input in degrees)
-vec3 rotateByEuler(vec3 v, vec3 eulerDeg) {
-    vec3 r = eulerDeg * 0.01745329251; // deg to rad (PI/180)
-
-    // Rotation around X
-    float cx = cos(r.x), sx = sin(r.x);
-    v = vec3(v.x, cx * v.y - sx * v.z, sx * v.y + cx * v.z);
-
-    // Rotation around Y
-    float cy = cos(r.y), sy = sin(r.y);
-    v = vec3(cy * v.x + sy * v.z, v.y, -sy * v.x + cy * v.z);
-
-    // Rotation around Z
-    float cz = cos(r.z), sz = sin(r.z);
-    v = vec3(cz * v.x - sz * v.y, sz * v.x + cz * v.y, v.z);
-
-    return v;
-}
 
 // Simple hash for pseudo-random values from grid position
 float hash(vec2 p) {
@@ -116,14 +94,7 @@ void main() {
     // TRANSFORM CIRCULAR CROSS-SECTION
     // ========================================
     vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
-    vec3 localPos = center + offset;
-
-    // ========================================
-    // APPLY OBJECT TRANSFORM
-    // ========================================
-    vec3 scaledPos = localPos * ObjectScale;
-    vec3 rotatedPos = rotateByEuler(scaledPos, ObjectRotation);
-    vec3 finalPos = rotatedPos + ObjectPosition;
+    vec3 finalPos = center + offset;
 
     // Color based on circular position and tube progress
     vec3 color = vec3(

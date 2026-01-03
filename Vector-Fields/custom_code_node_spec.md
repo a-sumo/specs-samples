@@ -1,8 +1,24 @@
 INSTRUCTIONS:
 NO inline comments for input and output variables.
-NO early returns. 
+NO early returns.
 Bottom Left UV is (0, 0).
 Top Right UV is (1, 1).
+
+VERTEX SHADER NOTES:
+
+Vertex Position Output:
+- output_vec3 transformedPosition outputs in OBJECT SPACE
+- The scene object's transform is NOT automatically applied
+- To respond to object translation, rotation, scale:
+  1. Connect transformedPosition to a Transform Vector node
+  2. Set Transform Vector to "Object to World"
+  3. Connect result to World Position
+
+Attribute Distortion:
+- Position attribute (getSurfacePositionObjectSpace) may be normalized/distorted
+- Normal attribute (getSurfaceNormalObjectSpace) gets auto-normalized
+- UV coordinates (getSurfaceUVCoord0/1/etc) pass through unchanged
+- For encoding arbitrary data in vertices, use UV coordinates instead of position/normal
 
 SPECIFICATION:
 

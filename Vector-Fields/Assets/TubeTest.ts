@@ -102,10 +102,12 @@ export class TubeTest extends BaseScriptComponent {
 
         let totalTubes = 0;
 
-        // Generate grid of tubes
+        // Generate grid of tubes (centered around origin)
+        const offsetX = (this._gridSizeX - 1) / 2;
+        const offsetY = (this._gridSizeY - 1) / 2;
         for (let gx = 0; gx < this._gridSizeX; gx++) {
             for (let gy = 0; gy < this._gridSizeY; gy++) {
-                this.generateSingleTube(gx, gy, pathLength, circleSegments);
+                this.generateSingleTube(gx - offsetX, gy - offsetY, pathLength, circleSegments);
                 totalTubes++;
             }
         }
