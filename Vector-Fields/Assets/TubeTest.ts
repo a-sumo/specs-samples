@@ -36,6 +36,7 @@ export class TubeTest extends BaseScriptComponent {
     onAwake(): void {
         this.setupMeshVisual();
         this.generateTube();
+        this.updateMaterialParams();  // Set initial values
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
         print("TubeTest: Created tube with " + this._lengthSegments + " length segments, " +
               this._radialSegments + " radial segments");
@@ -46,14 +47,27 @@ export class TubeTest extends BaseScriptComponent {
         if (this.material) {
             this.meshVisual.mainMaterial = this.material;
             this.mainPass = this.material.mainPass;
+            print("TubeTest: Material assigned, mainPass set");
+        } else {
+            print("TubeTest: WARNING - No material assigned!");
         }
     }
 
+    private updateMaterialParams(): void {
+        if (!this.mainPass) return;
+        this.mainPass.TubeRadius = this._radius;
+        this.mainPass.TubeLength = this._length;
+    }
+
     private generateTube(): void {
-        // Following VolumetricLine.ts pattern exactly:
-        // - Compute actual positions on CPU (not encoded data for GPU)
-        // - Use circleSegments vertices per ring (with modulo for indices)
-        // - Order: getMesh() → assign → updateMesh()
+        // GPU deformation approach:
+        // - Encode parametric data (t, angle) in vertices
+        // - GPU computes actual positions via sine path + perpendicular frame
+        //
+        // Encoding:
+        //   position.y = t (0-1 along tube length)
+        //   normal.x = angle (0-1 around tube, -1 for cap centers)
+        //   normal.y = 1 for tube vertices, 0 for cap centers
 
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
@@ -67,45 +81,20 @@ export class TubeTest extends BaseScriptComponent {
         const pathLength = this._lengthSegments + 1;  // Number of rings
         const circleSegments = this._radialSegments;
 
-        // Generate a simple straight tube along Z axis for testing
-        // (we can add deformation later once we confirm geometry works)
+        // Generate tube body vertices with local frame encoding
+        // Pass localX/localY via texture0 to avoid position attribute issues
         for (let i = 0; i < pathLength; i++) {
-            const t = i / (pathLength - 1);  // 0 to 1
-            const z = t * this._length;
+            const t = i / (pathLength - 1);  // 0 to 1 along tube
 
-            // Center of this ring
-            const center = new vec3(0, 0, z);
-
-            // For straight tube: forward = Z, right = X, up = Y
-            const right = new vec3(1, 0, 0);
-            const up = new vec3(0, 1, 0);
-
-            // Generate circle vertices at this position
             for (let j = 0; j < circleSegments; j++) {
-                const angle = (j / circleSegments) * Math.PI * 2;
-                const cos = Math.cos(angle);
-                const sin = Math.sin(angle);
-
-                // Offset from center
-                const localX = cos * this._radius;
-                const localY = sin * this._radius;
-
-                const worldPos = new vec3(
-                    center.x + right.x * localX + up.x * localY,
-                    center.y + right.y * localX + up.y * localY,
-                    center.z + right.z * localX + up.z * localY
-                );
-
-                // Normal points outward from center
-                const normal = new vec3(cos, sin, 0);
-
-                const uCoord = j / circleSegments;
-                const vCoord = t;
+                const theta = (j / circleSegments) * Math.PI * 2;
+                const localX = Math.cos(theta);  // -1 to 1
+                const localY = Math.sin(theta);  // -1 to 1
 
                 this.meshBuilder.appendVerticesInterleaved([
-                    worldPos.x, worldPos.y, worldPos.z,
-                    normal.x, normal.y, normal.z,
-                    uCoord, vCoord
+                    0.0, t, 0.0,           // position: just t for now
+                    localX, localY, 1.0,   // normal: localX, localY, isTube=1
+                    localX, localY         // texture0: localX, localY (use UV for frame data)
                 ]);
             }
         }
@@ -149,19 +138,16 @@ export class TubeTest extends BaseScriptComponent {
         const tubeVertexCount = pathLength * circleSegments;
 
         // ========================================
-        // START CAP (at z = 0)
+        // START CAP (at t = 0)
         // ========================================
-        // Center vertex for start cap
-        const startCenter = new vec3(0, 0, 0);
-        const startNormal = new vec3(0, 0, 1);  // Points backward (out of tube)
-
+        // Center vertex: localX=0, localY=0 (center of cross-section)
         this.meshBuilder.appendVerticesInterleaved([
-            startCenter.x, startCenter.y, startCenter.z,
-            startNormal.x, startNormal.y, startNormal.z,
-            0.5, 0.5  // UV at center
+            0.0, 0.0, 0.0,         // position: t=0
+            0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
+            0.0, 0.0               // texture0: localX=0, localY=0
         ]);
 
-        const startCenterIndex = tubeVertexCount;  // Index of start cap center vertex
+        const startCenterIndex = tubeVertexCount;
 
         // Triangles from center to first ring vertices
         for (let i = 0; i < circleSegments; i++) {
@@ -173,20 +159,16 @@ export class TubeTest extends BaseScriptComponent {
         }
 
         // ========================================
-        // END CAP (at z = length)
+        // END CAP (at t = 1)
         // ========================================
-        // Center vertex for end cap
-        const endCenter = new vec3(0, 0, this._length);
-        const endNormal = new vec3(0, 0, -1);  // Points forward (out of tube)
-
         this.meshBuilder.appendVerticesInterleaved([
-            endCenter.x, endCenter.y, endCenter.z,
-            endNormal.x, endNormal.y, endNormal.z,
-            0.5, 0.5  // UV at center
+            0.0, 1.0, 0.0,         // position: t=1
+            0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
+            0.0, 0.0               // texture0: localX=0, localY=0
         ]);
 
-        const endCenterIndex = tubeVertexCount + 1;  // Index of end cap center vertex
-        const lastRingStart = (pathLength - 1) * circleSegments;  // First vertex of last ring
+        const endCenterIndex = tubeVertexCount + 1;
+        const lastRingStart = (pathLength - 1) * circleSegments;
 
         // Triangles from center to last ring vertices
         for (let i = 0; i < circleSegments; i++) {
@@ -199,10 +181,7 @@ export class TubeTest extends BaseScriptComponent {
     }
 
     private onUpdate(): void {
-        if (this.mainPass) {
-            this.mainPass.TubeRadius = this._radius;
-            this.mainPass.TubeLength = this._length;
-        }
+        this.updateMaterialParams();
     }
 
     public refresh(): void {

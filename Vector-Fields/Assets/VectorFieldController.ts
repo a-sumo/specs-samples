@@ -14,8 +14,8 @@ export class VectorFieldController extends BaseScriptComponent {
 
     @input
     @hint("Number of trail lines (randomly positioned)")
-    @widget(new SliderWidget(100, 800, 50))
-    private _numTrails: number = 400;
+    @widget(new SliderWidget(10, 800, 50))
+    private _numTrails: number = 100;
 
     @input
     @hint("Number of segments per trail line")
