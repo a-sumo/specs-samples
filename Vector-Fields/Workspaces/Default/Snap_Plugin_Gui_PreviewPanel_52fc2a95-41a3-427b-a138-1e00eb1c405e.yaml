@@ -28,7 +28,7 @@ fullscreenSpectaclesSimulation:
   options: 4
 lastPosition:
   type: vec3
-  value: {x: -0.035065, y: 0.000000, z: -38.053768}
+  value: {x: -0.030617, y: 0.000000, z: -38.153633}
   options: 4
 lastRotation:
   type: vec3

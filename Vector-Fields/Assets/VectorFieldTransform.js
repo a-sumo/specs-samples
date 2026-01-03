@@ -3,16 +3,22 @@
 // This shader integrates particles through a vector field on the GPU.
 // The mesh is generated on the CPU with ribbon geometry for each trail.
 //
-// Texture coordinate encoding:
-// texture0.xy = normalized start position (x, y) in 0-1 range
-// texture1.x  = normalized start position z in 0-1 range
-// texture1.y  = step index (0-1 range, where 0 = head, 1 = tail)
+// Vertex data encoding (from MeshBuilder):
+//   position.x = seed.x
+//   position.y = segmentIndex (0-1, where 0 = head, 1 = tail)
+//   position.z = seed.z
+//   normal.x   = seed.y
+//   normal.y   = ribbonSide (-1 or 1)
+//   normal.z   = lineIndex normalized (0-1)
+//
+// Uniforms (all uppercase, connected from material):
+//   Preset, Speed, FieldScale, StepSize, Brightness, etc.
 //
 // The shader:
-// 1. Reconstructs the 3D start position from texture coords
-// 2. Integrates the vector field for (stepIndex * numSteps) iterations
-// 3. Outputs the transformed position
-// 4. Computes color based on velocity and step position
+// 1. Decodes seed position and segmentIndex from vertex data
+// 2. Integrates through vector field step-by-step (curved trails)
+// 3. Outputs transformed position with ribbon offset
+// 4. Colors based on preset and velocity
 
 // ============================================================
 // INPUTS
@@ -141,7 +147,7 @@ vec3 fieldCurlNoise(vec3 p, float t, float scale) {
 // 1: Tornado - upward spiral
 vec3 fieldTornado(vec3 p, float t) {
     float r = length(p.xz);
-    float angle = atan(p.z, p.x);
+    float angle = atan(p.z, p.x) + t * 0.5;  // Rotate with time
     float lift = 0.3 / (r + 0.5);
     float spin = 1.0 / (r + 0.3);
 
@@ -154,8 +160,8 @@ vec3 fieldTornado(vec3 p, float t) {
 
 // 2: Strange Attractor
 vec3 fieldAttractor(vec3 p, float t) {
-    float a = 0.2;
-    float b = 0.2;
+    float a = 0.2 + sin(t * 0.3) * 0.05;  // Animate parameters
+    float b = 0.2 + cos(t * 0.2) * 0.05;
     float c = 5.7;
     return vec3(
         -p.y - p.z,
@@ -176,8 +182,8 @@ vec3 fieldWaves(vec3 p, float t, float scale) {
 
 // 4: Lorenz System
 vec3 fieldLorenz(vec3 p, float t) {
-    float sigma = 10.0;
-    float rho = 28.0;
+    float sigma = 10.0 + sin(t * 0.2) * 1.0;  // Animate parameters
+    float rho = 28.0 + cos(t * 0.15) * 2.0;
     float beta = 8.0 / 3.0;
 
     vec3 scaled = p * 0.1;
@@ -191,10 +197,10 @@ vec3 fieldLorenz(vec3 p, float t) {
 // 5: Torus Flow
 vec3 fieldTorus(vec3 p, float t) {
     float R = 2.0;
-    float angle = atan(p.z, p.x);
+    float angle = atan(p.z, p.x) + t * 0.3;  // Rotate with time
     vec3 tangent = vec3(-sin(angle), 0.0, cos(angle));
 
-    float polAngle = atan(p.y, length(p.xz) - R);
+    float polAngle = atan(p.y, length(p.xz) - R) + t * 0.5;
     vec3 poloidal = vec3(
         cos(angle) * (-sin(polAngle)),
         cos(polAngle),
@@ -208,10 +214,11 @@ vec3 fieldTorus(vec3 p, float t) {
 vec3 fieldSinkSource(vec3 p, float t) {
     vec3 v = vec3(0.0);
 
-    vec3 source1 = vec3(2.0, 0.0, 0.0);
-    vec3 sink1 = vec3(-2.0, 0.0, 0.0);
-    vec3 source2 = vec3(0.0, 2.0, 0.0);
-    vec3 sink2 = vec3(0.0, -2.0, 0.0);
+    // Animate source/sink positions
+    vec3 source1 = vec3(2.0 * cos(t * 0.3), 0.0, 2.0 * sin(t * 0.3));
+    vec3 sink1 = vec3(-2.0 * cos(t * 0.3), 0.0, -2.0 * sin(t * 0.3));
+    vec3 source2 = vec3(0.0, 2.0 * cos(t * 0.4), 2.0 * sin(t * 0.4));
+    vec3 sink2 = vec3(0.0, -2.0 * cos(t * 0.4), -2.0 * sin(t * 0.4));
 
     vec3 d1 = p - source1;
     vec3 d2 = p - sink1;
@@ -300,6 +307,21 @@ vec3 getField(vec3 p, float t, int preset, float scale) {
     return fieldCurlNoise(p, t, scale);
 }
 
+// Float-based version (avoids int cast issues)
+vec3 getFieldFloat(vec3 p, float t, float preset, float scale) {
+    if (preset < 0.5) return fieldCurlNoise(p, t, scale);
+    if (preset < 1.5) return fieldTornado(p, t);
+    if (preset < 2.5) return fieldAttractor(p, t);
+    if (preset < 3.5) return fieldWaves(p, t, scale);
+    if (preset < 4.5) return fieldLorenz(p, t);
+    if (preset < 5.5) return fieldTorus(p, t);
+    if (preset < 6.5) return fieldSinkSource(p, t);
+    if (preset < 7.5) return fieldTurbulence(p, t, scale);
+    if (preset < 8.5) return fieldHelix(p, t);
+    if (preset < 9.5) return fieldGalaxy(p, t);
+    return fieldCurlNoise(p, t, scale);
+}
+
 // ============================================================
 // COLOR BASED ON PRESET
 // ============================================================
@@ -318,6 +340,20 @@ vec3 getPresetColor(int preset) {
     return vec3(0.2, 0.5, 1.0);
 }
 
+vec3 getPresetColorFloat(float preset) {
+    if (preset < 0.5) return vec3(0.2, 0.5, 1.0);      // Blue - curl
+    if (preset < 1.5) return vec3(0.8, 0.4, 0.1);      // Orange - tornado
+    if (preset < 2.5) return vec3(0.9, 0.2, 0.4);      // Red - attractor
+    if (preset < 3.5) return vec3(0.2, 0.9, 0.6);      // Cyan - waves
+    if (preset < 4.5) return vec3(0.7, 0.3, 0.9);      // Purple - lorenz
+    if (preset < 5.5) return vec3(0.3, 0.8, 0.3);      // Green - torus
+    if (preset < 6.5) return vec3(1.0, 0.8, 0.2);      // Yellow - sink/source
+    if (preset < 7.5) return vec3(0.5, 0.5, 0.9);      // Light blue - turbulence
+    if (preset < 8.5) return vec3(0.9, 0.5, 0.7);      // Pink - helix
+    if (preset < 9.5) return vec3(0.8, 0.7, 0.4);      // Gold - galaxy
+    return vec3(0.2, 0.5, 1.0);
+}
+
 // ============================================================
 // MAIN - VERTEX SHADER
 // ============================================================
@@ -330,24 +366,44 @@ void main() {
     float t = inPos.y;
     vec3 seedPosition = vec3(inPos.x, inNormal.x, inPos.z);
     float ribbonSide = inNormal.y;
+    float lineIndex = inNormal.z * 400.0;
 
-    float time = system.getTimeElapsed();
-    float phase = seedPosition.x * 0.5 + seedPosition.z * 0.3 + time;
+    // Use uniforms directly (all uppercase) with fallbacks
+    float elapsedTime = system.getTimeElapsed();
+    float uSpeed = Speed > 0.0 ? Speed : 1.0;
+    float uScale = FieldScale > 0.0 ? FieldScale : 1.0;
+    float uStepSize = StepSize > 0.0 ? StepSize : 0.1;
+    float uBrightness = Brightness > 0.0 ? Brightness : 1.0;
+    float uPreset = Preset;  // Float for comparison
+
+    float animTime = elapsedTime * uSpeed;
+
+    // Animate the seed position so heads move too
+    float linePhase = lineIndex * 0.0137;
+    float cycle = mod(animTime * 0.25 + linePhase, 5.0);
+    vec3 animatedSeed = seedPosition + getFieldFloat(seedPosition, 0.0, uPreset, uScale) * cycle * 1.5;
 
     // Integrate step by step for CURVED trails
-    vec3 pos = seedPosition;
-    int numSteps = int(t * 32.0);  // More steps for vertices further along
+    vec3 pos = animatedSeed;
+    int numSteps = int(t * 32.0);
 
-    // Step through the field, updating direction at each position
     for (int i = 0; i < 32; i++) {
         if (i >= numSteps) break;
-        vec3 dir = fieldTornado(pos, time);
-        pos += dir * 0.1;  // Small step
+        vec3 dir = getFieldFloat(pos, animTime, uPreset, uScale);
+        pos += dir * uStepSize;
     }
 
+    // Get final velocity for coloring
+    vec3 vel = getFieldFloat(pos, animTime, uPreset, uScale);
+
+    // Simple ribbon offset
     vec3 finalPos = pos + vec3(ribbonSide * 0.02, 0.0, 0.0);
-    // Color based on position along trail
-    vec3 color = vec3(1.0 - t, 0.5, t);  // Gradient from red to blue
+
+    // Color based on preset
+    vec3 baseColor = getPresetColorFloat(uPreset);
+    vec3 velColor = abs(normalize(vel + 0.001)) * 0.3;
+    vec3 color = mix(baseColor, baseColor + velColor, 0.5);
+    color *= uBrightness * (0.5 + t * 0.5);
 
     transformedPosition = finalPos;
     vertexColor = vec4(color, 1.0);
