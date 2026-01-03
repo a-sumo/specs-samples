@@ -82,19 +82,25 @@ export class TubeTest extends BaseScriptComponent {
         const circleSegments = this._radialSegments;
 
         // Generate tube body vertices with local frame encoding
-        // Pass localX/localY via texture0 to avoid position attribute issues
+        // Store actual object-space positions so transforms work correctly
         for (let i = 0; i < pathLength; i++) {
             const t = i / (pathLength - 1);  // 0 to 1 along tube
+            const z = t * this._length;      // actual Z position in object space
 
             for (let j = 0; j < circleSegments; j++) {
                 const theta = (j / circleSegments) * Math.PI * 2;
                 const localX = Math.cos(theta);  // -1 to 1
                 const localY = Math.sin(theta);  // -1 to 1
 
+                // Position: actual object-space coords (x=localX*radius, y=localY*radius, z)
+                // This allows object transforms to work correctly
+                const x = localX * this._radius;
+                const y = localY * this._radius;
+
                 this.meshBuilder.appendVerticesInterleaved([
-                    0.0, t, 0.0,           // position: just t for now
+                    x, y, z,               // position: actual object-space position
                     localX, localY, 1.0,   // normal: localX, localY, isTube=1
-                    localX, localY         // texture0: localX, localY (use UV for frame data)
+                    localX, localY         // texture0: unit circle coords for GPU deformation
                 ]);
             }
         }
@@ -138,18 +144,16 @@ export class TubeTest extends BaseScriptComponent {
         const tubeVertexCount = pathLength * circleSegments;
 
         // ========================================
-        // START CAP (at t = 0)
+        // START CAP (at z = 0)
         // ========================================
-        // Center vertex: localX=0, localY=0 (center of cross-section)
         this.meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 0.0,         // position: t=0
+            0.0, 0.0, 0.0,         // position: center at z=0
             0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
             0.0, 0.0               // texture0: localX=0, localY=0
         ]);
 
         const startCenterIndex = tubeVertexCount;
 
-        // Triangles from center to first ring vertices
         for (let i = 0; i < circleSegments; i++) {
             const current = i;
             const next = (i + 1) % circleSegments;
@@ -159,18 +163,17 @@ export class TubeTest extends BaseScriptComponent {
         }
 
         // ========================================
-        // END CAP (at t = 1)
+        // END CAP (at z = length)
         // ========================================
         this.meshBuilder.appendVerticesInterleaved([
-            0.0, 1.0, 0.0,         // position: t=1
-            0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
-            0.0, 0.0               // texture0: localX=0, localY=0
+            0.0, 0.0, this._length,  // position: center at z=length
+            0.0, 0.0, 0.0,           // normal: 0,0,0 = cap center
+            0.0, 0.0                 // texture0: localX=0, localY=0
         ]);
 
         const endCenterIndex = tubeVertexCount + 1;
         const lastRingStart = (pathLength - 1) * circleSegments;
 
-        // Triangles from center to last ring vertices
         for (let i = 0; i < circleSegments; i++) {
             const current = lastRingStart + i;
             const next = lastRingStart + ((i + 1) % circleSegments);
