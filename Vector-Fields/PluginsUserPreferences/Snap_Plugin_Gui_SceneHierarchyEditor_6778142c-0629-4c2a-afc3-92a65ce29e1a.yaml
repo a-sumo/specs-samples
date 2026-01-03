@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 9
+    size: 10
     values:
       - 0005641c-028d-459a-0000-000000014b4d
       - 02e9d3c7-7195-4bf3-997a-a3c98380bd1b
@@ -11,6 +11,7 @@ CollapsedEntities:
       - 6adb9a2c-1a58-42c4-a284-ad60b866f748
       - 89e578be-4847-4114-ae2f-330beb00eaa6
       - d5c9be0c-16ec-4b08-8fdf-56a08f49c888
+      - f95a3f9e-c3f7-48c9-885c-4459494ca20e
       - fc12da50-80bd-4a51-9335-660b811ea872
   options: 4
 PinnedEntities:

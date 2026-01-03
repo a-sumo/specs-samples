@@ -7,6 +7,7 @@
     - !<own> 6adb9a2c-1a58-42c4-a284-ad60b866f748
     - !<own> 40fbf502-83ed-4f0d-8279-cc0d86cf271d
     - !<own> 435a6e3b-e290-4fc0-b73d-e2f71a3fc2a1
+    - !<own> f95a3f9e-c3f7-48c9-885c-4459494ca20e
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       []
@@ -1009,7 +1010,7 @@
   PrefabRemaps:
     []
   Name: TubeTest
-  Enabled: true
+  Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: -50.000000}
@@ -2770,6 +2771,35 @@
     - !<own> 6bf04e34-6299-4f27-8f48-259345a32666
   Components:
     []
+- !<ScriptComponent/d814cda9-374f-4e04-b2fb-5c4ca71aef9b>
+  PrefabRemaps:
+    []
+  Name: VectorFieldTubes
+  Enabled: true
+  ScriptAsset: !<reference> e70ea878-ce68-42de-809a-df95318d9571
+  ScriptInputsDefault:
+    _lengthSegments: true
+    _radialSegments: true
+    _radius: true
+    _gridSizeX: true
+    _gridSizeY: true
+    _gridSpacing: true
+    _stepSize: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _lengthSegments: !<float> 32.000000
+      _radialSegments: !<float> 8.000000
+      _radius: 0.050000
+      _gridSizeX: !<float> 5.000000
+      _gridSizeY: !<float> 5.000000
+      _gridSpacing: !<float> 1.000000
+      _stepSize: 0.100000
+      material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/d8ce2d41-6bdf-4d37-beb2-a693b7e1d24c>
   PrefabRemaps:
     []
@@ -3273,6 +3303,21 @@
     - !<own> 6dc5dd7a-4726-4cb6-b42f-a12f4b6416c3
   Components:
     []
+- !<SceneObject/f95a3f9e-c3f7-48c9-885c-4459494ca20e>
+  PrefabRemaps:
+    []
+  Name: VectorFieldTubes
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> d814cda9-374f-4e04-b2fb-5c4ca71aef9b
 - !<SceneObject/fc12da50-80bd-4a51-9335-660b811ea872>
   PrefabRemaps:
     []

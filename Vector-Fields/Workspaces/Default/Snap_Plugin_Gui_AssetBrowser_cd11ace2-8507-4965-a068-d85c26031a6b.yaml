@@ -1,8 +1,15 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 444
+    size: 451
     values:
+      - ""
+      - Device Camera Texture.deviceCameraTexture
+      - Echopark.hdr
+      - Echopark.hdr/Diffuse
+      - Echopark.hdr/Specular
+      - Render Target.renderTarget
+      - Scene.scene
       - SpectaclesInteractionKit.lspkg
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
@@ -431,12 +438,12 @@ CollapsedEntities:
       - TubeTestShader.js
       - Vector-Field.mat
       - Vector-Field.ss_graph
-      - VectorFieldController.ts
-      - VectorFieldTransform.js
+      - VolumetricLine.lspkg
       - VolumetricLine.lspkg/Materials
       - VolumetricLine.lspkg/Materials/PBR.mat
       - VolumetricLine.lspkg/Materials/Rainbow.mat
       - VolumetricLine.lspkg/README.md
+      - VolumetricLine.lspkg/Scripts
       - VolumetricLine.lspkg/Scripts/VolumetricLine.ts
       - VolumetricLine.lspkg/Shaders
       - VolumetricLine.lspkg/Shaders/Rainbow.ss_graph
