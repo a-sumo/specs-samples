@@ -323,31 +323,31 @@ vec3 getPresetColor(int preset) {
 // ============================================================
 
 void main() {
-    // Get vertex data - using the encoding from TypeScript:
-    // position.x = seed.x, position.y = segmentIndex (0-1), position.z = seed.z
-    // normal.x = seed.y, normal.y = ribbonSide, normal.z = lineIndex normalized
+    // Get vertex data
     vec3 inPos = system.getSurfacePositionObjectSpace();
     vec3 inNormal = system.getSurfaceNormalObjectSpace();
 
-    float t = inPos.y;                              // segmentIndex 0-1
+    float t = inPos.y;
     vec3 seedPosition = vec3(inPos.x, inNormal.x, inPos.z);
     float ribbonSide = inNormal.y;
-    float lineIndex = inNormal.z * 400.0;
 
     float time = system.getTimeElapsed();
-
-    // MINIMAL SINE TEST with per-line phase variation
     float phase = seedPosition.x * 0.5 + seedPosition.z * 0.3 + time;
 
+    // Integrate step by step for CURVED trails
     vec3 pos = seedPosition;
-    pos.x += sin(t * 6.28 + phase) * 0.5;
-    pos.y += t * 2.0;
+    int numSteps = int(t * 32.0);  // More steps for vertices further along
 
-    // Simple ribbon
+    // Step through the field, updating direction at each position
+    for (int i = 0; i < 32; i++) {
+        if (i >= numSteps) break;
+        vec3 dir = fieldTornado(pos, time);
+        pos += dir * 0.1;  // Small step
+    }
+
     vec3 finalPos = pos + vec3(ribbonSide * 0.02, 0.0, 0.0);
-
-    // Color shows t gradient
-    vec3 color = vec3(t, sin(phase) * 0.5 + 0.5, 0.5);
+    // Color based on position along trail
+    vec3 color = vec3(1.0 - t, 0.5, t);  // Gradient from red to blue
 
     transformedPosition = finalPos;
     vertexColor = vec4(color, 1.0);
