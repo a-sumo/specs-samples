@@ -26,6 +26,9 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    _gridSizeX: false
+    _gridSizeY: false
+    _gridSpacing: false
     _length: false
     _lengthSegments: false
     _radialSegments: false
@@ -45,6 +48,9 @@
       _radialSegments: !<float> 8.000000
       _radius: 0.100000
       _length: !<float> 5.000000
+      _gridSizeX: !<float> 5.000000
+      _gridSizeY: !<float> 5.000000
+      _gridSpacing: 1.500000
   ScriptTypes:
     -
       {}
@@ -54,3 +60,6 @@
     - '// @input float _radialSegments = 8 {"hint":"Segments around tube circumference", "widget":"slider", "min":3, "max":16, "step":1}'
     - '// @input float _radius = 0.1 {"hint":"Tube radius", "widget":"slider", "min":0.05, "max":0.5, "step":0.01}'
     - '// @input float _length = 5 {"hint":"Tube length", "widget":"slider", "min":1, "max":10, "step":0.5}'
+    - '// @input float _gridSizeX = 5 {"hint":"Grid size X", "widget":"slider", "min":1, "max":10, "step":1}'
+    - '// @input float _gridSizeY = 5 {"hint":"Grid size Y", "widget":"slider", "min":1, "max":10, "step":1}'
+    - '// @input float _gridSpacing = 1.5 {"hint":"Spacing between tubes", "widget":"slider", "min":0.5, "max":5, "step":0.1}'

@@ -29,6 +29,21 @@ export class TubeTest extends BaseScriptComponent {
     @hint("Tube length")
     private _length: number = 5.0;
 
+    @input
+    @widget(new SliderWidget(1, 10, 1))
+    @hint("Grid size X")
+    private _gridSizeX: number = 5;
+
+    @input
+    @widget(new SliderWidget(1, 10, 1))
+    @hint("Grid size Y")
+    private _gridSizeY: number = 5;
+
+    @input
+    @widget(new SliderWidget(0.5, 5.0, 0.1))
+    @hint("Spacing between tubes")
+    private _gridSpacing: number = 1.5;
+
     private meshBuilder!: MeshBuilder;
     private meshVisual!: RenderMeshVisual;
     private mainPass: Pass;
@@ -57,17 +72,21 @@ export class TubeTest extends BaseScriptComponent {
         if (!this.mainPass) return;
         this.mainPass.TubeRadius = this._radius;
         this.mainPass.TubeLength = this._length;
+        this.mainPass.GridSpacing = this._gridSpacing;
+        // ObjectPosition, ObjectRotation, ObjectScale wired in graph
     }
 
     private generateTube(): void {
-        // GPU deformation approach:
-        // - Encode parametric data (t, angle) in vertices
-        // - GPU computes actual positions via sine path + perpendicular frame
+        // GPU deformation approach for grid of tubes:
+        // - Encode parametric data + grid position in vertices
+        // - GPU computes actual positions via unique sine path per tube
         //
         // Encoding:
-        //   position.y = t (0-1 along tube length)
-        //   normal.x = angle (0-1 around tube, -1 for cap centers)
-        //   normal.y = 1 for tube vertices, 0 for cap centers
+        //   position.x = gridX (grid index)
+        //   position.y = gridY (grid index)
+        //   position.z = t (0-1 along tube length)
+        //   normal.z = 1 for tube vertices, 0 for cap centers
+        //   texture0 = (localX, localY) unit circle coords
 
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
@@ -78,42 +97,59 @@ export class TubeTest extends BaseScriptComponent {
         this.meshBuilder.topology = MeshTopology.Triangles;
         this.meshBuilder.indexType = MeshIndexType.UInt16;
 
-        const pathLength = this._lengthSegments + 1;  // Number of rings
+        const pathLength = this._lengthSegments + 1;
         const circleSegments = this._radialSegments;
 
-        // Generate tube body vertices with local frame encoding
-        // Store actual object-space positions so transforms work correctly
+        let totalTubes = 0;
+
+        // Generate grid of tubes
+        for (let gx = 0; gx < this._gridSizeX; gx++) {
+            for (let gy = 0; gy < this._gridSizeY; gy++) {
+                this.generateSingleTube(gx, gy, pathLength, circleSegments);
+                totalTubes++;
+            }
+        }
+
+        if (this.meshBuilder.isValid()) {
+            this.meshVisual.mesh = this.meshBuilder.getMesh();
+            this.meshBuilder.updateMesh();
+
+            print("TubeTest: Generated " + totalTubes + " tubes (" +
+                  this._gridSizeX + "x" + this._gridSizeY + " grid), " +
+                  this.meshBuilder.getVerticesCount() + " total vertices");
+        } else {
+            print("TubeTest: ERROR - mesh not valid!");
+        }
+    }
+
+    private generateSingleTube(gridX: number, gridY: number, pathLength: number, circleSegments: number): void {
+        const startVertexIndex = this.meshBuilder.getVerticesCount();
+
+        // Generate tube body vertices
         for (let i = 0; i < pathLength; i++) {
-            const t = i / (pathLength - 1);  // 0 to 1 along tube
-            const z = t * this._length;      // actual Z position in object space
+            const t = i / (pathLength - 1);
 
             for (let j = 0; j < circleSegments; j++) {
                 const theta = (j / circleSegments) * Math.PI * 2;
-                const localX = Math.cos(theta);  // -1 to 1
-                const localY = Math.sin(theta);  // -1 to 1
-
-                // Position: actual object-space coords (x=localX*radius, y=localY*radius, z)
-                // This allows object transforms to work correctly
-                const x = localX * this._radius;
-                const y = localY * this._radius;
+                const localX = Math.cos(theta);
+                const localY = Math.sin(theta);
 
                 this.meshBuilder.appendVerticesInterleaved([
-                    x, y, z,               // position: actual object-space position
+                    gridX, gridY, t,       // position: gridX, gridY, t
                     localX, localY, 1.0,   // normal: localX, localY, isTube=1
-                    localX, localY         // texture0: unit circle coords for GPU deformation
+                    localX, localY         // texture0: unit circle coords
                 ]);
             }
         }
 
-        // Generate indices (flipped winding for correct face culling)
+        // Generate indices for tube body
         for (let segment = 0; segment < pathLength - 1; segment++) {
             for (let i = 0; i < circleSegments; i++) {
-                const current = segment * circleSegments + i;
-                const next = segment * circleSegments + ((i + 1) % circleSegments);
-                const currentNext = (segment + 1) * circleSegments + i;
-                const nextNext = (segment + 1) * circleSegments + ((i + 1) % circleSegments);
+                const current = startVertexIndex + segment * circleSegments + i;
+                const next = startVertexIndex + segment * circleSegments + ((i + 1) % circleSegments);
+                const currentNext = startVertexIndex + (segment + 1) * circleSegments + i;
+                const nextNext = startVertexIndex + (segment + 1) * circleSegments + ((i + 1) % circleSegments);
 
-                // Flipped winding order
                 this.meshBuilder.appendIndices([
                     current, next, currentNext,
                     next, nextNext, currentNext
@@ -121,65 +157,40 @@ export class TubeTest extends BaseScriptComponent {
             }
         }
 
-        // Generate flat end caps
-        this.generateEndCaps(pathLength, circleSegments);
-
-        if (this.meshBuilder.isValid()) {
-            // CRITICAL: This order matches VolumetricLine.ts
-            this.meshVisual.mesh = this.meshBuilder.getMesh();
-            this.meshBuilder.updateMesh();
-
-            const tubeVerts = pathLength * circleSegments;
-            const capVerts = 2;  // 2 center vertices for caps
-            const totalVerts = tubeVerts + capVerts;
-            const tubeTris = (pathLength - 1) * circleSegments * 2;
-            const capTris = circleSegments * 2;  // triangles for both caps
-            print("TubeTest: Generated " + totalVerts + " vertices, " + (tubeTris + capTris) + " triangles");
-        } else {
-            print("TubeTest: ERROR - mesh not valid!");
-        }
+        // Generate end caps for this tube
+        this.generateSingleTubeCaps(gridX, gridY, startVertexIndex, pathLength, circleSegments);
     }
 
-    private generateEndCaps(pathLength: number, circleSegments: number): void {
+    private generateSingleTubeCaps(gridX: number, gridY: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
         const tubeVertexCount = pathLength * circleSegments;
 
-        // ========================================
-        // START CAP (at z = 0)
-        // ========================================
+        // START CAP (at t = 0)
+        const startCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 0.0,         // position: center at z=0
+            gridX, gridY, 0.0,     // position: gridX, gridY, t=0
             0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
-            0.0, 0.0               // texture0: localX=0, localY=0
+            0.0, 0.0               // texture0: center
         ]);
 
-        const startCenterIndex = tubeVertexCount;
-
         for (let i = 0; i < circleSegments; i++) {
-            const current = i;
-            const next = (i + 1) % circleSegments;
-            this.meshBuilder.appendIndices([
-                startCenterIndex, next, current
-            ]);
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            this.meshBuilder.appendIndices([startCapIndex, next, current]);
         }
 
-        // ========================================
-        // END CAP (at z = length)
-        // ========================================
+        // END CAP (at t = 1)
+        const endCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, this._length,  // position: center at z=length
-            0.0, 0.0, 0.0,           // normal: 0,0,0 = cap center
-            0.0, 0.0                 // texture0: localX=0, localY=0
+            gridX, gridY, 1.0,     // position: gridX, gridY, t=1
+            0.0, 0.0, 0.0,         // normal: 0,0,0 = cap center
+            0.0, 0.0               // texture0: center
         ]);
 
-        const endCenterIndex = tubeVertexCount + 1;
-        const lastRingStart = (pathLength - 1) * circleSegments;
-
+        const lastRingStart = startVertexIndex + (pathLength - 1) * circleSegments;
         for (let i = 0; i < circleSegments; i++) {
             const current = lastRingStart + i;
-            const next = lastRingStart + ((i + 1) % circleSegments);
-            this.meshBuilder.appendIndices([
-                endCenterIndex, current, next
-            ]);
+            const next = lastRingStart + (i + 1) % circleSegments;
+            this.meshBuilder.appendIndices([endCapIndex, current, next]);
         }
     }
 
@@ -208,4 +219,22 @@ export class TubeTest extends BaseScriptComponent {
 
     get length(): number { return this._length; }
     set length(value: number) { this._length = value; }
+
+    get gridSizeX(): number { return this._gridSizeX; }
+    set gridSizeX(value: number) {
+        this._gridSizeX = Math.max(1, Math.floor(value));
+        this.refresh();
+    }
+
+    get gridSizeY(): number { return this._gridSizeY; }
+    set gridSizeY(value: number) {
+        this._gridSizeY = Math.max(1, Math.floor(value));
+        this.refresh();
+    }
+
+    get gridSpacing(): number { return this._gridSpacing; }
+    set gridSpacing(value: number) {
+        this._gridSpacing = value;
+        this.refresh();
+    }
 }

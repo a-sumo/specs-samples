@@ -1013,7 +1013,7 @@
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: -50.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 90.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
   Children:
@@ -2007,8 +2007,8 @@
       material: !<reference.Material> 06598390-3698-4de8-ae96-21316ae6e046
       _lengthSegments: !<float> 12.000000
       _radialSegments: !<float> 12.000000
-      _radius: 0.500000
-      _length: !<float> 1.000000
+      _radius: 0.180000
+      _length: !<float> 10.000000
   ScriptTypes:
     "":
       {}
