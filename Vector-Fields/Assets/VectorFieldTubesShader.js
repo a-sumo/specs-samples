@@ -7,6 +7,7 @@
 //   normal.z = 1 for tube vertices, 0 for cap centers
 //   texture0 = (localX, localY) unit circle coords for cross-section
 //   texture1 = (startX, startZ) starting position in XZ plane
+//   texture2.x = startY starting Y position
 
 input_float TubeRadius;
 input_float StepSize;
@@ -224,6 +225,7 @@ void main() {
     vec3 inNormal = system.getSurfaceNormalObjectSpace();
     vec2 inUV0 = system.getSurfaceUVCoord0();
     vec2 inUV1 = system.getSurfaceUVCoord1();
+    vec2 inUV2 = system.getSurfaceUVCoord2();
 
     // Decode vertex data
     float t = inPos.z;
@@ -231,6 +233,7 @@ void main() {
     float localY = inUV0.y;
     float startX = inUV1.x;
     float startZ = inUV1.y;
+    float startY = inUV2.x;
     float radius = TubeRadius;
 
     // Cap centers
@@ -245,9 +248,9 @@ void main() {
     int stepIndex = int(t * NumSteps + 0.5);
 
     // ========================================
-    // START AT GRID POSITION (XZ plane, Y=0)
+    // START AT 3D GRID POSITION
     // ========================================
-    vec3 pos = vec3(startX, 0.0, startZ);
+    vec3 pos = vec3(startX, startY, startZ);
     vec3 prevPos = pos;
 
     // ========================================

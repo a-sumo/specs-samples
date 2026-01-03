@@ -26,7 +26,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     @input
     @widget(new SliderWidget(1, 10, 1))
-    @hint("Grid size (NxN)")
+    @hint("Grid size (NxNxN)")
     private _gridSize: number = 5;
 
     @input
@@ -84,7 +84,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.generateMesh();
         this.updateMaterialParams();
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
-        print("VectorFieldTubes: Initialized " + (this._gridSize * this._gridSize) + " tubes");
+        print("VectorFieldTubes: Initialized " + (this._gridSize * this._gridSize * this._gridSize) + " tubes");
     }
 
     private setupMeshVisual(): void {
@@ -142,12 +142,14 @@ export class VectorFieldTubes extends BaseScriptComponent {
         //   normal.z = 1 for tube vertices, 0 for cap centers
         //   texture0 = (localX, localY) unit circle coords
         //   texture1 = (startX, startZ) starting position in XZ plane
+        //   texture2 = (startY) starting Y position
 
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
             { name: "normal", components: 3 },
             { name: "texture0", components: 2 },
             { name: "texture1", components: 2 },
+            { name: "texture2", components: 1 },
         ]);
 
         this.meshBuilder.topology = MeshTopology.Triangles;
@@ -158,14 +160,17 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
         let totalTubes = 0;
 
-        // Generate 2D grid of tubes in XZ plane (centered around origin)
+        // Generate 3D grid of tubes (centered around origin)
         const halfExtent = (this._gridSize - 1) * this._gridSpacing / 2;
         for (let gx = 0; gx < this._gridSize; gx++) {
-            for (let gz = 0; gz < this._gridSize; gz++) {
-                const startX = -halfExtent + gx * this._gridSpacing;
-                const startZ = -halfExtent + gz * this._gridSpacing;
-                this.generateSingleTube(startX, startZ, pathLength, circleSegments);
-                totalTubes++;
+            for (let gy = 0; gy < this._gridSize; gy++) {
+                for (let gz = 0; gz < this._gridSize; gz++) {
+                    const startX = -halfExtent + gx * this._gridSpacing;
+                    const startY = -halfExtent + gy * this._gridSpacing;
+                    const startZ = -halfExtent + gz * this._gridSpacing;
+                    this.generateSingleTube(startX, startY, startZ, pathLength, circleSegments);
+                    totalTubes++;
+                }
             }
         }
 
@@ -179,7 +184,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
         }
     }
 
-    private generateSingleTube(startX: number, startZ: number, pathLength: number, circleSegments: number): void {
+    private generateSingleTube(startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
         const startVertexIndex = this.meshBuilder.getVerticesCount();
 
         // Generate tube body vertices
@@ -195,7 +200,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
                     0.0, 0.0, t,           // position: unused, unused, t (step index)
                     0.0, 0.0, 1.0,         // normal: unused, unused, isTube=1
                     localX, localY,        // texture0: unit circle coords
-                    startX, startZ         // texture1: starting position XZ
+                    startX, startZ,        // texture1: starting position XZ
+                    startY                 // texture2: starting position Y
                 ]);
             }
         }
@@ -216,17 +222,18 @@ export class VectorFieldTubes extends BaseScriptComponent {
         }
 
         // Generate end caps
-        this.generateSingleTubeCaps(startX, startZ, startVertexIndex, pathLength, circleSegments);
+        this.generateSingleTubeCaps(startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
     }
 
-    private generateSingleTubeCaps(startX: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
+    private generateSingleTubeCaps(startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
         // START CAP (at t = 0)
         const startCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
             0.0, 0.0, 0.0,         // position: t=0
             0.0, 0.0, 0.0,         // normal: isCap=0
             0.0, 0.0,              // texture0: center
-            startX, startZ         // texture1: starting position XZ
+            startX, startZ,        // texture1: starting position XZ
+            startY                 // texture2: starting position Y
         ]);
 
         for (let i = 0; i < circleSegments; i++) {
@@ -241,7 +248,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
             0.0, 0.0, 1.0,         // position: t=1
             0.0, 0.0, 0.0,         // normal: isCap=0
             0.0, 0.0,              // texture0: center
-            startX, startZ         // texture1: starting position XZ
+            startX, startZ,        // texture1: starting position XZ
+            startY                 // texture2: starting position Y
         ]);
 
         const lastRingStart = startVertexIndex + (pathLength - 1) * circleSegments;
