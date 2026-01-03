@@ -6,17 +6,14 @@
 //   position.z = t (0-1, maps to step index for integration)
 //   normal.z = 1 for tube vertices, 0 for cap centers
 //   texture0 = (localX, localY) unit circle coords for cross-section
-//   texture1 = (startX, startY) starting position of this tube
+//   texture1 = (startX, startZ) starting position in XZ plane
 
 input_float TubeRadius;
 input_float StepSize;
 input_float NumSteps;
 input_float FieldScale;
 input_int Preset;
-
 input_vec3 TargetPosition;
-input_vec3 ColliderCenter;
-input_vec3 ColliderHalfExtents;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
@@ -106,22 +103,73 @@ vec3 curlNoise(vec3 p) {
 }
 
 // ========================================
-// COLLIDER BOUNDS CHECK
+// VECTOR FIELD PRESETS
 // ========================================
-float insideBox(vec3 p) {
-    vec3 d = abs(p - ColliderCenter) - ColliderHalfExtents;
-    // Returns 1.0 inside, 0.0 outside, smooth falloff at boundary
-    float outside = length(max(d, 0.0));
-    return 1.0 - smoothstep(0.0, 0.5, outside);
+
+// 0: Expansion - radial waves expanding from target with 3D oscillation
+vec3 fieldExpansion(vec3 p) {
+    vec3 rel = p - TargetPosition;
+    float dist = length(rel);
+    float s = FieldScale;
+
+    // Radial direction with sinusoidal modulation
+    vec3 radial = (dist > 0.001) ? rel / dist : vec3(0.0, 1.0, 0.0);
+    float wave = sin(dist * s * 2.0) * 0.5 + 0.5;
+
+    // Add perpendicular oscillation for 3D interest
+    vec3 perp = vec3(
+        sin(rel.y * s) * cos(rel.z * s),
+        sin(rel.z * s) * cos(rel.x * s),
+        sin(rel.x * s) * cos(rel.y * s)
+    );
+
+    return (radial * wave + perp * 0.3) * 0.4;
 }
 
-// ========================================
-// VECTOR FIELD PRESETS
-// Field is static - moving TargetPosition changes the field
-// Only active inside collider bounds
-// ========================================
+// 1: Contraction - spiraling inward toward target
+vec3 fieldContraction(vec3 p) {
+    vec3 rel = p - TargetPosition;
+    float dist = length(rel);
+    float s = FieldScale;
 
-// 0: Waves - sinusoidal interference
+    // Inward direction
+    vec3 inward = (dist > 0.001) ? -rel / dist : vec3(0.0);
+    float wave = sin(dist * s * 2.0) * 0.3 + 0.7;
+
+    // Add spiral/twist component
+    vec3 twist = vec3(
+        sin(rel.z * s + rel.y * s * 0.5),
+        cos(rel.x * s + rel.z * s * 0.5),
+        sin(rel.y * s + rel.x * s * 0.5)
+    );
+
+    return (inward * wave + twist * 0.25) * 0.4;
+}
+
+// 2: Circulation - 3D swirling vortex around target
+vec3 fieldCirculation(vec3 p) {
+    vec3 rel = p - TargetPosition;
+    float s = FieldScale;
+
+    // Rotation in XZ plane
+    float distXZ = length(vec2(rel.x, rel.z));
+    vec3 tangentXZ = (distXZ > 0.001) ? vec3(-rel.z, 0.0, rel.x) / distXZ : vec3(1.0, 0.0, 0.0);
+
+    // Rotation in XY plane
+    float distXY = length(vec2(rel.x, rel.y));
+    vec3 tangentXY = (distXY > 0.001) ? vec3(-rel.y, rel.x, 0.0) / distXY : vec3(0.0, 1.0, 0.0);
+
+    // Combine rotations with distance-based mixing and wave modulation
+    float wave = sin(length(rel) * s) * 0.5 + 0.5;
+    vec3 combined = mix(tangentXZ, tangentXY, sin(rel.y * s) * 0.5 + 0.5);
+
+    // Add vertical oscillation
+    combined.y += sin(rel.x * s) * cos(rel.z * s) * 0.4;
+
+    return combined * wave * 0.45;
+}
+
+// 3: Waves - sinusoidal interference centered on target
 vec3 fieldWaves(vec3 p) {
     vec3 rel = p - TargetPosition;
     float s = FieldScale;
@@ -132,17 +180,15 @@ vec3 fieldWaves(vec3 p) {
     ) * 0.35;
 }
 
-// 1: Vortex - multiple rotating cells
+// 4: Vortex - rotating cells centered on target
 vec3 fieldVortex(vec3 p) {
     vec3 rel = p - TargetPosition;
     float s = FieldScale * 0.7;
 
-    // Create vortex pattern using sin/cos
     float vx = sin(rel.z * s) * cos(rel.y * s * 0.5);
     float vy = sin(rel.x * s) * cos(rel.z * s * 0.5);
     float vz = sin(rel.y * s) * cos(rel.x * s * 0.5);
 
-    // Add rotation around target
     float angle = atan(rel.z, rel.x);
     vec3 spin = vec3(-sin(angle), 0.0, cos(angle)) * 0.3;
 
@@ -150,23 +196,24 @@ vec3 fieldVortex(vec3 p) {
 }
 
 vec3 getField(vec3 p) {
-    float inside = insideBox(p);
-    if (inside < 0.001) return vec3(0.0);
-
-    vec3 field;
-    if (Preset == 0) field = fieldWaves(p);
-    else field = fieldVortex(p);
-
-    return field * inside;
+    if (Preset == 0) return fieldExpansion(p);
+    if (Preset == 1) return fieldContraction(p);
+    if (Preset == 2) return fieldCirculation(p);
+    if (Preset == 3) return fieldWaves(p);
+    if (Preset == 4) return fieldVortex(p);
+    return fieldWaves(p);
 }
 
 // ========================================
 // COLOR BASED ON VELOCITY
 // ========================================
 vec3 getColor(vec3 vel, float t) {
-    vec3 baseColor = (Preset == 0)
-        ? vec3(0.2, 0.9, 0.6)   // Green - waves
-        : vec3(0.9, 0.3, 0.5);  // Pink - vortex
+    vec3 baseColor;
+    if (Preset == 0) baseColor = vec3(0.9, 0.5, 0.2);      // Orange - expansion
+    else if (Preset == 1) baseColor = vec3(0.3, 0.5, 0.9); // Blue - contraction
+    else if (Preset == 2) baseColor = vec3(0.8, 0.3, 0.8); // Purple - circulation
+    else if (Preset == 3) baseColor = vec3(0.2, 0.9, 0.6); // Green - waves
+    else baseColor = vec3(0.9, 0.3, 0.5);                  // Pink - vortex
 
     vec3 velColor = abs(normalize(vel + 0.001)) * 0.3;
     return mix(baseColor, baseColor + velColor, 0.5);
@@ -183,7 +230,7 @@ void main() {
     float localX = inUV0.x;
     float localY = inUV0.y;
     float startX = inUV1.x;
-    float startY = inUV1.y;
+    float startZ = inUV1.y;
     float radius = TubeRadius;
 
     // Cap centers
@@ -198,10 +245,9 @@ void main() {
     int stepIndex = int(t * NumSteps + 0.5);
 
     // ========================================
-    // START AT GRID POSITION
-    // Field changes when TargetPosition moves
+    // START AT GRID POSITION (XZ plane, Y=0)
     // ========================================
-    vec3 pos = vec3(startX, 0.0, startY);
+    vec3 pos = vec3(startX, 0.0, startZ);
     vec3 prevPos = pos;
 
     // ========================================

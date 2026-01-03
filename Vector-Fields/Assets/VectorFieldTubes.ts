@@ -26,13 +26,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     @input
     @widget(new SliderWidget(1, 10, 1))
-    @hint("Grid size X")
-    private _gridSizeX: number = 5;
-
-    @input
-    @widget(new SliderWidget(1, 10, 1))
-    @hint("Grid size Y")
-    private _gridSizeY: number = 5;
+    @hint("Grid size (NxN)")
+    private _gridSize: number = 5;
 
     @input
     @widget(new SliderWidget(0.5, 5.0, 0.1))
@@ -55,22 +50,23 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     @input
     @widget(new ComboBoxWidget([
-        new ComboBoxItem("Waves", 0),
-        new ComboBoxItem("Vortex", 1)
+        new ComboBoxItem("Expansion", 0),
+        new ComboBoxItem("Contraction", 1),
+        new ComboBoxItem("Circulation", 2),
+        new ComboBoxItem("Waves", 3),
+        new ComboBoxItem("Vortex", 4)
     ]))
-    @hint("Vector field type - move target object to animate")
+    @hint("Vector field type")
     private _preset: number = 0;
 
-    // ============ TARGET OBJECT ============
+    // ============ TRACKED OBJECT ============
 
     @input
-    @hint("Target object - field centers/orients around this object")
-    targetObject: SceneObject;
-
-    // ============ FIELD BOUNDS ============
+    @hint("Object that affects the field - field reacts to its position")
+    trackedObject: SceneObject;
 
     @input
-    @hint("Box collider defining field bounds - field only active inside")
+    @hint("Box collider - field only animates when tracked object is inside")
     fieldCollider: ColliderComponent;
 
     // ============ MATERIAL ============
@@ -88,7 +84,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.generateMesh();
         this.updateMaterialParams();
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
-        print("VectorFieldTubes: Initialized " + (this._gridSizeX * this._gridSizeY) + " tubes");
+        print("VectorFieldTubes: Initialized " + (this._gridSize * this._gridSize) + " tubes");
     }
 
     private setupMeshVisual(): void {
@@ -101,6 +97,27 @@ export class VectorFieldTubes extends BaseScriptComponent {
         }
     }
 
+    private lastValidTargetPos: vec3 = new vec3(0, 0, 0);
+
+    private isInsideCollider(pos: vec3): boolean {
+        if (!this.fieldCollider) return true;
+
+        // Use this script's scene object as the center (moves with manipulation)
+        const center = this.sceneObject.getTransform().getWorldPosition();
+        const worldScale = this.sceneObject.getTransform().getWorldScale();
+        const shape = this.fieldCollider.shape as BoxShape;
+
+        const halfExtents = new vec3(
+            shape.size.x * 0.5 * worldScale.x,
+            shape.size.y * 0.5 * worldScale.y,
+            shape.size.z * 0.5 * worldScale.z
+        );
+
+        return Math.abs(pos.x - center.x) <= halfExtents.x &&
+               Math.abs(pos.y - center.y) <= halfExtents.y &&
+               Math.abs(pos.z - center.z) <= halfExtents.z;
+    }
+
     private updateMaterialParams(): void {
         if (!this.mainPass) return;
         this.mainPass.TubeRadius = this._radius;
@@ -109,31 +126,14 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.FieldScale = this._fieldScale;
         this.mainPass.Preset = this._preset;
 
-        // Pass target position to shader - moving this animates the field
-        if (this.targetObject) {
-            this.mainPass.TargetPosition = this.targetObject.getTransform().getWorldPosition();
-        } else {
-            this.mainPass.TargetPosition = new vec3(0, 0, 0);
+        // Only update target position if inside collider bounds
+        if (this.trackedObject) {
+            const pos = this.trackedObject.getTransform().getWorldPosition();
+            if (this.isInsideCollider(pos)) {
+                this.lastValidTargetPos = pos;
+            }
         }
-
-        // Pass collider bounds to shader
-        if (this.fieldCollider) {
-            const colliderTransform = this.fieldCollider.getSceneObject().getTransform();
-            this.mainPass.ColliderCenter = colliderTransform.getWorldPosition();
-
-            // Get box shape size, apply world scale, convert to half-extents
-            const shape = this.fieldCollider.shape as BoxShape;
-            const worldScale = colliderTransform.getWorldScale();
-            this.mainPass.ColliderHalfExtents = new vec3(
-                shape.size.x * 0.5 * worldScale.x,
-                shape.size.y * 0.5 * worldScale.y,
-                shape.size.z * 0.5 * worldScale.z
-            );
-        } else {
-            // No collider = field everywhere (huge bounds)
-            this.mainPass.ColliderCenter = new vec3(0, 0, 0);
-            this.mainPass.ColliderHalfExtents = new vec3(1000, 1000, 1000);
-        }
+        this.mainPass.TargetPosition = this.lastValidTargetPos;
     }
 
     private generateMesh(): void {
@@ -141,7 +141,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
         //   position.z = t (0-1 along tube, used for integration step index)
         //   normal.z = 1 for tube vertices, 0 for cap centers
         //   texture0 = (localX, localY) unit circle coords
-        //   texture1 = (gridX, gridY) starting position
+        //   texture1 = (startX, startZ) starting position in XZ plane
 
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
@@ -158,14 +158,13 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
         let totalTubes = 0;
 
-        // Generate grid of tubes (centered around origin)
-        const offsetX = (this._gridSizeX - 1) / 2;
-        const offsetY = (this._gridSizeY - 1) / 2;
-        for (let gx = 0; gx < this._gridSizeX; gx++) {
-            for (let gy = 0; gy < this._gridSizeY; gy++) {
-                const startX = (gx - offsetX) * this._gridSpacing;
-                const startY = (gy - offsetY) * this._gridSpacing;
-                this.generateSingleTube(startX, startY, pathLength, circleSegments);
+        // Generate 2D grid of tubes in XZ plane (centered around origin)
+        const halfExtent = (this._gridSize - 1) * this._gridSpacing / 2;
+        for (let gx = 0; gx < this._gridSize; gx++) {
+            for (let gz = 0; gz < this._gridSize; gz++) {
+                const startX = -halfExtent + gx * this._gridSpacing;
+                const startZ = -halfExtent + gz * this._gridSpacing;
+                this.generateSingleTube(startX, startZ, pathLength, circleSegments);
                 totalTubes++;
             }
         }
@@ -180,7 +179,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
         }
     }
 
-    private generateSingleTube(startX: number, startY: number, pathLength: number, circleSegments: number): void {
+    private generateSingleTube(startX: number, startZ: number, pathLength: number, circleSegments: number): void {
         const startVertexIndex = this.meshBuilder.getVerticesCount();
 
         // Generate tube body vertices
@@ -196,7 +195,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
                     0.0, 0.0, t,           // position: unused, unused, t (step index)
                     0.0, 0.0, 1.0,         // normal: unused, unused, isTube=1
                     localX, localY,        // texture0: unit circle coords
-                    startX, startY         // texture1: starting position
+                    startX, startZ         // texture1: starting position XZ
                 ]);
             }
         }
@@ -217,17 +216,17 @@ export class VectorFieldTubes extends BaseScriptComponent {
         }
 
         // Generate end caps
-        this.generateSingleTubeCaps(startX, startY, startVertexIndex, pathLength, circleSegments);
+        this.generateSingleTubeCaps(startX, startZ, startVertexIndex, pathLength, circleSegments);
     }
 
-    private generateSingleTubeCaps(startX: number, startY: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
+    private generateSingleTubeCaps(startX: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
         // START CAP (at t = 0)
         const startCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
             0.0, 0.0, 0.0,         // position: t=0
             0.0, 0.0, 0.0,         // normal: isCap=0
             0.0, 0.0,              // texture0: center
-            startX, startY         // texture1: starting position
+            startX, startZ         // texture1: starting position XZ
         ]);
 
         for (let i = 0; i < circleSegments; i++) {
@@ -242,7 +241,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
             0.0, 0.0, 1.0,         // position: t=1
             0.0, 0.0, 0.0,         // normal: isCap=0
             0.0, 0.0,              // texture0: center
-            startX, startY         // texture1: starting position
+            startX, startZ         // texture1: starting position XZ
         ]);
 
         const lastRingStart = startVertexIndex + (pathLength - 1) * circleSegments;
@@ -268,18 +267,18 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     /**
      * Set preset from normalized value (0-1)
-     * Maps to presets 0-1 (Waves, Vortex)
+     * Maps to presets 0-4 (Expansion, Contraction, Circulation, Waves, Vortex)
      */
     public setPresetNormalized(value: number): void {
-        this._preset = Math.floor(Math.min(0.999, Math.max(0, value)) * 2);
+        this._preset = Math.floor(Math.min(0.999, Math.max(0, value)) * 5);
     }
 
     /**
-     * Set preset by index (0-1)
-     * 0=Waves, 1=Vortex
+     * Set preset by index (0-4)
+     * 0=Expansion, 1=Contraction, 2=Circulation, 3=Waves, 4=Vortex
      */
     public setPreset(index: number): void {
-        this._preset = Math.floor(Math.min(1, Math.max(0, index)));
+        this._preset = Math.floor(Math.min(4, Math.max(0, index)));
     }
 
     /**
@@ -322,15 +321,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
     get radius(): number { return this._radius; }
     set radius(value: number) { this._radius = value; }
 
-    get gridSizeX(): number { return this._gridSizeX; }
-    set gridSizeX(value: number) {
-        this._gridSizeX = Math.max(1, Math.floor(value));
-        this.refresh();
-    }
-
-    get gridSizeY(): number { return this._gridSizeY; }
-    set gridSizeY(value: number) {
-        this._gridSizeY = Math.max(1, Math.floor(value));
+    get gridSize(): number { return this._gridSize; }
+    set gridSize(value: number) {
+        this._gridSize = Math.max(1, Math.floor(value));
         this.refresh();
     }
 

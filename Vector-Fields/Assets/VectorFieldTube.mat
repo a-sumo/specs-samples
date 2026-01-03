@@ -4,15 +4,33 @@
     - !<own> f95f928d-9c3b-4080-8128-1a43caebb8f6
 - !<PassInfo/f95f928d-9c3b-4080-8128-1a43caebb8f6>
   CachedProperties:
+    - ColliderCenter:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - ColliderHalfExtents:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - FieldCenter:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - InfluenceRadius:
         typeIdx: 1
         value: 1.000000
     - ObjectPosition:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - Port_ColliderCenter_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_ColliderHalfExtents_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
+    - Port_FieldCenter_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_FieldScale_N000:
         typeIdx: 1
         value: 0.000000
@@ -118,6 +136,9 @@
     - TrackingBlend:
         typeIdx: 1
         value: 1.000000
+    - Tweak_N10:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Tweak_N12:
         typeIdx: 1
         value: 1.000000
@@ -136,6 +157,9 @@
     - Tweak_N8:
         typeIdx: 1
         value: 1.000000
+    - Tweak_N9:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
