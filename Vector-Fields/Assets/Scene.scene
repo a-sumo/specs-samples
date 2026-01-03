@@ -4,6 +4,7 @@
     - !<own> 00000000-0000-0065-0000-000000000064
     - !<own> 0005641c-028d-459a-0000-000000014b4d
     - !<own> 5aa0f98b-e799-448c-a2dc-cae5d04fa2a4
+    - !<own> 6adb9a2c-1a58-42c4-a284-ad60b866f748
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       []
@@ -1318,6 +1319,37 @@
     - !<own> eeefed81-5683-4d40-9498-fd8984e6e8f6
   Components:
     []
+- !<ScriptComponent/5b8f5183-dcc9-48a7-babc-8d52cba1c35b>
+  PrefabRemaps:
+    []
+  Name: VectorFieldController
+  Enabled: true
+  ScriptAsset: !<reference> 285bda02-acc2-4ba9-a938-046eb13d1a50
+  ScriptInputsDefault:
+    _numTrails: true
+    _preset: true
+    autoAnimate: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _fieldSize: !<float> 1.000000
+      _numTrails: !<float> 400.000000
+      _segmentsPerTrail: !<float> 36.000000
+      _lineWidth: 3.500000
+      material: !<reference.Material> fe5ea0e7-e546-4875-b330-5b58e0748cbb
+      _preset: !<float> 0.000000
+      _speed: !<float> 3.000000
+      _fieldScale: !<float> 3.000000
+      _stepSize: 0.270000
+      _brightness: 2.500000
+      _fadeStart: !<float> 1.000000
+      _trailLength: !<float> 1.000000
+      autoAnimate: true
+      timeMultiplier: !<float> 5.000000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/5d0fd01d-a7f6-432e-b50e-d0c6a689b942>
   PrefabRemaps:
     []
@@ -1399,6 +1431,21 @@
     - !<own> ec5cf781-7365-4db2-83df-e3d10556ffd3
   Components:
     []
+- !<SceneObject/6adb9a2c-1a58-42c4-a284-ad60b866f748>
+  PrefabRemaps:
+    []
+  Name: VectorFieldController
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: -50.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 5b8f5183-dcc9-48a7-babc-8d52cba1c35b
 - !<SceneObject/6bf04e34-6299-4f27-8f48-259345a32666>
   PrefabRemaps:
     []
