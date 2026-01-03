@@ -26,13 +26,17 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    _fieldScale: false
     _gridSizeX: false
     _gridSizeY: false
     _gridSpacing: false
     _lengthSegments: false
+    _preset: false
     _radialSegments: false
     _radius: false
     _stepSize: false
+    _timeSpeed: false
+    autoAnimate: false
     material: false
   ScriptTypesHidden:
     {}
@@ -50,6 +54,10 @@
       _gridSizeY: !<float> 5.000000
       _gridSpacing: !<float> 1.000000
       _stepSize: 0.100000
+      _fieldScale: !<float> 1.000000
+      _preset: !<float> 0.000000
+      autoAnimate: true
+      _timeSpeed: !<float> 1.000000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
@@ -62,4 +70,8 @@
     - '// @input float _gridSizeY = 5 {"hint":"Grid size Y", "widget":"slider", "min":1, "max":10, "step":1}'
     - '// @input float _gridSpacing = 1 {"hint":"Spacing between tube start positions", "widget":"slider", "min":0.5, "max":5, "step":0.1}'
     - '// @input float _stepSize = 0.1 {"hint":"Step size for vector field integration", "widget":"slider", "min":0.01, "max":0.5, "step":0.01}'
+    - '// @input float _fieldScale = 1 {"hint":"Field noise/frequency scale", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
+    - '// @input float _preset {"hint":"Vector field type", "widget":"combobox", "values":[{"label":"Curl Noise", "value":0}, {"label":"Tornado", "value":1}, {"label":"Attractor", "value":2}, {"label":"Waves", "value":3}, {"label":"Lorenz", "value":4}, {"label":"Helix", "value":5}]}'
+    - '// @input bool autoAnimate = true {"hint":"Auto-animate time"}'
+    - '// @input float _timeSpeed = 1 {"hint":"Animation speed", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
     - '// @input Asset.Material material {"hint":"Material with VectorFieldTubesShader.js"}'

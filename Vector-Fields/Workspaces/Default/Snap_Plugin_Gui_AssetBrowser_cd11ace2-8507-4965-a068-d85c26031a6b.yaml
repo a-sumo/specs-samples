@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 451
+    size: 453
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
@@ -438,6 +438,8 @@ CollapsedEntities:
       - TubeTestShader.js
       - Vector-Field.mat
       - Vector-Field.ss_graph
+      - VectorFieldTubes.ts
+      - VectorFieldTubesShader.js
       - VolumetricLine.lspkg
       - VolumetricLine.lspkg/Materials
       - VolumetricLine.lspkg/Materials/PBR.mat

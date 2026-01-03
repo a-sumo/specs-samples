@@ -46,6 +46,38 @@ export class VectorFieldTubes extends BaseScriptComponent {
     @hint("Step size for vector field integration")
     private _stepSize: number = 0.1;
 
+    @input
+    @widget(new SliderWidget(0.1, 3.0, 0.1))
+    @hint("Field noise/frequency scale")
+    private _fieldScale: number = 1.0;
+
+    // ============ PRESET ============
+
+    @input
+    @widget(new ComboBoxWidget([
+        new ComboBoxItem("Curl Noise", 0),
+        new ComboBoxItem("Tornado", 1),
+        new ComboBoxItem("Attractor", 2),
+        new ComboBoxItem("Waves", 3),
+        new ComboBoxItem("Lorenz", 4),
+        new ComboBoxItem("Helix", 5)
+    ]))
+    @hint("Vector field type")
+    private _preset: number = 0;
+
+    // ============ ANIMATION ============
+
+    @input
+    @hint("Auto-animate time")
+    autoAnimate: boolean = true;
+
+    @input
+    @widget(new SliderWidget(0.1, 3.0, 0.1))
+    @hint("Animation speed")
+    private _timeSpeed: number = 1.0;
+
+    private elapsedTime: number = 0;
+
     // ============ MATERIAL ============
 
     @input
@@ -79,6 +111,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.TubeRadius = this._radius;
         this.mainPass.StepSize = this._stepSize;
         this.mainPass.NumSteps = this._lengthSegments;
+        this.mainPass.Time = this.elapsedTime;
+        this.mainPass.FieldScale = this._fieldScale;
+        this.mainPass.Preset = this._preset;
     }
 
     private generateMesh(): void {
@@ -199,6 +234,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
     }
 
     private onUpdate(): void {
+        if (this.autoAnimate) {
+            this.elapsedTime += getDeltaTime() * this._timeSpeed;
+        }
         this.updateMaterialParams();
     }
 
@@ -244,5 +282,20 @@ export class VectorFieldTubes extends BaseScriptComponent {
     get stepSize(): number { return this._stepSize; }
     set stepSize(value: number) {
         this._stepSize = value;
+    }
+
+    get fieldScale(): number { return this._fieldScale; }
+    set fieldScale(value: number) {
+        this._fieldScale = value;
+    }
+
+    get preset(): number { return this._preset; }
+    set preset(value: number) {
+        this._preset = value;
+    }
+
+    get timeSpeed(): number { return this._timeSpeed; }
+    set timeSpeed(value: number) {
+        this._timeSpeed = value;
     }
 }

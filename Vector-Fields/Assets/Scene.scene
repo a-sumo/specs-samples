@@ -2781,10 +2781,10 @@
     _lengthSegments: true
     _radialSegments: true
     _radius: true
-    _gridSizeX: true
-    _gridSizeY: true
-    _gridSpacing: true
-    _stepSize: true
+    _fieldScale: true
+    _preset: true
+    autoAnimate: true
+    _timeSpeed: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -2792,10 +2792,14 @@
       _lengthSegments: !<float> 32.000000
       _radialSegments: !<float> 8.000000
       _radius: 0.050000
-      _gridSizeX: !<float> 5.000000
-      _gridSizeY: !<float> 5.000000
-      _gridSpacing: !<float> 1.000000
-      _stepSize: 0.100000
+      _gridSizeX: !<float> 2.000000
+      _gridSizeY: !<float> 2.000000
+      _gridSpacing: 0.800000
+      _stepSize: 0.240000
+      _fieldScale: !<float> 1.000000
+      _preset: !<float> 0.000000
+      autoAnimate: true
+      _timeSpeed: !<float> 1.000000
       material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42
   ScriptTypes:
     "":

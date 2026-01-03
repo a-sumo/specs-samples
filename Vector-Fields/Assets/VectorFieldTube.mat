@@ -7,6 +7,9 @@
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
+    - Port_FieldScale_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_FinalColor1_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
@@ -31,6 +34,9 @@
     - Port_NumSteps_N000:
         typeIdx: 1
         value: 0.000000
+    - Port_Preset_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_PrevWorldPosition_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
@@ -41,6 +47,9 @@
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_StepSize_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Time_N000:
         typeIdx: 1
         value: 0.000000
     - Port_TubeRadius_N000:
@@ -70,6 +79,12 @@
     - Tweak_N3:
         typeIdx: 1
         value: 1.000000
+    - Tweak_N7:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N8:
+        typeIdx: 1
+        value: 1.000000
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
@@ -84,13 +99,22 @@
     []
   BlendMode: Disabled
   Properties:
+    FieldScale:
+      typeIdx: 1
+      value: 1.000000
     NumSteps:
+      typeIdx: 1
+      value: 1.000000
+    Preset:
       typeIdx: 1
       value: 1.000000
     PreviewEnabled:
       typeIdx: 0
       value: 0
     StepSize:
+      typeIdx: 1
+      value: 1.000000
+    Time:
       typeIdx: 1
       value: 1.000000
     TubeRadius:
