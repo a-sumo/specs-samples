@@ -3815,7 +3815,6 @@
     _gridSize: true
     _gridSpacing: true
     _stepSize: true
-    _preset: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -3828,7 +3827,7 @@
       _stepSize: 0.100000
       _fieldScale: 0.400000
       _flowSpeed: !<float> 30.000000
-      _preset: !<float> 0.000000
+      _preset: !<float> 2.000000
       trackedObject: !<reference.SceneObject> 98ef9586-1be1-4c72-b3c2-994c212b2031
       fieldCollider: !<reference.ColliderComponent> e4caa013-716a-4de1-86ea-ce401eee163a
       material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42
