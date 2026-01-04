@@ -4,10 +4,17 @@ A collection of self-contained sample projects for [Lens Studio](https://develop
 
 ## Projects
 
-| | | |
-|:--:|:--|:--:|
-| <img src="assets/eyedropper/preview.png" width="60"> | **Eyedropper**<br>A color picker tool that samples colors from the real world.<br>[`Eyedropper/`](Eyedropper/) | <img src="assets/eyedropper/demo.gif" width="150"> |
-| <img src="assets/color-spaces/preview.png" width="60"> | **Color Spaces**<br>Interactive visualization of various Color Spaces. Also demonstrates procedural mesh manipulation in Lens Studio.<br>[`Color-Spaces/`](Color-Spaces/) | <img src="assets/color-spaces/demo.gif" width="150"> |
+**[Eyedropper](Eyedropper/)** - A color picker tool that samples colors from the real world.
+
+<img src="assets/eyedropper/demo.gif" width="200">
+
+**[Color Spaces](Color-Spaces/)** - Interactive visualization of various Color Spaces. Also demonstrates procedural mesh manipulation in Lens Studio.
+
+<img src="assets/color-spaces/demo.gif" width="200">
+
+[WIP] **[Vector Fields](Vector-Fields/)** - Interactive vector field visualization in AR.
+
+<img src="Vector-Fields/vector-field-attractor-demo-cropped.gif" width="150"> <img src="Vector-Fields/vector-field-circulation-demo-cropped.gif" width="150">
 
 ---
 
