@@ -1,12 +1,13 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 591
+    size: 592
     values:
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
+      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/TestTubeShader.mat
