@@ -1,0 +1,65 @@
+- !<AssetImportMetadata/c7ad8da2-a740-4715-9846-c2aa72a73759>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 054e4c8e-ece9-4fbc-8e30-458cc4e6a681
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 054e4c8e-ece9-4fbc-8e30-458cc4e6a681
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> a500056e-9887-40e2-b6dc-dc943eb4d3dd
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/a500056e-9887-40e2-b6dc-dc943eb4d3dd>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 01455dcb-02e3-453c-bc19-cac1f2e7a9a3
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _gridSizeX: false
+    _gridSizeY: false
+    _gridSpacing: false
+    _length: false
+    _lengthSegments: false
+    _radialSegments: false
+    _radius: false
+    material: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      _lengthSegments: !<float> 32.000000
+      _radialSegments: !<float> 8.000000
+      _radius: 0.100000
+      _length: !<float> 5.000000
+      _gridSizeX: !<float> 5.000000
+      _gridSizeY: !<float> 5.000000
+      _gridSpacing: 1.500000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.Material material {"hint":"Material with TubeTestShader.js"}'
+    - '// @input float _lengthSegments = 32 {"hint":"Segments along tube length", "widget":"slider", "min":8, "max":64, "step":4}'
+    - '// @input float _radialSegments = 8 {"hint":"Segments around tube circumference", "widget":"slider", "min":3, "max":16, "step":1}'
+    - '// @input float _radius = 0.1 {"hint":"Tube radius", "widget":"slider", "min":0.05, "max":0.5, "step":0.01}'
+    - '// @input float _length = 5 {"hint":"Tube length", "widget":"slider", "min":1, "max":10, "step":0.5}'
+    - '// @input float _gridSizeX = 5 {"hint":"Grid size X", "widget":"slider", "min":1, "max":10, "step":1}'
+    - '// @input float _gridSizeY = 5 {"hint":"Grid size Y", "widget":"slider", "min":1, "max":10, "step":1}'
+    - '// @input float _gridSpacing = 1.5 {"hint":"Spacing between tubes", "widget":"slider", "min":0.5, "max":5, "step":0.1}'
