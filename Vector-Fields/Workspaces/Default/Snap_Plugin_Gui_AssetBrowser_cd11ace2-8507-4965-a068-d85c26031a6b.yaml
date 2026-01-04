@@ -1,15 +1,24 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 590
+    size: 591
     values:
-      - Custom Sphere.mesh
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
+      - Materials/FlatMaterial.mat
+      - Materials/FlatMaterial.ss_graph
+      - Materials/TestTubeShader.mat
+      - Materials/TestTubeShader.ss_graph
+      - Meshes
+      - Meshes/Custom Sphere.mesh
       - Render Target.renderTarget
       - Scene.scene
+      - Scripts
+      - Scripts/TubeTest.ts
+      - Scripts/VectorFieldTubes.ts
+      - Shaders
       - Shaders/TubeTestShader.js
       - Shaders/VectorFieldTubesShader.js
       - SpectaclesInteractionKit.lspkg
@@ -585,12 +594,4 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Textures/test-image.jpg
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
-      - Sphere.mat
-      - Sphere.ss_graph
-      - TestTubeShader.mat
-      - TestTubeShader.ss_graph
-      - TubeTest.ts
-      - Vector-Field.mat
-      - Vector-Field.ss_graph
-      - VectorFieldTubes.ts
   options: 4
