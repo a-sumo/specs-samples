@@ -35,6 +35,11 @@ export class MagnetPhysics extends BaseScriptComponent {
     maxDistance: number = 15.0;
 
     @input
+    @widget(new SliderWidget(0.0, 1.0, 0.1))
+    @hint("Bounciness on collision (0 = no bounce, 1 = full bounce)")
+    bounciness: number = 0.3;
+
+    @input
     @hint("Enable physics simulation")
     enabled: boolean = true;
 
@@ -140,6 +145,61 @@ export class MagnetPhysics extends BaseScriptComponent {
         return diff > 0.01;
     }
 
+    // Get collision radius from SceneObject's scale (default sphere radius is 0.25)
+    private getCollisionRadius(obj: SceneObject): number {
+        const scale = obj.getTransform().getWorldScale();
+        // Use max scale component for non-uniform scaling
+        const maxScale = Math.max(scale.x, Math.max(scale.y, scale.z));
+        return 0.25 * maxScale;
+    }
+
+    // Handle sphere-sphere collision between the two magnets
+    // Returns true if collision occurred
+    private handleCollision(): boolean {
+        if (!this.magnet1 || !this.magnet2) return false;
+
+        const pos1 = this.magnet1.getTransform().getWorldPosition();
+        const pos2 = this.magnet2.getTransform().getWorldPosition();
+
+        const radius1 = this.getCollisionRadius(this.magnet1);
+        const radius2 = this.getCollisionRadius(this.magnet2);
+
+        const delta = pos2.sub(pos1);
+        const distance = delta.length;
+        const minDist = radius1 + radius2;
+
+        if (distance >= minDist || distance < 0.001) {
+            return false; // No collision
+        }
+
+        // Collision detected - separate the magnets
+        const overlap = minDist - distance;
+        const normal = delta.normalize(); // Points from m1 to m2
+
+        // Push magnets apart (half each)
+        const separation = normal.uniformScale(overlap * 0.5);
+        const newPos1 = pos1.sub(separation);
+        const newPos2 = pos2.add(separation);
+
+        this.magnet1.getTransform().setWorldPosition(newPos1);
+        this.magnet2.getTransform().setWorldPosition(newPos2);
+
+        // Reflect velocities along collision normal with bounciness
+        const relativeVel = this.velocity2.sub(this.velocity1);
+        const velAlongNormal = relativeVel.dot(normal);
+
+        // Only resolve if velocities are moving toward each other
+        if (velAlongNormal < 0) {
+            const impulse = normal.uniformScale(velAlongNormal * (1 + this.bounciness));
+
+            // Apply impulse (equal mass assumption)
+            this.velocity1 = this.velocity1.add(impulse.uniformScale(0.5));
+            this.velocity2 = this.velocity2.sub(impulse.uniformScale(0.5));
+        }
+
+        return true;
+    }
+
     private onUpdate(): void {
         if (!this.enabled || !this.magnet1 || !this.magnet2) {
             return;
@@ -191,6 +251,9 @@ export class MagnetPhysics extends BaseScriptComponent {
         } else {
             this.velocity2 = pos2.sub(this.lastPos2).uniformScale(1.0 / dt);
         }
+
+        // Handle collision - prevent overlap
+        this.handleCollision();
 
         // Update tracking
         this.lastPos1 = this.magnet1.getTransform().getWorldPosition();

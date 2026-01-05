@@ -1,8 +1,8 @@
-- !<Material/4b855636-7c26-431f-8107-f031ca0c0244>
+- !<Material/fef61a97-fc6a-4d51-af72-aac70fc25e1d>
   PackagePath: ""
   PassesInfo:
-    - !<own> 00000000-0000-0000-0000-000000000002
-- !<PassInfo/00000000-0000-0000-0000-000000000002>
+    - !<own> 0a9d7e0e-df92-46b4-afc9-189956eeeb3e
+- !<PassInfo/0a9d7e0e-df92-46b4-afc9-189956eeeb3e>
   CachedProperties:
     - Port_Depth_N004:
         typeIdx: 1
@@ -14,6 +14,9 @@
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_FinalColor3_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_GSplatPointSize_N004:
@@ -34,6 +37,12 @@
     - Port_RayOrigin_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Value1_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value2_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_WorldNormal_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 1.000000, z: 0.000000}
@@ -55,7 +64,7 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: PremultipliedAlphaAuto
+  BlendMode: Disabled
   Properties:
     PreviewEnabled:
       typeIdx: 0

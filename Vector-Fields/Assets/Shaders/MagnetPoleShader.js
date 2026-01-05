@@ -36,12 +36,5 @@ void main() {
         color = sideColor;
     }
 
-    // Add simple lighting based on world normal
-    vec3 worldNormal = system.getSurfaceNormalWorldSpace();
-    vec3 lightDir = normalize(vec3(0.5, 1.0, 0.3));
-    float diffuse = max(0.0, dot(worldNormal, lightDir));
-    float ambient = 0.3;
-    float lighting = ambient + diffuse * 0.7;
-
-    fragColor = vec4(color * lighting, 1.0);
+    fragColor = vec4(color, 1.0);
 }

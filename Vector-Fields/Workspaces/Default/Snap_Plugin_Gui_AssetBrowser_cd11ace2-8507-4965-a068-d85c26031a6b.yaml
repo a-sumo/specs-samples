@@ -1,12 +1,14 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 596
+    size: 599
     values:
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
+      - MagnetPoleShader.mat
+      - MagnetPoleShader.ss_graph
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/MagnetPole.mat
@@ -18,6 +20,7 @@ CollapsedEntities:
       - Prefabs
       - Render Target.renderTarget
       - Scene.scene
+      - Scripts/MagnetPhysics.ts
       - Scripts/MagneticFieldTubes.ts
       - Scripts/TubeTest.ts
       - Scripts/VectorFieldTubes.ts

@@ -301,19 +301,19 @@
   Enabled: true
   ScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
   ScriptInputsDefault:
-    _stepSize: true
+    {}
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       _lengthSegments: !<float> 8.000000
       _radialSegments: !<float> 4.000000
-      _radius: 0.030000
-      _gridSize: !<float> 10.000000
+      _radius: 0.010000
+      _gridSize: !<float> 8.000000
       _gridSpacing: 0.300000
-      _stepSize: 0.100000
-      _fieldStrength: 3.400000
-      _flowSpeed: 25.500000
+      _stepSize: 0.050000
+      _fieldStrength: 3.600000
+      _flowSpeed: !<float> 39.000000
       magnet1: !<reference.SceneObject> 4097fcfc-06c0-4422-8877-b4683d89347c
       magnet2: !<reference.SceneObject> 18608aec-083f-433f-8711-54c2985e9aa4
       material: !<reference.Material> 08e73cb7-208f-4146-b04c-e78b8e72756f
@@ -510,12 +510,12 @@
 - !<SceneObject/18608aec-083f-433f-8711-54c2985e9aa4>
   PrefabRemaps:
     []
-  Name: Magnet 1
+  Name: Magnet 2
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 90.000000, z: 0.000000}
     Scale: {x: 0.400000, y: 0.400000, z: 0.400000}
     HasSegmentScaleCompensation: false
   Children:
@@ -669,6 +669,9 @@
     damping: true
     minDistance: true
     maxDistance: true
+    collisionRadius1: true
+    collisionRadius2: true
+    bounciness: true
     enabled: true
   ScriptTypesDefault:
     {}
@@ -680,6 +683,9 @@
       damping: 0.100000
       minDistance: !<float> 1.000000
       maxDistance: !<float> 15.000000
+      collisionRadius1: !<float> 1.000000
+      collisionRadius2: !<float> 1.000000
+      bounciness: 0.300000
       enabled: true
   ScriptTypes:
     "":
@@ -1309,7 +1315,7 @@
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 90.000000, z: 0.000000}
     Scale: {x: 0.400000, y: 0.400000, z: 0.400000}
     HasSegmentScaleCompensation: false
   Children:
@@ -1754,7 +1760,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Materials:
-    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
+    - !<reference> 4b855636-7c26-431f-8107-f031ca0c0244
   Mesh: !<reference> 06fe80f9-b0cb-4134-b59e-69ead9395e81
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
@@ -2278,7 +2284,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Materials:
-    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
+    - !<reference> 4b855636-7c26-431f-8107-f031ca0c0244
   Mesh: !<reference> 06fe80f9-b0cb-4134-b59e-69ead9395e81
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
