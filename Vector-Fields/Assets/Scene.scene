@@ -7,7 +7,6 @@
     - !<own> 5aa0f98b-e799-448c-a2dc-cae5d04fa2a4
     - !<own> 40fbf502-83ed-4f0d-8279-cc0d86cf271d
     - !<own> f95a3f9e-c3f7-48c9-885c-4459494ca20e
-    - !<own> 8cac24a7-56d3-4887-9e93-e942ed2aadb6
     - !<own> 1b18912d-b9e3-478c-8d6e-4695172483e0
     - !<own> 01a44fdd-23cd-4fc7-8393-1e8fa7f97b9f
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
@@ -201,7 +200,7 @@
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: -50.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 20.000000, y: 20.000000, z: 20.000000}
+    Scale: {x: 26.660000, y: 20.000000, z: 20.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -508,25 +507,6 @@
     - !<own> 4d75f471-9b48-4b6f-aa35-ecb1d7d4c0fb
   Components:
     []
-- !<ScriptComponent/176169f0-28c6-4b23-8d2a-c587fcdecf4e>
-  PrefabRemaps:
-    []
-  Name: ExtendedMarkerTracking_OnStartEvent
-  Enabled: true
-  ScriptAsset: !<reference> 5b88e9ca-dfd7-45f1-9a9c-5f9660706735
-  ScriptInputsDefault:
-    trackMarkerOnce: true
-    detachOnFound: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      markerComponent: !<reference.MarkerTrackingComponent> 9456514f-1b01-403f-a9ca-055ee7e0f3a6
-      trackMarkerOnce: true
-      detachOnFound: true
-  ScriptTypes:
-    "":
-      {}
 - !<SceneObject/176c2931-e1c4-4a63-bd5a-dee92f049b01>
   PrefabRemaps:
     []
@@ -727,21 +707,6 @@
   ScriptTypes:
     "":
       {}
-- !<SceneObject/21f59d4a-e630-42a0-b2ef-9d124d37e402>
-  PrefabRemaps:
-    []
-  Name: Object 0
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 20.000000, y: 20.000000, z: 20.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> f186302c-d52b-4f61-8d9d-3417b1eb9dce
 - !<SceneObject/25a5160c-dd09-4e72-9e5d-156e2f82f869>
   PrefabRemaps:
     []
@@ -1354,18 +1319,17 @@
   Enabled: true
   ScriptAsset: !<reference> 28f4c2b8-7749-4f9d-bf09-692307664947
   ScriptInputsDefault:
-    continuous: true
-    maxDetections: true
+    {}
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       model: !<reference.MLAsset> 4e83273c-6379-4551-9477-283dc33e82f2
-      inputTexture: !<reference.Texture> fa0efcd5-2b18-48d6-a32d-2a9847f9985f
-      continuous: false
+      inputTexture: !<reference.Texture> 207addf3-cc85-4211-9aa9-3554fa17aaef
+      continuous: true
       scoreThreshold: 0.100000
-      iouThreshold: 0.200000
-      maxDetections: !<float> 5.000000
+      iouThreshold: 0.750000
+      maxDetections: !<float> 17.000000
       overlayMaterial: !<reference.Material> 6e150ccf-5171-48fe-879c-ba8b7921a2a2
   ScriptTypes:
     "":
@@ -2609,22 +2573,6 @@
     []
   Components:
     - !<own> e883aef3-fc76-429f-9615-6f679ac473d7
-- !<SceneObject/8cac24a7-56d3-4887-9e93-e942ed2aadb6>
-  PrefabRemaps:
-    - 176169f0-28c6-4b23-8d2a-c587fcdecf4e: 619f46a9-930a-44aa-4462-8df6f7d90117
-    - 8cac24a7-56d3-4887-9e93-e942ed2aadb6: c89b4cc9-d57f-4bfa-5a10-e6a78dfe43c6
-  Name: Extended_Marker_Tracking_-PLACE_AT_ROOT-
-  Enabled: false
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    - !<own> 21f59d4a-e630-42a0-b2ef-9d124d37e402
-  Components:
-    - !<own> 176169f0-28c6-4b23-8d2a-c587fcdecf4e
 - !<SceneObject/8cdd4c87-6054-4626-9717-2c37ae231599>
   PrefabRemaps:
     []
@@ -4263,26 +4211,6 @@
     []
   Components:
     - !<own> 4d3c2e52-807c-4c3e-96ce-305f2b364250
-- !<RenderMeshVisual/f186302c-d52b-4f61-8d9d-3417b1eb9dce>
-  PrefabRemaps:
-    []
-  Name: Render Mesh Visual
-  Enabled: true
-  RenderOrder: 0
-  StretchMode: Stretch
-  VerticalAlignment: Center
-  HorizontalAlignment: Center
-  MeshShadowMode: None
-  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-  ShadowDensity: 1.000000
-  Materials:
-    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
-  Mesh: !<reference> 06fe80f9-b0cb-4134-b59e-69ead9395e81
-  Skin: !<reference> 00000000-0000-0000-0000-000000000000
-  BlendShapesEnabled: true
-  BlendNormals: false
-  BlendShapes:
-    {}
 - !<SceneObject/f6c982d9-adba-4f8e-85d5-5af9a3cb3769>
   PrefabRemaps:
     []

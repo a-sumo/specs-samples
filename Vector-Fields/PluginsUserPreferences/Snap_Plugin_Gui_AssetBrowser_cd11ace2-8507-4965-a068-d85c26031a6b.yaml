@@ -1,19 +1,13 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 654
+    size: 639
     values:
       - DetectionOverlay.js
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
-      - Extended Marker Tracking.lspkg
-      - Extended Marker Tracking.lspkg/Extended_Marker_Tracking_-PLACE_AT_ROOT-__PLACE_IN_SCENE.prefab
-      - Extended Marker Tracking.lspkg/Scripts
-      - Extended Marker Tracking.lspkg/Scripts/ExtendedMarkerTracking_OnStartEvent.js
-      - Extended Marker Tracking.lspkg/Scripts/ExtendedMarkerTracking_wrapped.js
-      - Extended Marker Tracking.lspkg/package.native
       - Marker Cube.lspkg
       - Marker Cube.lspkg/Marker_Cube_PUT_UNDER_MAIN_CAM__PLACE_IN_SCENE.prefab
       - Marker Cube.lspkg/Materials
@@ -36,30 +30,19 @@ CollapsedEntities:
       - Marker Cube.lspkg/Textures/image.jpg
       - "Marker Cube.lspkg/image_marker [EDIT_ME].imgmarker"
       - Marker Cube.lspkg/package.native
-      - Marker Image.lspkg
-      - Marker Image.lspkg/Marker_Image_PUT_UNDER_MAIN_CAM__PLACE_IN_SCENE.prefab
-      - Marker Image.lspkg/Materials
-      - Marker Image.lspkg/Materials/Image 2.mat
-      - Marker Image.lspkg/Scripts
-      - Marker Image.lspkg/Scripts/ImageTrackingController.js
-      - Marker Image.lspkg/Shaders
-      - Marker Image.lspkg/Shaders/Image 21.ss_graph
-      - Marker Image.lspkg/Textures/Image 2.png
-      - Marker Image.lspkg/Textures/ImageMaterial.mat
-      - Marker Image.lspkg/Textures/image.jpg
-      - "Marker Image.lspkg/image_marker [EDIT_ME].imgmarker"
-      - Marker Image.lspkg/package.native
       - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/TestTubeShader.mat
       - Materials/TestTubeShader.ss_graph
+      - Meshes
       - Meshes/Custom Sphere.mesh
       - Meshes/Custom Unit Plane.mesh
       - OverlayMaterial.mat
       - OverlayMaterial.ss_graph
       - Render Target.renderTarget
       - Scene.scene
+      - Scripts
       - Scripts/TubeTest.ts
       - Scripts/VectorFieldTubes.ts
       - Scripts/YoloxPoseTest.ts
@@ -656,5 +639,7 @@ CollapsedEntities:
       - book-cover.jpg
       - desk-objects-glass-bottle-book.png
       - image_unlit.ss_graph
+      - trimmed-banana-desk.mp4
+      - trimmed-milk-bottle.mp4
       - yolox_s_object_pose_lens.onnx
   options: 4

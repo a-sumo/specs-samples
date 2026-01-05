@@ -39,7 +39,7 @@ export class YoloxPoseTest extends BaseScriptComponent {
     // ============ VISUALIZATION ============
 
     @input
-    @hint("Material with DetectionOverlay shader for drawing boxes")
+    @hint("Material with DetectionOverlay shader for drawing boxes and poses")
     overlayMaterial: Material;
 
     // ============ EVENTS ============
@@ -106,38 +106,47 @@ export class YoloxPoseTest extends BaseScriptComponent {
         if (!this.overlayMaterial) return;
 
         const pass = this.overlayMaterial.mainPass;
-        const count = Math.min(detections.length, 5);  // Shader supports max 5 boxes
+        const count = Math.min(detections.length, 3);  // Shader supports max 3
 
-        // Set number of detections
         pass.NumDetections = count;
-
-        // Set border width in UV coords (4 pixels / image size)
         pass.BorderWidth = 4.0 / this.INPUT_WIDTH;
+        pass.ArrowLength = 0.08;
+        pass.ArrowWidth = 0.008;
 
-        // Update each box slot
-        for (let i = 0; i < 5; i++) {
-            const boxParam = `Box${i}`;
-            const colorParam = `Color${i}`;
-
-            if (i < count) {
-                const det = detections[i];
-
-                // Convert pixel coords to UV (0-1), flip Y since UV origin is bottom-left
-                const x1 = det.x1 / this.INPUT_WIDTH;
-                const y1 = 1.0 - det.y2 / this.INPUT_HEIGHT;  // Flip: y2 becomes top
-                const x2 = det.x2 / this.INPUT_WIDTH;
-                const y2 = 1.0 - det.y1 / this.INPUT_HEIGHT;  // Flip: y1 becomes bottom
-
-                pass[boxParam] = new vec4(x1, y1, x2, y2);
-                pass[colorParam] = this.BOX_COLORS[det.classId % this.BOX_COLORS.length];
-            } else {
-                // Clear unused slots
-                pass[boxParam] = new vec4(0, 0, 0, 0);
-                pass[colorParam] = new vec4(0, 0, 0, 0);
-            }
+        // Pack each detection into a mat4
+        for (let i = 0; i < 3; i++) {
+            const detMat = this.packDetection(i < count ? detections[i] : null);
+            pass[`Det${i}`] = detMat;
         }
 
-        print(`YoloxPoseTest: Updated overlay with ${count} boxes`);
+        // Only log occasionally in continuous mode
+        if (!this.continuous || Math.random() < 0.02) {
+            print(`YoloxPoseTest: ${count} detections`);
+        }
+    }
+
+    private packDetection(det: Detection | null): mat4 {
+        if (!det) {
+            return new mat4();  // Zero matrix - invalid bbox will be skipped
+        }
+
+        // Convert pixel coords to UV (0-1), flip Y
+        const x1 = det.x1 / this.INPUT_WIDTH;
+        const y1 = 1.0 - det.y2 / this.INPUT_HEIGHT;
+        const x2 = det.x2 / this.INPUT_WIDTH;
+        const y2 = 1.0 - det.y1 / this.INPUT_HEIGHT;
+
+        const r = det.rotation || [1, 0, 0, 0, 1, 0];
+        const color = this.BOX_COLORS[det.classId % this.BOX_COLORS.length];
+
+        // Shader reads: det[0]=bbox, det[1]=rotA, det[2]=rotB, det[3]=color
+        // mat4.fromColumns(col0, col1, col2, col3)
+        return mat4.fromColumns(
+            new vec4(x1, y1, x2, y2),           // col0 = bbox
+            new vec4(r[0], r[1], r[2], 0),     // col1 = rotA
+            new vec4(r[3], r[4], r[5], 0),     // col2 = rotB
+            color                               // col3 = color
+        );
     }
 
     private initML(): void {
@@ -215,27 +224,6 @@ export class YoloxPoseTest extends BaseScriptComponent {
 
     private onInferenceComplete(): void {
         this.isRunning = false;
-        this.debugCount = 0;  // Reset debug counter
-
-        // Debug: log output structure
-        print(`YoloxPoseTest: Received ${this.outputs.length} outputs`);
-        for (let i = 0; i < this.outputs.length; i++) {
-            const out = this.outputs[i];
-            const data = out.data;
-            print(`  Output ${i} "${out.name}": ${data.length} values`);
-
-            // Sample first few values and some statistics
-            const sample = Array.from(data.slice(0, 10)).map(v => v.toFixed(3)).join(", ");
-            print(`    First 10: [${sample}]`);
-
-            // Find min/max to understand data range
-            let min = Infinity, max = -Infinity;
-            for (let j = 0; j < data.length; j++) {
-                if (data[j] < min) min = data[j];
-                if (data[j] > max) max = data[j];
-            }
-            print(`    Range: [${min.toFixed(3)}, ${max.toFixed(3)}]`);
-        }
 
         // Gather raw detections from all scales
         const rawDetections: Detection[] = [];
@@ -258,40 +246,23 @@ export class YoloxPoseTest extends BaseScriptComponent {
             }
             const [gridH, gridW] = gridConfig;
 
-            // Verify expected size: 35 channels * gridH * gridW
+            // Verify expected size
             const expectedSize = 35 * gridH * gridW;
-            print(`  Scale "${out.name}" (stride ${stride}): got ${data.length} values, expected ${expectedSize}`);
-
-            if (data.length !== expectedSize) {
-                print(`  WARNING: Size mismatch! Skipping this scale.`);
-                continue;
-            }
+            if (data.length !== expectedSize) continue;
 
             const scaleDetections = this.decodeScale(data, gridH, gridW, stride);
             rawDetections.push(...scaleDetections);
         }
 
-        print(`YoloxPoseTest: Found ${rawDetections.length} raw detections above threshold`);
-
         // Apply NMS
         const finalDetections = this.nms(rawDetections);
 
-        print(`YoloxPoseTest: ${finalDetections.length} detections after NMS`);
-
-        // Log detections
-        for (let i = 0; i < finalDetections.length; i++) {
-            const d = finalDetections[i];
-            print(`  Detection ${i}: class=${d.classId}, score=${d.score.toFixed(3)}, ` +
-                  `bbox=[${d.x1.toFixed(1)}, ${d.y1.toFixed(1)}, ${d.x2.toFixed(1)}, ${d.y2.toFixed(1)}]`);
-
-            // Log rotation if available (with null checks)
-            if (d.rotation && d.rotation.length === 6) {
-                const rotStr = d.rotation.map(v => (v != null ? v.toFixed(3) : "null")).join(", ");
-                print(`    Rotation 6D: [${rotStr}]`);
-            }
-            if (d.translation && d.translation.length === 3) {
-                const transStr = d.translation.map(v => (v != null ? v.toFixed(3) : "null")).join(", ");
-                print(`    Translation: [${transStr}]`);
+        // Only log details occasionally in continuous mode
+        if (!this.continuous || Math.random() < 0.02) {
+            print(`YoloxPoseTest: ${rawDetections.length} raw -> ${finalDetections.length} after NMS`);
+            for (let i = 0; i < finalDetections.length; i++) {
+                const d = finalDetections[i];
+                print(`  [${i}] class=${d.classId}, score=${d.score.toFixed(2)}, bbox=[${d.x1.toFixed(0)},${d.y1.toFixed(0)},${d.x2.toFixed(0)},${d.y2.toFixed(0)}]`);
             }
         }
 
@@ -304,8 +275,6 @@ export class YoloxPoseTest extends BaseScriptComponent {
         // Update shader visualization
         this.updateVisualization(finalDetections);
     }
-
-    private debugCount = 0;
 
     private decodeScale(data: Float32Array, gridH: number, gridW: number, stride: number): Detection[] {
         const detections: Detection[] = [];
@@ -329,15 +298,6 @@ export class YoloxPoseTest extends BaseScriptComponent {
                 // Decode size (channels 2, 3)
                 const wRaw = data[baseIdx + 2];
                 const hRaw = data[baseIdx + 3];
-
-                // Debug: print raw values for first few detections
-                if (this.debugCount < 3) {
-                    print(`  DEBUG stride=${stride} grid=(${x},${y}):`);
-                    print(`    ch0(cx_off)=${cxOffset.toFixed(4)}, ch1(cy_off)=${cyOffset.toFixed(4)}`);
-                    print(`    ch2(w_raw)=${wRaw.toFixed(4)}, ch3(h_raw)=${hRaw.toFixed(4)}`);
-                    print(`    ch4(obj_raw)=${objRaw.toFixed(4)} -> score=${objScore.toFixed(4)}`);
-                    this.debugCount++;
-                }
 
                 // Apply grid position and stride
                 const cx = (x + 0.5 + cxOffset) * stride;
@@ -402,9 +362,6 @@ export class YoloxPoseTest extends BaseScriptComponent {
 
             for (let j = i + 1; j < detections.length; j++) {
                 if (suppressed[j]) continue;
-
-                // Only suppress same class
-                if (detections[i].classId !== detections[j].classId) continue;
 
                 const iou = this.computeIoU(detections[i], detections[j]);
                 if (iou > this.iouThreshold) {
