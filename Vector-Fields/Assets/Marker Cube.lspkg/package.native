@@ -1,0 +1,37 @@
+- !<NativePackageDescriptor/e281570b-4114-4f8a-9b7c-7bc89ed258d6>
+  PackagePath: ""
+  StudioVersion:
+    major: 5
+    minor: 15
+    patch: 1
+    build: 25102815
+    type: Unset
+    buildFlavor: ""
+    timestamp: 0
+    commit: ""
+  Description: allows you to specify an image that is recognized and tracked by the Snapchat camera. Add a cube to the marker image with shadow and occluder. Learn more in the Marker Template guide
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  UpdateCheckpoint: 76
+  ExportUid: 8b6bd66a-cc4d-4c38-b798-2f2cf8912eac
+  ComponentUid: a70be3ba-2c56-47ee-a96a-9e088e4933c7
+  PackagePolicy: CanBeUnpackedTransparent
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  Instantiable: !<reference> 00000000-0000-0000-0000-000000000000
+  AssetLibraryDependencyStructure: !<AssetLibraryDependencyStructure>
+    Name: ""
+    AssetId: ""
+    Hash: ""
+    Version:
+      major: 0
+      minor: 0
+      patch: 0
+      build: 0

@@ -1,0 +1,62 @@
+- !<AssetImportMetadata/a4999a90-94f6-47fc-8ad5-00b4e9e84fd1>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 28f4c2b8-7749-4f9d-bf09-692307664947
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 28f4c2b8-7749-4f9d-bf09-692307664947
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> e9787df6-3f3d-43be-823d-28576f5003a5
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/e9787df6-3f3d-43be-823d-28576f5003a5>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: ce4cbe51-d8b6-4a03-92c2-831ac845647c
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    continuous: false
+    inputTexture: false
+    iouThreshold: false
+    maxDetections: false
+    model: false
+    overlayMaterial: false
+    scoreThreshold: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - model: !<reference.MLAsset> 00000000-0000-0000-0000-000000000000
+      inputTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      continuous: false
+      scoreThreshold: 0.300000
+      iouThreshold: 0.500000
+      maxDetections: !<float> 5.000000
+      overlayMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.MLAsset model {"hint":"The yolox_s_object_pose_lens.onnx model asset"}'
+    - '// @input Asset.Texture inputTexture {"hint":"Static image texture to run inference on (640x480 recommended)"}'
+    - '// @input bool continuous {"hint":"Run inference continuously on update"}'
+    - '// @input float scoreThreshold = 0.3 {"hint":"Minimum objectness score to consider a detection", "widget":"slider", "min":0.1, "max":0.9, "step":0.05}'
+    - '// @input float iouThreshold = 0.5 {"hint":"IoU threshold for NMS", "widget":"slider", "min":0.1, "max":0.9, "step":0.05}'
+    - '// @input float maxDetections = 5 {"hint":"Maximum detections to return after NMS", "widget":"slider", "min":1, "max":20, "step":1}'
+    - '// @input Asset.Material overlayMaterial {"hint":"Material with DetectionOverlay shader for drawing boxes"}'

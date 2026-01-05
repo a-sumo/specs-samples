@@ -1,7 +1,14 @@
 data:
   externalSources:
+    - 02dce05b-d25a-4529-a77e-56ec22219a36: /Users/armand/Downloads/yolox_s_object_pose_lens.onnx
     - 064056df-0d5e-4c10-ae06-1ea766ebdd23: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/SpectaclesUIKit@0.0.8/SpectaclesUIKit.lspkg
     - 1187b987-243a-4470-8bda-88e5da5192e4: /Users/armand/Documents/specs-samples/Vector-Fields/Cache/9d8c693a-a378-46c9-8021-febbb828c507/b9d337111b2b58ca91267151257bbbed/Data/Assets/Meshes/SphereMesh.mesh
     - 1592d7db-b2f2-4bd8-8467-441463c314c9: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 505da725-2b4d-4f99-bb47-0f5b2b595d41: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 6074e1cf-bd94-442c-8a18-9033749d790c: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - 625c4a11-ea69-40a9-9f33-338308092207: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Model.bundle/InstantiationResources/image_unlit.ss_graph
+    - cde10c08-9c78-45fc-a11d-d35cec7addb6: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - d21ca6dc-1a50-4745-9b82-3df1f1827bf3: /Users/armand/Documents/specs-samples/Vector-Fields/Cache/064056df-0d5e-4c10-ae06-1ea766ebdd23/6b8202a6b55a598827ab6a7d0a098a39/Data/Meshes/Unit Plane.mesh
+    - d3fff607-1348-4161-85db-2e361fc63672: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/VolumetricLine@0.1.0/VolumetricLine.lspkg
+    - db4b00ba-c72b-4349-bb3f-3f31a3555f7c: /Users/armand/Downloads/desk-objects-glass-bottle-book.png
+    - ef5e87e7-26fb-4ab7-9002-e9b188dd80fa: /Users/armand/Downloads/book-cover.jpg

@@ -1,0 +1,137 @@
+- !<AssetImportMetadata/d5d06b99-5c01-9f9c-4df1-f52341bc7a1c>
+  ImportedAssetIds:
+    ObjectPrefab: !<reference> b3ae4acb-3696-40ed-941d-a1a8640aabdd
+  ImporterName: ObjectPrefabImporter
+  PrimaryAsset: !<reference> b3ae4acb-3696-40ed-941d-a1a8640aabdd
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    AssetLibraryId: 7CUKrgeGwyX4k7HALkhv8d
+  AssetDataMap:
+    ObjectPrefab: !<own> e37b81b5-0482-477a-ab19-97fbb8f40b29
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<RenderMeshVisual/021e715a-c45d-4cb0-9409-aa4a78db34b1>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
+  Mesh: !<reference> 06fe80f9-b0cb-4134-b59e-69ead9395e81
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
+- !<SceneObject/106ce055-3c53-4079-92b1-befd3c242608>
+  PrefabRemaps:
+    []
+  Name: Object 0
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 021e715a-c45d-4cb0-9409-aa4a78db34b1
+- !<MarkerTrackingComponent/1d70cf4f-fc24-4e34-73c7-5a14d1bd2453>
+  PrefabRemaps:
+    []
+  Name: Marker Tracking
+  Enabled: true
+  Marker: !<reference> 6361001f-d36b-456a-a889-bfd8bae2a4bd
+- !<ScriptComponent/1f1b7142-0f82-4d60-4524-e2b3ff0bce33>
+  PrefabRemaps:
+    []
+  Name: ImageTrackingController
+  Enabled: true
+  ScriptAsset: !<reference> dac2fa4e-5466-4709-8896-b66b3744605d
+  ScriptInputsDefault:
+    onMarkerFoundGlobalBehaviors: true
+    onMarkerLostGlobalBehaviors: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      markerTrackingComponent: !<reference.MarkerTrackingComponent> 1d70cf4f-fc24-4e34-73c7-5a14d1bd2453
+      resizeObjectArray: !<reference.SceneObject[]>
+        - !<reference> cfb0f300-a8ee-42bf-6221-df543e374ece
+      sendTriggers: true
+      onMarkerFoundGlobalBehaviors: !<reference.ScriptComponent[]>
+        []
+      onMarkerLostGlobalBehaviors: !<reference.ScriptComponent[]>
+        []
+  ScriptTypes:
+    "":
+      {}
+- !<Image/503a6b71-3442-490d-604b-6cde0742a935>
+  PrefabRemaps:
+    []
+  Name: Image 2
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Fit
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> fbac4899-beab-46f3-a7a4-15ef9ad13444
+  FlipX: false
+  FlipY: false
+  RotationAngle: 0
+  Pivot: {x: 0.000000, y: 0.000000}
+  ExtentsTarget: !<reference> 00000000-0000-0000-0000-000000000000
+- !<SceneObject/9d0c57b4-5921-40fe-6232-562c0e4ba852>
+  PrefabRemaps:
+    []
+  Name: Marker_Image_PUT_UNDER_MAIN_CAM__PLACE_IN_SCENE
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> cfb0f300-a8ee-42bf-6221-df543e374ece
+    - !<own> 106ce055-3c53-4079-92b1-befd3c242608
+  Components:
+    - !<own> 1d70cf4f-fc24-4e34-73c7-5a14d1bd2453
+    - !<own> 1f1b7142-0f82-4d60-4524-e2b3ff0bce33
+- !<SceneObject/cfb0f300-a8ee-42bf-6221-df543e374ece>
+  PrefabRemaps:
+    []
+  Name: "Tracked Image [REPLACE_ME]"
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 503a6b71-3442-490d-604b-6cde0742a935
+- !<ObjectPrefabAssetData/e37b81b5-0482-477a-ab19-97fbb8f40b29>
+  Prototype: !<ObjectOwner/b86e6cb4-fbe8-47ea-acad-7956d07a6d13>
+    PackagePath: ""
+    objects:
+      - !<own> 9d0c57b4-5921-40fe-6232-562c0e4ba852

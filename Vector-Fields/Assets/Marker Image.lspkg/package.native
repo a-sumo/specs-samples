@@ -1,0 +1,37 @@
+- !<NativePackageDescriptor/1d10e6e1-f2e9-47ca-8bbc-894adaa02b18>
+  PackagePath: ""
+  StudioVersion:
+    major: 5
+    minor: 15
+    patch: 1
+    build: 25102815
+    type: Unset
+    buildFlavor: ""
+    timestamp: 0
+    commit: ""
+  Description: "allows you to specify an image that is recognized and tracked by the Snapchat camera. Unlike the other tracking techniques in the Device Tracking component, marker tracking detects and tracks the features in a specific user defined image. The asset shows you how to utilize marker tracking to resizable image tightly tracked to a marker image. Learn more in the Marker Template guide"
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  UpdateCheckpoint: 76
+  ExportUid: f0024b52-9a30-47d5-aac9-3d34b27ab35e
+  ComponentUid: b66da6f6-c4d4-4368-988a-5401c6a8db3c
+  PackagePolicy: CanBeUnpackedTransparent
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  Instantiable: !<reference> 00000000-0000-0000-0000-000000000000
+  AssetLibraryDependencyStructure: !<AssetLibraryDependencyStructure>
+    Name: ""
+    AssetId: ""
+    Hash: ""
+    Version:
+      major: 0
+      minor: 0
+      patch: 0
+      build: 0

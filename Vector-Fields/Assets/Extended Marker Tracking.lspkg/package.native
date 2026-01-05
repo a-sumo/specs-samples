@@ -1,0 +1,37 @@
+- !<NativePackageDescriptor/0999ceb6-da91-44eb-9c00-ce48283d61ea>
+  PackagePath: ""
+  StudioVersion:
+    major: 5
+    minor: 15
+    patch: 1
+    build: 25102815
+    type: Unset
+    buildFlavor: ""
+    timestamp: 0
+    commit: ""
+  Description: "Extended Marker Tracking This helper script allows you to have a marker tracked object to continue to be tracked to the world, even when the original marker is not visible. To use it, add a Device Tracking component to your Camera object, and place this prefab at the root of the Objects panel. The helper script will parent the child of the referenced marker to itself when the marker is lost, and attach it back to the marker when it's found."
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  UpdateCheckpoint: 76
+  ExportUid: 28df34c0-b220-41a6-84d5-8dd8c69e6f00
+  ComponentUid: 125100e0-f7b8-496a-9aee-55235f556a52
+  PackagePolicy: CanBeUnpackedTransparent
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  Instantiable: !<reference> 00000000-0000-0000-0000-000000000000
+  AssetLibraryDependencyStructure: !<AssetLibraryDependencyStructure>
+    Name: ""
+    AssetId: ""
+    Hash: ""
+    Version:
+      major: 0
+      minor: 0
+      patch: 0
+      build: 0
