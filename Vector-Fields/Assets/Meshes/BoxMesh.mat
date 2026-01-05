@@ -1,10 +1,21 @@
-- !<Material/670aa9b3-02f5-42ea-8818-fd59cace41cf>
+- !<Material/8ff84ae2-dcdd-4ffb-9e5d-b7fd8feeeb3d>
   PackagePath: ""
   PassesInfo:
     - !<own> 9724d496-d658-4327-8e06-526c2d31147b
 - !<PassInfo/9724d496-d658-4327-8e06-526c2d31147b>
   CachedProperties:
-    []
+    - Port_Default_N204:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Default_N369:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - PreviewEnabled:
+        typeIdx: 0
+        value: 0
+    - baseColor:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
@@ -22,16 +33,5 @@
     - NODE_69_DROPLIST_ITEM 0
   BlendMode: Disabled
   Properties:
-    Port_Default_N204:
-      typeIdx: 1
-      value: 0.000000
-    Port_Default_N369:
-      typeIdx: 5
-      value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-    PreviewEnabled:
-      typeIdx: 0
-      value: 0
-    baseColor:
-      typeIdx: 5
-      value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    {}
   Pass: !<reference> 579368a6-5c16-4416-b6fa-53d40ff5f9b0

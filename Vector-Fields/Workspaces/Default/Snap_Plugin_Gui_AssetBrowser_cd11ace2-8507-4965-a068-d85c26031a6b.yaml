@@ -1,25 +1,28 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 592
+    size: 596
     values:
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
-      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
+      - Materials/MagnetPole.mat
+      - Materials/MagneticFieldTubes.ss_graph
       - Materials/TestTubeShader.mat
       - Materials/TestTubeShader.ss_graph
       - Meshes
       - Meshes/Custom Sphere.mesh
+      - Prefabs
       - Render Target.renderTarget
       - Scene.scene
-      - Scripts
+      - Scripts/MagneticFieldTubes.ts
       - Scripts/TubeTest.ts
       - Scripts/VectorFieldTubes.ts
-      - Shaders
+      - Shaders/MagnetPoleShader.js
+      - Shaders/MagneticFieldTubesShader.js
       - Shaders/TubeTestShader.js
       - Shaders/VectorFieldTubesShader.js
       - SpectaclesInteractionKit.lspkg
@@ -595,4 +598,5 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Textures/test-image.jpg
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
+      - alnico_rectangular_bar_magnet.glb
   options: 4

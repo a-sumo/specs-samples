@@ -68,11 +68,9 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     @hint("Material with MagneticFieldTubesShader.js")
     material: Material;
 
-    private meshVisuals: RenderMeshVisual[] = [];
+    private meshBuilder!: MeshBuilder;
+    private meshVisual!: RenderMeshVisual;
     private mainPass: Pass;
-
-    // Max vertices per mesh (UInt16 limit)
-    private readonly MAX_VERTICES_PER_MESH = 65000;
 
     onAwake(): void {
         this.setupMeshVisual();
@@ -83,29 +81,13 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     }
 
     private setupMeshVisual(): void {
+        this.meshVisual = this.sceneObject.createComponent("Component.RenderMeshVisual");
         if (this.material) {
+            this.meshVisual.mainMaterial = this.material;
             this.mainPass = this.material.mainPass;
         } else {
             print("MagneticFieldTubes: WARNING - No material assigned!");
         }
-    }
-
-    private clearMeshVisuals(): void {
-        for (const mv of this.meshVisuals) {
-            if (mv) {
-                mv.destroy();
-            }
-        }
-        this.meshVisuals = [];
-    }
-
-    private createMeshVisual(): RenderMeshVisual {
-        const mv = this.sceneObject.createComponent("Component.RenderMeshVisual");
-        if (this.material) {
-            mv.mainMaterial = this.material;
-        }
-        this.meshVisuals.push(mv);
-        return mv;
     }
 
     // Get forward vector (from S to N pole) based on object's Y rotation
@@ -141,9 +123,18 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         }
 
         const worldForward = this.getForwardVector(obj);
-        const invWorld = this.sceneObject.getTransform().getInvertedWorldTransform();
-        // Transform direction (not point) - use multiplyDirection
-        return invWorld.multiplyDirection(worldForward).normalize();
+
+        // Transform direction to local space by using inverse rotation
+        // (directions don't need translation, only rotation)
+        const parentRotation = this.sceneObject.getTransform().getWorldRotation();
+        const invRotation = parentRotation.invert();
+        const localForward = invRotation.multiplyVec3(worldForward);
+
+        const len = localForward.length;
+        if (len < 0.001) {
+            return new vec3(0, 0, 1);
+        }
+        return localForward.normalize();
     }
 
     private updateMaterialParams(): void {
@@ -157,76 +148,77 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         this.mainPass.FlowSpeed = this._flowSpeed;
 
         // Magnet 1 position and forward (in local space)
-        this.mainPass.Magnet1Position = this.getMagnetLocalPosition(this.magnet1);
-        this.mainPass.Magnet1Forward = this.getMagnetLocalForward(this.magnet1);
+        // Default to offset positions if magnets not assigned
+        if (this.magnet1) {
+            this.mainPass.Magnet1Position = this.getMagnetLocalPosition(this.magnet1);
+            this.mainPass.Magnet1Forward = this.getMagnetLocalForward(this.magnet1);
+        } else {
+            this.mainPass.Magnet1Position = new vec3(-2, 0, 0);
+            this.mainPass.Magnet1Forward = new vec3(0, 0, 1);
+        }
 
         // Magnet 2 position and forward (in local space)
-        this.mainPass.Magnet2Position = this.getMagnetLocalPosition(this.magnet2);
-        this.mainPass.Magnet2Forward = this.getMagnetLocalForward(this.magnet2);
+        if (this.magnet2) {
+            this.mainPass.Magnet2Position = this.getMagnetLocalPosition(this.magnet2);
+            this.mainPass.Magnet2Forward = this.getMagnetLocalForward(this.magnet2);
+        } else {
+            this.mainPass.Magnet2Position = new vec3(2, 0, 0);
+            this.mainPass.Magnet2Forward = new vec3(0, 0, -1);
+        }
     }
 
     private generateMesh(): void {
-        this.clearMeshVisuals();
+        // Encoding (position/normal get distorted, use UVs for data):
+        //   position.z = t (0-1 along tube, used for integration step index)
+        //   normal.z = 1 for tube vertices, 0 for cap centers
+        //   texture0 = (localX, localY) unit circle coords
+        //   texture1 = (startX, startZ) starting position in XZ plane
+        //   texture2 = (startY) starting Y position
+
+        this.meshBuilder = new MeshBuilder([
+            { name: "position", components: 3 },
+            { name: "normal", components: 3 },
+            { name: "texture0", components: 2 },
+            { name: "texture1", components: 2 },
+            { name: "texture2", components: 1 },
+        ]);
+
+        this.meshBuilder.topology = MeshTopology.Triangles;
+        this.meshBuilder.indexType = MeshIndexType.UInt16;
 
         const pathLength = this._lengthSegments + 1;
         const circleSegments = this._radialSegments;
 
-        const vertsPerTube = pathLength * circleSegments + 2;
-        const maxTubesPerMesh = Math.floor(this.MAX_VERTICES_PER_MESH / vertsPerTube);
-        const totalTubes = this._gridSize * this._gridSize * this._gridSize;
-        const numMeshes = Math.ceil(totalTubes / maxTubesPerMesh);
+        let totalTubes = 0;
 
-        const tubePositions: { x: number, y: number, z: number }[] = [];
+        // Generate 3D grid of tubes (centered around origin)
         const halfExtent = (this._gridSize - 1) * this._gridSpacing / 2;
         for (let gx = 0; gx < this._gridSize; gx++) {
             for (let gy = 0; gy < this._gridSize; gy++) {
                 for (let gz = 0; gz < this._gridSize; gz++) {
-                    tubePositions.push({
-                        x: -halfExtent + gx * this._gridSpacing,
-                        y: -halfExtent + gy * this._gridSpacing,
-                        z: -halfExtent + gz * this._gridSpacing
-                    });
+                    const startX = -halfExtent + gx * this._gridSpacing;
+                    const startY = -halfExtent + gy * this._gridSpacing;
+                    const startZ = -halfExtent + gz * this._gridSpacing;
+                    this.generateSingleTube(startX, startY, startZ, pathLength, circleSegments);
+                    totalTubes++;
                 }
             }
         }
 
-        let tubeIndex = 0;
-        let meshCount = 0;
-
-        for (let meshIdx = 0; meshIdx < numMeshes; meshIdx++) {
-            const meshBuilder = new MeshBuilder([
-                { name: "position", components: 3 },
-                { name: "normal", components: 3 },
-                { name: "texture0", components: 2 },
-                { name: "texture1", components: 2 },
-                { name: "texture2", components: 1 },
-            ]);
-            meshBuilder.topology = MeshTopology.Triangles;
-            meshBuilder.indexType = MeshIndexType.UInt16;
-
-            let tubesInThisMesh = 0;
-
-            while (tubeIndex < totalTubes && tubesInThisMesh < maxTubesPerMesh) {
-                const pos = tubePositions[tubeIndex];
-                this.generateSingleTubeToBuilder(meshBuilder, pos.x, pos.y, pos.z, pathLength, circleSegments);
-                tubesInThisMesh++;
-                tubeIndex++;
-            }
-
-            if (meshBuilder.isValid()) {
-                const mv = this.createMeshVisual();
-                mv.mesh = meshBuilder.getMesh();
-                meshBuilder.updateMesh();
-                meshCount++;
-            }
+        if (this.meshBuilder.isValid()) {
+            this.meshVisual.mesh = this.meshBuilder.getMesh();
+            this.meshBuilder.updateMesh();
+            print("MagneticFieldTubes: Generated " + totalTubes + " tubes, " +
+                  this.meshBuilder.getVerticesCount() + " vertices");
+        } else {
+            print("MagneticFieldTubes: ERROR - mesh not valid!");
         }
-
-        print("MagneticFieldTubes: Generated " + totalTubes + " tubes across " + meshCount + " meshes");
     }
 
-    private generateSingleTubeToBuilder(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
-        const startVertexIndex = meshBuilder.getVerticesCount();
+    private generateSingleTube(startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
+        const startVertexIndex = this.meshBuilder.getVerticesCount();
 
+        // Generate tube body vertices
         for (let i = 0; i < pathLength; i++) {
             const t = i / (pathLength - 1);
 
@@ -235,16 +227,17 @@ export class MagneticFieldTubes extends BaseScriptComponent {
                 const localX = Math.cos(theta);
                 const localY = Math.sin(theta);
 
-                meshBuilder.appendVerticesInterleaved([
-                    0.0, 0.0, t,
-                    0.0, 0.0, 1.0,
-                    localX, localY,
-                    startX, startZ,
-                    startY
+                this.meshBuilder.appendVerticesInterleaved([
+                    0.0, 0.0, t,           // position: unused, unused, t (step index)
+                    0.0, 0.0, 1.0,         // normal: unused, unused, isTube=1
+                    localX, localY,        // texture0: unit circle coords
+                    startX, startZ,        // texture1: starting position XZ
+                    startY                 // texture2: starting position Y
                 ]);
             }
         }
 
+        // Generate indices for tube body
         for (let segment = 0; segment < pathLength - 1; segment++) {
             for (let i = 0; i < circleSegments; i++) {
                 const current = startVertexIndex + segment * circleSegments + i;
@@ -252,46 +245,49 @@ export class MagneticFieldTubes extends BaseScriptComponent {
                 const currentNext = startVertexIndex + (segment + 1) * circleSegments + i;
                 const nextNext = startVertexIndex + (segment + 1) * circleSegments + ((i + 1) % circleSegments);
 
-                meshBuilder.appendIndices([
+                this.meshBuilder.appendIndices([
                     current, next, currentNext,
                     next, nextNext, currentNext
                 ]);
             }
         }
 
-        this.generateSingleTubeCapsToBuilder(meshBuilder, startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
+        // Generate end caps
+        this.generateSingleTubeCaps(startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
     }
 
-    private generateSingleTubeCapsToBuilder(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
-        const startCapIndex = meshBuilder.getVerticesCount();
-        meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0,
-            0.0, 0.0,
-            startX, startZ,
-            startY
+    private generateSingleTubeCaps(startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
+        // START CAP (at t = 0)
+        const startCapIndex = this.meshBuilder.getVerticesCount();
+        this.meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,         // position: t=0
+            0.0, 0.0, 0.0,         // normal: isCap=0
+            0.0, 0.0,              // texture0: center
+            startX, startZ,        // texture1: starting position XZ
+            startY                 // texture2: starting position Y
         ]);
 
         for (let i = 0; i < circleSegments; i++) {
             const current = startVertexIndex + i;
             const next = startVertexIndex + (i + 1) % circleSegments;
-            meshBuilder.appendIndices([startCapIndex, next, current]);
+            this.meshBuilder.appendIndices([startCapIndex, next, current]);
         }
 
-        const endCapIndex = meshBuilder.getVerticesCount();
-        meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 0.0,
-            0.0, 0.0,
-            startX, startZ,
-            startY
+        // END CAP (at t = 1)
+        const endCapIndex = this.meshBuilder.getVerticesCount();
+        this.meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 1.0,         // position: t=1
+            0.0, 0.0, 0.0,         // normal: isCap=0
+            0.0, 0.0,              // texture0: center
+            startX, startZ,        // texture1: starting position XZ
+            startY                 // texture2: starting position Y
         ]);
 
         const lastRingStart = startVertexIndex + (pathLength - 1) * circleSegments;
         for (let i = 0; i < circleSegments; i++) {
             const current = lastRingStart + i;
             const next = lastRingStart + (i + 1) % circleSegments;
-            meshBuilder.appendIndices([endCapIndex, current, next]);
+            this.meshBuilder.appendIndices([endCapIndex, current, next]);
         }
     }
 
