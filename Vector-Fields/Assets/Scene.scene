@@ -306,14 +306,14 @@
     {}
   ScriptInputs:
     "":
-      _lengthSegments: !<float> 8.000000
+      _lengthSegments: !<float> 20.000000
       _radialSegments: !<float> 4.000000
       _radius: 0.010000
       _gridSize: !<float> 8.000000
-      _gridSpacing: 0.300000
+      _gridSpacing: 0.600000
       _stepSize: 0.050000
-      _fieldStrength: 3.600000
-      _flowSpeed: !<float> 39.000000
+      _fieldStrength: 4.600000
+      _flowSpeed: !<float> 50.000000
       magnet1: !<reference.SceneObject> 4097fcfc-06c0-4422-8877-b4683d89347c
       magnet2: !<reference.SceneObject> 18608aec-083f-433f-8711-54c2985e9aa4
       material: !<reference.Material> 08e73cb7-208f-4146-b04c-e78b8e72756f
@@ -665,10 +665,7 @@
   Enabled: true
   ScriptAsset: !<reference> ef6ca5f6-a6eb-4091-91ea-806ae2b23629
   ScriptInputsDefault:
-    forceStrength: true
-    damping: true
     minDistance: true
-    maxDistance: true
     bounciness: true
     enabled: true
   ScriptTypesDefault:
@@ -677,10 +674,10 @@
     "":
       magnet1: !<reference.SceneObject> 4097fcfc-06c0-4422-8877-b4683d89347c
       magnet2: !<reference.SceneObject> 18608aec-083f-433f-8711-54c2985e9aa4
-      forceStrength: !<float> 10.000000
-      damping: 0.100000
+      forceStrength: !<float> 50.000000
+      damping: !<float> 0.000000
       minDistance: !<float> 1.000000
-      maxDistance: !<float> 15.000000
+      maxDistance: !<float> 20.000000
       bounciness: 0.300000
       enabled: true
   ScriptTypes:
@@ -2879,7 +2876,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: -60.000000}
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false

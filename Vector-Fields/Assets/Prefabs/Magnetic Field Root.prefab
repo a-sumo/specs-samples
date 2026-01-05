@@ -34,14 +34,14 @@
     {}
   ScriptInputs:
     "":
-      _lengthSegments: !<float> 8.000000
+      _lengthSegments: !<float> 20.000000
       _radialSegments: !<float> 4.000000
       _radius: 0.010000
       _gridSize: !<float> 8.000000
-      _gridSpacing: 0.300000
+      _gridSpacing: 0.600000
       _stepSize: 0.050000
-      _fieldStrength: 3.600000
-      _flowSpeed: !<float> 39.000000
+      _fieldStrength: 4.600000
+      _flowSpeed: !<float> 50.000000
       magnet1: !<reference.SceneObject> b3994541-f6c7-4a38-8f96-fabaa6b2c64e
       magnet2: !<reference.SceneObject> 4f834552-0988-4b35-aa75-7bbf37d193a8
       material: !<reference.Material> 08e73cb7-208f-4146-b04c-e78b8e72756f
@@ -85,7 +85,7 @@
   RotationTension: 30.000000
   ForceCompound: false
   Intangible: false
-  ShowCollider: true
+  ShowCollider: false
 - !<ScriptComponent/246e406c-6c8e-4115-a199-b5956fbcfc12>
   PrefabRemaps:
     []
