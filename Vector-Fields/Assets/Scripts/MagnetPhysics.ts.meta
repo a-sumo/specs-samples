@@ -27,8 +27,6 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     bounciness: false
-    collisionRadius1: false
-    collisionRadius2: false
     damping: false
     enabled: false
     forceStrength: false
@@ -51,8 +49,6 @@
       damping: 0.100000
       minDistance: !<float> 1.000000
       maxDistance: !<float> 15.000000
-      collisionRadius1: !<float> 1.000000
-      collisionRadius2: !<float> 1.000000
       bounciness: 0.300000
       enabled: true
   ScriptTypes:
@@ -65,7 +61,5 @@
     - '// @input float damping = 0.1 {"hint":"Velocity damping (0 = no damping, 1 = full damping)", "widget":"slider", "min":0, "max":1, "step":0.01}'
     - '// @input float minDistance = 1 {"hint":"Minimum distance to prevent extreme forces", "widget":"slider", "min":0.5, "max":5, "step":0.1}'
     - '// @input float maxDistance = 15 {"hint":"Maximum distance for force to apply", "widget":"slider", "min":0, "max":20, "step":0.5}'
-    - '// @input float collisionRadius1 = 1 {"hint":"Collision radius for magnet 1", "widget":"slider", "min":0.1, "max":5, "step":0.1}'
-    - '// @input float collisionRadius2 = 1 {"hint":"Collision radius for magnet 2", "widget":"slider", "min":0.1, "max":5, "step":0.1}'
     - '// @input float bounciness = 0.3 {"hint":"Bounciness on collision (0 = no bounce, 1 = full bounce)", "widget":"slider", "min":0, "max":1, "step":0.1}'
     - '// @input bool enabled = true {"hint":"Enable physics simulation"}'

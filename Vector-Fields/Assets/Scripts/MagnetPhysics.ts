@@ -145,12 +145,12 @@ export class MagnetPhysics extends BaseScriptComponent {
         return diff > 0.01;
     }
 
-    // Get collision radius from SceneObject's scale (default sphere radius is 0.25)
+    // Get collision radius from SceneObject's scale (default sphere radius is 0.5)
     private getCollisionRadius(obj: SceneObject): number {
         const scale = obj.getTransform().getWorldScale();
         // Use max scale component for non-uniform scaling
         const maxScale = Math.max(scale.x, Math.max(scale.y, scale.z));
-        return 0.25 * maxScale;
+        return 0.5 * maxScale;
     }
 
     // Handle sphere-sphere collision between the two magnets

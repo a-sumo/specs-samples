@@ -669,8 +669,6 @@
     damping: true
     minDistance: true
     maxDistance: true
-    collisionRadius1: true
-    collisionRadius2: true
     bounciness: true
     enabled: true
   ScriptTypesDefault:
@@ -683,8 +681,6 @@
       damping: 0.100000
       minDistance: !<float> 1.000000
       maxDistance: !<float> 15.000000
-      collisionRadius1: !<float> 1.000000
-      collisionRadius2: !<float> 1.000000
       bounciness: 0.300000
       enabled: true
   ScriptTypes:
@@ -2064,8 +2060,8 @@
   Name: Physics Collider
   Enabled: true
   Shape: !<Sphere>
-    FitVisual: true
-    Radius: 6.000000
+    FitVisual: false
+    Radius: 0.500000
   Matter: !<reference> 00000000-0000-0000-0000-000000000000
   Filter: !<reference> 00000000-0000-0000-0000-000000000000
   OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
@@ -2075,7 +2071,7 @@
   RotationTension: 30.000000
   ForceCompound: false
   Intangible: false
-  ShowCollider: false
+  ShowCollider: true
 - !<SceneObject/6bf04e34-6299-4f27-8f48-259345a32666>
   PrefabRemaps:
     []
