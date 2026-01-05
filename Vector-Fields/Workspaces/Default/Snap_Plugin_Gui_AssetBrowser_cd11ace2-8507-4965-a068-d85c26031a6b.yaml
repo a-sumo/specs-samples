@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 599
+    size: 602
     values:
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
@@ -9,6 +9,7 @@ CollapsedEntities:
       - Echopark.hdr/Specular
       - MagnetPoleShader.mat
       - MagnetPoleShader.ss_graph
+      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/MagnetPole.mat
@@ -17,9 +18,11 @@ CollapsedEntities:
       - Materials/TestTubeShader.ss_graph
       - Meshes
       - Meshes/Custom Sphere.mesh
-      - Prefabs
+      - Prefabs/Magnetic Field Root.prefab
+      - Prefabs/Vector FIeld Examples Root.prefab
       - Render Target.renderTarget
       - Scene.scene
+      - Scripts
       - Scripts/MagnetPhysics.ts
       - Scripts/MagneticFieldTubes.ts
       - Scripts/TubeTest.ts
