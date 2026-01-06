@@ -3,25 +3,65 @@
 // Magnet orientation: +X axis points from S to N pole (aligned with capsule mesh)
 // Rotate magnet to change pole direction
 
+enum MagneticTubeMode {
+    Trails = 0,    // Flowing tubes that bend along field lines
+    Particles = 1, // Short trails - minimal geometry, same flow animation
+    Arrows = 2     // Static arrows: orient + scale by field, cone tip
+}
+
 @component
 export class MagneticFieldTubes extends BaseScriptComponent {
+
+    // ============ PERFORMANCE ============
+
+    private static readonly RADIAL_SEGMENTS: number = 6;
+    private static readonly MIN_LENGTH_SEGMENTS: number = 2;
+    private static readonly MAX_LENGTH_SEGMENTS: number = 64;
+
+    @input
+    @widget(new SliderWidget(10000, 100000, 5000))
+    @hint("Maximum vertex count budget - geometry adapts to stay below this")
+    private _maxVertexCount: number = 40000;
+
+    // ============ MODE ============
+
+    @input
+    @widget(new ComboBoxWidget([
+        new ComboBoxItem("Trails", 0),
+        new ComboBoxItem("Particles", 1),
+        new ComboBoxItem("Arrows", 2)
+    ]))
+    @hint("Trails: flowing tubes, Particles: short flowing trails, Arrows: static oriented")
+    private _tubeMode: number = 0;
 
     // ============ GEOMETRY ============
 
     @input
-    @widget(new SliderWidget(8, 64, 4))
-    @hint("Segments along tube length (integration steps)")
-    private _lengthSegments: number = 32;
+    @widget(new SliderWidget(2, 64, 2))
+    @hint("Desired segments along tube length (may be reduced to fit vertex budget)")
+    private _desiredLengthSegments: number = 32;
 
-    @input
-    @widget(new SliderWidget(3, 16, 1))
-    @hint("Segments around tube circumference")
-    private _radialSegments: number = 8;
+    private _lengthSegments: number = 32;
 
     @input
     @widget(new SliderWidget(0.01, 0.2, 0.01))
     @hint("Tube radius")
     private _radius: number = 0.05;
+
+    @input
+    @widget(new SliderWidget(1.0, 30.0, 0.1))
+    @hint("Cone tip length multiplier for Arrow mode")
+    private _coneLength: number = 4.0;
+
+    @input
+    @widget(new SliderWidget(1.0, 2.5, 0.1))
+    @hint("Cone tip radius multiplier for Arrow mode")
+    private _coneRadius: number = 1.7;
+
+    @input
+    @widget(new SliderWidget(0.05, 1.0, 0.05))
+    @hint("Arrow length scale factor (multiplied by field magnitude)")
+    private _arrowScale: number = 0.15;
 
     // ============ GRID ============
 
@@ -70,21 +110,85 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     private meshVisuals: RenderMeshVisual[] = [];
     private mainPass: Pass;
-    private _baseFlowSpeed: number = -1; // Stores original flow speed for sync multiplier
+    private _baseFlowSpeed: number = -1;
 
-    // Max vertices per mesh (UInt16 index limit)
     private readonly MAX_VERTICES_PER_MESH = 65000;
 
-    // Normalized default values (0-1) for: [forceStrength, stepSize, radius, flowSpeed, lengthSegments]
-    // Use with setters: setForceStrengthNormalized, setStepSizeNormalized, setRadiusNormalized, setFlowSpeedNormalized, setLengthSegmentsNormalized
     public static readonly NORMALIZED_DEFAULTS: number[] = [0.2, 0.18, 0.21, 0.04, 0.43];
+
+    // ============ VERTEX BUDGET HELPERS ============
+
+    public static computeVertexCount(gridSize: number, lengthSegments: number, mode: number): number {
+        const tubeCount = gridSize * gridSize * gridSize;
+        const radial = MagneticFieldTubes.RADIAL_SEGMENTS;
+
+        if (mode === MagneticTubeMode.Particles) {
+            return tubeCount * (2 * radial + 2);
+        } else if (mode === MagneticTubeMode.Arrows) {
+            const tubeVerts = 2 * radial;
+            const coneVerts = radial + 1;
+            const startCapVerts = 1;
+            return tubeCount * (tubeVerts + coneVerts + startCapVerts);
+        } else {
+            const tubeVerts = (lengthSegments + 1) * radial;
+            const capVerts = 2;
+            return tubeCount * (tubeVerts + capVerts);
+        }
+    }
+
+    public static computeMaxLengthSegments(gridSize: number, maxVertices: number, mode: number): number {
+        if (mode === MagneticTubeMode.Particles || mode === MagneticTubeMode.Arrows) {
+            return MagneticFieldTubes.MIN_LENGTH_SEGMENTS;
+        }
+
+        const tubeCount = gridSize * gridSize * gridSize;
+        const radial = MagneticFieldTubes.RADIAL_SEGMENTS;
+        const capVerts = 2;
+
+        const budgetPerTube = Math.floor(maxVertices / tubeCount);
+        const lengthSegments = Math.floor((budgetPerTube - capVerts) / radial) - 1;
+
+        return Math.max(
+            MagneticFieldTubes.MIN_LENGTH_SEGMENTS,
+            Math.min(MagneticFieldTubes.MAX_LENGTH_SEGMENTS, lengthSegments)
+        );
+    }
+
+    private adaptGeometryToBudget(): void {
+        const maxAllowed = MagneticFieldTubes.computeMaxLengthSegments(
+            this._gridSize,
+            this._maxVertexCount,
+            this._tubeMode
+        );
+
+        if (this._tubeMode === MagneticTubeMode.Particles || this._tubeMode === MagneticTubeMode.Arrows) {
+            this._lengthSegments = MagneticFieldTubes.MIN_LENGTH_SEGMENTS;
+        } else {
+            this._lengthSegments = Math.min(this._desiredLengthSegments, maxAllowed);
+        }
+
+        const actualVerts = MagneticFieldTubes.computeVertexCount(
+            this._gridSize,
+            this._lengthSegments,
+            this._tubeMode
+        );
+
+        if (this._tubeMode === MagneticTubeMode.Trails && this._lengthSegments < this._desiredLengthSegments) {
+            print("MagneticFieldTubes: Adapted lengthSegments " + this._desiredLengthSegments +
+                  " → " + this._lengthSegments + " to fit vertex budget (" + actualVerts + "/" + this._maxVertexCount + ")");
+        }
+    }
 
     onAwake(): void {
         this.setupMaterial();
+        this.adaptGeometryToBudget();
         this.generateMesh();
         this.updateMaterialParams();
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
-        print("MagneticFieldTubes: Initialized " + (this._gridSize * this._gridSize * this._gridSize) + " tubes");
+
+        const tubeCount = this._gridSize * this._gridSize * this._gridSize;
+        const modeNames = ["Trails", "Particles", "Arrows"];
+        print("MagneticFieldTubes: Initialized " + tubeCount + " " + modeNames[this._tubeMode] + " mode");
     }
 
     private setupMaterial(): void {
@@ -113,45 +217,33 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         return mv;
     }
 
-    // Get forward vector (from S to N pole) along object's X axis (capsule axis)
     private getForwardVector(obj: SceneObject): vec3 {
         if (!obj) {
             return new vec3(1, 0, 0);
         }
-
         const transform = obj.getTransform();
         const rotation = transform.getWorldRotation();
-
-        // Forward vector in world space (local +X rotated by world rotation)
         const localForward = new vec3(1, 0, 0);
         return rotation.multiplyVec3(localForward);
     }
 
-    // Get magnet position in local space (relative to this component's scene object)
     private getMagnetLocalPosition(obj: SceneObject): vec3 {
         if (!obj) {
             return new vec3(0, 0, 0);
         }
-
         const worldPos = obj.getTransform().getWorldPosition();
         const invWorld = this.sceneObject.getTransform().getInvertedWorldTransform();
         return invWorld.multiplyPoint(worldPos);
     }
 
-    // Get magnet forward in local space
     private getMagnetLocalForward(obj: SceneObject): vec3 {
         if (!obj) {
             return new vec3(0, 0, 1);
         }
-
         const worldForward = this.getForwardVector(obj);
-
-        // Transform direction to local space by using inverse rotation
-        // (directions don't need translation, only rotation)
         const parentRotation = this.sceneObject.getTransform().getWorldRotation();
         const invRotation = parentRotation.invert();
         const localForward = invRotation.multiplyVec3(worldForward);
-
         const len = localForward.length;
         if (len < 0.001) {
             return new vec3(0, 0, 1);
@@ -168,45 +260,51 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         this.mainPass.FieldStrength = this._fieldStrength;
         this.mainPass.Time = getTime();
         this.mainPass.FlowSpeed = this._flowSpeed;
+        this.mainPass.ArrowScale = this._arrowScale;
+        this.mainPass.ConeLength = this._coneLength;
+        this.mainPass.ConeRadius = this._coneRadius;
 
-        // Magnet 1 position and forward (in local space)
-        // Default to offset positions if magnets not assigned
         if (this.magnet1) {
             this.mainPass.Magnet1Position = this.getMagnetLocalPosition(this.magnet1);
             this.mainPass.Magnet1Forward = this.getMagnetLocalForward(this.magnet1);
         } else {
             this.mainPass.Magnet1Position = new vec3(-2, 0, 0);
-            this.mainPass.Magnet1Forward = new vec3(1, 0, 0); // X axis
+            this.mainPass.Magnet1Forward = new vec3(1, 0, 0);
         }
 
-        // Magnet 2 position and forward (in local space)
         if (this.magnet2) {
             this.mainPass.Magnet2Position = this.getMagnetLocalPosition(this.magnet2);
             this.mainPass.Magnet2Forward = this.getMagnetLocalForward(this.magnet2);
         } else {
             this.mainPass.Magnet2Position = new vec3(2, 0, 0);
-            this.mainPass.Magnet2Forward = new vec3(-1, 0, 0); // -X axis (opposite)
+            this.mainPass.Magnet2Forward = new vec3(-1, 0, 0);
         }
     }
 
     private generateMesh(): void {
-        // Encoding (position/normal get distorted, use UVs for data):
-        //   position.z = t (0-1 along tube, used for integration step index)
-        //   normal.z = 1 for tube vertices, 0 for cap centers
-        //   texture0 = (localX, localY) unit circle coords
+        // Encoding (position/normal get distorted, use UVs for all data):
+        //   texture0 = (localX, localY) unit circle coords for cross-section
         //   texture1 = (startX, startZ) starting position in XZ plane
-        //   texture2 = (startY) starting Y position
+        //   texture2 = (startY, t) starting Y position and t parameter
+        //   texture3 = (geoType) geometry type:
+        //     0=trailCap, 1=trail, 3=particle (short trail), 4=arrow, 5=arrowCone, 6=arrowCap
 
         this.clearMeshVisuals();
 
         const pathLength = this._lengthSegments + 1;
-        const circleSegments = this._radialSegments;
+        const circleSegments = MagneticFieldTubes.RADIAL_SEGMENTS;
 
-        // Calculate vertices per tube: body + 2 cap centers
-        const vertsPerTube = pathLength * circleSegments + 2;
+        let vertsPerTube: number;
+        if (this._tubeMode === MagneticTubeMode.Particles) {
+            vertsPerTube = 2 * circleSegments + 2;
+        } else if (this._tubeMode === MagneticTubeMode.Arrows) {
+            vertsPerTube = 2 * circleSegments + circleSegments + 1 + 1;
+        } else {
+            vertsPerTube = pathLength * circleSegments + 2;
+        }
+
         const maxTubesPerMesh = Math.floor(this.MAX_VERTICES_PER_MESH / vertsPerTube);
 
-        // Build list of all tube start positions
         const tubePositions: { x: number, y: number, z: number }[] = [];
         const halfExtent = (this._gridSize - 1) * this._gridSpacing / 2;
         for (let gx = 0; gx < this._gridSize; gx++) {
@@ -232,7 +330,8 @@ export class MagneticFieldTubes extends BaseScriptComponent {
                 { name: "normal", components: 3 },
                 { name: "texture0", components: 2 },
                 { name: "texture1", components: 2 },
-                { name: "texture2", components: 1 },
+                { name: "texture2", components: 2 },
+                { name: "texture3", components: 1 },
             ]);
             meshBuilder.topology = MeshTopology.Triangles;
             meshBuilder.indexType = MeshIndexType.UInt16;
@@ -241,7 +340,15 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
             while (tubeIndex < totalTubes && tubesInThisMesh < maxTubesPerMesh) {
                 const pos = tubePositions[tubeIndex];
-                this.generateSingleTube(meshBuilder, pos.x, pos.y, pos.z, pathLength, circleSegments);
+
+                if (this._tubeMode === MagneticTubeMode.Particles) {
+                    this.generateParticle(meshBuilder, pos.x, pos.y, pos.z, circleSegments);
+                } else if (this._tubeMode === MagneticTubeMode.Arrows) {
+                    this.generateArrow(meshBuilder, pos.x, pos.y, pos.z, circleSegments);
+                } else {
+                    this.generateTrail(meshBuilder, pos.x, pos.y, pos.z, pathLength, circleSegments);
+                }
+
                 tubesInThisMesh++;
                 tubeIndex++;
             }
@@ -254,13 +361,13 @@ export class MagneticFieldTubes extends BaseScriptComponent {
             }
         }
 
-        print("MagneticFieldTubes: Generated " + totalTubes + " tubes across " + meshCount + " mesh(es)");
+        const modeNames = ["Trails", "Particles", "Arrows"];
+        print("MagneticFieldTubes: Generated " + totalTubes + " " + modeNames[this._tubeMode] + " across " + meshCount + " mesh(es)");
     }
 
-    private generateSingleTube(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
+    private generateTrail(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
         const startVertexIndex = meshBuilder.getVerticesCount();
 
-        // Generate tube body vertices
         for (let i = 0; i < pathLength; i++) {
             const t = i / (pathLength - 1);
 
@@ -270,16 +377,16 @@ export class MagneticFieldTubes extends BaseScriptComponent {
                 const localY = Math.sin(theta);
 
                 meshBuilder.appendVerticesInterleaved([
-                    0.0, 0.0, t,           // position: unused, unused, t (step index)
-                    0.0, 0.0, 1.0,         // normal: unused, unused, isTube=1
-                    localX, localY,        // texture0: unit circle coords
-                    startX, startZ,        // texture1: starting position XZ
-                    startY                 // texture2: starting position Y
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    localX, localY,
+                    startX, startZ,
+                    startY, t,
+                    1.0
                 ]);
             }
         }
 
-        // Generate indices for tube body
         for (let segment = 0; segment < pathLength - 1; segment++) {
             for (let i = 0; i < circleSegments; i++) {
                 const current = startVertexIndex + segment * circleSegments + i;
@@ -294,19 +401,18 @@ export class MagneticFieldTubes extends BaseScriptComponent {
             }
         }
 
-        // Generate end caps
-        this.generateSingleTubeCaps(meshBuilder, startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
+        this.generateTrailCaps(meshBuilder, startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
     }
 
-    private generateSingleTubeCaps(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
-        // START CAP (at t = 0)
+    private generateTrailCaps(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
         const startCapIndex = meshBuilder.getVerticesCount();
         meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 0.0,         // position: t=0
-            0.0, 0.0, 0.0,         // normal: isCap=0
-            0.0, 0.0,              // texture0: center
-            startX, startZ,        // texture1: starting position XZ
-            startY                 // texture2: starting position Y
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0,
+            startX, startZ,
+            startY, 0.0,
+            0.0
         ]);
 
         for (let i = 0; i < circleSegments; i++) {
@@ -315,17 +421,181 @@ export class MagneticFieldTubes extends BaseScriptComponent {
             meshBuilder.appendIndices([startCapIndex, next, current]);
         }
 
-        // END CAP (at t = 1)
         const endCapIndex = meshBuilder.getVerticesCount();
         meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 1.0,         // position: t=1
-            0.0, 0.0, 0.0,         // normal: isCap=0
-            0.0, 0.0,              // texture0: center
-            startX, startZ,        // texture1: starting position XZ
-            startY                 // texture2: starting position Y
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0,
+            startX, startZ,
+            startY, 1.0,
+            0.0
         ]);
 
         const lastRingStart = startVertexIndex + (pathLength - 1) * circleSegments;
+        for (let i = 0; i < circleSegments; i++) {
+            const current = lastRingStart + i;
+            const next = lastRingStart + (i + 1) % circleSegments;
+            meshBuilder.appendIndices([endCapIndex, current, next]);
+        }
+    }
+
+    private generateArrow(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, circleSegments: number): void {
+        const startVertexIndex = meshBuilder.getVerticesCount();
+
+        for (let i = 0; i < 2; i++) {
+            const t = i;
+
+            for (let j = 0; j < circleSegments; j++) {
+                const theta = (j / circleSegments) * Math.PI * 2;
+                const localX = Math.cos(theta);
+                const localY = Math.sin(theta);
+
+                meshBuilder.appendVerticesInterleaved([
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    localX, localY,
+                    startX, startZ,
+                    startY, t,
+                    4.0
+                ]);
+            }
+        }
+
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            const currentNext = startVertexIndex + circleSegments + i;
+            const nextNext = startVertexIndex + circleSegments + (i + 1) % circleSegments;
+
+            meshBuilder.appendIndices([
+                current, next, currentNext,
+                next, nextNext, currentNext
+            ]);
+        }
+
+        const startCapIndex = meshBuilder.getVerticesCount();
+        meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0,
+            startX, startZ,
+            startY, 0.0,
+            6.0
+        ]);
+
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            meshBuilder.appendIndices([startCapIndex, next, current]);
+        }
+
+        const coneBaseStart = meshBuilder.getVerticesCount();
+        for (let j = 0; j < circleSegments; j++) {
+            const theta = (j / circleSegments) * Math.PI * 2;
+            const localX = Math.cos(theta) * this._coneRadius;
+            const localY = Math.sin(theta) * this._coneRadius;
+
+            meshBuilder.appendVerticesInterleaved([
+                0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
+                localX, localY,
+                startX, startZ,
+                startY, 1.0,
+                5.0
+            ]);
+        }
+
+        const coneTipIndex = meshBuilder.getVerticesCount();
+        meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0,
+            startX, startZ,
+            startY, 2.0,
+            5.0
+        ]);
+
+        for (let i = 0; i < circleSegments; i++) {
+            const current = coneBaseStart + i;
+            const next = coneBaseStart + (i + 1) % circleSegments;
+            meshBuilder.appendIndices([current, next, coneTipIndex]);
+        }
+
+        const bodyEndRing = startVertexIndex + circleSegments;
+        for (let i = 0; i < circleSegments; i++) {
+            const tubeVert = bodyEndRing + i;
+            const tubeNext = bodyEndRing + (i + 1) % circleSegments;
+            const coneVert = coneBaseStart + i;
+            const coneNext = coneBaseStart + (i + 1) % circleSegments;
+
+            meshBuilder.appendIndices([
+                tubeVert, tubeNext, coneVert,
+                tubeNext, coneNext, coneVert
+            ]);
+        }
+    }
+
+    private generateParticle(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, circleSegments: number): void {
+        const startVertexIndex = meshBuilder.getVerticesCount();
+
+        for (let i = 0; i < 2; i++) {
+            const t = i;
+
+            for (let j = 0; j < circleSegments; j++) {
+                const theta = (j / circleSegments) * Math.PI * 2;
+                const localX = Math.cos(theta);
+                const localY = Math.sin(theta);
+
+                meshBuilder.appendVerticesInterleaved([
+                    0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0,
+                    localX, localY,
+                    startX, startZ,
+                    startY, t,
+                    3.0
+                ]);
+            }
+        }
+
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            const currentNext = startVertexIndex + circleSegments + i;
+            const nextNext = startVertexIndex + circleSegments + (i + 1) % circleSegments;
+
+            meshBuilder.appendIndices([
+                current, next, currentNext,
+                next, nextNext, currentNext
+            ]);
+        }
+
+        const startCapIndex = meshBuilder.getVerticesCount();
+        meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0,
+            startX, startZ,
+            startY, 0.0,
+            0.0
+        ]);
+
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            meshBuilder.appendIndices([startCapIndex, next, current]);
+        }
+
+        const endCapIndex = meshBuilder.getVerticesCount();
+        meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0,
+            startX, startZ,
+            startY, 1.0,
+            0.0
+        ]);
+
+        const lastRingStart = startVertexIndex + circleSegments;
         for (let i = 0; i < circleSegments; i++) {
             const current = lastRingStart + i;
             const next = lastRingStart + (i + 1) % circleSegments;
@@ -338,6 +608,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     }
 
     public refresh(): void {
+        this.adaptGeometryToBudget();
         this.generateMesh();
         this.updateMaterialParams();
     }
@@ -363,21 +634,51 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     }
 
     public setLengthSegmentsNormalized(value: number): void {
-        this._lengthSegments = Math.floor(8 + value * 56);
+        this._desiredLengthSegments = Math.floor(2 + value * 62);
         this.refresh();
     }
 
-    // Property accessors
+    public setTubeMode(mode: number): void {
+        this._tubeMode = Math.floor(Math.min(2, Math.max(0, mode)));
+        this.refresh();
+    }
+
     get lengthSegments(): number { return this._lengthSegments; }
-    set lengthSegments(value: number) {
-        this._lengthSegments = Math.max(4, Math.floor(value));
+    get desiredLengthSegments(): number { return this._desiredLengthSegments; }
+    set desiredLengthSegments(value: number) {
+        this._desiredLengthSegments = Math.max(MagneticFieldTubes.MIN_LENGTH_SEGMENTS, Math.floor(value));
         this.refresh();
     }
 
-    get radialSegments(): number { return this._radialSegments; }
-    set radialSegments(value: number) {
-        this._radialSegments = Math.max(3, Math.floor(value));
+    get radialSegments(): number { return MagneticFieldTubes.RADIAL_SEGMENTS; }
+
+    get maxVertexCount(): number { return this._maxVertexCount; }
+    set maxVertexCount(value: number) {
+        this._maxVertexCount = Math.max(1000, Math.floor(value));
         this.refresh();
+    }
+
+    get tubeMode(): number { return this._tubeMode; }
+    set tubeMode(value: number) {
+        this._tubeMode = Math.floor(Math.min(2, Math.max(0, value)));
+        this.refresh();
+    }
+
+    get coneLength(): number { return this._coneLength; }
+    set coneLength(value: number) {
+        this._coneLength = Math.max(0.1, value);
+        this.refresh();
+    }
+
+    get coneRadius(): number { return this._coneRadius; }
+    set coneRadius(value: number) {
+        this._coneRadius = Math.max(1.0, value);
+        this.refresh();
+    }
+
+    get arrowScale(): number { return this._arrowScale; }
+    set arrowScale(value: number) {
+        this._arrowScale = Math.max(0.1, value);
     }
 
     get radius(): number { return this._radius; }
@@ -404,24 +705,13 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     get flowSpeed(): number { return this._flowSpeed; }
     set flowSpeed(value: number) { this._flowSpeed = value; }
 
-    // Sync visualization from physics force strength
-    // Affects flow speed (animation) and intensity, NOT field line shape
-    // Maps physics range (1-500) to appropriate visual ranges
     public syncFromPhysicsStrength(physicsForceStrength: number): void {
-        // Store base flow speed on first call
         if (this._baseFlowSpeed < 0) {
             this._baseFlowSpeed = this._flowSpeed;
         }
-
-        // Normalize 1-500 to 0-1
         const normalized = (physicsForceStrength - 1) / 499;
-
-        // Flow speed: multiply base by strength factor (1x to 5x)
         const speedMultiplier = 1.0 + normalized * 4.0;
         this._flowSpeed = this._baseFlowSpeed * speedMultiplier;
-
-        // Field strength for integration stays moderate (affects tube length)
-        // Keep relatively constant so shape is consistent
         this._fieldStrength = 1.0 + normalized * 2.0;
     }
 }

@@ -2,37 +2,82 @@
 // Tube geometry that integrates a vector field on the GPU
 // Based on TubeTest.ts pattern
 
+enum TubeMode {
+    Trails = 0,    // Flowing tubes that bend along field lines
+    Particles = 1, // Short trails - minimal geometry, same flow animation
+    Arrows = 2     // Static arrows: orient + scale by field, cone tip
+}
+
 @component
 export class VectorFieldTubes extends BaseScriptComponent {
+
+    // Normalized default values (0-1) for: [preset, scale, radius, speed, length]
+    // Use with setters: setPresetNormalized, setFieldScaleNormalized, setRadiusNormalized, setFlowSpeedNormalized, setLengthSegmentsNormalized
+    public static readonly NORMALIZED_DEFAULTS: number[] = [0.0, 0.31, 0.21, 0.5, 0.0];
+
+    // ============ PERFORMANCE ============
+
+    private static readonly RADIAL_SEGMENTS: number = 6;  // Fixed for performance
+    private static readonly MIN_LENGTH_SEGMENTS: number = 2;
+    private static readonly MAX_LENGTH_SEGMENTS: number = 64;
+
+    @input
+    @widget(new SliderWidget(10000, 100000, 5000))
+    @hint("Maximum vertex count budget - geometry adapts to stay below this")
+    private _maxVertexCount: number = 40000;
+
+    // ============ MODE ============
+
+    @input
+    @widget(new ComboBoxWidget([
+        new ComboBoxItem("Trails", 0),
+        new ComboBoxItem("Particles", 1),
+        new ComboBoxItem("Arrows", 2)
+    ]))
+    @hint("Trails: flowing tubes, Particles: short flowing trails, Arrows: static oriented")
+    private _tubeMode: number = 0;
 
     // ============ GEOMETRY ============
 
     @input
-    @widget(new SliderWidget(8, 64, 4))
-    @hint("Segments along tube length (integration steps)")
-    private _lengthSegments: number = 32;
+    @widget(new SliderWidget(2, 64, 2))
+    @hint("Desired segments along tube length (may be reduced to fit vertex budget)")
+    private _desiredLengthSegments: number = 8;
 
-    @input
-    @widget(new SliderWidget(3, 16, 1))
-    @hint("Segments around tube circumference")
-    private _radialSegments: number = 8;
+    // Actual segments used after budget adaptation
+    private _lengthSegments: number = 8;
 
     @input
     @widget(new SliderWidget(0.01, 0.2, 0.01))
     @hint("Tube radius")
     private _radius: number = 0.05;
 
+    @input
+    @widget(new SliderWidget(1.0, 30.0, 0.1))
+    @hint("Cone tip length multiplier for Arrow mode")
+    private _coneLength: number = 4.0;
+
+    @input
+    @widget(new SliderWidget(1.0, 2.5, 0.1))
+    @hint("Cone tip radius multiplier for Arrow mode")
+    private _coneRadius: number = 1.7;
+
+    @input
+    @widget(new SliderWidget(0.5, 5.0, 0.1))
+    @hint("Arrow length scale factor (multiplied by field magnitude)")
+    private _arrowScale: number = 2.0;
+
     // ============ GRID ============
 
     @input
     @widget(new SliderWidget(1, 10, 1))
     @hint("Grid size (NxNxN)")
-    private _gridSize: number = 5;
+    private _gridSize: number = 8;
 
     @input
     @widget(new SliderWidget(0.1, 5.0, 0.1))
     @hint("Spacing between tube start positions")
-    private _gridSpacing: number = 1.0;
+    private _gridSpacing: number = 0.6;
 
     // ============ INTEGRATION ============
 
@@ -47,9 +92,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
     private _fieldScale: number = 1.0;
 
     @input
-    @widget(new SliderWidget(0.0, 50.0, 0.5))
+    @widget(new SliderWidget(0.0, 100.0, 0.5))
     @hint("Speed at which tubes flow along field lines")
-    private _flowSpeed: number = 2.0;
+    private _flowSpeed: number = 50.0;
 
     // ============ PRESET ============
 
@@ -84,12 +129,91 @@ export class VectorFieldTubes extends BaseScriptComponent {
     private meshVisual!: RenderMeshVisual;
     private mainPass: Pass;
 
+    // ============ VERTEX BUDGET HELPERS ============
+
+    /**
+     * Compute vertex count for given parameters
+     */
+    public static computeVertexCount(gridSize: number, lengthSegments: number, mode: number): number {
+        const tubeCount = gridSize * gridSize * gridSize;
+        const radial = VectorFieldTubes.RADIAL_SEGMENTS;
+
+        if (mode === TubeMode.Particles) {
+            // Particles: 2 rings + 2 flat caps
+            return tubeCount * (2 * radial + 2);
+        } else if (mode === TubeMode.Arrows) {
+            // Arrows: 2 rings (straight tube) + cone (radial + 1) + start cap (1)
+            const tubeVerts = 2 * radial;
+            const coneVerts = radial + 1;
+            const startCapVerts = 1;
+            return tubeCount * (tubeVerts + coneVerts + startCapVerts);
+        } else {
+            // Trails: full tube + 2 flat caps
+            const tubeVerts = (lengthSegments + 1) * radial;
+            const capVerts = 2;  // start + end cap centers
+            return tubeCount * (tubeVerts + capVerts);
+        }
+    }
+
+    /**
+     * Compute max lengthSegments that fits within vertex budget
+     */
+    public static computeMaxLengthSegments(gridSize: number, maxVertices: number, mode: number): number {
+        if (mode === TubeMode.Particles || mode === TubeMode.Arrows) {
+            // These modes don't use lengthSegments for tube body
+            return VectorFieldTubes.MIN_LENGTH_SEGMENTS;
+        }
+
+        // Trails mode: solve for lengthSegments
+        const tubeCount = gridSize * gridSize * gridSize;
+        const radial = VectorFieldTubes.RADIAL_SEGMENTS;
+        const capVerts = 2;
+
+        // maxVertices = tubeCount * ((lengthSegments + 1) * radial + capVerts)
+        const budgetPerTube = Math.floor(maxVertices / tubeCount);
+        const lengthSegments = Math.floor((budgetPerTube - capVerts) / radial) - 1;
+
+        return Math.max(
+            VectorFieldTubes.MIN_LENGTH_SEGMENTS,
+            Math.min(VectorFieldTubes.MAX_LENGTH_SEGMENTS, lengthSegments)
+        );
+    }
+
+    private adaptGeometryToBudget(): void {
+        const maxAllowed = VectorFieldTubes.computeMaxLengthSegments(
+            this._gridSize,
+            this._maxVertexCount,
+            this._tubeMode
+        );
+
+        if (this._tubeMode === TubeMode.Particles || this._tubeMode === TubeMode.Arrows) {
+            this._lengthSegments = VectorFieldTubes.MIN_LENGTH_SEGMENTS;
+        } else {
+            this._lengthSegments = Math.min(this._desiredLengthSegments, maxAllowed);
+        }
+
+        const actualVerts = VectorFieldTubes.computeVertexCount(
+            this._gridSize,
+            this._lengthSegments,
+            this._tubeMode
+        );
+
+        if (this._tubeMode === TubeMode.Trails && this._lengthSegments < this._desiredLengthSegments) {
+            print("VectorFieldTubes: Adapted lengthSegments " + this._desiredLengthSegments +
+                  " → " + this._lengthSegments + " to fit vertex budget (" + actualVerts + "/" + this._maxVertexCount + ")");
+        }
+    }
+
     onAwake(): void {
         this.setupMeshVisual();
+        this.adaptGeometryToBudget();
         this.generateMesh();
         this.updateMaterialParams();
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
-        print("VectorFieldTubes: Initialized " + (this._gridSize * this._gridSize * this._gridSize) + " tubes");
+
+        const tubeCount = this._gridSize * this._gridSize * this._gridSize;
+        const modeNames = ["Trails", "Particles", "Arrows"];
+        print("VectorFieldTubes: Initialized " + tubeCount + " " + modeNames[this._tubeMode] + " mode");
     }
 
     private setupMeshVisual(): void {
@@ -132,6 +256,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.Preset = this._preset;
         this.mainPass.Time = getTime();
         this.mainPass.FlowSpeed = this._flowSpeed;
+        this.mainPass.ArrowScale = this._arrowScale;
+        this.mainPass.ConeLength = this._coneLength;
+        this.mainPass.ConeRadius = this._coneRadius;
 
         // Only update target position if inside collider bounds
         // Convert to local space since tube positions are in local space
@@ -147,26 +274,27 @@ export class VectorFieldTubes extends BaseScriptComponent {
     }
 
     private generateMesh(): void {
-        // Encoding (position/normal get distorted, use UVs for data):
-        //   position.z = t (0-1 along tube, used for integration step index)
-        //   normal.z = 1 for tube vertices, 0 for cap centers
-        //   texture0 = (localX, localY) unit circle coords
+        // Encoding (position/normal get distorted, use UVs for all data):
+        //   texture0 = (localX, localY) unit circle coords for cross-section
         //   texture1 = (startX, startZ) starting position in XZ plane
-        //   texture2 = (startY) starting Y position
+        //   texture2 = (startY, t) starting Y position and t parameter
+        //   texture3 = (geoType) geometry type:
+        //     0=trailCap, 1=trail, 3=particle (short trail), 4=arrow, 5=arrowCone, 6=arrowCap
 
         this.meshBuilder = new MeshBuilder([
             { name: "position", components: 3 },
             { name: "normal", components: 3 },
             { name: "texture0", components: 2 },
             { name: "texture1", components: 2 },
-            { name: "texture2", components: 1 },
+            { name: "texture2", components: 2 },
+            { name: "texture3", components: 1 },
         ]);
 
         this.meshBuilder.topology = MeshTopology.Triangles;
         this.meshBuilder.indexType = MeshIndexType.UInt16;
 
         const pathLength = this._lengthSegments + 1;
-        const circleSegments = this._radialSegments;
+        const circleSegments = VectorFieldTubes.RADIAL_SEGMENTS;
 
         let totalTubes = 0;
 
@@ -178,7 +306,14 @@ export class VectorFieldTubes extends BaseScriptComponent {
                     const startX = -halfExtent + gx * this._gridSpacing;
                     const startY = -halfExtent + gy * this._gridSpacing;
                     const startZ = -halfExtent + gz * this._gridSpacing;
-                    this.generateSingleTube(startX, startY, startZ, pathLength, circleSegments);
+
+                    if (this._tubeMode === TubeMode.Particles) {
+                        this.generateParticle(startX, startY, startZ, circleSegments);
+                    } else if (this._tubeMode === TubeMode.Arrows) {
+                        this.generateArrow(startX, startY, startZ, circleSegments);
+                    } else {
+                        this.generateTrail(startX, startY, startZ, pathLength, circleSegments);
+                    }
                     totalTubes++;
                 }
             }
@@ -187,14 +322,18 @@ export class VectorFieldTubes extends BaseScriptComponent {
         if (this.meshBuilder.isValid()) {
             this.meshVisual.mesh = this.meshBuilder.getMesh();
             this.meshBuilder.updateMesh();
-            print("VectorFieldTubes: Generated " + totalTubes + " tubes, " +
+            const modeNames = ["Trails", "Particles", "Arrows"];
+            print("VectorFieldTubes: Generated " + totalTubes + " " + modeNames[this._tubeMode] + ", " +
                   this.meshBuilder.getVerticesCount() + " vertices");
         } else {
             print("VectorFieldTubes: ERROR - mesh not valid!");
         }
     }
 
-    private generateSingleTube(startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
+    /**
+     * Generate Trail mode: tube body that bends along field, flat caps at both ends
+     */
+    private generateTrail(startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
         const startVertexIndex = this.meshBuilder.getVerticesCount();
 
         // Generate tube body vertices
@@ -207,11 +346,12 @@ export class VectorFieldTubes extends BaseScriptComponent {
                 const localY = Math.sin(theta);
 
                 this.meshBuilder.appendVerticesInterleaved([
-                    0.0, 0.0, t,           // position: unused, unused, t (step index)
-                    0.0, 0.0, 1.0,         // normal: unused, unused, isTube=1
+                    0.0, 0.0, 0.0,         // position (unused)
+                    0.0, 0.0, 0.0,         // normal (unused)
                     localX, localY,        // texture0: unit circle coords
                     startX, startZ,        // texture1: starting position XZ
-                    startY                 // texture2: starting position Y
+                    startY, t,             // texture2: startY, t parameter
+                    1.0                    // texture3: geoType = trail
                 ]);
             }
         }
@@ -231,19 +371,23 @@ export class VectorFieldTubes extends BaseScriptComponent {
             }
         }
 
-        // Generate end caps
-        this.generateSingleTubeCaps(startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
+        // Generate flat caps at both ends
+        this.generateTrailCaps(startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
     }
 
-    private generateSingleTubeCaps(startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
-        // START CAP (at t = 0)
+    /**
+     * Generate flat caps for Trail mode (no cone)
+     */
+    private generateTrailCaps(startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
+        // START CAP (flat, at t = 0)
         const startCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 0.0,         // position: t=0
-            0.0, 0.0, 0.0,         // normal: isCap=0
+            0.0, 0.0, 0.0,         // position (unused)
+            0.0, 0.0, 0.0,         // normal (unused)
             0.0, 0.0,              // texture0: center
             startX, startZ,        // texture1: starting position XZ
-            startY                 // texture2: starting position Y
+            startY, 0.0,           // texture2: startY, t=0
+            0.0                    // texture3: geoType = cap
         ]);
 
         for (let i = 0; i < circleSegments; i++) {
@@ -252,17 +396,201 @@ export class VectorFieldTubes extends BaseScriptComponent {
             this.meshBuilder.appendIndices([startCapIndex, next, current]);
         }
 
-        // END CAP (at t = 1)
+        // END CAP (flat, at t = 1)
         const endCapIndex = this.meshBuilder.getVerticesCount();
         this.meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 1.0,         // position: t=1
-            0.0, 0.0, 0.0,         // normal: isCap=0
+            0.0, 0.0, 0.0,         // position (unused)
+            0.0, 0.0, 0.0,         // normal (unused)
             0.0, 0.0,              // texture0: center
-            startX, startZ,        // texture1: starting position XZ
-            startY                 // texture2: starting position Y
+            startX, startZ,
+            startY, 1.0,           // texture2: startY, t=1
+            0.0                    // texture3: geoType = cap
         ]);
 
         const lastRingStart = startVertexIndex + (pathLength - 1) * circleSegments;
+        for (let i = 0; i < circleSegments; i++) {
+            const current = lastRingStart + i;
+            const next = lastRingStart + (i + 1) % circleSegments;
+            this.meshBuilder.appendIndices([endCapIndex, current, next]);
+        }
+    }
+
+    /**
+     * Generate Arrow mode: straight 2-ring tube with cone tip
+     * Shader will orient and scale based on field at position
+     */
+    private generateArrow(startX: number, startY: number, startZ: number, circleSegments: number): void {
+        const startVertexIndex = this.meshBuilder.getVerticesCount();
+
+        // Just 2 rings for arrow body (t=0 base, t=1 before cone)
+        for (let i = 0; i < 2; i++) {
+            const t = i;  // 0 or 1
+
+            for (let j = 0; j < circleSegments; j++) {
+                const theta = (j / circleSegments) * Math.PI * 2;
+                const localX = Math.cos(theta);
+                const localY = Math.sin(theta);
+
+                this.meshBuilder.appendVerticesInterleaved([
+                    0.0, 0.0, 0.0,         // position (unused)
+                    0.0, 0.0, 0.0,         // normal (unused)
+                    localX, localY,        // texture0: unit circle coords
+                    startX, startZ,        // texture1: starting position XZ
+                    startY, t,             // texture2: startY, t
+                    4.0                    // texture3: geoType = arrow
+                ]);
+            }
+        }
+
+        // Connect the two rings (arrow body)
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            const currentNext = startVertexIndex + circleSegments + i;
+            const nextNext = startVertexIndex + circleSegments + (i + 1) % circleSegments;
+
+            this.meshBuilder.appendIndices([
+                current, next, currentNext,
+                next, nextNext, currentNext
+            ]);
+        }
+
+        // START CAP (flat, at t = 0) - use geoType=6 for arrow caps
+        const startCapIndex = this.meshBuilder.getVerticesCount();
+        this.meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,         // position (unused)
+            0.0, 0.0, 0.0,         // normal (unused)
+            0.0, 0.0,              // texture0: center
+            startX, startZ,
+            startY, 0.0,           // texture2: startY, t=0
+            6.0                    // texture3: geoType = arrowCap
+        ]);
+
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            this.meshBuilder.appendIndices([startCapIndex, next, current]);
+        }
+
+        // CONE TIP (at t > 1)
+        // Cone base ring (wider, at t=1)
+        const coneBaseStart = this.meshBuilder.getVerticesCount();
+        for (let j = 0; j < circleSegments; j++) {
+            const theta = (j / circleSegments) * Math.PI * 2;
+            const localX = Math.cos(theta) * this._coneRadius;
+            const localY = Math.sin(theta) * this._coneRadius;
+
+            this.meshBuilder.appendVerticesInterleaved([
+                0.0, 0.0, 0.0,         // position (unused)
+                0.0, 0.0, 0.0,         // normal (unused)
+                localX, localY,        // texture0: scaled unit circle
+                startX, startZ,
+                startY, 1.0,           // texture2: startY, t=1 (cone base)
+                5.0                    // texture3: geoType = arrowCone
+            ]);
+        }
+
+        // Cone tip vertex - t=2.0 marks it as tip, shader uses ConeLength uniform
+        const coneTipIndex = this.meshBuilder.getVerticesCount();
+        this.meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,         // position (unused)
+            0.0, 0.0, 0.0,         // normal (unused)
+            0.0, 0.0,              // texture0: center (tip)
+            startX, startZ,
+            startY, 2.0,           // texture2: startY, t=2 marks cone tip
+            5.0                    // texture3: geoType = arrowCone
+        ]);
+
+        // Connect cone base to tip
+        for (let i = 0; i < circleSegments; i++) {
+            const current = coneBaseStart + i;
+            const next = coneBaseStart + (i + 1) % circleSegments;
+            this.meshBuilder.appendIndices([current, next, coneTipIndex]);
+        }
+
+        // Connect arrow body end ring to cone base (skirt)
+        const bodyEndRing = startVertexIndex + circleSegments;
+        for (let i = 0; i < circleSegments; i++) {
+            const tubeVert = bodyEndRing + i;
+            const tubeNext = bodyEndRing + (i + 1) % circleSegments;
+            const coneVert = coneBaseStart + i;
+            const coneNext = coneBaseStart + (i + 1) % circleSegments;
+
+            this.meshBuilder.appendIndices([
+                tubeVert, tubeNext, coneVert,
+                tubeNext, coneNext, coneVert
+            ]);
+        }
+    }
+
+    /**
+     * Generate Particle mode: short trail (2 rings + caps)
+     */
+    private generateParticle(startX: number, startY: number, startZ: number, circleSegments: number): void {
+        const startVertexIndex = this.meshBuilder.getVerticesCount();
+
+        // 2 rings for a short tube
+        for (let i = 0; i < 2; i++) {
+            const t = i;  // 0 or 1
+
+            for (let j = 0; j < circleSegments; j++) {
+                const theta = (j / circleSegments) * Math.PI * 2;
+                const localX = Math.cos(theta);
+                const localY = Math.sin(theta);
+
+                this.meshBuilder.appendVerticesInterleaved([
+                    0.0, 0.0, 0.0,         // position (unused)
+                    0.0, 0.0, 0.0,         // normal (unused)
+                    localX, localY,        // texture0: unit circle coords
+                    startX, startZ,        // texture1: starting position XZ
+                    startY, t,             // texture2: startY, t
+                    3.0                    // texture3: geoType = particle
+                ]);
+            }
+        }
+
+        // Connect the two rings
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            const currentNext = startVertexIndex + circleSegments + i;
+            const nextNext = startVertexIndex + circleSegments + (i + 1) % circleSegments;
+
+            this.meshBuilder.appendIndices([
+                current, next, currentNext,
+                next, nextNext, currentNext
+            ]);
+        }
+
+        // START CAP (flat, at t = 0)
+        const startCapIndex = this.meshBuilder.getVerticesCount();
+        this.meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,         // position (unused)
+            0.0, 0.0, 0.0,         // normal (unused)
+            0.0, 0.0,              // texture0: center
+            startX, startZ,        // texture1: starting position XZ
+            startY, 0.0,           // texture2: startY, t=0
+            0.0                    // texture3: geoType = trailCap (same as trail caps)
+        ]);
+
+        for (let i = 0; i < circleSegments; i++) {
+            const current = startVertexIndex + i;
+            const next = startVertexIndex + (i + 1) % circleSegments;
+            this.meshBuilder.appendIndices([startCapIndex, next, current]);
+        }
+
+        // END CAP (flat, at t = 1)
+        const endCapIndex = this.meshBuilder.getVerticesCount();
+        this.meshBuilder.appendVerticesInterleaved([
+            0.0, 0.0, 0.0,         // position (unused)
+            0.0, 0.0, 0.0,         // normal (unused)
+            0.0, 0.0,              // texture0: center
+            startX, startZ,
+            startY, 1.0,           // texture2: startY, t=1
+            0.0                    // texture3: geoType = trailCap
+        ]);
+
+        const lastRingStart = startVertexIndex + circleSegments;
         for (let i = 0; i < circleSegments; i++) {
             const current = lastRingStart + i;
             const next = lastRingStart + (i + 1) % circleSegments;
@@ -275,6 +603,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
     }
 
     public refresh(): void {
+        this.adaptGeometryToBudget();
         this.generateMesh();
         this.updateMaterialParams();
     }
@@ -325,32 +654,71 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     /**
      * Set flow speed from normalized value (0-1)
-     * Maps to range 0.0-10.0
+     * Maps to range 0.0-100.0
      */
     public setFlowSpeedNormalized(value: number): void {
-        this._flowSpeed = value * 50.0;
+        this._flowSpeed = value * 100.0;
     }
 
     /**
-     * Set length segments from normalized value (0-1)
-     * Maps to range 8-64
+     * Set desired length segments from normalized value (0-1)
+     * Maps to range 2-64 (actual may be lower due to vertex budget)
      */
     public setLengthSegmentsNormalized(value: number): void {
-        this._lengthSegments = Math.floor(8 + value * 56);
+        this._desiredLengthSegments = Math.floor(2 + value * 62);
+        this.refresh();
+    }
+
+    /**
+     * Set tube mode: 0=Trails, 1=Particles, 2=Arrows
+     */
+    public setTubeMode(mode: number): void {
+        this._tubeMode = Math.floor(Math.min(2, Math.max(0, mode)));
         this.refresh();
     }
 
     // Property accessors
+
+    /** Actual length segments used (may be less than desired due to budget) */
     get lengthSegments(): number { return this._lengthSegments; }
-    set lengthSegments(value: number) {
-        this._lengthSegments = Math.max(4, Math.floor(value));
+
+    /** Desired length segments (set this, actual may be adapted) */
+    get desiredLengthSegments(): number { return this._desiredLengthSegments; }
+    set desiredLengthSegments(value: number) {
+        this._desiredLengthSegments = Math.max(VectorFieldTubes.MIN_LENGTH_SEGMENTS, Math.floor(value));
         this.refresh();
     }
 
-    get radialSegments(): number { return this._radialSegments; }
-    set radialSegments(value: number) {
-        this._radialSegments = Math.max(3, Math.floor(value));
+    /** Radial segments (fixed at 6 for performance) */
+    get radialSegments(): number { return VectorFieldTubes.RADIAL_SEGMENTS; }
+
+    get maxVertexCount(): number { return this._maxVertexCount; }
+    set maxVertexCount(value: number) {
+        this._maxVertexCount = Math.max(1000, Math.floor(value));
         this.refresh();
+    }
+
+    get tubeMode(): number { return this._tubeMode; }
+    set tubeMode(value: number) {
+        this._tubeMode = Math.floor(Math.min(2, Math.max(0, value)));
+        this.refresh();
+    }
+
+    get coneLength(): number { return this._coneLength; }
+    set coneLength(value: number) {
+        this._coneLength = Math.max(0.1, value);
+        this.refresh();
+    }
+
+    get coneRadius(): number { return this._coneRadius; }
+    set coneRadius(value: number) {
+        this._coneRadius = Math.max(1.0, value);
+        this.refresh();
+    }
+
+    get arrowScale(): number { return this._arrowScale; }
+    set arrowScale(value: number) {
+        this._arrowScale = Math.max(0.1, value);
     }
 
     get radius(): number { return this._radius; }

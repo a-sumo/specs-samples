@@ -28,6 +28,9 @@
     - Port_Amount_N014:
         typeIdx: 1
         value: 1.000000
+    - Port_ArrowScale_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_Blue_N006:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
@@ -49,6 +52,12 @@
     - Port_Color_N006:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_ConeLength_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ConeRadius_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
@@ -235,6 +244,9 @@
     - Tweak_N2:
         typeIdx: 1
         value: 1.000000
+    - Tweak_N27:
+        typeIdx: 1
+        value: 1.000000
     - Tweak_N3:
         typeIdx: 1
         value: 1.000000
@@ -250,9 +262,6 @@
     - Tweak_N9:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
-    - alphaTestThreshold:
-        typeIdx: 1
-        value: 0.500000
     - mainColor:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
@@ -261,15 +270,21 @@
   DepthFunction: LessEqual
   TwoSided: false
   ColorMask: {x: true, y: true, z: true, w: true}
-  CullMode: Back
+  CullMode: Front
   PolygonOffset: {x: 0.000000, y: 0.000000}
   FrustumCulling: Extend
   FrustumCullPad: 10.000000
   InstanceCount: 1
   Defines:
     []
-  BlendMode: AlphaToCoverage
+  BlendMode: AlphaTest
   Properties:
+    ArrowScale:
+      typeIdx: 1
+      value: 1.000000
+    ConeLength:
+      typeIdx: 1
+      value: 1.000000
     FieldScale:
       typeIdx: 1
       value: 1.000000
@@ -284,10 +299,10 @@
       value: 0.000000
     Port_Import_N017:
       typeIdx: 1
-      value: 0.000000
+      value: 79.000000
     Port_Import_N019:
       typeIdx: 1
-      value: 0.000000
+      value: 44.000000
     Port_Input1_N018:
       typeIdx: 1
       value: 0.010000
@@ -324,4 +339,7 @@
     TubeRadius:
       typeIdx: 1
       value: 1.000000
+    alphaTestThreshold:
+      typeIdx: 1
+      value: 0.500000
   Pass: !<reference> f5440cbc-b54a-4809-8554-48231fc75b02

@@ -26,15 +26,19 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    _arrowScale: false
+    _coneLength: false
+    _coneRadius: false
+    _desiredLengthSegments: false
     _fieldScale: false
     _flowSpeed: false
     _gridSize: false
     _gridSpacing: false
-    _lengthSegments: false
+    _maxVertexCount: false
     _preset: false
-    _radialSegments: false
     _radius: false
     _stepSize: false
+    _tubeMode: false
     fieldCollider: false
     material: false
     trackedObject: false
@@ -47,9 +51,13 @@
   Attachments:
     []
   DefaultScriptInputs:
-    - _lengthSegments: !<float> 32.000000
-      _radialSegments: !<float> 8.000000
+    - _maxVertexCount: !<float> 40000.000000
+      _tubeMode: !<float> 0.000000
+      _desiredLengthSegments: !<float> 8.000000
       _radius: 0.050000
+      _coneLength: 1.500000
+      _coneRadius: 1.800000
+      _arrowScale: !<float> 2.000000
       _gridSize: !<float> 5.000000
       _gridSpacing: !<float> 1.000000
       _stepSize: 0.100000
@@ -63,14 +71,18 @@
     -
       {}
   InputLines:
-    - '// @input float _lengthSegments = 32 {"hint":"Segments along tube length (integration steps)", "widget":"slider", "min":8, "max":64, "step":4}'
-    - '// @input float _radialSegments = 8 {"hint":"Segments around tube circumference", "widget":"slider", "min":3, "max":16, "step":1}'
+    - '// @input float _maxVertexCount = 40000 {"hint":"Maximum vertex count budget - geometry adapts to stay below this", "widget":"slider", "min":10000, "max":100000, "step":5000}'
+    - '// @input float _tubeMode {"hint":"Trails: flowing tubes, Particles: short flowing trails, Arrows: static oriented", "widget":"combobox", "values":[{"label":"Trails", "value":0}, {"label":"Particles", "value":1}, {"label":"Arrows", "value":2}]}'
+    - '// @input float _desiredLengthSegments = 8 {"hint":"Desired segments along tube length (may be reduced to fit vertex budget)", "widget":"slider", "min":2, "max":64, "step":2}'
     - '// @input float _radius = 0.05 {"hint":"Tube radius", "widget":"slider", "min":0.01, "max":0.2, "step":0.01}'
-    - '// @input float _gridSize = 5 {"hint":"Grid size (NxNxN)", "widget":"slider", "min":1, "max":10, "step":1}'
-    - '// @input float _gridSpacing = 1 {"hint":"Spacing between tube start positions", "widget":"slider", "min":0.1, "max":5, "step":0.1}'
+    - '// @input float _coneLength = 4 {"hint":"Cone tip length multiplier for Arrow mode", "widget":"slider", "min":1, "max":30, "step":0.1}'
+    - '// @input float _coneRadius = 1.7 {"hint":"Cone tip radius multiplier for Arrow mode", "widget":"slider", "min":1, "max":2.5, "step":0.1}'
+    - '// @input float _arrowScale = 2 {"hint":"Arrow length scale factor (multiplied by field magnitude)", "widget":"slider", "min":0.5, "max":5, "step":0.1}'
+    - '// @input float _gridSize = 8 {"hint":"Grid size (NxNxN)", "widget":"slider", "min":1, "max":10, "step":1}'
+    - '// @input float _gridSpacing = 0.6 {"hint":"Spacing between tube start positions", "widget":"slider", "min":0.1, "max":5, "step":0.1}'
     - '// @input float _stepSize = 0.1 {"hint":"Step size for vector field integration", "widget":"slider", "min":0.01, "max":0.5, "step":0.01}'
     - '// @input float _fieldScale = 1 {"hint":"Field noise/frequency scale", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
-    - '// @input float _flowSpeed = 2 {"hint":"Speed at which tubes flow along field lines", "widget":"slider", "min":0, "max":50, "step":0.5}'
+    - '// @input float _flowSpeed = 50 {"hint":"Speed at which tubes flow along field lines", "widget":"slider", "min":0, "max":100, "step":0.5}'
     - '// @input float _preset {"hint":"Vector field type", "widget":"combobox", "values":[{"label":"Expansion", "value":0}, {"label":"Contraction", "value":1}, {"label":"Circulation", "value":2}, {"label":"Waves", "value":3}, {"label":"Vortex", "value":4}]}'
     - '// @input SceneObject trackedObject {"hint":"Object that affects the field - field reacts to its position"}'
     - '// @input Component.ColliderComponent fieldCollider {"hint":"Box collider - field only animates when tracked object is inside"}'

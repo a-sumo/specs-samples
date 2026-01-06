@@ -1,13 +1,17 @@
 // VectorFieldTubesShader.js
 // Integrates a vector field to compute tube positions on the GPU
-// Based on vector-field-trails.html approach
 //
-// Vertex encoding:
-//   position.z = t (0-1, maps to step index for integration)
-//   normal.z = 1 for tube vertices, 0 for cap centers
+// Vertex encoding (all data in UVs to avoid distortion):
 //   texture0 = (localX, localY) unit circle coords for cross-section
 //   texture1 = (startX, startZ) starting position in XZ plane
-//   texture2.x = startY starting Y position
+//   texture2 = (startY, t) starting Y position and t parameter
+//   texture3 = (geoType) geometry type:
+//     0 = trail cap center (flat)
+//     1 = trail body (flow animation + integration)
+//     3 = particle (short trail - flow animation + integration, minimal geometry)
+//     4 = arrow body (static, orient by field)
+//     5 = arrow cone (static, orient by field)
+//     6 = arrow cap center (static)
 
 input_float TubeRadius;
 input_float StepSize;
@@ -17,6 +21,9 @@ input_int Preset;
 input_vec3 TargetPosition;
 input_float Time;
 input_float FlowSpeed;
+input_float ArrowScale;
+input_float ConeLength;
+input_float ConeRadius;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
@@ -208,143 +215,189 @@ vec3 getField(vec3 p) {
 }
 
 // ========================================
-// COLOR BASED ON VELOCITY
+// PLASMA COLOR GRADIENT
 // ========================================
-vec3 getColor(vec3 vel, float t) {
-    vec3 baseColor;
-    if (Preset == 0) baseColor = vec3(0.9, 0.5, 0.2);      // Orange - expansion
-    else if (Preset == 1) baseColor = vec3(0.3, 0.5, 0.9); // Blue - contraction
-    else if (Preset == 2) baseColor = vec3(0.8, 0.3, 0.8); // Purple - circulation
-    else if (Preset == 3) baseColor = vec3(0.2, 0.9, 0.6); // Green - waves
-    else baseColor = vec3(0.9, 0.3, 0.5);                  // Pink - vortex
 
-    vec3 velColor = abs(normalize(vel + 0.001)) * 0.3;
-    return mix(baseColor, baseColor + velColor, 0.5);
+// Plasma: Deep blue -> Purple -> Magenta -> Pink -> White
+vec3 plasmaGradient(float value) {
+    vec3 c0 = vec3(0.05, 0.0, 0.2);  // Deep blue-black
+    vec3 c1 = vec3(0.3, 0.0, 0.5);   // Purple
+    vec3 c2 = vec3(0.7, 0.0, 0.7);   // Magenta
+    vec3 c3 = vec3(0.95, 0.3, 0.6);  // Hot pink
+    vec3 c4 = vec3(1.0, 0.85, 0.5);  // Peach/yellow
+    vec3 c5 = vec3(1.0, 1.0, 0.95);  // Near white
+
+    if (value < 0.2) return mix(c0, c1, value * 5.0);
+    else if (value < 0.4) return mix(c1, c2, (value - 0.2) * 5.0);
+    else if (value < 0.6) return mix(c2, c3, (value - 0.4) * 5.0);
+    else if (value < 0.8) return mix(c3, c4, (value - 0.6) * 5.0);
+    else return mix(c4, c5, (value - 0.8) * 5.0);
+}
+
+vec3 getColor(vec3 vel, float t) {
+    float speed = length(vel);
+    float intensity = min(1.0, speed * 2.5);
+
+    return plasmaGradient(intensity);
 }
 
 void main() {
-    vec3 inPos = system.getSurfacePositionObjectSpace();
-    vec3 inNormal = system.getSurfaceNormalObjectSpace();
     vec2 inUV0 = system.getSurfaceUVCoord0();
     vec2 inUV1 = system.getSurfaceUVCoord1();
     vec2 inUV2 = system.getSurfaceUVCoord2();
+    vec2 inUV3 = system.getSurfaceUVCoord3();
 
-    // Decode vertex data
-    float t = inPos.z;
+    // Decode vertex data from UVs (position/normal get distorted)
     float localX = inUV0.x;
     float localY = inUV0.y;
     float startX = inUV1.x;
     float startZ = inUV1.y;
     float startY = inUV2.x;
+    float t = inUV2.y;
+    float geoType = inUV3.x;
     float radius = TubeRadius;
 
-    // Cap centers
-    bool isCapCenter = (inNormal.z < 0.5);
-    if (isCapCenter) {
+    // Geometry type: 0=trailCap, 1=trail, 3=particle (short trail), 4=arrow, 5=arrowCone, 6=arrowCap
+    bool isTrailCap = (geoType < 0.5);
+    bool isArrow = (geoType > 3.5 && geoType < 4.5);
+    bool isArrowCone = (geoType > 4.5 && geoType < 5.5);
+    bool isArrowCap = (geoType > 5.5);
+    bool isArrowMode = isArrow || isArrowCone || isArrowCap;
+
+    // Cap centers: collapse to point
+    if (isTrailCap || isArrowCap) {
         localX = 0.0;
         localY = 0.0;
         radius = 0.001;
     }
 
-    // Calculate step index
-    int stepIndex = int(t * NumSteps + 0.5);
+    // Calculate step index for trails (clamp t, cone/arrow tip extends beyond 1)
+    float tClamped = min(t, 1.0);
+    int stepIndex = int(tClamped * NumSteps + 0.5);
 
     // ========================================
     // START AT 3D GRID POSITION
     // ========================================
-    vec3 pos = vec3(startX, startY, startZ);
+    vec3 startPos = vec3(startX, startY, startZ);
+    vec3 pos = startPos;
     vec3 prevPos = pos;
 
-    // ========================================
-    // TIME-BASED FLOW: Pre-integrate to shift starting point
-    // This makes the tube "flow" along the field line
-    // Wraps around to create continuous looping flow
-    // ========================================
-    float maxPreSteps = 32.0; // Loop after this many steps
-
-    // Per-tube phase offset based on starting position (0 to maxPreSteps)
-    float tubePhase = fract(sin(dot(vec3(startX, startY, startZ), vec3(12.9898, 78.233, 45.164))) * 43758.5453) * maxPreSteps;
-
-    float flowOffset = mod(Time * FlowSpeed + tubePhase, maxPreSteps);
-    int preSteps = int(flowOffset);
-    float fractional = fract(flowOffset);
-
-    // Pre-integrate to move the effective starting position
-    for (int i = 0; i < 32; i++) {
-        if (i >= preSteps) break;
-        pos += getField(pos) * StepSize;
-    }
-    // Fractional step for smooth motion
-    pos += getField(pos) * StepSize * fractional;
-    prevPos = pos;
-
-    // Growth + fade near wrap point for smoother transition
-    float growZone = 10.0; // Steps to grow over
-    float shrinkZone = 18.0; // Steps to shrink over (larger = fade out earlier, before jitter)
-
-    // Growth factor: 0 at wrap point, 1 when fully grown
-    float growthFactor = smoothstep(0.0, growZone, flowOffset);
-
-    // Shrink factor: 1 normally, 0 as approaching wrap (starts earlier)
-    float shrinkFactor = smoothstep(0.0, shrinkZone, maxPreSteps - flowOffset);
-
-    // BIRTH: Tube grows from start (t=0) toward end (t=1)
-    // Clamp t to growth factor - vertices beyond are collapsed to the growing tip
-    float clampedT = min(t, growthFactor);
-    int clampedStepIndex = int(clampedT * NumSteps + 0.5);
-
-    // DEATH: Fade from end (t=1) toward start (t=0)
-    // Vertices with high t fade out first
-    float deathFade = 1.0 - smoothstep(shrinkFactor - 0.15, shrinkFactor, t);
-
-    // Birth fade: vertices fade in as they become part of the visible tube
-    float birthFade = smoothstep(growthFactor - 0.15, growthFactor, t);
-    birthFade = 1.0 - birthFade; // Invert: visible when t < growthFactor
-
-    // Combined opacity
-    float flowFade = birthFade * deathFade;
+    // Output variables
+    vec3 finalPos = startPos;
+    vec3 color = vec3(1.0);
+    float alpha = 1.0;
 
     // ========================================
-    // INTEGRATE THROUGH VECTOR FIELD
+    // ARROW MODE: Static arrows oriented by field
+    // No integration - just sample field once, orient, scale
     // ========================================
-    for (int i = 0; i < 64; i++) {
-        if (i >= clampedStepIndex) break;
+    if (isArrowMode) {
+        vec3 fieldVec = getField(startPos);
+        float magnitude = length(fieldVec);
+        vec3 tangent = (magnitude > 0.001) ? fieldVec / magnitude : vec3(0.0, 1.0, 0.0);
+
+        // Scale arrow length by field magnitude
+        float arrowLength = magnitude * ArrowScale;
+
+        // Build perpendicular frame
+        vec3 up = vec3(0.0, 1.0, 0.0);
+        vec3 frameNormal = cross(up, tangent);
+        float fnLen = length(frameNormal);
+        if (fnLen < 0.001) {
+            frameNormal = vec3(1.0, 0.0, 0.0);
+        } else {
+            frameNormal /= fnLen;
+        }
+        vec3 frameBinormal = normalize(cross(tangent, frameNormal));
+
+        // Position along straight arrow (t=0 is base, t=1 is before cone, t=2 is cone tip)
+        float alongArrow = tClamped * arrowLength;
+        vec3 arrowPos = startPos + tangent * alongArrow;
+
+        // Cross-section offset
+        vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
+        finalPos = arrowPos + offset;
+
+        // Cone tip: t=2 marks the tip, use ConeLength uniform for height
+        if (isArrowCone && t > 1.5) {
+            float coneHeight = ConeLength * TubeRadius;
+            finalPos = startPos + tangent * (arrowLength + coneHeight);
+        }
+
+        color = getColor(fieldVec, tClamped);
+        if (isArrowCone) {
+            color = mix(color, vec3(1.0), 0.2);
+        }
+        alpha = 1.0;
+
+    // ========================================
+    // TRAIL & PARTICLE MODE: Flowing tubes with integration
+    // Particles are just short trails (minimal geometry, same animation)
+    // ========================================
+    } else {
+        // TIME-BASED FLOW: Pre-integrate to shift starting point
+        float maxPreSteps = 32.0;
+        float tubePhase = fract(sin(dot(startPos, vec3(12.9898, 78.233, 45.164))) * 43758.5453) * maxPreSteps;
+        float flowOffset = mod(Time * FlowSpeed + tubePhase, maxPreSteps);
+        int preSteps = int(flowOffset);
+        float fractional = fract(flowOffset);
+
+        // Pre-integrate to move the effective starting position
+        for (int i = 0; i < 32; i++) {
+            if (i >= preSteps) break;
+            pos += getField(pos) * StepSize;
+        }
+        pos += getField(pos) * StepSize * fractional;
         prevPos = pos;
-        pos += getField(pos) * StepSize;
+
+        // Growth + fade near wrap point
+        float growZone = 10.0;
+        float shrinkZone = 18.0;
+        float growthFactor = smoothstep(0.0, growZone, flowOffset);
+        float shrinkFactor = smoothstep(0.0, shrinkZone, maxPreSteps - flowOffset);
+
+        float clampedT = min(tClamped, growthFactor);
+        int clampedStepIndex = int(clampedT * NumSteps + 0.5);
+
+        float deathFade = 1.0 - smoothstep(shrinkFactor - 0.15, shrinkFactor, tClamped);
+        float birthFade = 1.0 - smoothstep(growthFactor - 0.15, growthFactor, tClamped);
+        float flowFade = birthFade * deathFade;
+
+        // Integrate through vector field
+        for (int i = 0; i < 64; i++) {
+            if (i >= clampedStepIndex) break;
+            prevPos = pos;
+            pos += getField(pos) * StepSize;
+        }
+
+        // Compute tangent
+        vec3 vel = getField(pos);
+        vec3 tangent;
+        if (stepIndex > 0 && length(pos - prevPos) > 0.0001) {
+            tangent = normalize(pos - prevPos);
+        } else {
+            tangent = normalize(vel + vec3(0.0, 0.001, 0.0));
+        }
+
+        // Build perpendicular frame
+        vec3 up = vec3(0.0, 1.0, 0.0);
+        vec3 frameNormal = cross(up, tangent);
+        float fnLen = length(frameNormal);
+        if (fnLen < 0.001) {
+            frameNormal = vec3(1.0, 0.0, 0.0);
+        } else {
+            frameNormal /= fnLen;
+        }
+        vec3 frameBinormal = normalize(cross(tangent, frameNormal));
+
+        // Place tube cross-section
+        vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
+        finalPos = pos + offset;
+
+        color = getColor(vel, tClamped);
+        alpha = flowFade;
     }
-
-    // ========================================
-    // COMPUTE TANGENT (direction of travel)
-    // ========================================
-    vec3 vel = getField(pos);
-    vec3 tangent;
-    if (stepIndex > 0 && length(pos - prevPos) > 0.0001) {
-        tangent = normalize(pos - prevPos);
-    } else {
-        tangent = normalize(vel + vec3(0.0, 0.001, 0.0));
-    }
-
-    // ========================================
-    // BUILD PERPENDICULAR FRAME
-    // ========================================
-    vec3 up = vec3(0.0, 1.0, 0.0);
-    vec3 frameNormal = cross(up, tangent);
-    float fnLen = length(frameNormal);
-    if (fnLen < 0.001) {
-        frameNormal = vec3(1.0, 0.0, 0.0);
-    } else {
-        frameNormal /= fnLen;
-    }
-    vec3 frameBinormal = normalize(cross(tangent, frameNormal));
-
-    // ========================================
-    // PLACE TUBE CROSS-SECTION
-    // ========================================
-    vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
-    vec3 finalPos = pos + offset;
-
-    vec3 color = getColor(vel, t);
 
     transformedPosition = finalPos;
-    vertexColor = vec4(color, flowFade);
+    vertexColor = vec4(color, alpha);
 }

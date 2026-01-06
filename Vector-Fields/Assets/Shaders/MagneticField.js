@@ -2,12 +2,17 @@
 // Computes magnetic field from two magnetic dipoles
 // Magnet's +X axis points from S to N pole (aligned with capsule mesh)
 //
-// Vertex encoding (same as VectorFieldTubesShader):
-//   position.z = t (0-1, maps to step index for integration)
-//   normal.z = 1 for tube vertices, 0 for cap centers
+// Vertex encoding (all data in UVs to avoid distortion):
 //   texture0 = (localX, localY) unit circle coords for cross-section
 //   texture1 = (startX, startZ) starting position in XZ plane
-//   texture2.x = startY starting Y position
+//   texture2 = (startY, t) starting Y position and t parameter
+//   texture3 = (geoType) geometry type:
+//     0 = trail cap center (flat)
+//     1 = trail body (flow animation + integration)
+//     3 = particle (short trail - flow animation + integration)
+//     4 = arrow body (static, orient by field)
+//     5 = arrow cone (static, orient by field)
+//     6 = arrow cap center (static)
 
 input_float TubeRadius;
 input_float StepSize;
@@ -15,14 +20,15 @@ input_float NumSteps;
 input_float FieldStrength;
 input_float Time;
 input_float FlowSpeed;
+input_float ArrowScale;
+input_float ConeLength;
+input_float ConeRadius;
 
-// Magnet 1: position and forward direction (from S to N pole)
 input_vec3 Magnet1Position;
-input_vec3 Magnet1Forward;  // Unit vector pointing from S to N
+input_vec3 Magnet1Forward;
 
-// Magnet 2: position and forward direction (from S to N pole)
 input_vec3 Magnet2Position;
-input_vec3 Magnet2Forward;  // Unit vector pointing from S to N
+input_vec3 Magnet2Forward;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
@@ -31,41 +37,31 @@ output_vec4 vertexColor;
 // MAGNETIC FIELD COMPUTATION
 // ========================================
 
-// Magnetic dipole field: B = (3(m dot r_hat)r_hat - m) / r^3
-// Where m is the magnetic moment (direction from S to N)
-// and r is the vector from dipole to the point
 vec3 dipoleMagneticField(vec3 point, vec3 dipolePos, vec3 moment) {
     vec3 r = point - dipolePos;
     float dist = length(r);
 
-    // Avoid singularity at dipole location
+    vec3 result;
     if (dist < 0.1) {
-        // Inside the magnet, field roughly aligns with moment
-        return moment * FieldStrength * 2.0;
+        result = moment * FieldStrength * 2.0;
+    } else {
+        vec3 rHat = r / dist;
+        float dist3 = dist * dist * dist;
+        float mDotR = dot(moment, rHat);
+        vec3 B = (3.0 * mDotR * rHat - moment) / dist3;
+        result = B * FieldStrength;
     }
-
-    vec3 rHat = r / dist;
-    float dist3 = dist * dist * dist;
-
-    // Dipole field formula
-    float mDotR = dot(moment, rHat);
-    vec3 B = (3.0 * mDotR * rHat - moment) / dist3;
-
-    return B * FieldStrength;
+    return result;
 }
 
-// Combined magnetic field from both dipoles
 vec3 getMagneticField(vec3 p) {
     vec3 B1 = dipoleMagneticField(p, Magnet1Position, Magnet1Forward);
     vec3 B2 = dipoleMagneticField(p, Magnet2Position, Magnet2Forward);
 
-    // Superposition principle: total field is sum of individual fields
     vec3 totalB = B1 + B2;
 
-    // Normalize and scale for visualization (field can get very strong near poles)
     float mag = length(totalB);
     if (mag > 0.001) {
-        // Soft clamp the magnitude while preserving direction
         float clampedMag = mag / (1.0 + mag * 0.5);
         totalB = normalize(totalB) * clampedMag * 0.5;
     }
@@ -77,160 +73,173 @@ vec3 getMagneticField(vec3 p) {
 // COLOR BASED ON FIELD DIRECTION
 // ========================================
 
-// Multi-stop gradient for rich north/south visualization
-// South (blue/cyan) -> Purple -> Magenta -> Red/Orange (North)
 vec3 getGradientColor(float value) {
-    // value: 0 = south, 1 = north
-    // 5-stop gradient: Cyan -> Blue -> Magenta -> Red -> Orange
+    vec3 c0 = vec3(0.0, 0.9, 1.0);
+    vec3 c1 = vec3(0.2, 0.3, 1.0);
+    vec3 c2 = vec3(0.85, 0.15, 0.95);
+    vec3 c3 = vec3(1.0, 0.15, 0.25);
+    vec3 c4 = vec3(1.0, 0.5, 0.0);
 
-    vec3 c0 = vec3(0.0, 0.9, 1.0);   // Cyan (deep south)
-    vec3 c1 = vec3(0.2, 0.3, 1.0);   // Blue
-    vec3 c2 = vec3(0.85, 0.15, 0.95); // Magenta (neutral)
-    vec3 c3 = vec3(1.0, 0.15, 0.25); // Red
-    vec3 c4 = vec3(1.0, 0.5, 0.0);   // Orange (deep north)
-
+    vec3 result;
     if (value < 0.25) {
-        return mix(c0, c1, value * 4.0);
+        result = mix(c0, c1, value * 4.0);
     } else if (value < 0.5) {
-        return mix(c1, c2, (value - 0.25) * 4.0);
+        result = mix(c1, c2, (value - 0.25) * 4.0);
     } else if (value < 0.75) {
-        return mix(c2, c3, (value - 0.5) * 4.0);
+        result = mix(c2, c3, (value - 0.5) * 4.0);
     } else {
-        return mix(c3, c4, (value - 0.75) * 4.0);
+        result = mix(c3, c4, (value - 0.75) * 4.0);
     }
+    return result;
 }
 
 vec3 getColor(vec3 field, float t) {
     vec3 normField = normalize(field + vec3(0.001));
 
-    // Compute "northness" - how much the field aligns with north direction
     vec3 avgNorth = normalize(Magnet1Forward + Magnet2Forward + vec3(0.001));
     float northness = dot(normField, avgNorth);
 
-    // Map -1..1 to 0..1 for gradient lookup
     float gradientPos = northness * 0.5 + 0.5;
 
     vec3 baseColor = getGradientColor(gradientPos);
 
-    // Boost saturation and brightness based on field strength
     float strength = length(field);
     float intensityBoost = min(1.0, strength * 2.0);
 
-    // Keep colors vivid - only slight darkening for weak fields
     baseColor = mix(baseColor * 0.7, baseColor, intensityBoost);
 
     return baseColor;
 }
 
 void main() {
-    vec3 inPos = system.getSurfacePositionObjectSpace();
-    vec3 inNormal = system.getSurfaceNormalObjectSpace();
     vec2 inUV0 = system.getSurfaceUVCoord0();
     vec2 inUV1 = system.getSurfaceUVCoord1();
     vec2 inUV2 = system.getSurfaceUVCoord2();
+    vec2 inUV3 = system.getSurfaceUVCoord3();
 
-    // Decode vertex data
-    float t = inPos.z;
     float localX = inUV0.x;
     float localY = inUV0.y;
     float startX = inUV1.x;
     float startZ = inUV1.y;
     float startY = inUV2.x;
+    float t = inUV2.y;
+    float geoType = inUV3.x;
     float radius = TubeRadius;
 
-    // Cap centers
-    bool isCapCenter = (inNormal.z < 0.5);
-    if (isCapCenter) {
+    bool isTrailCap = (geoType < 0.5);
+    bool isArrow = (geoType > 3.5 && geoType < 4.5);
+    bool isArrowCone = (geoType > 4.5 && geoType < 5.5);
+    bool isArrowCap = (geoType > 5.5);
+    bool isArrowMode = isArrow || isArrowCone || isArrowCap;
+
+    if (isTrailCap || isArrowCap) {
         localX = 0.0;
         localY = 0.0;
         radius = 0.001;
     }
 
-    // Calculate step index
-    int stepIndex = int(t * NumSteps + 0.5);
+    float tClamped = min(t, 1.0);
+    int stepIndex = int(tClamped * NumSteps + 0.5);
 
-    // ========================================
-    // START AT 3D GRID POSITION
-    // ========================================
-    vec3 pos = vec3(startX, startY, startZ);
+    vec3 startPos = vec3(startX, startY, startZ);
+    vec3 pos = startPos;
     vec3 prevPos = pos;
 
-    // ========================================
-    // TIME-BASED FLOW
-    // ========================================
-    float maxPreSteps = 32.0;
+    vec3 finalPos = startPos;
+    vec3 color = vec3(1.0);
+    float alpha = 1.0;
 
-    // Per-tube phase offset
-    float tubePhase = fract(sin(dot(vec3(startX, startY, startZ), vec3(12.9898, 78.233, 45.164))) * 43758.5453) * maxPreSteps;
+    if (isArrowMode) {
+        vec3 fieldVec = getMagneticField(startPos);
+        float magnitude = length(fieldVec);
+        vec3 tangent = (magnitude > 0.001) ? fieldVec / magnitude : vec3(0.0, 1.0, 0.0);
 
-    float flowOffset = mod(Time * FlowSpeed + tubePhase, maxPreSteps);
-    int preSteps = int(flowOffset);
-    float fractional = fract(flowOffset);
+        float arrowLength = magnitude * ArrowScale;
 
-    // Pre-integrate to move the effective starting position
-    for (int i = 0; i < 32; i++) {
-        if (i >= preSteps) break;
-        pos += getMagneticField(pos) * StepSize;
-    }
-    pos += getMagneticField(pos) * StepSize * fractional;
-    prevPos = pos;
+        vec3 up = vec3(0.0, 1.0, 0.0);
+        vec3 frameNormal = cross(up, tangent);
+        float fnLen = length(frameNormal);
+        if (fnLen < 0.001) {
+            frameNormal = vec3(1.0, 0.0, 0.0);
+        } else {
+            frameNormal /= fnLen;
+        }
+        vec3 frameBinormal = normalize(cross(tangent, frameNormal));
 
-    // Growth/fade for smooth looping
-    float growZone = 10.0;
-    float shrinkZone = 18.0;
+        float alongArrow = tClamped * arrowLength;
+        vec3 arrowPos = startPos + tangent * alongArrow;
 
-    float growthFactor = smoothstep(0.0, growZone, flowOffset);
-    float shrinkFactor = smoothstep(0.0, shrinkZone, maxPreSteps - flowOffset);
+        vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
+        finalPos = arrowPos + offset;
 
-    float clampedT = min(t, growthFactor);
-    int clampedStepIndex = int(clampedT * NumSteps + 0.5);
+        if (isArrowCone && t > 1.5) {
+            float coneHeight = ConeLength * TubeRadius;
+            finalPos = startPos + tangent * (arrowLength + coneHeight);
+        }
 
-    float deathFade = 1.0 - smoothstep(shrinkFactor - 0.15, shrinkFactor, t);
-    float birthFade = 1.0 - smoothstep(growthFactor - 0.15, growthFactor, t);
-    float flowFade = birthFade * deathFade;
+        color = getColor(fieldVec, tClamped);
+        if (isArrowCone) {
+            color = mix(color, vec3(1.0), 0.2);
+        }
+        alpha = 1.0;
 
-    // ========================================
-    // INTEGRATE THROUGH MAGNETIC FIELD
-    // ========================================
-    for (int i = 0; i < 64; i++) {
-        if (i >= clampedStepIndex) break;
+    } else {
+        float maxPreSteps = 32.0;
+        float tubePhase = fract(sin(dot(startPos, vec3(12.9898, 78.233, 45.164))) * 43758.5453) * maxPreSteps;
+        float flowOffset = mod(Time * FlowSpeed + tubePhase, maxPreSteps);
+        int preSteps = int(flowOffset);
+        float fractional = fract(flowOffset);
+
+        for (int i = 0; i < 32; i++) {
+            if (i >= preSteps) break;
+            pos += getMagneticField(pos) * StepSize;
+        }
+        pos += getMagneticField(pos) * StepSize * fractional;
         prevPos = pos;
-        pos += getMagneticField(pos) * StepSize;
+
+        float growZone = 10.0;
+        float shrinkZone = 18.0;
+        float growthFactor = smoothstep(0.0, growZone, flowOffset);
+        float shrinkFactor = smoothstep(0.0, shrinkZone, maxPreSteps - flowOffset);
+
+        float clampedT = min(tClamped, growthFactor);
+        int clampedStepIndex = int(clampedT * NumSteps + 0.5);
+
+        float deathFade = 1.0 - smoothstep(shrinkFactor - 0.15, shrinkFactor, tClamped);
+        float birthFade = 1.0 - smoothstep(growthFactor - 0.15, growthFactor, tClamped);
+        float flowFade = birthFade * deathFade;
+
+        for (int i = 0; i < 64; i++) {
+            if (i >= clampedStepIndex) break;
+            prevPos = pos;
+            pos += getMagneticField(pos) * StepSize;
+        }
+
+        vec3 vel = getMagneticField(pos);
+        vec3 tangent;
+        if (stepIndex > 0 && length(pos - prevPos) > 0.0001) {
+            tangent = normalize(pos - prevPos);
+        } else {
+            tangent = normalize(vel + vec3(0.0, 0.001, 0.0));
+        }
+
+        vec3 up = vec3(0.0, 1.0, 0.0);
+        vec3 frameNormal = cross(up, tangent);
+        float fnLen = length(frameNormal);
+        if (fnLen < 0.001) {
+            frameNormal = vec3(1.0, 0.0, 0.0);
+        } else {
+            frameNormal /= fnLen;
+        }
+        vec3 frameBinormal = normalize(cross(tangent, frameNormal));
+
+        vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
+        finalPos = pos + offset;
+
+        color = getColor(vel, tClamped);
+        alpha = flowFade;
     }
-
-    // ========================================
-    // COMPUTE TANGENT (direction of travel)
-    // ========================================
-    vec3 field = getMagneticField(pos);
-    vec3 tangent;
-    if (stepIndex > 0 && length(pos - prevPos) > 0.0001) {
-        tangent = normalize(pos - prevPos);
-    } else {
-        tangent = normalize(field + vec3(0.0, 0.001, 0.0));
-    }
-
-    // ========================================
-    // BUILD PERPENDICULAR FRAME
-    // ========================================
-    vec3 up = vec3(0.0, 1.0, 0.0);
-    vec3 frameNormal = cross(up, tangent);
-    float fnLen = length(frameNormal);
-    if (fnLen < 0.001) {
-        frameNormal = vec3(1.0, 0.0, 0.0);
-    } else {
-        frameNormal /= fnLen;
-    }
-    vec3 frameBinormal = normalize(cross(tangent, frameNormal));
-
-    // ========================================
-    // PLACE TUBE CROSS-SECTION
-    // ========================================
-    vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
-    vec3 finalPos = pos + offset;
-
-    // Color with flow fade applied
-    vec3 color = getColor(field, t);
 
     transformedPosition = finalPos;
-    vertexColor = vec4(color, flowFade);
+    vertexColor = vec4(color, alpha);
 }

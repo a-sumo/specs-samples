@@ -7,6 +7,15 @@
     - Port_Amount_N014:
         typeIdx: 1
         value: 1.000000
+    - Port_ArrowScale_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ConeLength_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ConeRadius_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
@@ -109,6 +118,12 @@
     - Tweak_N2:
         typeIdx: 1
         value: 1.000000
+    - Tweak_N28:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N29:
+        typeIdx: 1
+        value: 1.000000
     - Tweak_N3:
         typeIdx: 1
         value: 1.000000
@@ -144,6 +159,12 @@
     []
   BlendMode: AlphaTest
   Properties:
+    ArrowScale:
+      typeIdx: 1
+      value: 1.000000
+    ConeLength:
+      typeIdx: 1
+      value: 1.000000
     FieldStrength:
       typeIdx: 1
       value: 1.000000
