@@ -36,7 +36,7 @@
 - !<ScriptComponent/07801f26-d6b3-408d-4797-1b33c0503c03>
   PrefabRemaps:
     []
-  Name: MagneticFieldTubes
+  Name: MagneticField
   Enabled: true
   ScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
   ScriptInputsDefault:
