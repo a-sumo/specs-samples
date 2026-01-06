@@ -326,7 +326,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: -60.000000}
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 2.000000, y: 2.000000, z: 2.000000}
     HasSegmentScaleCompensation: false
@@ -743,8 +743,8 @@
   ScriptInputs:
     "":
       _lengthSegments: !<float> 64.000000
-      _radialSegments: !<float> 4.000000
-      _radius: 0.020000
+      _radialSegments: !<float> 6.000000
+      _radius: 0.040000
       _gridSize: !<float> 5.000000
       _gridSpacing: !<float> 1.000000
       _stepSize: 0.100000
@@ -779,7 +779,7 @@
   PrefabRemaps:
     []
   Name: Settings Frame
-  Enabled: true
+  Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: -10.000000, y: 0.000000, z: 0.000000}

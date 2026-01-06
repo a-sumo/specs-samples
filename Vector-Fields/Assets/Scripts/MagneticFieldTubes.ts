@@ -1,7 +1,7 @@
 // MagneticFieldTubes.ts
 // Tube geometry that visualizes magnetic field from two dipole magnets
-// Magnet orientation: Y-axis rotation determines N/S pole direction
-// Forward vector (+Z in local space, rotated by Y rotation) points from S to N
+// Magnet orientation: +X axis points from S to N pole (aligned with capsule mesh)
+// Rotate magnet to change pole direction
 
 @component
 export class MagneticFieldTubes extends BaseScriptComponent {
@@ -70,9 +70,14 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     private meshVisuals: RenderMeshVisual[] = [];
     private mainPass: Pass;
+    private _baseFlowSpeed: number = -1; // Stores original flow speed for sync multiplier
 
     // Max vertices per mesh (UInt16 index limit)
     private readonly MAX_VERTICES_PER_MESH = 65000;
+
+    // Normalized default values (0-1) for: [forceStrength, stepSize, radius, flowSpeed, lengthSegments]
+    // Use with setters: setForceStrengthNormalized, setStepSizeNormalized, setRadiusNormalized, setFlowSpeedNormalized, setLengthSegmentsNormalized
+    public static readonly NORMALIZED_DEFAULTS: number[] = [0.2, 0.18, 0.21, 0.04, 0.43];
 
     onAwake(): void {
         this.setupMaterial();
@@ -108,18 +113,17 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         return mv;
     }
 
-    // Get forward vector (from S to N pole) based on object's Y rotation
-    // In local space, forward is +Z, and Y rotation rotates this in the XZ plane
+    // Get forward vector (from S to N pole) along object's X axis (capsule axis)
     private getForwardVector(obj: SceneObject): vec3 {
         if (!obj) {
-            return new vec3(0, 0, 1);
+            return new vec3(1, 0, 0);
         }
 
         const transform = obj.getTransform();
         const rotation = transform.getWorldRotation();
 
-        // Forward vector in world space (local +Z rotated by world rotation)
-        const localForward = new vec3(0, 0, 1);
+        // Forward vector in world space (local +X rotated by world rotation)
+        const localForward = new vec3(1, 0, 0);
         return rotation.multiplyVec3(localForward);
     }
 
@@ -172,7 +176,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
             this.mainPass.Magnet1Forward = this.getMagnetLocalForward(this.magnet1);
         } else {
             this.mainPass.Magnet1Position = new vec3(-2, 0, 0);
-            this.mainPass.Magnet1Forward = new vec3(0, 0, 1);
+            this.mainPass.Magnet1Forward = new vec3(1, 0, 0); // X axis
         }
 
         // Magnet 2 position and forward (in local space)
@@ -181,7 +185,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
             this.mainPass.Magnet2Forward = this.getMagnetLocalForward(this.magnet2);
         } else {
             this.mainPass.Magnet2Position = new vec3(2, 0, 0);
-            this.mainPass.Magnet2Forward = new vec3(0, 0, -1);
+            this.mainPass.Magnet2Forward = new vec3(-1, 0, 0); // -X axis (opposite)
         }
     }
 
@@ -399,4 +403,25 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     get flowSpeed(): number { return this._flowSpeed; }
     set flowSpeed(value: number) { this._flowSpeed = value; }
+
+    // Sync visualization from physics force strength
+    // Affects flow speed (animation) and intensity, NOT field line shape
+    // Maps physics range (1-500) to appropriate visual ranges
+    public syncFromPhysicsStrength(physicsForceStrength: number): void {
+        // Store base flow speed on first call
+        if (this._baseFlowSpeed < 0) {
+            this._baseFlowSpeed = this._flowSpeed;
+        }
+
+        // Normalize 1-500 to 0-1
+        const normalized = (physicsForceStrength - 1) / 499;
+
+        // Flow speed: multiply base by strength factor (1x to 5x)
+        const speedMultiplier = 1.0 + normalized * 4.0;
+        this._flowSpeed = this._baseFlowSpeed * speedMultiplier;
+
+        // Field strength for integration stays moderate (affects tube length)
+        // Keep relatively constant so shape is consistent
+        this._fieldStrength = 1.0 + normalized * 2.0;
+    }
 }

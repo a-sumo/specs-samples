@@ -4,6 +4,9 @@
     - !<own> 140573ab-e0a5-434c-8bcb-205a42a38a5a
 - !<PassInfo/140573ab-e0a5-434c-8bcb-205a42a38a5a>
   CachedProperties:
+    - Port_Amount_N014:
+        typeIdx: 1
+        value: 1.000000
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
@@ -34,6 +37,12 @@
     - Port_GSplatScale_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Import_N015:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Input_N014:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_Magnet1Forward_N000:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
@@ -73,6 +82,9 @@
     - Port_Value2_N000:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value4_N023:
+        typeIdx: 1
+        value: 0.000000
     - Port_VectorIn_N001:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
@@ -130,7 +142,7 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: PremultipliedAlpha
+  BlendMode: AlphaToCoverage
   Properties:
     FieldStrength:
       typeIdx: 1
@@ -153,6 +165,33 @@
     NumSteps:
       typeIdx: 1
       value: 1.000000
+    Port_Import_N017:
+      typeIdx: 1
+      value: 0.000000
+    Port_Import_N019:
+      typeIdx: 1
+      value: 38.000000
+    Port_Import_N021:
+      typeIdx: 1
+      value: 100.000000
+    Port_Input1_N020:
+      typeIdx: 1
+      value: 0.010000
+    Port_Input1_N022:
+      typeIdx: 1
+      value: 0.010000
+    Port_RangeMaxA_N018:
+      typeIdx: 1
+      value: 180.000000
+    Port_RangeMaxB_N018:
+      typeIdx: 1
+      value: 0.500000
+    Port_RangeMinA_N018:
+      typeIdx: 1
+      value: -180.000000
+    Port_RangeMinB_N018:
+      typeIdx: 1
+      value: -0.500000
     PreviewEnabled:
       typeIdx: 0
       value: 0

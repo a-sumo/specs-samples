@@ -1,7 +1,8 @@
 // MagnetPhysics.ts
 // Simulates magnetic attraction/repulsion between two magnets
 // Uses dipole-dipole interaction: opposite poles attract, like poles repel
-// Forward vector (+Z local, rotated by Y) points from S to N pole
+// Forward vector (+X local) points from S to N pole (aligned with capsule axis)
+// Shake either magnet to separate when stuck
 
 @component
 export class MagnetPhysics extends BaseScriptComponent {
@@ -15,19 +16,27 @@ export class MagnetPhysics extends BaseScriptComponent {
     magnet2: SceneObject;
 
     @input
-    @widget(new SliderWidget(0.1, 50.0, 0.1))
+    @hint("Collider for first magnet (optional)")
+    collider1: ColliderComponent;
+
+    @input
+    @hint("Collider for second magnet (optional)")
+    collider2: ColliderComponent;
+
+    @input
+    @widget(new SliderWidget(1, 500, 1))
     @hint("Strength of magnetic force")
-    forceStrength: number = 10.0;
+    forceStrength: number = 100.0;
 
     @input
-    @widget(new SliderWidget(0.0, 1.0, 0.01))
-    @hint("Velocity damping (0 = no damping, 1 = full damping)")
-    damping: number = 0.1;
+    @widget(new SliderWidget(0.0, 10.0, 0.1))
+    @hint("Velocity damping per second")
+    damping: number = 2.0;
 
     @input
-    @widget(new SliderWidget(0.5, 5.0, 0.1))
+    @widget(new SliderWidget(0.1, 2.0, 0.1))
     @hint("Minimum distance to prevent extreme forces")
-    minDistance: number = 1.0;
+    minDistance: number = 0.3;
 
     @input
     @widget(new SliderWidget(0.0, 20.0, 0.5))
@@ -35,234 +44,384 @@ export class MagnetPhysics extends BaseScriptComponent {
     maxDistance: number = 15.0;
 
     @input
-    @widget(new SliderWidget(0.0, 1.0, 0.1))
-    @hint("Bounciness on collision (0 = no bounce, 1 = full bounce)")
-    bounciness: number = 0.3;
+    @widget(new SliderWidget(1, 100, 1))
+    @hint("Maximum velocity to prevent flying off")
+    maxVelocity: number = 20.0;
 
     @input
     @hint("Enable physics simulation")
     enabled: boolean = true;
 
-    // Velocities for each magnet
-    private velocity1: vec3 = vec3.zero();
-    private velocity2: vec3 = vec3.zero();
+    @input
+    @widget(new SliderWidget(1, 50, 1))
+    @hint("Impulse strength when shaking to separate")
+    separationImpulse: number = 15.0;
 
-    // Track if magnets are being manipulated
-    private wasManipulating1: boolean = false;
-    private wasManipulating2: boolean = false;
-    private lastPos1: vec3 = vec3.zero();
-    private lastPos2: vec3 = vec3.zero();
+    @input
+    @widget(new SliderWidget(1, 20, 1))
+    @hint("Shake acceleration threshold to trigger separation")
+    shakeThreshold: number = 8.0;
+
+    @input
+    @widget(new SliderWidget(0.1, 1.0, 0.1))
+    @hint("Cooldown between shake separations (seconds)")
+    shakeCooldown: number = 0.3;
+
+    @input
+    @widget(new SliderWidget(0.0, 0.95, 0.05))
+    @hint("Force smoothing (higher = smoother but slower)")
+    forceSmoothing: number = 0.7;
+
+    // Normalized default for force strength (0-1 maps to 1-500)
+    public static readonly NORMALIZED_FORCE_DEFAULT: number = 0.2;
+
+    // Physics state
+    private velocity1 = vec3.zero();
+    private velocity2 = vec3.zero();
+    private smoothedForce = vec3.zero();
+    private isStuck = false;
+
+    // Collision state
+    private isColliding = false;
+    private collisionNormal = vec3.zero();
+    private overlapDepth = 0;
+
+    // Manipulation tracking
+    private wasManipulating1 = false;
+    private wasManipulating2 = false;
+    private lastPos1 = vec3.zero();
+    private lastPos2 = vec3.zero();
+    private lastManipVel1 = vec3.zero();
+    private lastManipVel2 = vec3.zero();
+    private lastSeparationTime = 0;
 
     onAwake(): void {
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
 
-        if (this.magnet1) {
-            this.lastPos1 = this.magnet1.getTransform().getWorldPosition();
-        }
-        if (this.magnet2) {
-            this.lastPos2 = this.magnet2.getTransform().getWorldPosition();
-        }
+        if (this.magnet1) this.lastPos1 = this.getPosition(this.magnet1);
+        if (this.magnet2) this.lastPos2 = this.getPosition(this.magnet2);
 
+        this.setupCollisionEvents();
         print("MagnetPhysics: Initialized");
     }
 
-    // Get forward vector (from S to N pole) based on object's Y rotation
-    private getForwardVector(obj: SceneObject): vec3 {
-        const rotation = obj.getTransform().getWorldRotation();
-        const localForward = new vec3(0, 0, 1);
-        return rotation.multiplyVec3(localForward);
+    private setupCollisionEvents(): void {
+        if (!this.collider1 || !this.collider2) return;
+
+        this.collider1.onOverlapEnter.add((e: OverlapEnterEventArgs) => {
+            if (e.overlap.collider === this.collider2) this.isColliding = true;
+        });
+
+        this.collider1.onOverlapStay.add((e: OverlapStayEventArgs) => {
+            if (e.overlap.collider === this.collider2) {
+                this.isColliding = true;
+                this.updateCollisionInfo();
+            }
+        });
+
+        this.collider1.onOverlapExit.add((e: OverlapExitEventArgs) => {
+            if (e.overlap.collider === this.collider2) {
+                this.isColliding = false;
+                this.overlapDepth = 0;
+            }
+        });
     }
 
-    // Compute magnetic force on magnet2 due to magnet1
-    // Dipole-dipole force is complex, but simplified:
-    // - Force along axis connecting them
-    // - Attractive if opposite poles face each other
-    // - Repulsive if same poles face each other
-    private computeMagneticForce(): vec3 {
-        if (!this.magnet1 || !this.magnet2) {
-            return vec3.zero();
+    private updateCollisionInfo(): void {
+        const delta = this.getPosition(this.magnet2).sub(this.getPosition(this.magnet1));
+        const distance = delta.length;
+
+        this.collisionNormal = distance > 0.001 ? delta.normalize() : new vec3(0, 1, 0);
+
+        const r1 = this.getColliderRadius(this.collider1);
+        const r2 = this.getColliderRadius(this.collider2);
+        this.overlapDepth = Math.max(0, r1 + r2 - distance);
+    }
+
+    private getColliderRadius(collider: ColliderComponent): number {
+        const shape = collider?.shape;
+        if (!shape) return 0.5;
+
+        let radius = (shape as any).radius ?? 0.5;
+        if ((shape as any).length !== undefined) {
+            radius += (shape as any).length / 2;
         }
+        return radius;
+    }
 
-        const pos1 = this.magnet1.getTransform().getWorldPosition();
-        const pos2 = this.magnet2.getTransform().getWorldPosition();
+    private getPosition(obj: SceneObject): vec3 {
+        return obj.getTransform().getWorldPosition();
+    }
 
-        // Vector from magnet1 to magnet2
+    private setPosition(obj: SceneObject, pos: vec3): void {
+        obj.getTransform().setWorldPosition(pos);
+    }
+
+    private getForwardVector(obj: SceneObject): vec3 {
+        return obj.getTransform().getWorldRotation().multiplyVec3(new vec3(1, 0, 0));
+    }
+
+    private getCollisionRadius(obj: SceneObject): number {
+        const scale = obj.getTransform().getWorldScale();
+        return 0.5 * Math.max(scale.x, Math.max(scale.y, scale.z));
+    }
+
+    // Returns alignment: negative = attracting, positive = repelling
+    private computeAlignment(): number {
+        const pos1 = this.getPosition(this.magnet1);
+        const pos2 = this.getPosition(this.magnet2);
         const delta = pos2.sub(pos1);
         const distance = delta.length;
 
-        if (distance < 0.001 || distance > this.maxDistance) {
-            return vec3.zero();
-        }
+        if (distance < 0.001) return -1; // Very close = attracting
 
         const direction = delta.normalize();
-
-        // Get magnetic moment directions (forward = S to N)
         const m1 = this.getForwardVector(this.magnet1);
         const m2 = this.getForwardVector(this.magnet2);
 
-        // Determine attraction/repulsion based on pole alignment
-        // If m1 points toward m2 position and m2 points toward m1 position,
-        // then N of m1 faces S of m2 = attraction
-        //
-        // dot(m1, direction) > 0 means N pole of m1 faces toward m2
-        // dot(m2, -direction) > 0 means N pole of m2 faces toward m1
-        // If both N poles face each other: repel
-        // If both S poles face each other: repel
-        // If N faces S: attract
+        const m1FacingM2 = m1.dot(direction);
+        const m2FacingM1 = m2.dot(direction.uniformScale(-1));
 
-        const m1FacingM2 = m1.dot(direction);      // >0 if N pole of m1 faces m2
-        const m2FacingM1 = m2.dot(direction.uniformScale(-1)); // >0 if N pole of m2 faces m1
+        return m1FacingM2 * m2FacingM1;
+    }
 
-        // Alignment factor:
-        // +1 if like poles face each other (repel)
-        // -1 if opposite poles face each other (attract)
+    private computeMagneticForce(): vec3 {
+        if (!this.magnet1 || !this.magnet2) return vec3.zero();
+
+        const pos1 = this.getPosition(this.magnet1);
+        const pos2 = this.getPosition(this.magnet2);
+        const delta = pos2.sub(pos1);
+        const distance = delta.length;
+
+        if (distance < 0.001 || distance > this.maxDistance) return vec3.zero();
+
+        const direction = delta.normalize();
+        const m1 = this.getForwardVector(this.magnet1);
+        const m2 = this.getForwardVector(this.magnet2);
+
+        const m1FacingM2 = m1.dot(direction);
+        const m2FacingM1 = m2.dot(direction.uniformScale(-1));
         const alignment = m1FacingM2 * m2FacingM1;
-
-        // Also consider overall dipole alignment for force magnitude
-        // Stronger interaction when dipoles are more aligned with connection axis
         const axialAlignment = Math.abs(m1FacingM2) * Math.abs(m2FacingM1);
 
-        // Clamp distance for force calculation
         const effectiveDistance = Math.max(distance, this.minDistance);
+        const distanceFactor = effectiveDistance * effectiveDistance;
 
-        // Force magnitude falls off with distance^3 (dipole-dipole)
-        const forceMagnitude = this.forceStrength * axialAlignment / (effectiveDistance * effectiveDistance);
+        // Close-range boost for attraction only
+        const isAttracting = alignment < 0;
+        const proximityFactor = Math.max(0, 1.0 - effectiveDistance / 2.0);
+        const closeRangeBoost = isAttracting ? (1.0 + 8.0 * proximityFactor * proximityFactor) : 1.0;
 
-        // Force direction: positive alignment = repulsion (force points away)
-        // negative alignment = attraction (force points toward)
-        const force = direction.uniformScale(forceMagnitude * alignment);
+        const alignmentFactor = Math.max(0.3, Math.sqrt(axialAlignment));
+        const maxForce = this.forceStrength * 5.0;
+        const forceMagnitude = Math.min(
+            this.forceStrength * alignmentFactor * closeRangeBoost / distanceFactor,
+            maxForce
+        );
 
-        return force;
+        return direction.uniformScale(forceMagnitude * alignment);
     }
 
-    // Detect if object is being manually manipulated (position changed externally)
-    private isBeingManipulated(obj: SceneObject, lastPos: vec3, velocity: vec3): boolean {
-        const currentPos = obj.getTransform().getWorldPosition();
-        const expectedPos = lastPos.add(velocity.uniformScale(getDeltaTime()));
-        const diff = currentPos.sub(expectedPos).length;
-
-        // If position differs significantly from physics prediction, user is manipulating
-        return diff > 0.01;
-    }
-
-    // Get collision radius from SceneObject's scale (default sphere radius is 0.5)
-    private getCollisionRadius(obj: SceneObject): number {
-        const scale = obj.getTransform().getWorldScale();
-        // Use max scale component for non-uniform scaling
-        const maxScale = Math.max(scale.x, Math.max(scale.y, scale.z));
-        return 0.5 * maxScale;
-    }
-
-    // Handle sphere-sphere collision between the two magnets
-    // Returns true if collision occurred
     private handleCollision(): boolean {
         if (!this.magnet1 || !this.magnet2) return false;
 
-        const pos1 = this.magnet1.getTransform().getWorldPosition();
-        const pos2 = this.magnet2.getTransform().getWorldPosition();
-
-        const radius1 = this.getCollisionRadius(this.magnet1);
-        const radius2 = this.getCollisionRadius(this.magnet2);
-
+        const pos1 = this.getPosition(this.magnet1);
+        const pos2 = this.getPosition(this.magnet2);
         const delta = pos2.sub(pos1);
         const distance = delta.length;
-        const minDist = radius1 + radius2;
 
-        if (distance >= minDist || distance < 0.001) {
-            return false; // No collision
+        let overlap = 0;
+        let normal = vec3.zero();
+
+        if (this.collider1 && this.collider2) {
+            if (!this.isColliding) {
+                this.isStuck = false;
+                return false;
+            }
+            overlap = this.overlapDepth;
+            normal = this.collisionNormal;
+        } else {
+            const minDist = this.getCollisionRadius(this.magnet1) + this.getCollisionRadius(this.magnet2);
+            if (distance >= minDist || distance < 0.001) {
+                this.isStuck = false;
+                return false;
+            }
+            overlap = minDist - distance;
+            normal = delta.normalize();
         }
 
-        // Collision detected - separate the magnets
-        const overlap = minDist - distance;
-        const normal = delta.normalize(); // Points from m1 to m2
+        if (overlap <= 0) {
+            this.isStuck = false;
+            return false;
+        }
 
-        // Push magnets apart (half each)
+        // Separate magnets
         const separation = normal.uniformScale(overlap * 0.5);
-        const newPos1 = pos1.sub(separation);
-        const newPos2 = pos2.add(separation);
+        this.setPosition(this.magnet1, pos1.sub(separation));
+        this.setPosition(this.magnet2, pos2.add(separation));
 
-        this.magnet1.getTransform().setWorldPosition(newPos1);
-        this.magnet2.getTransform().setWorldPosition(newPos2);
+        const attracting = this.computeAlignment() < 0;
 
-        // Reflect velocities along collision normal with bounciness
-        const relativeVel = this.velocity2.sub(this.velocity1);
-        const velAlongNormal = relativeVel.dot(normal);
+        if (attracting) {
+            // Stick together
+            this.isStuck = true;
+            this.velocity1 = vec3.zero();
+            this.velocity2 = vec3.zero();
+        } else {
+            // Cancel approaching velocity
+            this.isStuck = false;
+            const relativeVel = this.velocity2.sub(this.velocity1);
+            const velAlongNormal = relativeVel.dot(normal);
 
-        // Only resolve if velocities are moving toward each other
-        if (velAlongNormal < 0) {
-            const impulse = normal.uniformScale(velAlongNormal * (1 + this.bounciness));
-
-            // Apply impulse (equal mass assumption)
-            this.velocity1 = this.velocity1.add(impulse.uniformScale(0.5));
-            this.velocity2 = this.velocity2.sub(impulse.uniformScale(0.5));
+            if (velAlongNormal < 0) {
+                const cancelImpulse = normal.uniformScale(velAlongNormal * 0.5);
+                this.velocity1 = this.velocity1.add(cancelImpulse);
+                this.velocity2 = this.velocity2.sub(cancelImpulse);
+            }
         }
 
         return true;
     }
 
-    private onUpdate(): void {
-        if (!this.enabled || !this.magnet1 || !this.magnet2) {
-            return;
+    private isBeingManipulated(obj: SceneObject, lastPos: vec3, velocity: vec3): boolean {
+        const currentPos = this.getPosition(obj);
+        const expectedPos = lastPos.add(velocity.uniformScale(getDeltaTime()));
+        return currentPos.sub(expectedPos).length > 0.01;
+    }
+
+    private checkShakeSeparation(currentVel: vec3, lastVel: vec3, isManipulating: boolean): boolean {
+        if (!isManipulating) return false;
+
+        const now = getTime();
+        if (now - this.lastSeparationTime < this.shakeCooldown) return false;
+
+        const dt = getDeltaTime();
+        if (dt <= 0) return false;
+
+        const acceleration = currentVel.sub(lastVel).length / dt;
+        if (acceleration > this.shakeThreshold) {
+            this.lastSeparationTime = now;
+            return true;
         }
+        return false;
+    }
+
+    private clampVelocity(vel: vec3): vec3 {
+        const speed = vel.length;
+        return speed > this.maxVelocity ? vel.normalize().uniformScale(this.maxVelocity) : vel;
+    }
+
+    private lerpVec3(a: vec3, b: vec3, t: number): vec3 {
+        return new vec3(
+            a.x + (b.x - a.x) * t,
+            a.y + (b.y - a.y) * t,
+            a.z + (b.z - a.z) * t
+        );
+    }
+
+    private onUpdate(): void {
+        if (!this.enabled || !this.magnet1 || !this.magnet2) return;
 
         const dt = getDeltaTime();
         if (dt <= 0) return;
 
-        const pos1 = this.magnet1.getTransform().getWorldPosition();
-        const pos2 = this.magnet2.getTransform().getWorldPosition();
+        const pos1 = this.getPosition(this.magnet1);
+        const pos2 = this.getPosition(this.magnet2);
 
-        // Detect manipulation (user moving the magnet)
         const manipulating1 = this.isBeingManipulated(this.magnet1, this.lastPos1, this.velocity1);
         const manipulating2 = this.isBeingManipulated(this.magnet2, this.lastPos2, this.velocity2);
 
-        // Reset velocity if user just grabbed/released the magnet
+        // Reset on grab
         if (manipulating1 && !this.wasManipulating1) {
             this.velocity1 = vec3.zero();
+            this.lastManipVel1 = vec3.zero();
+            this.smoothedForce = vec3.zero();
         }
         if (manipulating2 && !this.wasManipulating2) {
             this.velocity2 = vec3.zero();
+            this.lastManipVel2 = vec3.zero();
+            this.smoothedForce = vec3.zero();
         }
 
-        // Compute magnetic force (on magnet2 from magnet1)
-        const force = this.computeMagneticForce();
+        // Shake detection
+        const manipVel1 = manipulating1 ? pos1.sub(this.lastPos1).uniformScale(1.0 / dt) : vec3.zero();
+        const manipVel2 = manipulating2 ? pos2.sub(this.lastPos2).uniformScale(1.0 / dt) : vec3.zero();
 
-        // Apply forces (equal and opposite)
-        // Only apply if not being manipulated
+        const stuckDistance = (this.getCollisionRadius(this.magnet1) + this.getCollisionRadius(this.magnet2)) * 1.5;
+        if (pos2.sub(pos1).length < stuckDistance) {
+            if (this.checkShakeSeparation(manipVel1, this.lastManipVel1, manipulating1) ||
+                this.checkShakeSeparation(manipVel2, this.lastManipVel2, manipulating2)) {
+                this.applySeparationImpulse();
+            }
+        }
+
+        this.lastManipVel1 = manipVel1;
+        this.lastManipVel2 = manipVel2;
+
+        // Skip physics when stuck
+        if (this.isStuck) {
+            this.velocity1 = vec3.zero();
+            this.velocity2 = vec3.zero();
+            this.smoothedForce = vec3.zero();
+            this.updateTracking(manipulating1, manipulating2);
+            return;
+        }
+
+        // Apply magnetic force
+        const rawForce = this.computeMagneticForce();
+        const smoothingRate = 1.0 - Math.pow(this.forceSmoothing, dt * 60);
+        this.smoothedForce = this.lerpVec3(this.smoothedForce, rawForce, smoothingRate);
+
+        const dampingFactor = Math.exp(-this.damping * dt);
+
         if (!manipulating1) {
-            // Force on magnet1 is opposite
-            const acceleration1 = force.uniformScale(-1);
-            this.velocity1 = this.velocity1.add(acceleration1.uniformScale(dt));
-            this.velocity1 = this.velocity1.uniformScale(1.0 - this.damping);
-
-            const newPos1 = pos1.add(this.velocity1.uniformScale(dt));
-            this.magnet1.getTransform().setWorldPosition(newPos1);
+            this.velocity1 = this.velocity1.sub(this.smoothedForce.uniformScale(dt));
+            this.velocity1 = this.clampVelocity(this.velocity1.uniformScale(dampingFactor));
+            this.setPosition(this.magnet1, pos1.add(this.velocity1.uniformScale(dt)));
         } else {
-            // Track velocity from manual movement
             this.velocity1 = pos1.sub(this.lastPos1).uniformScale(1.0 / dt);
         }
 
         if (!manipulating2) {
-            const acceleration2 = force;
-            this.velocity2 = this.velocity2.add(acceleration2.uniformScale(dt));
-            this.velocity2 = this.velocity2.uniformScale(1.0 - this.damping);
-
-            const newPos2 = pos2.add(this.velocity2.uniformScale(dt));
-            this.magnet2.getTransform().setWorldPosition(newPos2);
+            this.velocity2 = this.velocity2.add(this.smoothedForce.uniformScale(dt));
+            this.velocity2 = this.clampVelocity(this.velocity2.uniformScale(dampingFactor));
+            this.setPosition(this.magnet2, pos2.add(this.velocity2.uniformScale(dt)));
         } else {
             this.velocity2 = pos2.sub(this.lastPos2).uniformScale(1.0 / dt);
         }
 
-        // Handle collision - prevent overlap
-        this.handleCollision();
+        // Handle collision
+        if (this.handleCollision()) {
+            this.velocity1 = this.velocity1.uniformScale(0.5);
+            this.velocity2 = this.velocity2.uniformScale(0.5);
+        }
 
-        // Update tracking
-        this.lastPos1 = this.magnet1.getTransform().getWorldPosition();
-        this.lastPos2 = this.magnet2.getTransform().getWorldPosition();
+        this.updateTracking(manipulating1, manipulating2);
+    }
+
+    private updateTracking(manipulating1: boolean, manipulating2: boolean): void {
+        this.lastPos1 = this.getPosition(this.magnet1);
+        this.lastPos2 = this.getPosition(this.magnet2);
         this.wasManipulating1 = manipulating1;
         this.wasManipulating2 = manipulating2;
     }
 
-    // Public API to enable/disable physics
+    // ============ PUBLIC API ============
+
+    public applySeparationImpulse(): void {
+        if (!this.magnet1 || !this.magnet2) return;
+
+        this.isStuck = false;
+
+        const delta = this.getPosition(this.magnet2).sub(this.getPosition(this.magnet1));
+        const direction = delta.length > 0.001
+            ? delta.normalize()
+            : new vec3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+
+        this.velocity1 = direction.uniformScale(-this.separationImpulse);
+        this.velocity2 = direction.uniformScale(this.separationImpulse);
+    }
+
     public setEnabled(value: boolean): void {
         this.enabled = value;
         if (!value) {
@@ -271,9 +430,23 @@ export class MagnetPhysics extends BaseScriptComponent {
         }
     }
 
-    // Reset velocities
     public resetVelocities(): void {
         this.velocity1 = vec3.zero();
         this.velocity2 = vec3.zero();
     }
+
+    public getForceStrength(): number { return this.forceStrength; }
+    public setForceStrength(value: number): void { this.forceStrength = Math.max(0, value); }
+    public setForceStrengthNormalized(value: number): void { this.forceStrength = 1 + value * 499; } // 0-1 maps to 1-500
+
+    public getDamping(): number { return this.damping; }
+    public setDamping(value: number): void { this.damping = Math.max(0, value); }
+
+    public getMagnet1Position(): vec3 { return this.magnet1 ? this.getPosition(this.magnet1) : vec3.zero(); }
+    public getMagnet2Position(): vec3 { return this.magnet2 ? this.getPosition(this.magnet2) : vec3.zero(); }
+
+    public getMagnet1Forward(): vec3 { return this.magnet1 ? this.getForwardVector(this.magnet1) : new vec3(1, 0, 0); }
+    public getMagnet2Forward(): vec3 { return this.magnet2 ? this.getForwardVector(this.magnet2) : new vec3(1, 0, 0); }
+
+    public getIsStuck(): boolean { return this.isStuck; }
 }

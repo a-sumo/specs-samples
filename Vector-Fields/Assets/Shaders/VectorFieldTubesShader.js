@@ -343,9 +343,9 @@ void main() {
     vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
     vec3 finalPos = pos + offset;
 
-    // Color with flow fade applied
+    // Color with alpha-based fade (premultiplied alpha for proper transparency)
     vec3 color = getColor(vel, t);
 
     transformedPosition = finalPos;
-    vertexColor = vec4(color, flowFade);
+    vertexColor = vec4(color * flowFade, flowFade);
 }

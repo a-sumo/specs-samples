@@ -1,6 +1,6 @@
 // MagneticFieldTubesShader.js
 // Computes magnetic field from two magnetic dipoles
-// Each magnet's Y-axis rotation determines the north/south pole orientation
+// Magnet's +X axis points from S to N pole (aligned with capsule mesh)
 //
 // Vertex encoding (same as VectorFieldTubesShader):
 //   position.z = t (0-1, maps to step index for integration)
@@ -76,32 +76,48 @@ vec3 getMagneticField(vec3 p) {
 // ========================================
 // COLOR BASED ON FIELD DIRECTION
 // ========================================
-vec3 getColor(vec3 field, float t) {
-    // Color based on field direction
-    // Red = +X (or toward N), Blue = -X (toward S)
-    // Use vertical component for variation
 
+// Multi-stop gradient for rich north/south visualization
+// South (blue/cyan) -> Purple -> Magenta -> Red/Orange (North)
+vec3 getGradientColor(float value) {
+    // value: 0 = south, 1 = north
+    // 5-stop gradient: Cyan -> Blue -> Magenta -> Red -> Orange
+
+    vec3 c0 = vec3(0.0, 0.9, 1.0);   // Cyan (deep south)
+    vec3 c1 = vec3(0.2, 0.3, 1.0);   // Blue
+    vec3 c2 = vec3(0.85, 0.15, 0.95); // Magenta (neutral)
+    vec3 c3 = vec3(1.0, 0.15, 0.25); // Red
+    vec3 c4 = vec3(1.0, 0.5, 0.0);   // Orange (deep north)
+
+    if (value < 0.25) {
+        return mix(c0, c1, value * 4.0);
+    } else if (value < 0.5) {
+        return mix(c1, c2, (value - 0.25) * 4.0);
+    } else if (value < 0.75) {
+        return mix(c2, c3, (value - 0.5) * 4.0);
+    } else {
+        return mix(c3, c4, (value - 0.75) * 4.0);
+    }
+}
+
+vec3 getColor(vec3 field, float t) {
     vec3 normField = normalize(field + vec3(0.001));
 
-    // Base color: red for north-pointing, blue for south-pointing
-    float northness = dot(normField, normalize(Magnet1Forward + Magnet2Forward + vec3(0.001)));
+    // Compute "northness" - how much the field aligns with north direction
+    vec3 avgNorth = normalize(Magnet1Forward + Magnet2Forward + vec3(0.001));
+    float northness = dot(normField, avgNorth);
 
-    vec3 northColor = vec3(0.9, 0.2, 0.2);  // Red for north
-    vec3 southColor = vec3(0.2, 0.4, 0.9);  // Blue for south
-    vec3 neutralColor = vec3(0.8, 0.8, 0.3); // Yellow for perpendicular
+    // Map -1..1 to 0..1 for gradient lookup
+    float gradientPos = northness * 0.5 + 0.5;
 
-    float blend = northness * 0.5 + 0.5;  // Map -1..1 to 0..1
+    vec3 baseColor = getGradientColor(gradientPos);
 
-    vec3 baseColor;
-    if (blend > 0.5) {
-        baseColor = mix(neutralColor, northColor, (blend - 0.5) * 2.0);
-    } else {
-        baseColor = mix(southColor, neutralColor, blend * 2.0);
-    }
-
-    // Add some variation based on field strength
+    // Boost saturation and brightness based on field strength
     float strength = length(field);
-    baseColor = mix(baseColor * 0.6, baseColor, min(1.0, strength * 2.0));
+    float intensityBoost = min(1.0, strength * 2.0);
+
+    // Keep colors vivid - only slight darkening for weak fields
+    baseColor = mix(baseColor * 0.7, baseColor, intensityBoost);
 
     return baseColor;
 }
@@ -216,5 +232,6 @@ void main() {
     vec3 color = getColor(field, t);
 
     transformedPosition = finalPos;
-    vertexColor = vec4(color, flowFade);
+    // Premultiplied alpha for proper transparency fade
+    vertexColor = vec4(color * flowFade, flowFade);
 }

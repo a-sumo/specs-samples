@@ -1,8 +1,7 @@
 // MagnetPoleShader.js
 // Colors magnet surfaces based on pole orientation
-// +Z (forward) = North = Red
-// -Z (back) = South = Blue
-// This aligns with MagneticFieldTubesShader where forward points S to N
+// +X = North = Red (aligned with capsule mesh axis)
+// -X = South = Blue
 
 output_vec4 fragColor;
 
@@ -13,17 +12,16 @@ void main() {
     // Normalize to be safe
     normal = normalize(normal);
 
-    // Use Z component to determine pole
-    // +Z = North (red), -Z = South (blue)
-    float poleFactor = normal.z;
+    // Use X component to determine pole (capsule axis)
+    // +X = North (red), -X = South (blue)
+    float poleFactor = normal.x;
 
     vec3 northColor = vec3(0.9, 0.15, 0.15);  // Red for north
     vec3 southColor = vec3(0.15, 0.3, 0.9);   // Blue for south
-    vec3 sideColor = vec3(0.4, 0.4, 0.45);    // Gray for sides
+    vec3 sideColor = vec3(0.9, 0.9, 0.92);    // White for sides
 
-    // Blend based on Z component
+    // Blend based on X component
     vec3 color;
-    float absZ = abs(poleFactor);
 
     if (poleFactor > 0.1) {
         // North-facing (red)
