@@ -22,6 +22,12 @@
     - ObjectPosition:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - Port_Amount_N006:
+        typeIdx: 1
+        value: 1.000000
+    - Port_Blue_N006:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Port_BoundsSize;_N000:
         typeIdx: 1
         value: 0.000000
@@ -34,6 +40,12 @@
     - Port_ColliderHalfExtents_N000:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_ColorIn_N006:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Color_N006:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
@@ -67,9 +79,54 @@
     - Port_GSplatScale_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Green_N006:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - Port_HSV_N006:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_HSV_N014:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_Hue_N006:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Import_N037:
+        typeIdx: 5
+        value: {x: 0.000107, y: 0.001755, z: 0.998215, w: 1.000000}
+    - Port_Import_N038:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Import_N054:
+        typeIdx: 5
+        value: {x: 0.528618, y: 0.202167, z: 0.206210, w: 1.000000}
+    - Port_Import_N056:
+        typeIdx: 1
+        value: 0.060000
+    - Port_Import_N058:
+        typeIdx: 1
+        value: 0.180000
     - Port_InfluenceRadius_N000:
         typeIdx: 1
         value: 0.000000
+    - Port_Input0_N006:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Input1_N006:
+        typeIdx: 1
+        value: 4.000000
+    - Port_Input1_N060:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Input2_N060:
+        typeIdx: 1
+        value: 1.000000
+    - Port_Input_N006:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_Input_N014:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_NumSteps_N000:
         typeIdx: 1
         value: 0.000000
@@ -85,12 +142,18 @@
     - Port_PrevWorldPosition_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_RGB_N006:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_RayDirection_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 1.000000, z: 0.000000}
     - Port_RayOrigin_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Red_N006:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Port_Speed_N000:
         typeIdx: 1
         value: 0.000000
@@ -121,6 +184,9 @@
     - Port_Value2_N000:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value_N006:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_VectorIn_N005:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
@@ -188,12 +254,12 @@
   ColorMask: {x: true, y: true, z: true, w: true}
   CullMode: Back
   PolygonOffset: {x: 0.000000, y: 0.000000}
-  FrustumCulling: Auto
-  FrustumCullPad: 0.000000
+  FrustumCulling: Extend
+  FrustumCullPad: 10.000000
   InstanceCount: 1
   Defines:
     []
-  BlendMode: Max
+  BlendMode: AlphaToCoverage
   Properties:
     FieldScale:
       typeIdx: 1
@@ -202,6 +268,9 @@
       typeIdx: 1
       value: 1.000000
     NumSteps:
+      typeIdx: 1
+      value: 1.000000
+    Port_Amount_N014:
       typeIdx: 1
       value: 1.000000
     Preset:

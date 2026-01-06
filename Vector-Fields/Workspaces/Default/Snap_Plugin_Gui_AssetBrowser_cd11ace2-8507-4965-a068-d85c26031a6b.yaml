@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 592
+    size: 602
     values:
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
@@ -10,16 +10,27 @@ CollapsedEntities:
       - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
+      - Materials/MagnetPole.mat
+      - Materials/MagnetPole.ss_graph
+      - Materials/MagneticFieldTubes.ss_graph
       - Materials/TestTubeShader.mat
       - Materials/TestTubeShader.ss_graph
       - Meshes
+      - Meshes/Custom CapsuleSphere.mesh
       - Meshes/Custom Sphere.mesh
+      - Prefabs
+      - Prefabs/Magnetic Field Root.prefab
+      - Prefabs/Vector FIeld Examples Root.prefab
       - Render Target.renderTarget
       - Scene.scene
       - Scripts
+      - Scripts/MagnetPhysics.ts
+      - Scripts/MagneticFieldTubes.ts
       - Scripts/TubeTest.ts
       - Scripts/VectorFieldTubes.ts
       - Shaders
+      - Shaders/MagnetPoleShader.js
+      - Shaders/MagneticFieldTubesShader.js
       - Shaders/TubeTestShader.js
       - Shaders/VectorFieldTubesShader.js
       - SpectaclesInteractionKit.lspkg
@@ -483,7 +494,6 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Materials/RoundedRectangleStrokeShader.ss_graph
       - SpectaclesUIKit.lspkg/Materials/ScrollWindowFadeMask.mat
       - SpectaclesUIKit.lspkg/Materials/ScrollWindowFadeMaskShader.ss_graph
-      - SpectaclesUIKit.lspkg/Meshes
       - SpectaclesUIKit.lspkg/Meshes/CapsuleSphere.mesh
       - SpectaclesUIKit.lspkg/Meshes/DefaultButton.mesh
       - SpectaclesUIKit.lspkg/Meshes/DefaultCapsule.mesh

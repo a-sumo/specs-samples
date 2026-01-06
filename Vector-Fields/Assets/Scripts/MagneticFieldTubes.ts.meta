@@ -1,0 +1,74 @@
+- !<AssetImportMetadata/3ed8c2f1-10d1-4025-b665-9fa1fdd0a22c>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> efc254ef-268d-4839-b853-8a448f8b42f3
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/efc254ef-268d-4839-b853-8a448f8b42f3>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: e23273bc-3434-4d94-956a-27381ac12201
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _fieldStrength: false
+    _flowSpeed: false
+    _gridSize: false
+    _gridSpacing: false
+    _lengthSegments: false
+    _radialSegments: false
+    _radius: false
+    _stepSize: false
+    magnet1: false
+    magnet2: false
+    material: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - _lengthSegments: !<float> 32.000000
+      _radialSegments: !<float> 8.000000
+      _radius: 0.050000
+      _gridSize: !<float> 5.000000
+      _gridSpacing: !<float> 1.000000
+      _stepSize: 0.100000
+      _fieldStrength: !<float> 1.000000
+      _flowSpeed: !<float> 2.000000
+      magnet1: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      magnet2: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float _lengthSegments = 32 {"hint":"Segments along tube length (integration steps)", "widget":"slider", "min":8, "max":64, "step":4}'
+    - '// @input float _radialSegments = 8 {"hint":"Segments around tube circumference", "widget":"slider", "min":3, "max":16, "step":1}'
+    - '// @input float _radius = 0.05 {"hint":"Tube radius", "widget":"slider", "min":0.01, "max":0.2, "step":0.01}'
+    - '// @input float _gridSize = 5 {"hint":"Grid size (NxNxN)", "widget":"slider", "min":1, "max":10, "step":1}'
+    - '// @input float _gridSpacing = 1 {"hint":"Spacing between tube start positions", "widget":"slider", "min":0.1, "max":5, "step":0.1}'
+    - '// @input float _stepSize = 0.1 {"hint":"Step size for field integration", "widget":"slider", "min":0.01, "max":0.5, "step":0.01}'
+    - '// @input float _fieldStrength = 1 {"hint":"Field strength multiplier", "widget":"slider", "min":0.1, "max":10, "step":0.1}'
+    - '// @input float _flowSpeed = 2 {"hint":"Speed at which tubes flow along field lines", "widget":"slider", "min":0, "max":50, "step":0.5}'
+    - '// @input SceneObject magnet1 {"hint":"First magnet object - Y rotation determines N/S orientation"}'
+    - '// @input SceneObject magnet2 {"hint":"Second magnet object - Y rotation determines N/S orientation"}'
+    - '// @input Asset.Material material {"hint":"Material with MagneticFieldTubesShader.js"}'
