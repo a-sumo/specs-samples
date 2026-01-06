@@ -236,6 +236,47 @@
     - !<own> c89d7e48-75a6-414e-a253-874f80bfe792
   Components:
     []
+- !<ScriptComponent/057a0819-28d7-499a-a390-7d2e379bf62c>
+  PrefabRemaps:
+    []
+  Name: Slider
+  Enabled: true
+  ScriptAsset: !<reference> 585fe530-c944-4f18-8ef9-ea90dc744e78
+  ScriptInputsDefault:
+    _renderOrder: true
+    _inactive: true
+    _defaultValue: true
+    snapToTriggerPosition: true
+    segmented: true
+    numberOfSegments: true
+    hasTrackVisual: true
+    customKnobSize: true
+    _knobSize: true
+    onFinishedCallbacks: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _renderOrder: 0
+      _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
+      _inactive: false
+      _playAudio: true
+      _defaultValue: !<float> 0.000000
+      snapToTriggerPosition: false
+      segmented: false
+      numberOfSegments: !<float> 5.000000
+      hasTrackVisual: true
+      customKnobSize: false
+      _knobSize: !<Vec2> {x: 3.000000, y: 3.000000}
+      addCallbacks: true
+      onValueChangeCallbacks:
+        - scriptComponent: !<reference.ScriptComponent> 0de8d1cb-88fb-4631-8822-8d088463662f
+          functionName: setRadiusNormalized
+      onFinishedCallbacks:
+        []
+  ScriptTypes:
+    "":
+      {}
 - !<ScriptComponent/06294c30-ed17-4a74-994a-6ff3832f1866>
   PrefabRemaps:
     []
@@ -301,14 +342,14 @@
   Enabled: true
   ScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
   ScriptInputsDefault:
-    {}
+    _radialSegments: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
-      _lengthSegments: !<float> 20.000000
-      _radialSegments: !<float> 4.000000
-      _radius: 0.010000
+      _lengthSegments: !<float> 8.000000
+      _radialSegments: !<float> 8.000000
+      _radius: 0.020000
       _gridSize: !<float> 8.000000
       _gridSpacing: 0.600000
       _stepSize: 0.050000
@@ -320,6 +361,87 @@
   ScriptTypes:
     "":
       {}
+- !<Text/0f418656-a653-45ed-adb5-a8829b67786b>
+  PrefabRemaps:
+    []
+  Name: Text
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Text: Step size
+  Editable: false
+  ShowEditingPreview: true
+  TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
+  SizeToFit: false
+  FontSize: 32
+  Font: !<reference> 00000000-0000-0000-0000-000000000000
+  LayoutRect:
+    left: -7.500000
+    bottom: -2.250000
+    right: 7.500000
+    top: 2.250000
+  OverflowVertical: Overflow
+  OverflowHorizontal: Overflow
+  Fill: !<TextFill>
+    Mode: Solid
+    Color: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    Texture: !<reference> 00000000-0000-0000-0000-000000000000
+    ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    TileCount: 5.000000
+    TileZone: Rect
+    TextureStretch: FitWidth
+  BlendMode: PremultipliedAlphaAuto
+  Outline: !<OutlineSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Size: 0.250000
+  Dropshadow: !<DropshadowSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    OffsetX: 0.250000
+    OffsetY: 0.250000
+  Background: !<BackgroundSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Margins:
+      left: 0.000000
+      bottom: 0.000000
+      right: 0.000000
+      top: 0.000000
+    CornerRadius: 0.000000
+  AdvancedLayout: !<TextAdvancedLayout>
+    ExtentsTarget: !<reference> 00000000-0000-0000-0000-000000000000
+    LetterSpacing: 0.000000
+    LineSpacing: 1.000000
+    CapitalizationOverride: None
+  DepthTest: true
+  TwoSided: false
 - !<SceneObject/0f704a07-d079-4984-9aaf-bf4a989b3490>
   PrefabRemaps:
     []
@@ -864,6 +986,21 @@
   ForceCompound: false
   Intangible: false
   ShowCollider: true
+- !<SceneObject/2f95912e-22cb-4245-a73b-0021caac1290>
+  PrefabRemaps:
+    []
+  Name: Object 2
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -7.000000, y: 0.000000, z: 0.020000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 6e842cfa-a8f6-47ac-be62-eba64d050433
 - !<SceneObject/2fa6895d-6663-4624-9e74-6b038b982135>
   PrefabRemaps:
     []
@@ -1078,6 +1215,21 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/33829e28-472d-423d-9508-c7b24b603b30>
+  PrefabRemaps:
+    []
+  Name: Object 2
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -7.000000, y: 0.000000, z: 0.020000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> b72c873c-645b-4296-b45b-45729b2a1e1a
 - !<SceneObject/38525cab-c9f5-4965-814b-8eb0d8b9ad55>
   PrefabRemaps:
     []
@@ -1940,6 +2092,21 @@
     - !<own> eeefed81-5683-4d40-9498-fd8984e6e8f6
   Components:
     []
+- !<SceneObject/5c24bc4c-fa6e-47fd-b65f-5745c8b53148>
+  PrefabRemaps:
+    []
+  Name: SliderSpeed
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -6.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> 33829e28-472d-423d-9508-c7b24b603b30
+  Components:
+    - !<own> ae298f99-a85a-4655-8497-5e837f2f45da
 - !<SceneObject/5d0fd01d-a7f6-432e-b50e-d0c6a689b942>
   PrefabRemaps:
     []
@@ -1956,6 +2123,21 @@
     - !<own> c2a3f250-ea25-4d54-a533-abe839f9bceb
   Components:
     []
+- !<SceneObject/5e977de1-dd88-4a12-8c0f-bb94d1079898>
+  PrefabRemaps:
+    []
+  Name: Slider Step Size
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> d9741ac7-009d-4d3c-9c72-da5ccafe91c3
+  Components:
+    - !<own> b98d9d9b-57d5-43f1-b82f-5026bf5eb0dc
 - !<RenderMeshVisual/5fa37268-1896-49a0-b157-2ecff0a9c18d>
   PrefabRemaps:
     []
@@ -2006,6 +2188,47 @@
     []
   Components:
     - !<own> 13babcea-912e-4e89-b60a-1b003f0c6dd8
+- !<ScriptComponent/6608c7a4-044e-4479-8440-503c7d5057a7>
+  PrefabRemaps:
+    []
+  Name: Slider
+  Enabled: true
+  ScriptAsset: !<reference> 585fe530-c944-4f18-8ef9-ea90dc744e78
+  ScriptInputsDefault:
+    _renderOrder: true
+    _inactive: true
+    _defaultValue: true
+    snapToTriggerPosition: true
+    segmented: true
+    numberOfSegments: true
+    hasTrackVisual: true
+    customKnobSize: true
+    _knobSize: true
+    onFinishedCallbacks: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _renderOrder: 0
+      _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
+      _inactive: false
+      _playAudio: true
+      _defaultValue: !<float> 0.000000
+      snapToTriggerPosition: false
+      segmented: false
+      numberOfSegments: !<float> 5.000000
+      hasTrackVisual: true
+      customKnobSize: false
+      _knobSize: !<Vec2> {x: 3.000000, y: 3.000000}
+      addCallbacks: true
+      onValueChangeCallbacks:
+        - scriptComponent: !<reference.ScriptComponent> 0de8d1cb-88fb-4631-8822-8d088463662f
+          functionName: setLengthSegmentsNormalized
+      onFinishedCallbacks:
+        []
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/67631804-38a6-4944-a9d7-8d2430f944a3>
   PrefabRemaps:
     []
@@ -2040,7 +2263,7 @@
   PrefabRemaps:
     []
   Name: Settings Frame
-  Enabled: true
+  Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: -10.000000, y: 0.000000, z: 0.000000}
@@ -2119,6 +2342,87 @@
     - !<own> b376ea46-bee6-4eac-82cc-1f09a4389f34
   Components:
     []
+- !<Text/6e842cfa-a8f6-47ac-be62-eba64d050433>
+  PrefabRemaps:
+    []
+  Name: Text
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Text: Length
+  Editable: false
+  ShowEditingPreview: true
+  TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
+  SizeToFit: false
+  FontSize: 32
+  Font: !<reference> 00000000-0000-0000-0000-000000000000
+  LayoutRect:
+    left: -7.500000
+    bottom: -2.250000
+    right: 7.500000
+    top: 2.250000
+  OverflowVertical: Overflow
+  OverflowHorizontal: Overflow
+  Fill: !<TextFill>
+    Mode: Solid
+    Color: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    Texture: !<reference> 00000000-0000-0000-0000-000000000000
+    ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    TileCount: 5.000000
+    TileZone: Rect
+    TextureStretch: FitWidth
+  BlendMode: PremultipliedAlphaAuto
+  Outline: !<OutlineSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Size: 0.250000
+  Dropshadow: !<DropshadowSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    OffsetX: 0.250000
+    OffsetY: 0.250000
+  Background: !<BackgroundSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Margins:
+      left: 0.000000
+      bottom: 0.000000
+      right: 0.000000
+      top: 0.000000
+    CornerRadius: 0.000000
+  AdvancedLayout: !<TextAdvancedLayout>
+    ExtentsTarget: !<reference> 00000000-0000-0000-0000-000000000000
+    LetterSpacing: 0.000000
+    LineSpacing: 1.000000
+    CapitalizationOverride: None
+  DepthTest: true
+  TwoSided: false
 - !<Text/6fee7ef0-3f83-4c2b-b755-d1f2f82b25d7>
   PrefabRemaps:
     []
@@ -2732,6 +3036,21 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/8e99c6c7-893e-4972-b910-83e7821fd672>
+  PrefabRemaps:
+    []
+  Name: Settings Frame
+  Enabled: false
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -10.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> 9b0ae202-17f6-474f-87e1-49ba696a9074
+  Components:
+    - !<own> b0e8fca0-2a71-439a-acf8-5deb606946ff
 - !<SceneObject/91191875-22ce-4150-892c-d780508fa8e5>
   PrefabRemaps:
     []
@@ -2825,6 +3144,24 @@
     []
   Components:
     []
+- !<SceneObject/9b0ae202-17f6-474f-87e1-49ba696a9074>
+  PrefabRemaps:
+    []
+  Name: Object 1
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 2.000000, y: 0.000000, z: 1.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> 5e977de1-dd88-4a12-8c0f-bb94d1079898
+    - !<own> 9bf844ce-c376-4946-bf63-6b51f2f3ef0c
+    - !<own> 5c24bc4c-fa6e-47fd-b65f-5745c8b53148
+    - !<own> c0caab89-0e35-4513-a1f5-25f6ebb425d4
+  Components:
+    []
 - !<SceneObject/9b8da751-599e-41c3-bebf-7b11dadee25a>
   PrefabRemaps:
     []
@@ -2840,6 +3177,21 @@
     - !<own> 541a1667-fb17-43bf-bd3b-7b713063d3f7
   Components:
     []
+- !<SceneObject/9bf844ce-c376-4946-bf63-6b51f2f3ef0c>
+  PrefabRemaps:
+    []
+  Name: SliderRadius
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -3.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> c8629ad7-e0e4-4e89-8eb5-4fed9f3377f8
+  Components:
+    - !<own> 057a0819-28d7-499a-a390-7d2e379bf62c
 - !<SceneObject/9c6bdaf8-6f75-4c15-8f87-51a47efb49e9>
   PrefabRemaps:
     []
@@ -2857,19 +3209,38 @@
     []
 - !<SceneObject/9e72f614-329f-4e4a-b149-7fe960315346>
   PrefabRemaps:
+    - 057a0819-28d7-499a-a390-7d2e379bf62c: 87ba7f11-d8c7-439b-a35f-3a3c5dabeb81
     - 0de8d1cb-88fb-4631-8822-8d088463662f: 07801f26-d6b3-408d-4797-1b33c0503c03
+    - 0f418656-a653-45ed-adb5-a8829b67786b: 0e85557b-e4ff-4c9c-b1aa-0f5ad5753d30
     - 18608aec-083f-433f-8711-54c2985e9aa4: 4f834552-0988-4b35-558a-8440c82e6c57
     - 20611fc4-d95e-4ab6-b136-6e4363d35457: 246e406c-6c8e-4115-5e66-4a6a904303ed
+    - 2f95912e-22cb-4245-a73b-0021caac1290: 29320cd4-1318-45a2-8b7b-dde940e9382b
     - 2ff50d84-c28e-4922-a527-b1ae784c2ef7: 68617cb6-4585-4cb4-4188-64b440589b80
     - 306d18f0-7ea5-4e2d-a14e-54dde3fe2946: 4547dda7-7fa3-4471-42f9-53d873eaa770
+    - 33829e28-472d-423d-9508-c7b24b603b30: 32568c4b-8dce-4770-8d54-407fccb86da7
     - 4097fcfc-06c0-4422-8877-b4683d89347c: b3994541-f6c7-4a38-7069-0545594d39b1
     - 43163b72-88eb-4edf-bdde-81950b6df61e: b9465c54-a3c2-4b20-471a-6f9aa4e840e8
     - 57bfdb92-2854-4735-a357-9463f60d4d9b: 0d846da2-664f-475d-7fc4-b89efb9ee6b4
+    - 5c24bc4c-fa6e-47fd-b65f-5745c8b53148: 1a8456a1-14fa-4924-a751-c0d53f9aadaf
+    - 5e977de1-dd88-4a12-8c0f-bb94d1079898: 9a50f0fd-8458-4432-9b92-dfa8771944da
+    - 6608c7a4-044e-4479-8440-503c7d5057a7: 2df2cf18-4ddc-4d15-9343-8c13c9abdccd
     - 6b54fcc4-c51d-4a18-b371-7bf7fb532cac: 1f1085de-9969-4e37-4474-88ddb0d3a352
+    - 6e842cfa-a8f6-47ac-be62-eba64d050433: 35901e3f-21ac-42bc-ae4a-d77d4803e283
     - 73e5be2f-2a03-45fb-bc51-a9dfe5d6e604: a0c8d365-8fae-4fd8-5177-bf007c7df7e0
     - 7a5869a4-db46-40e4-b647-8d19996a8b54: 39bda1cb-18c0-41ea-68d8-3af772c1b3bb
+    - 8e99c6c7-893e-4972-b910-83e7821fd672: f8936f24-b29a-4219-8e75-97d91ad908d0
+    - 9b0ae202-17f6-474f-87e1-49ba696a9074: e033cde0-9243-4a71-aa4d-9027e04c91b1
+    - 9bf844ce-c376-4946-bf63-6b51f2f3ef0c: 4a786843-4fd4-4b73-a3da-97eaf323d140
     - 9e72f614-329f-4e4a-b149-7fe960315346: c0c3d116-02b6-433c-459f-0c999cba5d0f
+    - a4953a6e-faef-4b9f-96fd-63e1970625f2: b26755c7-2df3-4a73-a0d6-b088ab481f48
+    - ae298f99-a85a-4655-8497-5e837f2f45da: b9fbfd25-25d1-4c75-9c7b-68ab4c455a1c
+    - b0e8fca0-2a71-439a-acf8-5deb606946ff: 53940cb6-ec16-4803-abed-4152778b613f
+    - b72c873c-645b-4296-b45b-45729b2a1e1a: bb6e157b-ea63-43c1-949f-f4adab2913f1
+    - b98d9d9b-57d5-43f1-b82f-5026bf5eb0dc: 12ef455a-ed2a-4ee4-9cd6-6a77869395bd
     - beea31a6-1668-4401-87aa-8562d5bfd4fa: 05aae4ff-d7dc-4670-4663-316d4b59e28e
+    - c0caab89-0e35-4513-a1f5-25f6ebb425d4: 7de226d2-50d4-4037-bba1-de4ad9c2dfb5
+    - c8629ad7-e0e4-4e89-8eb5-4fed9f3377f8: 47206a25-8450-4b05-aabc-7faef1f35f0a
+    - d9741ac7-009d-4d3c-9c72-da5ccafe91c3: 14d8640b-85b0-449b-ad4c-f02bb11ac217
     - e96e45ea-e940-49dc-a3f3-3d3da617934d: 95ddfbf5-9874-4a2a-6d43-60d990706e44
     - fa0d7b81-5092-4c78-a970-efb36a1ca87f: 351a4940-22c4-418f-6043-a6dfe5a7df60
   Name: Magnetic Field Root
@@ -2883,6 +3254,7 @@
   Children:
     - !<own> fa0d7b81-5092-4c78-a970-efb36a1ca87f
     - !<own> 2ff50d84-c28e-4922-a527-b1ae784c2ef7
+    - !<own> 8e99c6c7-893e-4972-b910-83e7821fd672
   Components:
     []
 - !<ScriptComponent/a1a2e9fd-9d16-4309-b197-15c98539e0c6>
@@ -2923,6 +3295,89 @@
   ScriptTypes:
     "":
       {}
+- !<Text/a4953a6e-faef-4b9f-96fd-63e1970625f2>
+  PrefabRemaps:
+    []
+  Name: Text
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Text: |
+    Line Radius
+
+  Editable: false
+  ShowEditingPreview: true
+  TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
+  SizeToFit: false
+  FontSize: 32
+  Font: !<reference> 00000000-0000-0000-0000-000000000000
+  LayoutRect:
+    left: -7.500000
+    bottom: -2.250000
+    right: 7.500000
+    top: 2.250000
+  OverflowVertical: Overflow
+  OverflowHorizontal: Overflow
+  Fill: !<TextFill>
+    Mode: Solid
+    Color: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    Texture: !<reference> 00000000-0000-0000-0000-000000000000
+    ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    TileCount: 5.000000
+    TileZone: Rect
+    TextureStretch: FitWidth
+  BlendMode: PremultipliedAlphaAuto
+  Outline: !<OutlineSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Size: 0.250000
+  Dropshadow: !<DropshadowSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    OffsetX: 0.250000
+    OffsetY: 0.250000
+  Background: !<BackgroundSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Margins:
+      left: 0.000000
+      bottom: 0.000000
+      right: 0.000000
+      top: 0.000000
+    CornerRadius: 0.000000
+  AdvancedLayout: !<TextAdvancedLayout>
+    ExtentsTarget: !<reference> 00000000-0000-0000-0000-000000000000
+    LetterSpacing: 0.000000
+    LineSpacing: 1.000000
+    CapitalizationOverride: None
+  DepthTest: true
+  TwoSided: false
 - !<SceneObject/a4be667c-356e-4cf4-81ef-21e3e55cb1c2>
   PrefabRemaps:
     []
@@ -3029,6 +3484,47 @@
     []
   Components:
     - !<own> 713150aa-e531-4c73-b44f-de109783cdec
+- !<ScriptComponent/ae298f99-a85a-4655-8497-5e837f2f45da>
+  PrefabRemaps:
+    []
+  Name: Slider
+  Enabled: true
+  ScriptAsset: !<reference> 585fe530-c944-4f18-8ef9-ea90dc744e78
+  ScriptInputsDefault:
+    _renderOrder: true
+    _inactive: true
+    _defaultValue: true
+    snapToTriggerPosition: true
+    segmented: true
+    numberOfSegments: true
+    hasTrackVisual: true
+    customKnobSize: true
+    _knobSize: true
+    onFinishedCallbacks: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _renderOrder: 0
+      _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
+      _inactive: false
+      _playAudio: true
+      _defaultValue: !<float> 0.000000
+      snapToTriggerPosition: false
+      segmented: false
+      numberOfSegments: !<float> 5.000000
+      hasTrackVisual: true
+      customKnobSize: false
+      _knobSize: !<Vec2> {x: 3.000000, y: 3.000000}
+      addCallbacks: true
+      onValueChangeCallbacks:
+        - scriptComponent: !<reference.ScriptComponent> 0de8d1cb-88fb-4631-8822-8d088463662f
+          functionName: setFlowSpeedNormalized
+      onFinishedCallbacks:
+        []
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/af1f37ee-22ea-45a4-b833-bf90f24f074b>
   PrefabRemaps:
     []
@@ -3064,6 +3560,77 @@
   BlendNormals: false
   BlendShapes:
     {}
+- !<ScriptComponent/b0e8fca0-2a71-439a-acf8-5deb606946ff>
+  PrefabRemaps:
+    []
+  Name: Frame
+  Enabled: true
+  ScriptAsset: !<reference> 3b46d829-f6db-432a-914c-3551904d3994
+  ScriptInputsDefault:
+    autoShowHide: true
+    _padding: true
+    allowScaling: true
+    autoScaleContent: true
+    relativeZ: true
+    _onlyInteractOnBorder: true
+    allowTranslation: true
+    _cutOutCenter: true
+    minimumSize: true
+    maximumSize: true
+    useBillboarding: true
+    xOnTranslate: true
+    xAlways: true
+    xBufferDegrees: true
+    yOnTranslate: true
+    yAlways: true
+    yBufferDegrees: true
+    useSnapping: true
+    itemSnapping: true
+    worldSnapping: true
+    _showFollowButton: true
+    useFollowBehavior: true
+    _following: true
+    _enableInteractionPlane: true
+    _interactionPlaneOffset: true
+    _interactionPlanePadding: true
+    _targetingVisual: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      autoShowHide: true
+      _appearance: Small
+      _innerSize: !<Vec2> {x: 10.000000, y: 16.000000}
+      _padding: !<Vec2> {x: 0.000000, y: 0.000000}
+      allowScaling: true
+      autoScaleContent: true
+      relativeZ: true
+      _onlyInteractOnBorder: false
+      allowTranslation: true
+      _cutOutCenter: false
+      minimumSize: !<Vec2> {x: 10.000000, y: 10.000000}
+      maximumSize: !<Vec2> {x: 150.000000, y: 150.000000}
+      useBillboarding: true
+      xOnTranslate: true
+      xAlways: false
+      xBufferDegrees: !<float> 0.000000
+      yOnTranslate: true
+      yAlways: false
+      yBufferDegrees: !<float> 0.000000
+      useSnapping: false
+      itemSnapping: false
+      worldSnapping: false
+      _showFollowButton: false
+      useFollowBehavior: false
+      _following: false
+      _showCloseButton: true
+      _enableInteractionPlane: true
+      _interactionPlaneOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      _interactionPlanePadding: !<Vec2> {x: 0.000000, y: 0.000000}
+      _targetingVisual: !<float> 1.000000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/b1f8254d-7ff0-4786-bdb0-5811371eac87>
   PrefabRemaps:
     []
@@ -3277,6 +3844,89 @@
     - !<own> 805bb70d-0e93-48e5-a665-76bd8c8928ce
   Components:
     []
+- !<Text/b72c873c-645b-4296-b45b-45729b2a1e1a>
+  PrefabRemaps:
+    []
+  Name: Text
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Text: |
+    Speed
+
+  Editable: false
+  ShowEditingPreview: true
+  TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
+  SizeToFit: false
+  FontSize: 32
+  Font: !<reference> 00000000-0000-0000-0000-000000000000
+  LayoutRect:
+    left: -7.500000
+    bottom: -2.250000
+    right: 7.500000
+    top: 2.250000
+  OverflowVertical: Overflow
+  OverflowHorizontal: Overflow
+  Fill: !<TextFill>
+    Mode: Solid
+    Color: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    Texture: !<reference> 00000000-0000-0000-0000-000000000000
+    ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    TileCount: 5.000000
+    TileZone: Rect
+    TextureStretch: FitWidth
+  BlendMode: PremultipliedAlphaAuto
+  Outline: !<OutlineSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Size: 0.250000
+  Dropshadow: !<DropshadowSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    OffsetX: 0.250000
+    OffsetY: 0.250000
+  Background: !<BackgroundSettings>
+    Enabled: false
+    Fill: !<TextFill>
+      Mode: Solid
+      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+      Texture: !<reference> 00000000-0000-0000-0000-000000000000
+      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      TileCount: 5.000000
+      TileZone: Rect
+      TextureStretch: FitWidth
+    Margins:
+      left: 0.000000
+      bottom: 0.000000
+      right: 0.000000
+      top: 0.000000
+    CornerRadius: 0.000000
+  AdvancedLayout: !<TextAdvancedLayout>
+    ExtentsTarget: !<reference> 00000000-0000-0000-0000-000000000000
+    LetterSpacing: 0.000000
+    LineSpacing: 1.000000
+    CapitalizationOverride: None
+  DepthTest: true
+  TwoSided: false
 - !<SceneObject/b74ff32e-5135-4266-b883-71d0f54a6200>
   PrefabRemaps:
     []
@@ -3393,6 +4043,47 @@
     - !<own> ed7074f4-802d-4336-9588-237c5c48f33e
   Components:
     []
+- !<ScriptComponent/b98d9d9b-57d5-43f1-b82f-5026bf5eb0dc>
+  PrefabRemaps:
+    []
+  Name: Slider
+  Enabled: true
+  ScriptAsset: !<reference> 585fe530-c944-4f18-8ef9-ea90dc744e78
+  ScriptInputsDefault:
+    _renderOrder: true
+    _inactive: true
+    _defaultValue: true
+    snapToTriggerPosition: true
+    segmented: true
+    numberOfSegments: true
+    hasTrackVisual: true
+    customKnobSize: true
+    _knobSize: true
+    onFinishedCallbacks: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _renderOrder: 0
+      _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
+      _inactive: false
+      _playAudio: true
+      _defaultValue: !<float> 0.000000
+      snapToTriggerPosition: false
+      segmented: false
+      numberOfSegments: !<float> 5.000000
+      hasTrackVisual: true
+      customKnobSize: false
+      _knobSize: !<Vec2> {x: 3.000000, y: 3.000000}
+      addCallbacks: true
+      onValueChangeCallbacks:
+        - scriptComponent: !<reference.ScriptComponent> eaa5f500-a9c9-4052-b208-001eb4957ad4
+          functionName: setStepSizeNormalized
+      onFinishedCallbacks:
+        []
+  ScriptTypes:
+    "":
+      {}
 - !<ColliderComponent/beea31a6-1668-4401-87aa-8562d5bfd4fa>
   PrefabRemaps:
     []
@@ -3411,6 +4102,21 @@
   ForceCompound: false
   Intangible: false
   ShowCollider: false
+- !<SceneObject/c0caab89-0e35-4513-a1f5-25f6ebb425d4>
+  PrefabRemaps:
+    []
+  Name: SliderLength
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 3.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> 2f95912e-22cb-4245-a73b-0021caac1290
+  Components:
+    - !<own> 6608c7a4-044e-4479-8440-503c7d5057a7
 - !<SceneObject/c1e4cdd6-40ff-4bbf-94e2-490af58b9b1d>
   PrefabRemaps:
     []
@@ -3579,6 +4285,21 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/c8629ad7-e0e4-4e89-8eb5-4fed9f3377f8>
+  PrefabRemaps:
+    []
+  Name: Object 2
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -7.000000, y: 0.000000, z: 0.020000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> a4953a6e-faef-4b9f-96fd-63e1970625f2
 - !<SceneObject/c89d7e48-75a6-414e-a253-874f80bfe792>
   PrefabRemaps:
     []
@@ -3846,6 +4567,21 @@
     index-2: !<reference> eeefed81-5683-4d40-9498-fd8984e6e8f6
     thumb-3_end_end_end_end: !<reference> 1fbad860-d2cc-4f57-a307-5ac38abfa448
     wrist_to_pinky: !<reference> 4d75f471-9b48-4b6f-aa35-ecb1d7d4c0fb
+- !<SceneObject/d9741ac7-009d-4d3c-9c72-da5ccafe91c3>
+  PrefabRemaps:
+    []
+  Name: Object 2
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -7.000000, y: 0.000000, z: 0.020000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 0f418656-a653-45ed-adb5-a8829b67786b
 - !<SceneObject/da31d502-20f7-4e8f-8ac9-adca9b659268>
   PrefabRemaps:
     []

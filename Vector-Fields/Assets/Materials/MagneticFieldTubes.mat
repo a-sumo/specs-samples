@@ -130,7 +130,7 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: Disabled
+  BlendMode: PremultipliedAlpha
   Properties:
     FieldStrength:
       typeIdx: 1

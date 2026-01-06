@@ -193,7 +193,7 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: Max
+  BlendMode: PremultipliedAlpha
   Properties:
     FieldScale:
       typeIdx: 1

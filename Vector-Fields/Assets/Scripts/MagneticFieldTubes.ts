@@ -68,26 +68,44 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     @hint("Material with MagneticFieldTubesShader.js")
     material: Material;
 
-    private meshBuilder!: MeshBuilder;
-    private meshVisual!: RenderMeshVisual;
+    private meshVisuals: RenderMeshVisual[] = [];
     private mainPass: Pass;
 
+    // Max vertices per mesh (UInt16 index limit)
+    private readonly MAX_VERTICES_PER_MESH = 65000;
+
     onAwake(): void {
-        this.setupMeshVisual();
+        this.setupMaterial();
         this.generateMesh();
         this.updateMaterialParams();
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
         print("MagneticFieldTubes: Initialized " + (this._gridSize * this._gridSize * this._gridSize) + " tubes");
     }
 
-    private setupMeshVisual(): void {
-        this.meshVisual = this.sceneObject.createComponent("Component.RenderMeshVisual");
+    private setupMaterial(): void {
         if (this.material) {
-            this.meshVisual.mainMaterial = this.material;
             this.mainPass = this.material.mainPass;
         } else {
             print("MagneticFieldTubes: WARNING - No material assigned!");
         }
+    }
+
+    private clearMeshVisuals(): void {
+        for (const mv of this.meshVisuals) {
+            if (mv) {
+                mv.destroy();
+            }
+        }
+        this.meshVisuals = [];
+    }
+
+    private createMeshVisual(): RenderMeshVisual {
+        const mv = this.sceneObject.createComponent("Component.RenderMeshVisual");
+        if (this.material) {
+            mv.mainMaterial = this.material;
+        }
+        this.meshVisuals.push(mv);
+        return mv;
     }
 
     // Get forward vector (from S to N pole) based on object's Y rotation
@@ -175,48 +193,68 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         //   texture1 = (startX, startZ) starting position in XZ plane
         //   texture2 = (startY) starting Y position
 
-        this.meshBuilder = new MeshBuilder([
-            { name: "position", components: 3 },
-            { name: "normal", components: 3 },
-            { name: "texture0", components: 2 },
-            { name: "texture1", components: 2 },
-            { name: "texture2", components: 1 },
-        ]);
-
-        this.meshBuilder.topology = MeshTopology.Triangles;
-        this.meshBuilder.indexType = MeshIndexType.UInt16;
+        this.clearMeshVisuals();
 
         const pathLength = this._lengthSegments + 1;
         const circleSegments = this._radialSegments;
 
-        let totalTubes = 0;
+        // Calculate vertices per tube: body + 2 cap centers
+        const vertsPerTube = pathLength * circleSegments + 2;
+        const maxTubesPerMesh = Math.floor(this.MAX_VERTICES_PER_MESH / vertsPerTube);
 
-        // Generate 3D grid of tubes (centered around origin)
+        // Build list of all tube start positions
+        const tubePositions: { x: number, y: number, z: number }[] = [];
         const halfExtent = (this._gridSize - 1) * this._gridSpacing / 2;
         for (let gx = 0; gx < this._gridSize; gx++) {
             for (let gy = 0; gy < this._gridSize; gy++) {
                 for (let gz = 0; gz < this._gridSize; gz++) {
-                    const startX = -halfExtent + gx * this._gridSpacing;
-                    const startY = -halfExtent + gy * this._gridSpacing;
-                    const startZ = -halfExtent + gz * this._gridSpacing;
-                    this.generateSingleTube(startX, startY, startZ, pathLength, circleSegments);
-                    totalTubes++;
+                    tubePositions.push({
+                        x: -halfExtent + gx * this._gridSpacing,
+                        y: -halfExtent + gy * this._gridSpacing,
+                        z: -halfExtent + gz * this._gridSpacing
+                    });
                 }
             }
         }
 
-        if (this.meshBuilder.isValid()) {
-            this.meshVisual.mesh = this.meshBuilder.getMesh();
-            this.meshBuilder.updateMesh();
-            print("MagneticFieldTubes: Generated " + totalTubes + " tubes, " +
-                  this.meshBuilder.getVerticesCount() + " vertices");
-        } else {
-            print("MagneticFieldTubes: ERROR - mesh not valid!");
+        const totalTubes = tubePositions.length;
+        const numMeshes = Math.ceil(totalTubes / maxTubesPerMesh);
+        let tubeIndex = 0;
+        let meshCount = 0;
+
+        for (let meshIdx = 0; meshIdx < numMeshes; meshIdx++) {
+            const meshBuilder = new MeshBuilder([
+                { name: "position", components: 3 },
+                { name: "normal", components: 3 },
+                { name: "texture0", components: 2 },
+                { name: "texture1", components: 2 },
+                { name: "texture2", components: 1 },
+            ]);
+            meshBuilder.topology = MeshTopology.Triangles;
+            meshBuilder.indexType = MeshIndexType.UInt16;
+
+            let tubesInThisMesh = 0;
+
+            while (tubeIndex < totalTubes && tubesInThisMesh < maxTubesPerMesh) {
+                const pos = tubePositions[tubeIndex];
+                this.generateSingleTube(meshBuilder, pos.x, pos.y, pos.z, pathLength, circleSegments);
+                tubesInThisMesh++;
+                tubeIndex++;
+            }
+
+            if (meshBuilder.isValid()) {
+                const mv = this.createMeshVisual();
+                mv.mesh = meshBuilder.getMesh();
+                meshBuilder.updateMesh();
+                meshCount++;
+            }
         }
+
+        print("MagneticFieldTubes: Generated " + totalTubes + " tubes across " + meshCount + " mesh(es)");
     }
 
-    private generateSingleTube(startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
-        const startVertexIndex = this.meshBuilder.getVerticesCount();
+    private generateSingleTube(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, pathLength: number, circleSegments: number): void {
+        const startVertexIndex = meshBuilder.getVerticesCount();
 
         // Generate tube body vertices
         for (let i = 0; i < pathLength; i++) {
@@ -227,7 +265,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
                 const localX = Math.cos(theta);
                 const localY = Math.sin(theta);
 
-                this.meshBuilder.appendVerticesInterleaved([
+                meshBuilder.appendVerticesInterleaved([
                     0.0, 0.0, t,           // position: unused, unused, t (step index)
                     0.0, 0.0, 1.0,         // normal: unused, unused, isTube=1
                     localX, localY,        // texture0: unit circle coords
@@ -245,7 +283,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
                 const currentNext = startVertexIndex + (segment + 1) * circleSegments + i;
                 const nextNext = startVertexIndex + (segment + 1) * circleSegments + ((i + 1) % circleSegments);
 
-                this.meshBuilder.appendIndices([
+                meshBuilder.appendIndices([
                     current, next, currentNext,
                     next, nextNext, currentNext
                 ]);
@@ -253,13 +291,13 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         }
 
         // Generate end caps
-        this.generateSingleTubeCaps(startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
+        this.generateSingleTubeCaps(meshBuilder, startX, startY, startZ, startVertexIndex, pathLength, circleSegments);
     }
 
-    private generateSingleTubeCaps(startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
+    private generateSingleTubeCaps(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, startVertexIndex: number, pathLength: number, circleSegments: number): void {
         // START CAP (at t = 0)
-        const startCapIndex = this.meshBuilder.getVerticesCount();
-        this.meshBuilder.appendVerticesInterleaved([
+        const startCapIndex = meshBuilder.getVerticesCount();
+        meshBuilder.appendVerticesInterleaved([
             0.0, 0.0, 0.0,         // position: t=0
             0.0, 0.0, 0.0,         // normal: isCap=0
             0.0, 0.0,              // texture0: center
@@ -270,12 +308,12 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         for (let i = 0; i < circleSegments; i++) {
             const current = startVertexIndex + i;
             const next = startVertexIndex + (i + 1) % circleSegments;
-            this.meshBuilder.appendIndices([startCapIndex, next, current]);
+            meshBuilder.appendIndices([startCapIndex, next, current]);
         }
 
         // END CAP (at t = 1)
-        const endCapIndex = this.meshBuilder.getVerticesCount();
-        this.meshBuilder.appendVerticesInterleaved([
+        const endCapIndex = meshBuilder.getVerticesCount();
+        meshBuilder.appendVerticesInterleaved([
             0.0, 0.0, 1.0,         // position: t=1
             0.0, 0.0, 0.0,         // normal: isCap=0
             0.0, 0.0,              // texture0: center
@@ -287,7 +325,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         for (let i = 0; i < circleSegments; i++) {
             const current = lastRingStart + i;
             const next = lastRingStart + (i + 1) % circleSegments;
-            this.meshBuilder.appendIndices([endCapIndex, current, next]);
+            meshBuilder.appendIndices([endCapIndex, current, next]);
         }
     }
 
