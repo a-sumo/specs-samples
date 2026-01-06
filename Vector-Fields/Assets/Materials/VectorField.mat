@@ -25,6 +25,9 @@
     - Port_Amount_N006:
         typeIdx: 1
         value: 1.000000
+    - Port_Amount_N014:
+        typeIdx: 1
+        value: 1.000000
     - Port_Blue_N006:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
@@ -91,6 +94,9 @@
     - Port_Hue_N006:
         typeIdx: 1
         value: 0.000000
+    - Port_Import_N015:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
     - Port_Import_N037:
         typeIdx: 5
         value: {x: 0.000107, y: 0.001755, z: 0.998215, w: 1.000000}
@@ -184,6 +190,9 @@
     - Port_Value2_N000:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value4_N021:
+        typeIdx: 1
+        value: 0.000000
     - Port_Value_N006:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
@@ -270,9 +279,33 @@
     NumSteps:
       typeIdx: 1
       value: 1.000000
-    Port_Amount_N014:
+    Port_Import_N010:
       typeIdx: 1
-      value: 1.000000
+      value: -0.000000
+    Port_Import_N017:
+      typeIdx: 1
+      value: 0.000000
+    Port_Import_N019:
+      typeIdx: 1
+      value: 0.000000
+    Port_Input1_N018:
+      typeIdx: 1
+      value: 0.010000
+    Port_Input1_N020:
+      typeIdx: 1
+      value: 0.010000
+    Port_RangeMaxA_N016:
+      typeIdx: 1
+      value: 180.000000
+    Port_RangeMaxB_N016:
+      typeIdx: 1
+      value: 0.500000
+    Port_RangeMinA_N016:
+      typeIdx: 1
+      value: -180.000000
+    Port_RangeMinB_N016:
+      typeIdx: 1
+      value: -0.500000
     Preset:
       typeIdx: 1
       value: 1.000000

@@ -337,7 +337,7 @@
 - !<ScriptComponent/0de8d1cb-88fb-4631-8822-8d088463662f>
   PrefabRemaps:
     []
-  Name: MagneticFieldTubes
+  Name: MagneticField
   Enabled: true
   ScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
   ScriptInputsDefault:
@@ -1039,7 +1039,7 @@
 - !<SceneObject/2ff50d84-c28e-4922-a527-b1ae784c2ef7>
   PrefabRemaps:
     []
-  Name: MagneticFieldTubes
+  Name: MagneticField
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -4892,41 +4892,41 @@
     - !<own> 28cf3766-599c-4bd5-8505-2a92bf6606ed
 - !<SceneObject/e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb>
   PrefabRemaps:
-    - 032abe87-97d0-4383-bbc4-bebdf523ce30: 4d166a39-1821-4373-7cf5-2242efc82fff
-    - 0f7acdea-85a2-41d5-bbc9-34f0447bc761: 8b99f410-e08a-4cbd-7ef1-7d5f5e8c7fd1
-    - 13b40e0a-619a-4edd-abce-6c7d38dc49ac: e99e618e-761c-4714-7bc9-2da990d66330
-    - 176c2931-e1c4-4a63-bd5a-dee92f049b01: ddb274f9-f54f-43d9-7f20-ec5d706ec3c8
-    - 1c5e3bd8-9a54-4836-bedd-c279117dd2ef: 9322335e-d32e-4722-6732-e19362da2e51
-    - 333eb799-69db-4ffb-8917-099a8a5a3674: 7a2d066c-be28-455f-66b5-c7d3cb538523
-    - 40685b84-ce25-4d3f-8e35-a127f5dc4c7a: 0ee0080d-ddba-4462-51de-893ed4fe1ee0
-    - 4f331621-9a2f-4215-92e3-2a1f1640ee78: 4ca4f08c-8f0f-47fb-6654-4cee16bc0046
-    - 5495e949-f535-4cfd-ae0f-0575deb1b87c: a4c49695-b30c-4fd5-43f7-5eb2c9a4eec4
-    - 694df92f-b96e-4848-9128-2476e6ad356d: 599162a3-e8e8-4f57-4b78-e87ec0cb484d
-    - 6ace045e-1481-481f-b680-8baa08811084: 8d08344c-5059-4fa1-694f-c5cd909c055f
-    - 6fee7ef0-3f83-4c2b-b755-d1f2f82b25d7: ae4db4ec-ab64-4e24-60dc-b9fabce029c9
-    - 7228cfab-bf82-491a-87e8-2f7cab109ca6: 69e0666c-1c8a-43cd-53ea-e84f04bd9ec8
-    - 8157ffce-6c2a-49a0-b2cd-984ccda281c3: dd91578b-171e-46e7-4fea-9a5b30fff8a7
-    - 86bf1743-8f8f-4b82-a5a3-111a401b5247: 4bc87314-7929-4b3d-4779-f86d34f236a7
-    - 8a12f0f5-e0d4-4c73-a3f1-310dd46360bc: 1f7f29ba-8413-409f-5b2e-b7b6fa2419d2
-    - 8befe306-3c4f-49f2-9cf4-496ef976e4ab: bfa55164-0e9c-4b79-4883-c595455ea82d
-    - 98ef9586-1be1-4c72-b3c2-994c212b2031: aad995a3-e6a6-4f8d-5fb0-50c1544ac181
-    - a7363d3f-459c-413c-bf6a-b616962f31e6: 79dd0b61-1253-4f12-4f49-314f67bab540
-    - af5703b4-6dd3-490f-9032-1785f13b9a0f: a6a19181-bf38-4b9d-4bce-2144fb706c7a
-    - b49bc88a-0a9c-4014-a074-224539c9ef1f: 4d181880-7619-49b8-5162-9b9427230f6c
-    - b9165a6f-8b89-4430-8491-10b3a0509f90: ab064963-3c3e-47da-4830-6736d06b81af
-    - c201be35-1a1e-45d8-8475-cef74686f8c3: 27fca6f2-f9d0-4075-644f-48e53c7f3902
-    - c74d91fd-7ade-4e9b-920c-5be19b26a26e: 0f12d0e4-f19f-42cd-63db-2cfea5fe14a1
-    - d3d0e98f-5c85-47b8-ab9a-11848c5c0f3d: 02f6e992-c76c-46e9-6459-c9a5bef00460
-    - e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb: 4bad5113-2fc1-4183-7def-d9f0ed5342fb
-    - e883aef3-fc76-429f-9615-6f679ac473d7: 696ecef6-2bc1-425b-59e2-34dfc66584d0
-    - eaa5f500-a9c9-4052-b208-001eb4957ad4: 85f676d9-223e-4752-4081-5cf2ae28b53c
-    - ebc9ba09-7f6a-49f1-9bdd-b89f62d8f3de: a92d0172-d258-4cab-4138-32b4aa23cbc7
-    - ef0e5b8d-6509-4fe8-86a9-a522d8aa3448: dd0e1165-4910-4bb4-625f-7f11d946cc56
-    - f6c982d9-adba-4f8e-85d5-5af9a3cb3769: 7af269c4-1f12-43fd-40f9-665042d5a08b
-    - f70d02db-fc38-4d6a-93fe-2d11fc0078f4: 72ffff12-17e5-4341-5d1e-f486b55257ae
-    - fcc681dc-9d27-46dc-ae89-201027f1cebb: cd26bfea-c998-44ab-5b98-b63e20a4ade2
-    - ff8d7741-cafa-4b95-b3c0-b54c15fd3b72: 5cfd6b93-0e98-4398-54b7-08f20105c1c5
-  Name: Vector FIeld Examples Root
+    - 032abe87-97d0-4383-bbc4-bebdf523ce30: 7686b063-d530-40f5-5fa2-b92996f641c8
+    - 0f7acdea-85a2-41d5-bbc9-34f0447bc761: 2c06fdd6-579d-41db-7f79-e9a72ef2217e
+    - 13b40e0a-619a-4edd-abce-6c7d38dc49ac: 63b9434e-a5d5-47f2-4f0e-a1f83e3ef1e8
+    - 176c2931-e1c4-4a63-bd5a-dee92f049b01: 445be62a-1a77-4754-470a-4f509d7ba079
+    - 1c5e3bd8-9a54-4836-bedd-c279117dd2ef: 28f5de5c-d2f1-4794-570b-ef64258f9fd4
+    - 333eb799-69db-4ffb-8917-099a8a5a3674: 47893d55-905e-4ffc-7618-d19f6fe53cfc
+    - 40685b84-ce25-4d3f-8e35-a127f5dc4c7a: 0456be28-f0c4-4e90-5762-f7f968562086
+    - 4f331621-9a2f-4215-92e3-2a1f1640ee78: e8142af2-a829-4a03-7c94-ae350bd30706
+    - 5495e949-f535-4cfd-ae0f-0575deb1b87c: 00b7c75f-729d-4dc0-6b32-14483953eef5
+    - 694df92f-b96e-4848-9128-2476e6ad356d: 486117c6-1921-4b1e-5e2a-382e1c02b5bc
+    - 6ace045e-1481-481f-b680-8baa08811084: 27259e89-1588-4d3d-53f4-4b552c301f87
+    - 6fee7ef0-3f83-4c2b-b755-d1f2f82b25d7: 45a53db9-1853-47af-5398-2cc9ffd537e9
+    - 7228cfab-bf82-491a-87e8-2f7cab109ca6: d65d0f0d-d715-447d-6b73-34e200e94aad
+    - 8157ffce-6c2a-49a0-b2cd-984ccda281c3: ca72c653-e11b-433f-642e-c1f3bb213408
+    - 86bf1743-8f8f-4b82-a5a3-111a401b5247: 4daf9939-dacc-4a01-70d2-3bb43df8c9ea
+    - 8a12f0f5-e0d4-4c73-a3f1-310dd46360bc: 2d04fbc4-0352-4f06-7e4a-b46bc885ee52
+    - 8befe306-3c4f-49f2-9cf4-496ef976e4ab: 11271088-9187-4d66-42f1-160b53b66ccb
+    - 98ef9586-1be1-4c72-b3c2-994c212b2031: 0050b465-28b3-48fb-704c-f0b551dfd029
+    - a7363d3f-459c-413c-bf6a-b616962f31e6: 23fe9552-abd0-4535-723f-9d8c9c8f7ecb
+    - af5703b4-6dd3-490f-9032-1785f13b9a0f: 67f7daa6-f5f7-4135-72d1-7a7b2b22411c
+    - b49bc88a-0a9c-4014-a074-224539c9ef1f: 2f38ba30-c9a8-4c60-749d-e2479a15bb90
+    - b9165a6f-8b89-4430-8491-10b3a0509f90: 49cd3e29-862d-4f79-533d-6dec189f3441
+    - c201be35-1a1e-45d8-8475-cef74686f8c3: c53d76ea-bb92-4353-4750-6fbee9b94a9c
+    - c74d91fd-7ade-4e9b-920c-5be19b26a26e: f5d61b0a-90ab-4651-404b-c62f262fd1f5
+    - d3d0e98f-5c85-47b8-ab9a-11848c5c0f3d: bd6ddcbe-d3ee-49fa-77d0-4de807c01dd2
+    - e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb: 8da3f4ce-ae40-4c0d-400b-004c9f76646a
+    - e883aef3-fc76-429f-9615-6f679ac473d7: 53c79042-a9bb-4f6b-6adf-da6b45f81ec6
+    - eaa5f500-a9c9-4052-b208-001eb4957ad4: 37a7bcb7-7b8f-4087-5393-9b15ffd299fc
+    - ebc9ba09-7f6a-49f1-9bdd-b89f62d8f3de: 2be39250-8813-4b31-6d82-79108f730911
+    - ef0e5b8d-6509-4fe8-86a9-a522d8aa3448: 9481d8e8-9e47-4445-727f-a7825cc8052b
+    - f6c982d9-adba-4f8e-85d5-5af9a3cb3769: 287a8e35-12a7-4948-6e12-5a7e119cc075
+    - f70d02db-fc38-4d6a-93fe-2d11fc0078f4: 674edbd5-b14b-418a-57a2-a6bfa91fded2
+    - fcc681dc-9d27-46dc-ae89-201027f1cebb: 0a5308b1-c647-43a0-65fb-cb823399eb75
+    - ff8d7741-cafa-4b95-b3c0-b54c15fd3b72: 1f908298-4bf7-4119-6266-da340da2d347
+  Name: Vector Field Examples Root
   Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -5155,7 +5155,7 @@
 - !<ScriptComponent/eaa5f500-a9c9-4052-b208-001eb4957ad4>
   PrefabRemaps:
     []
-  Name: VectorFieldTubes
+  Name: VectorField
   Enabled: true
   ScriptAsset: !<reference> e70ea878-ce68-42de-809a-df95318d9571
   ScriptInputsDefault:

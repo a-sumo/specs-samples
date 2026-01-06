@@ -232,6 +232,5 @@ void main() {
     vec3 color = getColor(field, t);
 
     transformedPosition = finalPos;
-    // Premultiplied alpha for proper transparency fade
-    vertexColor = vec4(color * flowFade, flowFade);
+    vertexColor = vec4(color, flowFade);
 }
