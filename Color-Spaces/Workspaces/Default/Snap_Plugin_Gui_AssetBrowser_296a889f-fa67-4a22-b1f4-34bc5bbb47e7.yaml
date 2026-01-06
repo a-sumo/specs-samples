@@ -1,9 +1,8 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 839
+    size: 838
     values:
-      - ""
       - Fonts
       - Fonts/galter
       - Fonts/galter/Galter.otf

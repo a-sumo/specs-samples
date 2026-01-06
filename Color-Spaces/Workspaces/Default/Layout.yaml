@@ -13,7 +13,7 @@ dock:
               - persistentName: Snap.Plugin.Gui.Graph.Editor
                 Uuid: f1fd58a7-691a-4187-ae38-725352358aa7
             type: section
-            current: 3
+            current: 0
           - items:
               - persistentName: Snap.Plugin.Gui.LoggerPanel
                 Uuid: 81de965d-0c94-4d28-82cf-901740003a1f
@@ -34,7 +34,7 @@ dock:
           - persistentName: Snap.Plugin.AssistantAI.Panel
             Uuid: d5dd60b0-1fed-4dec-9b2c-2e40dc54bbad
         type: section
-        current: 1
+        current: 0
       - items:
           - persistentName: Snap.Plugin.Gui.InspectorPanel
             Uuid: 780d9164-e681-4de1-b586-5213ed5523b9
