@@ -45,18 +45,26 @@
   Enabled: true
   ScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
   ScriptInputsDefault:
-    _radialSegments: true
+    _maxVertexCount: true
+    _desiredLengthSegments: true
+    _coneLength: true
+    _coneRadius: true
+    _fieldStrength: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
-      _lengthSegments: !<float> 8.000000
-      _radialSegments: !<float> 8.000000
+      _maxVertexCount: !<float> 40000.000000
+      _tubeMode: !<float> 2.000000
+      _desiredLengthSegments: !<float> 32.000000
       _radius: 0.020000
+      _coneLength: !<float> 4.000000
+      _coneRadius: 1.700000
+      _arrowScale: 0.600000
       _gridSize: !<float> 8.000000
       _gridSpacing: 0.600000
       _stepSize: 0.050000
-      _fieldStrength: 4.600000
+      _fieldStrength: !<float> 1.000000
       _flowSpeed: !<float> 50.000000
       magnet1: !<reference.SceneObject> b3994541-f6c7-4a38-8f96-fabaa6b2c64e
       magnet2: !<reference.SceneObject> 4f834552-0988-4b35-aa75-7bbf37d193a8
@@ -618,6 +626,64 @@
     CapitalizationOverride: None
   DepthTest: true
   TwoSided: false
+- !<ScriptComponent/4b309ecf-2d96-4c91-8add-9ff15e348ae0>
+  PrefabRemaps:
+    []
+  Name: InteractableManipulation
+  Enabled: true
+  ScriptAsset: !<reference> 664b556b-1946-4c2c-866a-e675b4e86006
+  ScriptInputsDefault:
+    manipulateRootSceneObject: true
+    minimumScaleFactor: true
+    maximumScaleFactor: true
+    enableTranslation: true
+    enableRotation: true
+    enableScale: true
+    enableStretchZ: true
+    showStretchZProperties: true
+    zStretchFactorMin: true
+    zStretchFactorMax: true
+    useFilter: true
+    showFilterProperties: true
+    minCutoff: true
+    beta: true
+    dcutoff: true
+    showTranslationProperties: true
+    _enableXTranslation: true
+    _enableYTranslation: true
+    _enableZTranslation: true
+    showRotationProperties: true
+    _rotationAxis: true
+    isSynced: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      manipulateRootSceneObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      minimumScaleFactor: 0.250000
+      maximumScaleFactor: !<float> 20.000000
+      enableTranslation: true
+      enableRotation: true
+      enableScale: true
+      enableStretchZ: true
+      showStretchZProperties: false
+      zStretchFactorMin: !<float> 1.000000
+      zStretchFactorMax: !<float> 12.000000
+      useFilter: true
+      showFilterProperties: false
+      minCutoff: !<float> 2.000000
+      beta: 0.015000
+      dcutoff: !<float> 1.000000
+      showTranslationProperties: false
+      _enableXTranslation: true
+      _enableYTranslation: true
+      _enableZTranslation: true
+      showRotationProperties: false
+      _rotationAxis: All
+      isSynced: false
+  ScriptTypes:
+    "":
+      {}
 - !<Text/4d5ffa39-e3e5-4305-a5c2-35646989afbb>
   PrefabRemaps:
     []
@@ -699,6 +765,24 @@
     CapitalizationOverride: None
   DepthTest: true
   TwoSided: false
+- !<ColliderComponent/4f6afcaf-e8e5-4dcc-bb2b-a13d1d7f587b>
+  PrefabRemaps:
+    []
+  Name: Physics Collider
+  Enabled: true
+  Shape: !<Box>
+    FitVisual: true
+    Size: {x: 15.000000, y: 15.000000, z: 15.000000}
+  Matter: !<reference> 00000000-0000-0000-0000-000000000000
+  Filter: !<reference> 00000000-0000-0000-0000-000000000000
+  OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
+  WorldSettings: !<reference> 00000000-0000-0000-0000-000000000000
+  EnableSmoothing: false
+  PositionTension: 30.000000
+  RotationTension: 30.000000
+  ForceCompound: false
+  Intangible: false
+  ShowCollider: false
 - !<SceneObject/4f834552-0988-4b35-aa75-7bbf37d193a8>
   PrefabRemaps:
     []
@@ -1027,10 +1111,10 @@
   PrefabRemaps:
     []
   Name: Settings Frame
-  Enabled: false
+  Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -10.000000, y: 0.000000, z: 0.000000}
+    Position: {x: 0.000000, y: -15.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -1252,7 +1336,9 @@
     - 4547dda7-7fa3-4471-bd06-ac278c15588f: 4547dda7-7fa3-4471-42f9-53d873eaa770
     - 4719b58d-aeb7-46d7-9ab6-79e80d443556: 12ef455a-ed2a-4ee4-9cd6-6a77869395bd
     - 49408d2f-74f4-4b52-a1c2-59c73c09cc17: 35901e3f-21ac-42bc-ae4a-d77d4803e283
+    - 4b309ecf-2d96-4c91-8add-9ff15e348ae0: 57c9e55e-1947-4732-aad3-9538045d7889
     - 4d5ffa39-e3e5-4305-a5c2-35646989afbb: 178d2ed3-2841-4f77-9333-cc1fab0b00b6
+    - 4f6afcaf-e8e5-4dcc-bb2b-a13d1d7f587b: bd8cd777-2214-42ad-bc68-4aab74a2df0e
     - 4f834552-0988-4b35-aa75-7bbf37d193a8: 4f834552-0988-4b35-558a-8440c82e6c57
     - 66f10180-1293-4deb-b8c9-8d26540d1ba4: 0e85557b-e4ff-4c9c-b1aa-0f5ad5753d30
     - 68617cb6-4585-4cb4-be77-9b4bbfa7647f: 68617cb6-4585-4cb4-4188-64b440589b80
@@ -1271,6 +1357,7 @@
     - bd4f6b7f-6ae4-44e7-b7c6-83155c3b3501: 9a50f0fd-8458-4432-9b92-dfa8771944da
     - c0c3d116-02b6-433c-ba60-f3666345a2f0: c0c3d116-02b6-433c-459f-0c999cba5d0f
     - c6afa360-aee2-45cd-905c-f31d87876311: 29320cd4-1318-45a2-8b7b-dde940e9382b
+    - ed09bd06-9877-495a-93c3-e1f60f704804: 4e19961d-b2e9-4380-8272-ed413cc85d5e
     - f1ee0505-d2e9-4a50-9cea-0acfd5d0cba4: 14d8640b-85b0-449b-ad4c-f02bb11ac217
   Name: Magnetic Field Root
   Enabled: true
@@ -1285,7 +1372,9 @@
     - !<own> 68617cb6-4585-4cb4-be77-9b4bbfa7647f
     - !<own> a35975db-c150-4b65-a41e-718829104c63
   Components:
-    []
+    - !<own> ed09bd06-9877-495a-93c3-e1f60f704804
+    - !<own> 4b309ecf-2d96-4c91-8add-9ff15e348ae0
+    - !<own> 4f6afcaf-e8e5-4dcc-bb2b-a13d1d7f587b
 - !<SceneObject/c6afa360-aee2-45cd-905c-f31d87876311>
   PrefabRemaps:
     []
@@ -1301,6 +1390,44 @@
     []
   Components:
     - !<own> 49408d2f-74f4-4b52-a1c2-59c73c09cc17
+- !<ScriptComponent/ed09bd06-9877-495a-93c3-e1f60f704804>
+  PrefabRemaps:
+    []
+  Name: Interactable
+  Enabled: true
+  ScriptAsset: !<reference> 652e631a-22d0-4941-9f74-2943df59f34c
+  ScriptInputsDefault:
+    targetingMode: true
+    targetingVisual: true
+    ignoreInteractionPlane: true
+    keepHoverOnTrigger: true
+    enableInstantDrag: true
+    isScrollable: true
+    allowMultipleInteractors: true
+    enablePokeDirectionality: true
+    acceptableXDirections: true
+    acceptableYDirections: true
+    acceptableZDirections: true
+    useFilteredPinch: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      targetingMode: !<float> 3.000000
+      targetingVisual: !<float> 1.000000
+      ignoreInteractionPlane: false
+      keepHoverOnTrigger: false
+      enableInstantDrag: false
+      isScrollable: false
+      allowMultipleInteractors: true
+      enablePokeDirectionality: false
+      acceptableXDirections: !<float> 0.000000
+      acceptableYDirections: !<float> 0.000000
+      acceptableZDirections: !<float> 1.000000
+      useFilteredPinch: false
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/f1ee0505-d2e9-4a50-9cea-0acfd5d0cba4>
   PrefabRemaps:
     []

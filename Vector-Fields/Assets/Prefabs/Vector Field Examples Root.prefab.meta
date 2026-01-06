@@ -38,7 +38,6 @@
   ScriptInputsDefault:
     _renderOrder: true
     _inactive: true
-    _defaultValue: true
     snapToTriggerPosition: true
     segmented: true
     numberOfSegments: true
@@ -54,7 +53,7 @@
       _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
       _inactive: false
       _playAudio: true
-      _defaultValue: !<float> 0.000000
+      _defaultValue: 0.040000
       snapToTriggerPosition: false
       segmented: false
       numberOfSegments: !<float> 5.000000
@@ -70,6 +69,24 @@
   ScriptTypes:
     "":
       {}
+- !<ColliderComponent/204b33fe-8ed9-4616-b055-6c4ef0c3c9e9>
+  PrefabRemaps:
+    []
+  Name: Physics Collider
+  Enabled: true
+  Shape: !<Box>
+    FitVisual: true
+    Size: {x: 15.000000, y: 15.000000, z: 15.000000}
+  Matter: !<reference> 00000000-0000-0000-0000-000000000000
+  Filter: !<reference> 00000000-0000-0000-0000-000000000000
+  OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
+  WorldSettings: !<reference> 00000000-0000-0000-0000-000000000000
+  EnableSmoothing: false
+  PositionTension: 30.000000
+  RotationTension: 30.000000
+  ForceCompound: false
+  Intangible: false
+  ShowCollider: false
 - !<Text/22fc30c9-68d4-4a50-48d4-0bcc99b3febe>
   PrefabRemaps:
     []
@@ -153,6 +170,64 @@
     CapitalizationOverride: None
   DepthTest: true
   TwoSided: false
+- !<ScriptComponent/4bbbff2f-0888-4975-9fde-cfbc0803a26b>
+  PrefabRemaps:
+    []
+  Name: InteractableManipulation
+  Enabled: true
+  ScriptAsset: !<reference> 664b556b-1946-4c2c-866a-e675b4e86006
+  ScriptInputsDefault:
+    manipulateRootSceneObject: true
+    minimumScaleFactor: true
+    maximumScaleFactor: true
+    enableTranslation: true
+    enableRotation: true
+    enableScale: true
+    enableStretchZ: true
+    showStretchZProperties: true
+    zStretchFactorMin: true
+    zStretchFactorMax: true
+    useFilter: true
+    showFilterProperties: true
+    minCutoff: true
+    beta: true
+    dcutoff: true
+    showTranslationProperties: true
+    _enableXTranslation: true
+    _enableYTranslation: true
+    _enableZTranslation: true
+    showRotationProperties: true
+    _rotationAxis: true
+    isSynced: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      manipulateRootSceneObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      minimumScaleFactor: 0.250000
+      maximumScaleFactor: !<float> 20.000000
+      enableTranslation: true
+      enableRotation: true
+      enableScale: true
+      enableStretchZ: true
+      showStretchZProperties: false
+      zStretchFactorMin: !<float> 1.000000
+      zStretchFactorMax: !<float> 12.000000
+      useFilter: true
+      showFilterProperties: false
+      minCutoff: !<float> 2.000000
+      beta: 0.015000
+      dcutoff: !<float> 1.000000
+      showTranslationProperties: false
+      _enableXTranslation: true
+      _enableYTranslation: true
+      _enableZTranslation: true
+      showRotationProperties: false
+      _rotationAxis: All
+      isSynced: false
+  ScriptTypes:
+    "":
+      {}
 - !<ScriptComponent/5370a26f-d26a-485b-5b93-95e93b105337>
   PrefabRemaps:
     []
@@ -162,6 +237,7 @@
   ScriptInputsDefault:
     _renderOrder: true
     _inactive: true
+    _defaultValue: true
     snapToTriggerPosition: true
     segmented: true
     numberOfSegments: true
@@ -177,7 +253,7 @@
       _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
       _inactive: false
       _playAudio: true
-      _defaultValue: 0.160000
+      _defaultValue: !<float> 0.000000
       snapToTriggerPosition: false
       segmented: false
       numberOfSegments: !<float> 5.000000
@@ -271,24 +347,28 @@
   Enabled: true
   ScriptAsset: !<reference> e70ea878-ce68-42de-809a-df95318d9571
   ScriptInputsDefault:
-    _gridSize: true
-    _gridSpacing: true
+    _maxVertexCount: true
+    _tubeMode: true
     _stepSize: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
-      _lengthSegments: !<float> 64.000000
-      _radialSegments: !<float> 6.000000
-      _radius: 0.040000
-      _gridSize: !<float> 5.000000
-      _gridSpacing: !<float> 1.000000
+      _maxVertexCount: !<float> 40000.000000
+      _tubeMode: !<float> 0.000000
+      _desiredLengthSegments: !<float> 20.000000
+      _radius: 0.030000
+      _coneLength: !<float> 4.000000
+      _coneRadius: 1.700000
+      _arrowScale: 1.300000
+      _gridSize: !<float> 8.000000
+      _gridSpacing: 0.600000
       _stepSize: 0.100000
-      _fieldScale: 0.400000
-      _flowSpeed: !<float> 30.000000
-      _preset: !<float> 2.000000
+      _fieldScale: 1.100000
+      _flowSpeed: !<float> 48.000000
+      _preset: !<float> 3.000000
       trackedObject: !<reference.SceneObject> 993a5b8b-d62f-4329-5f51-f5c9950706b4
-      fieldCollider: !<reference.ColliderComponent> e4caa013-716a-4de1-86ea-ce401eee163a
+      fieldCollider: !<reference.ColliderComponent> 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9
       material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42
   ScriptTypes:
     "":
@@ -312,10 +392,10 @@
   PrefabRemaps:
     []
   Name: Settings Frame
-  Enabled: false
+  Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -10.000000, y: 0.000000, z: 0.000000}
+    Position: {x: -15.000000, y: 0.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -428,7 +508,6 @@
   ScriptInputsDefault:
     _renderOrder: true
     _inactive: true
-    _defaultValue: true
     snapToTriggerPosition: true
     segmented: true
     numberOfSegments: true
@@ -444,7 +523,7 @@
       _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
       _inactive: false
       _playAudio: true
-      _defaultValue: !<float> 0.000000
+      _defaultValue: 0.430000
       snapToTriggerPosition: false
       segmented: false
       numberOfSegments: !<float> 5.000000
@@ -704,6 +783,44 @@
     - !<own> c2777241-f6b2-4f70-5cfc-98eb835f91a3
   Components:
     []
+- !<ScriptComponent/a6da0529-5cc3-453f-b69d-1183d1bc46c3>
+  PrefabRemaps:
+    []
+  Name: Interactable
+  Enabled: true
+  ScriptAsset: !<reference> 652e631a-22d0-4941-9f74-2943df59f34c
+  ScriptInputsDefault:
+    targetingMode: true
+    targetingVisual: true
+    ignoreInteractionPlane: true
+    keepHoverOnTrigger: true
+    enableInstantDrag: true
+    isScrollable: true
+    allowMultipleInteractors: true
+    enablePokeDirectionality: true
+    acceptableXDirections: true
+    acceptableYDirections: true
+    acceptableZDirections: true
+    useFilteredPinch: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      targetingMode: !<float> 3.000000
+      targetingVisual: !<float> 1.000000
+      ignoreInteractionPlane: false
+      keepHoverOnTrigger: false
+      enableInstantDrag: false
+      isScrollable: false
+      allowMultipleInteractors: true
+      enablePokeDirectionality: false
+      acceptableXDirections: !<float> 0.000000
+      acceptableYDirections: !<float> 0.000000
+      acceptableZDirections: !<float> 1.000000
+      useFilteredPinch: false
+  ScriptTypes:
+    "":
+      {}
 - !<Text/a8bd7d94-a604-45bb-7ccc-e5df0b959169>
   PrefabRemaps:
     []
@@ -1015,7 +1132,6 @@
   ScriptInputsDefault:
     _renderOrder: true
     _inactive: true
-    _defaultValue: true
     snapToTriggerPosition: true
     segmented: true
     numberOfSegments: true
@@ -1031,7 +1147,7 @@
       _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
       _inactive: false
       _playAudio: true
-      _defaultValue: !<float> 0.000000
+      _defaultValue: 0.310000
       snapToTriggerPosition: false
       segmented: false
       numberOfSegments: !<float> 5.000000
@@ -1170,7 +1286,6 @@
   ScriptInputsDefault:
     _renderOrder: true
     _inactive: true
-    _defaultValue: true
     snapToTriggerPosition: true
     segmented: true
     numberOfSegments: true
@@ -1186,7 +1301,7 @@
       _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
       _inactive: false
       _playAudio: true
-      _defaultValue: !<float> 0.000000
+      _defaultValue: 0.210000
       snapToTriggerPosition: false
       segmented: false
       numberOfSegments: !<float> 5.000000
@@ -1206,7 +1321,7 @@
   PrefabRemaps:
     []
   Name: Vector Field Examples Root
-  Enabled: false
+  Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: 0.000000}
@@ -1218,4 +1333,6 @@
     - !<own> 760d6bd5-cc08-41fa-6bba-88b9ced98617
     - !<own> 993a5b8b-d62f-4329-5f51-f5c9950706b4
   Components:
-    []
+    - !<own> a6da0529-5cc3-453f-b69d-1183d1bc46c3
+    - !<own> 4bbbff2f-0888-4975-9fde-cfbc0803a26b
+    - !<own> 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9

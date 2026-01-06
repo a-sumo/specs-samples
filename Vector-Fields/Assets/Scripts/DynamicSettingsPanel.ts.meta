@@ -1,0 +1,59 @@
+- !<AssetImportMetadata/35e73a49-be5e-4627-a15c-2d53113ffa79>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> d3b0260e-3bf2-4a23-94a1-2c9e0e9e6b4b
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> d3b0260e-3bf2-4a23-94a1-2c9e0e9e6b4b
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> f041b9cf-eccb-4431-a2b9-2175274adfba
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/f041b9cf-eccb-4431-a2b9-2175274adfba>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 019adaca-72f8-4781-b817-ba2a5e820c7d
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    labelChildName: false
+    magneticFieldComponent: false
+    sliderContainer: false
+    sliderPrefab: false
+    sliderSpacing: false
+    vectorFieldComponent: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - sliderPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      sliderContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      sliderSpacing: !<float> 4.000000
+      vectorFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      magneticFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      labelChildName: Label
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.ObjectPrefab sliderPrefab {"hint":"Prefab containing a Slider component to instantiate"}'
+    - '// @input SceneObject sliderContainer {"hint":"Parent object to place instantiated sliders under"}'
+    - '// @input float sliderSpacing = 4 {"hint":"Vertical spacing between sliders"}'
+    - '// @input Component.ScriptComponent vectorFieldComponent {"hint":"VectorFieldTubes component to control"}'
+    - '// @input Component.ScriptComponent magneticFieldComponent {"hint":"MagneticFieldTubes component to control"}'
+    - '// @input string labelChildName = "Text" {"hint":"Text component on slider prefab for label (child name)"}'
