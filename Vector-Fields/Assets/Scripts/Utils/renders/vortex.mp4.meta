@@ -1,0 +1,19 @@
+- !<AssetImportMetadata/6e0a02a0-f031-480d-b97d-166fd5e3e167>
+  ImportedAssetIds:
+    VideoTexture: !<reference> ecdd77ec-73f0-4357-887a-907e7e375da0
+  ImporterName: VideoTextureImporter
+  PrimaryAsset: !<reference> ecdd77ec-73f0-4357-887a-907e7e375da0
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    VideoTexture: !<own> 1037b735-0244-4a4a-bd1b-4bd317b2a751
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<VideoTextureAssetData/1037b735-0244-4a4a-bd1b-4bd317b2a751>
+  AutoPlay: true
+  Volume: 1.000000
