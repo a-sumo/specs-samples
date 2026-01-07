@@ -65,23 +65,23 @@
   Properties:
     Brightness:
       typeIdx: 1
-      value: 0.900000
+      value: 1.000000
     ColorSpeed:
       typeIdx: 1
-      value: 0.010000
+      value: 0.200000
     FilmThickness:
       typeIdx: 1
-      value: 0.800000
+      value: 0.500000
     FresnelPower:
       typeIdx: 1
-      value: 0.500000
+      value: 9.000000
     Opacity:
       typeIdx: 1
-      value: 1.000000
+      value: 0.100000
     PreviewEnabled:
       typeIdx: 0
       value: 0
     Saturation:
       typeIdx: 1
-      value: 0.300000
+      value: 0.030000
   Pass: !<reference> 0b935d54-9154-4647-9fea-f447fe1b1360

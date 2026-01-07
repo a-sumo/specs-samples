@@ -1,13 +1,53 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 612
+    size: 652
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
+      - Fonts/latin-modern-roman
+      - Fonts/latin-modern-roman/GUST-FONT-LICENSE.TXT
+      - Fonts/latin-modern-roman/lm-info.pdf
+      - Fonts/latin-modern-roman/lmroman10-bold.otf
+      - Fonts/latin-modern-roman/lmroman10-bolditalic.otf
+      - Fonts/latin-modern-roman/lmroman10-italic.otf
+      - Fonts/latin-modern-roman/lmroman10-regular.otf
+      - Fonts/latin-modern-roman/lmroman12-bold.otf
+      - Fonts/latin-modern-roman/lmroman12-italic.otf
+      - Fonts/latin-modern-roman/lmroman12-regular.otf
+      - Fonts/latin-modern-roman/lmroman17-regular.otf
+      - Fonts/latin-modern-roman/lmroman5-bold.otf
+      - Fonts/latin-modern-roman/lmroman5-regular.otf
+      - Fonts/latin-modern-roman/lmroman6-bold.otf
+      - Fonts/latin-modern-roman/lmroman6-regular.otf
+      - Fonts/latin-modern-roman/lmroman7-bold.otf
+      - Fonts/latin-modern-roman/lmroman7-italic.otf
+      - Fonts/latin-modern-roman/lmroman7-regular.otf
+      - Fonts/latin-modern-roman/lmroman8-bold.otf
+      - Fonts/latin-modern-roman/lmroman8-italic.otf
+      - Fonts/latin-modern-roman/lmroman8-regular.otf
+      - Fonts/latin-modern-roman/lmroman9-bold.otf
+      - Fonts/latin-modern-roman/lmroman9-italic.otf
+      - Fonts/latin-modern-roman/lmroman9-regular.otf
+      - Fonts/latin-modern-roman/lmromancaps10-oblique.otf
+      - Fonts/latin-modern-roman/lmromancaps10-regular.otf
+      - Fonts/latin-modern-roman/lmromandemi10-oblique.otf
+      - Fonts/latin-modern-roman/lmromandemi10-regular.otf
+      - Fonts/latin-modern-roman/lmromandunh10-oblique.otf
+      - Fonts/latin-modern-roman/lmromandunh10-regular.otf
+      - Fonts/latin-modern-roman/lmromanslant10-bold.otf
+      - Fonts/latin-modern-roman/lmromanslant10-regular.otf
+      - Fonts/latin-modern-roman/lmromanslant12-regular.otf
+      - Fonts/latin-modern-roman/lmromanslant17-regular.otf
+      - Fonts/latin-modern-roman/lmromanslant8-regular.otf
+      - Fonts/latin-modern-roman/lmromanslant9-regular.otf
+      - Fonts/latin-modern-roman/lmromanunsl10-regular.otf
+      - Images/color_cloud_sprite.png
+      - Materials/BG.mat
+      - Materials/BG.ss_graph
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/IridescentMaterial.mat

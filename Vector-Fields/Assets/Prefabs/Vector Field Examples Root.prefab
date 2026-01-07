@@ -60,31 +60,6 @@
     - !<own> 8f392357-c171-4e52-9f24-ed77dd06b3c9
     - !<own> 663d3834-b731-48c8-b5c4-a085f52d67c9
     - !<own> c53a443e-d0fc-4d2e-a3a6-5680677bdd4c
-- !<ScriptComponent/65dff174-b562-49c3-b55c-4aa629846744>
-  PrefabRemaps:
-    []
-  Name: InteractableOutlineFeedback
-  Enabled: true
-  ScriptAsset: !<reference> 657cbbe5-2a9c-4889-93fb-fd72ba8a1d52
-  ScriptInputsDefault:
-    targetOutlineMaterial: true
-    hoveringColor: true
-    activatingColor: true
-    outlineWeight: true
-    meshVisuals: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      targetOutlineMaterial: !<reference.Material> 7ac80b6c-979a-4a00-a694-099f296be161
-      hoveringColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 0.040000, w: 1.000000}
-      activatingColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-      outlineWeight: -0.250000
-      meshVisuals: !<reference.RenderMeshVisual[]>
-        []
-  ScriptTypes:
-    "":
-      {}
 - !<ScriptComponent/663d3834-b731-48c8-b5c4-a085f52d67c9>
   PrefabRemaps:
     []
@@ -212,7 +187,6 @@
     - !<own> e380bfaf-3fde-4bc2-8772-694fcd64e90c
     - !<own> b8a520bc-21a4-44d6-a332-2b3f73649569
     - !<own> ba89eaa7-52fc-4491-829f-708d0fe8a498
-    - !<own> 65dff174-b562-49c3-b55c-4aa629846744
 - !<ScriptComponent/b8a520bc-21a4-44d6-a332-2b3f73649569>
   PrefabRemaps:
     []
@@ -493,7 +467,6 @@
   PrefabRemaps:
     - 3b8fe396-9172-4303-b599-ff915795f898: a6da0529-5cc3-453f-b69d-1183d1bc46c3
     - 5c4b659d-1fec-4582-84ac-22d403284e8e: 5c4b659d-1fec-4582-7b53-dd2bfcd7b171
-    - 65dff174-b562-49c3-b55c-4aa629846744: 5db2e44f-28d4-4310-899c-d35d7f5e3f2e
     - 663d3834-b731-48c8-b5c4-a085f52d67c9: 663d3834-b731-48c8-4a3b-5f7a0ad29836
     - 68a56ace-6401-4200-a536-d7dd73708538: 68a56ace-6401-4200-5ac9-28228c8f7ac7
     - 6d180f37-2b4d-4aac-976f-470670f916a3: 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9

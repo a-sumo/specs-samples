@@ -1,6 +1,5 @@
 <p align="center">
-  <img src="../assets/vector-fields/vector-field-demo.gif" alt="Vector Fields Demo" width="300">
-  <img src="../assets/vector-fields/magnetic-field-demo.gif" alt="Magnetic Field Demo" width="300">
+  <img src="../assets/vector-fields/magnetic-field-demo.gif" alt="Magnetic Field Demo" width="500">
 </p>
 
 <h1 align="center">Vector Fields</h1>
@@ -72,36 +71,66 @@ Starting from sample points, the shader integrates along the field: `pos += fiel
 Vectors spiral inward toward a target point, creating sink-like behavior.
 
 <p align="center">
-  <img src="../assets/vector-fields/FieldContraction.gif" alt="Contraction Field" width="400">
+  <img src="../assets/vector-fields/FieldContraction.gif" alt="Contraction Field" width="500">
 </p>
+<p align="center"><em>Manim visualization of contraction field</em></p>
+
+<p align="center">
+  <img src="../assets/vector-fields/contraction-demo.gif" alt="Contraction Demo" width="500">
+</p>
+<p align="center"><em>Demo on Spectacles</em></p>
 
 #### Expansion
 Radial waves emanate outward from the target with 3D oscillation perpendicular to the flow.
 
 <p align="center">
-  <img src="../assets/vector-fields/FieldExpansion.gif" alt="Expansion Field" width="400">
+  <img src="../assets/vector-fields/FieldExpansion.gif" alt="Expansion Field" width="500">
 </p>
+<p align="center"><em>Manim visualization of expansion field</em></p>
+
+<p align="center">
+  <img src="../assets/vector-fields/expansion-demo.gif" alt="Expansion Demo" width="500">
+</p>
+<p align="center"><em>Demo on Spectacles</em></p>
 
 #### Circulation
 A 3D swirling vortex that mixes rotation in multiple planes around the target.
 
 <p align="center">
-  <img src="../assets/vector-fields/FieldCirculation.gif" alt="Circulation Field" width="400">
+  <img src="../assets/vector-fields/FieldCirculation.gif" alt="Circulation Field" width="500">
 </p>
+<p align="center"><em>Manim visualization of circulation field</em></p>
+
+<p align="center">
+  <img src="../assets/vector-fields/circulation-demo.gif" alt="Circulation Demo" width="500">
+</p>
+<p align="center"><em>Demo on Spectacles</em></p>
 
 #### Vortex
 Rotating cellular patterns with an added spin component based on angular position.
 
 <p align="center">
-  <img src="../assets/vector-fields/FieldVortex.gif" alt="Vortex Field" width="400">
+  <img src="../assets/vector-fields/FieldVortex.gif" alt="Vortex Field" width="500">
 </p>
+<p align="center"><em>Manim visualization of vortex field</em></p>
+
+<p align="center">
+  <img src="../assets/vector-fields/vortex-demo.gif" alt="Vortex Demo" width="500">
+</p>
+<p align="center"><em>Demo on Spectacles</em></p>
 
 #### Waves
 Sinusoidal interference patterns where each axis oscillates based on the other two coordinates.
 
 <p align="center">
-  <img src="../assets/vector-fields/FieldWaves.gif" alt="Waves Field" width="400">
+  <img src="../assets/vector-fields/FieldWaves.gif" alt="Waves Field" width="500">
 </p>
+<p align="center"><em>Manim visualization of waves field</em></p>
+
+<p align="center">
+  <img src="../assets/vector-fields/waves-demo.gif" alt="Waves Demo" width="500">
+</p>
+<p align="center"><em>Demo on Spectacles</em></p>
 
 ### Magnetic Field
 
@@ -112,8 +141,14 @@ B = (3(m·r̂)r̂ - m) / r³
 ```
 
 <p align="center">
-  <img src="../assets/vector-fields/MagneticField.gif" alt="Magnetic Field" width="400">
+  <img src="../assets/vector-fields/MagneticField.gif" alt="Magnetic Field" width="500">
 </p>
+<p align="center"><em>Manim visualization of magnetic dipole field</em></p>
+
+<p align="center">
+  <img src="../assets/vector-fields/magnetic-field-demo.gif" alt="Magnetic Field Demo" width="500">
+</p>
+<p align="center"><em>Demo on Spectacles with interactive magnet positioning</em></p>
 
 The magnets can be repositioned interactively to observe field line changes in real-time.
 

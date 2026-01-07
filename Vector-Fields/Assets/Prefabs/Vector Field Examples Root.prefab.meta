@@ -134,31 +134,6 @@
     - !<own> 8f392357-c171-4e52-60db-128822f94c36
     - !<own> 663d3834-b731-48c8-4a3b-5f7a0ad29836
     - !<own> c53a443e-d0fc-4d2e-5c59-a97f988422b3
-- !<ScriptComponent/5db2e44f-28d4-4310-899c-d35d7f5e3f2e>
-  PrefabRemaps:
-    []
-  Name: InteractableOutlineFeedback
-  Enabled: true
-  ScriptAsset: !<reference> 657cbbe5-2a9c-4889-93fb-fd72ba8a1d52
-  ScriptInputsDefault:
-    targetOutlineMaterial: true
-    hoveringColor: true
-    activatingColor: true
-    outlineWeight: true
-    meshVisuals: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      targetOutlineMaterial: !<reference.Material> 7ac80b6c-979a-4a00-a694-099f296be161
-      hoveringColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 0.040000, w: 1.000000}
-      activatingColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-      outlineWeight: -0.250000
-      meshVisuals: !<reference.RenderMeshVisual[]>
-        []
-  ScriptTypes:
-    "":
-      {}
 - !<ScriptComponent/663d3834-b731-48c8-4a3b-5f7a0ad29836>
   PrefabRemaps:
     []
@@ -273,7 +248,6 @@
     - !<own> e380bfaf-3fde-4bc2-788d-96b0329b16f3
     - !<own> b8a520bc-21a4-44d6-5ccd-d4c08c9b6a96
     - !<own> 59eef357-cdd7-4eb0-b404-56e9ab9debc4
-    - !<own> 5db2e44f-28d4-4310-899c-d35d7f5e3f2e
 - !<ScriptComponent/a6da0529-5cc3-453f-b69d-1183d1bc46c3>
   PrefabRemaps:
     []

@@ -3,7 +3,6 @@ CollapsedEntities:
   value:
     size: 839
     values:
-      - ""
       - Fonts
       - Fonts/galter
       - Fonts/galter/Galter.otf
@@ -51,6 +50,7 @@ CollapsedEntities:
       - Materials/Encoders/Pigment Gamut Encoder.ss_graph
       - Materials/Encoders/RGB Encoder.mat
       - Materials/Encoders/RGB Encoder.ss_graph
+      - Materials/MeshTransforms
       - Materials/MeshTransforms/ColorSpaceTransforms 2.mat
       - Materials/MeshTransforms/ColorSpaceTransforms 2.ss_graph
       - Materials/MeshTransforms/ColorSpaceTransforms.mat
