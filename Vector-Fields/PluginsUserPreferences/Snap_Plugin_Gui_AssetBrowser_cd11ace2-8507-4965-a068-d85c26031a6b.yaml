@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 665
+    size: 664
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
@@ -31,7 +31,6 @@ CollapsedEntities:
       - Images/vortex_sprite.png
       - Images/waves_preview.png
       - Images/waves_sprite.png
-      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/IridescentMaterial.mat

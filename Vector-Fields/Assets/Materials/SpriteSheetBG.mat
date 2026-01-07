@@ -290,7 +290,7 @@
       value:
         id: eb510a6a-e056-4139-ae35-bbcde04b2627
         sampler:
-          filteringMode: Bilinear
+          filteringMode: Trilinear
           wrapModeU: Repeat
           wrapModeV: Repeat
           wrapModeW: Repeat
@@ -311,7 +311,7 @@
       value:
         id: cd33564f-30be-4ba5-bbe8-3baf200672c7
         sampler:
-          filteringMode: Bilinear
+          filteringMode: Trilinear
           wrapModeU: Repeat
           wrapModeV: Repeat
           wrapModeW: Repeat
@@ -329,7 +329,7 @@
       value:
         id: 607b1131-f7b1-41f7-b0fe-0615c59cdeac
         sampler:
-          filteringMode: Bilinear
+          filteringMode: Trilinear
           wrapModeU: Repeat
           wrapModeV: Repeat
           wrapModeW: Repeat
@@ -350,7 +350,7 @@
       value:
         id: 462d3eb2-0fd3-465f-8645-f11d1abd64c6
         sampler:
-          filteringMode: Bilinear
+          filteringMode: Trilinear
           wrapModeU: Repeat
           wrapModeV: Repeat
           wrapModeW: Repeat
@@ -380,7 +380,7 @@
       value:
         id: e171dcbb-b7dd-44bf-b6f2-3fd332caacb7
         sampler:
-          filteringMode: Bilinear
+          filteringMode: Trilinear
           wrapModeU: Repeat
           wrapModeV: Repeat
           wrapModeW: Repeat
@@ -398,7 +398,7 @@
       value:
         id: d680c731-869d-4943-9bcc-e5af1cf91374
         sampler:
-          filteringMode: Bilinear
+          filteringMode: Trilinear
           wrapModeU: Repeat
           wrapModeV: Repeat
           wrapModeW: Repeat
