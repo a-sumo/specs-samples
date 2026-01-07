@@ -245,6 +245,32 @@
   ScriptTypes:
     "":
       {}
+- !<ScriptComponent/0218bb34-8ded-49ac-a591-48e380f944ac>
+  PrefabRemaps:
+    []
+  Name: InteractableAudioFeedback
+  Enabled: true
+  ScriptAsset: !<reference> 1ad7da86-2c32-418c-bdf1-b7150c07c912
+  ScriptInputsDefault:
+    _playAudioOnHover: true
+    _hoverAudioTrack: true
+    _playAudioOnTriggerStart: true
+    _triggerStartAudioTrack: true
+    _playAudioOnTriggerEnd: true
+    _triggerEndAudioTrack: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _playAudioOnHover: false
+      _hoverAudioTrack: !<reference.AudioTrackAsset> 97bf97ae-b2da-47d7-bde6-003f597fe888
+      _playAudioOnTriggerStart: true
+      _triggerStartAudioTrack: !<reference.AudioTrackAsset> edad7d53-55da-40b1-9025-fad0e7207862
+      _playAudioOnTriggerEnd: true
+      _triggerEndAudioTrack: !<reference.AudioTrackAsset> 82028831-1631-4d7b-b548-ff6be4e0a2ba
+  ScriptTypes:
+    "":
+      {}
 - !<Text/029205d3-4284-4c3b-8096-9987aab4b56f>
   PrefabRemaps:
     []
@@ -1550,6 +1576,31 @@
         - !<reference> c9c9a9bc-999d-4193-a934-4d07b63df2ca
         - !<reference> 5643fa8f-b02d-4429-a0c8-e716a4f35002
         - !<reference> 6ec96506-c83a-4273-8aaa-2679aa7c7c7d
+  ScriptTypes:
+    "":
+      {}
+- !<ScriptComponent/21dc2f92-f8bf-4037-9850-b39f31f73668>
+  PrefabRemaps:
+    []
+  Name: InteractableOutlineFeedback
+  Enabled: true
+  ScriptAsset: !<reference> 657cbbe5-2a9c-4889-93fb-fd72ba8a1d52
+  ScriptInputsDefault:
+    targetOutlineMaterial: true
+    hoveringColor: true
+    activatingColor: true
+    outlineWeight: true
+    meshVisuals: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      targetOutlineMaterial: !<reference.Material> 7ac80b6c-979a-4a00-a694-099f296be161
+      hoveringColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 0.040000, w: 1.000000}
+      activatingColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      outlineWeight: -0.250000
+      meshVisuals: !<reference.RenderMeshVisual[]>
+        []
   ScriptTypes:
     "":
       {}
@@ -5732,9 +5783,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 5.000000, z: 0.000000}
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Scale: {x: 2.000000, y: 2.000000, z: 2.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -5743,6 +5794,8 @@
     - !<own> 0f7acdea-85a2-41d5-bbc9-34f0447bc761
     - !<own> 1c5e3bd8-9a54-4836-bedd-c279117dd2ef
     - !<own> fcc681dc-9d27-46dc-ae89-201027f1cebb
+    - !<own> 0218bb34-8ded-49ac-a591-48e380f944ac
+    - !<own> 21dc2f92-f8bf-4037-9850-b39f31f73668
 - !<SceneObject/9a14c486-688a-4af4-a99a-084652f3efa1>
   PrefabRemaps:
     []
@@ -5846,45 +5899,22 @@
     []
 - !<SceneObject/9e72f614-329f-4e4a-b149-7fe960315346>
   PrefabRemaps:
-    - 057a0819-28d7-499a-a390-7d2e379bf62c: 87ba7f11-d8c7-439b-a35f-3a3c5dabeb81
     - 0a9131f4-4224-4d4d-8009-a3a3fd8804f6: 4e19961d-b2e9-4380-8272-ed413cc85d5e
     - 0de8d1cb-88fb-4631-8822-8d088463662f: 07801f26-d6b3-408d-4797-1b33c0503c03
-    - 0f418656-a653-45ed-adb5-a8829b67786b: 0e85557b-e4ff-4c9c-b1aa-0f5ad5753d30
     - 18608aec-083f-433f-8711-54c2985e9aa4: 4f834552-0988-4b35-558a-8440c82e6c57
     - 20611fc4-d95e-4ab6-b136-6e4363d35457: 246e406c-6c8e-4115-5e66-4a6a904303ed
-    - 2f95912e-22cb-4245-a73b-0021caac1290: 29320cd4-1318-45a2-8b7b-dde940e9382b
     - 2ff50d84-c28e-4922-a527-b1ae784c2ef7: 68617cb6-4585-4cb4-4188-64b440589b80
     - 306d18f0-7ea5-4e2d-a14e-54dde3fe2946: 4547dda7-7fa3-4471-42f9-53d873eaa770
-    - 33829e28-472d-423d-9508-c7b24b603b30: 32568c4b-8dce-4770-8d54-407fccb86da7
     - 4097fcfc-06c0-4422-8877-b4683d89347c: b3994541-f6c7-4a38-7069-0545594d39b1
     - 43163b72-88eb-4edf-bdde-81950b6df61e: b9465c54-a3c2-4b20-471a-6f9aa4e840e8
     - 57bfdb92-2854-4735-a357-9463f60d4d9b: 0d846da2-664f-475d-7fc4-b89efb9ee6b4
-    - 5c24bc4c-fa6e-47fd-b65f-5745c8b53148: 1a8456a1-14fa-4924-a751-c0d53f9aadaf
-    - 5e977de1-dd88-4a12-8c0f-bb94d1079898: 9a50f0fd-8458-4432-9b92-dfa8771944da
-    - 6608c7a4-044e-4479-8440-503c7d5057a7: 2df2cf18-4ddc-4d15-9343-8c13c9abdccd
-    - 670d47eb-93b5-4a17-a4bd-bb712c5b3a2d: 178d2ed3-2841-4f77-9333-cc1fab0b00b6
     - 6b54fcc4-c51d-4a18-b371-7bf7fb532cac: 1f1085de-9969-4e37-4474-88ddb0d3a352
-    - 6e842cfa-a8f6-47ac-be62-eba64d050433: 35901e3f-21ac-42bc-ae4a-d77d4803e283
     - 73e5be2f-2a03-45fb-bc51-a9dfe5d6e604: a0c8d365-8fae-4fd8-5177-bf007c7df7e0
     - 7a5869a4-db46-40e4-b647-8d19996a8b54: 39bda1cb-18c0-41ea-68d8-3af772c1b3bb
-    - 7eae5d2d-a404-4c29-a1ad-bb01819b6e4d: fee01ca2-7bba-4be6-9eae-e85b72da084e
-    - 7f582e11-542f-4129-a5e5-7991ab92326f: 173415de-072f-40ad-a969-cbb9d6a3d00a
-    - 8e99c6c7-893e-4972-b910-83e7821fd672: f8936f24-b29a-4219-8e75-97d91ad908d0
     - 90c343e7-aff3-416b-8cfa-7d13a389286d: bd8cd777-2214-42ad-bc68-4aab74a2df0e
-    - 9985c7f2-a13b-4049-870a-f979b5d042bb: bfa1009c-682b-4538-bf14-d28c54915d7f
-    - 9b0ae202-17f6-474f-87e1-49ba696a9074: e033cde0-9243-4a71-aa4d-9027e04c91b1
-    - 9bf844ce-c376-4946-bf63-6b51f2f3ef0c: 4a786843-4fd4-4b73-a3da-97eaf323d140
     - 9e72f614-329f-4e4a-b149-7fe960315346: c0c3d116-02b6-433c-459f-0c999cba5d0f
     - a04f678a-d4f0-43c1-a8ba-db48ef958aaa: 57c9e55e-1947-4732-aad3-9538045d7889
-    - a4953a6e-faef-4b9f-96fd-63e1970625f2: b26755c7-2df3-4a73-a0d6-b088ab481f48
-    - ae298f99-a85a-4655-8497-5e837f2f45da: b9fbfd25-25d1-4c75-9c7b-68ab4c455a1c
-    - b0e8fca0-2a71-439a-acf8-5deb606946ff: 53940cb6-ec16-4803-abed-4152778b613f
-    - b72c873c-645b-4296-b45b-45729b2a1e1a: bb6e157b-ea63-43c1-949f-f4adab2913f1
-    - b98d9d9b-57d5-43f1-b82f-5026bf5eb0dc: 12ef455a-ed2a-4ee4-9cd6-6a77869395bd
     - beea31a6-1668-4401-87aa-8562d5bfd4fa: 05aae4ff-d7dc-4670-4663-316d4b59e28e
-    - c0caab89-0e35-4513-a1f5-25f6ebb425d4: 7de226d2-50d4-4037-bba1-de4ad9c2dfb5
-    - c8629ad7-e0e4-4e89-8eb5-4fed9f3377f8: 47206a25-8450-4b05-aabc-7faef1f35f0a
-    - d9741ac7-009d-4d3c-9c72-da5ccafe91c3: 14d8640b-85b0-449b-ad4c-f02bb11ac217
     - e96e45ea-e940-49dc-a3f3-3d3da617934d: 95ddfbf5-9874-4a2a-6d43-60d990706e44
     - fa0d7b81-5092-4c78-a970-efb36a1ca87f: 351a4940-22c4-418f-6043-a6dfe5a7df60
   Name: Magnetic Field Root
@@ -6491,7 +6521,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Materials:
-    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
+    - !<reference> 109dfeab-0ee0-4fd1-bb42-22a06bfa4a89
   Mesh: !<reference> 06fe80f9-b0cb-4134-b59e-69ead9395e81
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
@@ -8639,48 +8669,27 @@
       {}
 - !<SceneObject/e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb>
   PrefabRemaps:
+    - 0218bb34-8ded-49ac-a591-48e380f944ac: 59eef357-cdd7-4eb0-b404-56e9ab9debc4
     - 032abe87-97d0-4383-bbc4-bebdf523ce30: 5c4b659d-1fec-4582-7b53-dd2bfcd7b171
     - 0f7acdea-85a2-41d5-bbc9-34f0447bc761: eb50fb70-d076-44a2-44dd-a9f39a158419
-    - 13b40e0a-619a-4edd-abce-6c7d38dc49ac: a09fda06-ef0e-42d8-7a97-6bfa0c583e66
-    - 176c2931-e1c4-4a63-bd5a-dee92f049b01: cd233e93-5954-44e3-733e-57e1ae573de5
     - 1c5e3bd8-9a54-4836-bedd-c279117dd2ef: e380bfaf-3fde-4bc2-788d-96b0329b16f3
-    - 333eb799-69db-4ffb-8917-099a8a5a3674: 5370a26f-d26a-485b-5b93-95e93b105337
-    - 40685b84-ce25-4d3f-8e35-a127f5dc4c7a: 05e25212-e2a9-48bf-5366-46803da13b0d
-    - 4f331621-9a2f-4215-92e3-2a1f1640ee78: a8bd7d94-a604-45bb-7ccc-e5df0b959169
-    - 5495e949-f535-4cfd-ae0f-0575deb1b87c: fa94be5c-c368-4a7d-5286-9c88810032ff
+    - 21dc2f92-f8bf-4037-9850-b39f31f73668: 5db2e44f-28d4-4310-899c-d35d7f5e3f2e
     - 5d4396b3-1749-4b2f-afb9-e67ea0c0cee2: 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9
-    - 694df92f-b96e-4848-9128-2476e6ad356d: 64d8c877-3454-4ca5-694d-3306352e6022
-    - 6ace045e-1481-481f-b680-8baa08811084: 760d6bd5-cc08-41fa-6bba-88b9ced98617
-    - 6fee7ef0-3f83-4c2b-b755-d1f2f82b25d7: 7925e201-2cba-4ce1-411b-3802715fde3b
     - 7228cfab-bf82-491a-87e8-2f7cab109ca6: 8f392357-c171-4e52-60db-128822f94c36
-    - 8157ffce-6c2a-49a0-b2cd-984ccda281c3: 0c101837-3ecf-4a66-677a-6f3e525068a8
-    - 86bf1743-8f8f-4b82-a5a3-111a401b5247: c2777241-f6b2-4f70-5cfc-98eb835f91a3
-    - 8a12f0f5-e0d4-4c73-a3f1-310dd46360bc: 8361e957-0fc5-4188-6491-a44e0497338b
-    - 8befe306-3c4f-49f2-9cf4-496ef976e4ab: e454bc1d-5cd7-4382-50e1-8549234a4caa
     - 98ef9586-1be1-4c72-b3c2-994c212b2031: 993a5b8b-d62f-4329-5f51-f5c9950706b4
-    - a7363d3f-459c-413c-bf6a-b616962f31e6: 6c4dbfb2-a783-405c-646f-4cc5cb831848
     - af5703b4-6dd3-490f-9032-1785f13b9a0f: bf13c035-9f02-4be6-7d1f-0ad32ec5b8ce
     - b2b53873-09b0-4f5b-adba-bdf9ddec6d16: 4bbbff2f-0888-4975-9fde-cfbc0803a26b
-    - b49bc88a-0a9c-4014-a074-224539c9ef1f: e4e30e30-8f2e-43d6-4ac7-3df6df1e945f
-    - b9165a6f-8b89-4430-8491-10b3a0509f90: 8736d7f4-4d17-4d1c-7d4b-b7848e859aa2
-    - c201be35-1a1e-45d8-8475-cef74686f8c3: 85ed45cb-0c6f-41b7-79fc-cb529994faa9
     - c74d91fd-7ade-4e9b-920c-5be19b26a26e: 663d3834-b731-48c8-4a3b-5f7a0ad29836
     - d3d0e98f-5c85-47b8-ab9a-11848c5c0f3d: c53a443e-d0fc-4d2e-5c59-a97f988422b3
     - e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb: fd9cd3ca-49f8-4cc9-6caf-0c79823bbbc0
-    - e883aef3-fc76-429f-9615-6f679ac473d7: ee478cdd-a442-4ee9-494d-0f49a1cad560
     - eaa5f500-a9c9-4052-b208-001eb4957ad4: 68a56ace-6401-4200-5ac9-28228c8f7ac7
-    - ebc9ba09-7f6a-49f1-9bdd-b89f62d8f3de: 9e5412d0-066a-46d3-48f3-f25d2c066465
-    - ef0e5b8d-6509-4fe8-86a9-a522d8aa3448: eb3be663-e7d9-4841-52c1-4101b72eacb4
-    - f6c982d9-adba-4f8e-85d5-5af9a3cb3769: 7928a4c6-2c3d-438d-665c-1ca5e170e855
-    - f70d02db-fc38-4d6a-93fe-2d11fc0078f4: 22fc30c9-68d4-4a50-48d4-0bcc99b3febe
     - f761af7d-4968-44dc-ab51-8d170cfb3362: a6da0529-5cc3-453f-b69d-1183d1bc46c3
     - fcc681dc-9d27-46dc-ae89-201027f1cebb: b8a520bc-21a4-44d6-5ccd-d4c08c9b6a96
-    - ff8d7741-cafa-4b95-b3c0-b54c15fd3b72: 8c5e6b77-8c24-4757-5e10-2b911ad32ea6
   Name: Vector Field Examples Root
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 10.000000, z: -50.000000}
+    Position: {x: 0.000000, y: 0.000000, z: -50.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -8928,6 +8937,7 @@
     _maxVertexCount: true
     _tubeMode: true
     _stepSize: true
+    _preset: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -8944,7 +8954,7 @@
       _stepSize: 0.100000
       _fieldScale: 1.100000
       _flowSpeed: !<float> 48.000000
-      _preset: !<float> 3.000000
+      _preset: !<float> 0.000000
       trackedObject: !<reference.SceneObject> 98ef9586-1be1-4c72-b3c2-994c212b2031
       fieldCollider: !<reference.ColliderComponent> 5d4396b3-1749-4b2f-afb9-e67ea0c0cee2
       material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42

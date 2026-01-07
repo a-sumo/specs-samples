@@ -1,21 +1,23 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 607
+    size: 612
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
-      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
+      - Materials/IridescentMaterial.mat
+      - Materials/IridescentMaterial.ss_graph
       - Materials/MagnetPole.mat
       - Materials/MagnetPole.ss_graph
       - Materials/MagneticField.ss_graph
       - Materials/TestTubeDeformation.mat
       - Materials/TestTubeDeformation.ss_graph
+      - Meshes
       - Meshes/Custom CapsuleSphere.mesh
       - Meshes/Custom Sphere.mesh
       - Prefabs/Magnetic Field Root.prefab
@@ -28,10 +30,13 @@ CollapsedEntities:
       - Scene.scene
       - Scripts/DynamicSettingsPanel.ts
       - Scripts/FieldController.ts
+      - Scripts/IridescentMaterial.ts
       - Scripts/MagnetPhysics.ts
       - Scripts/MagneticField.ts
       - Scripts/TubeTest.ts
       - Scripts/VectorField.ts
+      - Shaders/IridescentShader.js
+      - Shaders/IridescentSimple.js
       - Shaders/MagnetPole.js
       - Shaders/MagneticField.js
       - Shaders/TubeTest.js
