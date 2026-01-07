@@ -14,9 +14,19 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     // ============ PERFORMANCE ============
 
-    private static readonly RADIAL_SEGMENTS: number = 6;
     private static readonly MIN_LENGTH_SEGMENTS: number = 2;
     private static readonly MAX_LENGTH_SEGMENTS: number = 64;
+
+    // LOD presets: [radialSegments, maxLengthSegments, gridSize]
+    private static readonly LOD_PRESETS: number[][] = [
+        [4, 6, 4],    // 0: Low - 64 tubes
+        [5, 10, 5],   // 1: Medium - 125 tubes
+        [6, 16, 6],   // 2: High - 216 tubes
+        [8, 24, 7],   // 3: Ultra - 343 tubes
+    ];
+
+    private _lod: number = 1;  // Default to Medium
+    private _radialSegments: number = 5;
 
     @input
     @widget(new SliderWidget(10000, 100000, 5000))
@@ -119,9 +129,9 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     // ============ VERTEX BUDGET HELPERS ============
 
-    public static computeVertexCount(gridSize: number, lengthSegments: number, mode: number): number {
+    private computeVertexCount(gridSize: number, lengthSegments: number, mode: number): number {
         const tubeCount = gridSize * gridSize * gridSize;
-        const radial = MagneticFieldTubes.RADIAL_SEGMENTS;
+        const radial = this._radialSegments;
 
         if (mode === MagneticTubeMode.Particles) {
             return tubeCount * (2 * radial + 2);
@@ -137,13 +147,13 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         }
     }
 
-    public static computeMaxLengthSegments(gridSize: number, maxVertices: number, mode: number): number {
+    private computeMaxLengthSegments(gridSize: number, maxVertices: number, mode: number): number {
         if (mode === MagneticTubeMode.Particles || mode === MagneticTubeMode.Arrows) {
             return MagneticFieldTubes.MIN_LENGTH_SEGMENTS;
         }
 
         const tubeCount = gridSize * gridSize * gridSize;
-        const radial = MagneticFieldTubes.RADIAL_SEGMENTS;
+        const radial = this._radialSegments;
         const capVerts = 2;
 
         const budgetPerTube = Math.floor(maxVertices / tubeCount);
@@ -155,8 +165,15 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         );
     }
 
+    private applyLOD(): void {
+        const preset = MagneticFieldTubes.LOD_PRESETS[this._lod];
+        this._radialSegments = preset[0];
+        this._desiredLengthSegments = preset[1];
+        this._gridSize = preset[2];
+    }
+
     private adaptGeometryToBudget(): void {
-        const maxAllowed = MagneticFieldTubes.computeMaxLengthSegments(
+        const maxAllowed = this.computeMaxLengthSegments(
             this._gridSize,
             this._maxVertexCount,
             this._tubeMode
@@ -168,7 +185,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
             this._lengthSegments = Math.min(this._desiredLengthSegments, maxAllowed);
         }
 
-        const actualVerts = MagneticFieldTubes.computeVertexCount(
+        const actualVerts = this.computeVertexCount(
             this._gridSize,
             this._lengthSegments,
             this._tubeMode
@@ -182,6 +199,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     onAwake(): void {
         this.setupMaterial();
+        this.applyLOD();
         this.adaptGeometryToBudget();
         this.generateMesh();
         this.updateMaterialParams();
@@ -189,7 +207,8 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
         const tubeCount = this._gridSize * this._gridSize * this._gridSize;
         const modeNames = ["Trails", "Particles", "Arrows"];
-        print("MagneticFieldTubes: Initialized " + tubeCount + " " + modeNames[this._tubeMode] + " mode");
+        const lodNames = ["Low", "Medium", "High", "Ultra"];
+        print("MagneticFieldTubes: Initialized " + tubeCount + " " + modeNames[this._tubeMode] + " (LOD: " + lodNames[this._lod] + ")");
     }
 
     private setupMaterial(): void {
@@ -293,7 +312,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         this.clearMeshVisuals();
 
         const pathLength = this._lengthSegments + 1;
-        const circleSegments = MagneticFieldTubes.RADIAL_SEGMENTS;
+        const circleSegments = this._radialSegments;
 
         let vertsPerTube: number;
         if (this._tubeMode === MagneticTubeMode.Particles) {
@@ -651,7 +670,23 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         this.refresh();
     }
 
-    get radialSegments(): number { return MagneticFieldTubes.RADIAL_SEGMENTS; }
+    get radialSegments(): number { return this._radialSegments; }
+
+    get lod(): number { return this._lod; }
+    set lod(value: number) {
+        this._lod = Math.max(0, Math.min(MagneticFieldTubes.LOD_PRESETS.length - 1, Math.floor(value)));
+        this.applyLOD();
+        this.refresh();
+    }
+
+    public setLOD(level: number): void {
+        this.lod = level;
+    }
+
+    public setLODNormalized(value: number): void {
+        const maxIndex = MagneticFieldTubes.LOD_PRESETS.length - 1;
+        this.lod = Math.round(value * maxIndex);
+    }
 
     get maxVertexCount(): number { return this._maxVertexCount; }
     set maxVertexCount(value: number) {

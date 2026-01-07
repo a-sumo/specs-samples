@@ -57,6 +57,7 @@
   ScriptAsset: !<reference> 173d7099-914c-4f24-ac1c-1b67a66ae138
   ScriptInputsDefault:
     _renderOrder: true
+    _size: true
     _inactive: true
     _playAudio: true
     _style: true
@@ -71,7 +72,7 @@
   ScriptInputs:
     "":
       _renderOrder: 0
-      _size: !<Vec3> {x: 4.000000, y: 1.500000, z: 1.500000}
+      _size: !<Vec3> {x: 6.000000, y: 3.000000, z: 3.000000}
       _inactive: false
       _playAudio: false
       _style: PrimaryNeutral
@@ -106,7 +107,7 @@
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
   SizeToFit: false
-  FontSize: 32
+  FontSize: 48
   Font: !<reference> bf22fc48-859b-42e2-9de7-55147e9efced
   LayoutRect:
     left: -7.500000

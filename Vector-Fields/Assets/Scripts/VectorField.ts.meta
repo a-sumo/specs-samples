@@ -34,6 +34,7 @@
     _flowSpeed: false
     _gridSize: false
     _gridSpacing: false
+    _lod: false
     _maxVertexCount: false
     _preset: false
     _radius: false
@@ -51,7 +52,8 @@
   Attachments:
     []
   DefaultScriptInputs:
-    - _maxVertexCount: !<float> 40000.000000
+    - _lod: !<float> 2.000000
+      _maxVertexCount: !<float> 40000.000000
       _tubeMode: !<float> 0.000000
       _desiredLengthSegments: !<float> 8.000000
       _radius: 0.050000
@@ -71,7 +73,8 @@
     -
       {}
   InputLines:
-    - '// @input float _maxVertexCount = 40000 {"hint":"Maximum vertex count budget - geometry adapts to stay below this", "widget":"slider", "min":10000, "max":100000, "step":5000}'
+    - '// @input float _lod = 1 {"hint":"Level of detail - affects radial segments, length segments, and grid size", "widget":"combobox", "values":[{"label":"Low", "value":0}, {"label":"Medium", "value":1}, {"label":"High", "value":2}, {"label":"Ultra", "value":3}]}'
+    - '// @input float _maxVertexCount = 32000 {"hint":"Maximum vertex count budget - geometry adapts to stay below this (UInt16 max: 65535)", "widget":"slider", "min":8000, "max":65000, "step":1000}'
     - '// @input float _tubeMode {"hint":"Trails: flowing tubes, Particles: short flowing trails, Arrows: static oriented", "widget":"combobox", "values":[{"label":"Trails", "value":0}, {"label":"Particles", "value":1}, {"label":"Arrows", "value":2}]}'
     - '// @input float _desiredLengthSegments = 8 {"hint":"Desired segments along tube length (may be reduced to fit vertex budget)", "widget":"slider", "min":2, "max":64, "step":2}'
     - '// @input float _radius = 0.04 {"hint":"Tube radius", "widget":"slider", "min":0.01, "max":0.2, "step":0.01}'

@@ -32,6 +32,7 @@
     fieldModeTogglePrefab: false
     fieldModeToggleSpacing: false
     labelChildName: false
+    lodToggleContainer: false
     magneticFieldComponent: false
     optionTogglePrefab: false
     optionToggleSpacing: false
@@ -66,6 +67,7 @@
       optionTogglePrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
       presetToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       tubeModeToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      lodToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       toggleTextChildName: Toggle Text
       optionToggleSpacing: !<float> 4.000000
       fieldController: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
@@ -87,6 +89,7 @@
     - '// @input Asset.ObjectPrefab optionTogglePrefab {"hint":"Toggle prefab for presets and tube mode options"}'
     - '// @input SceneObject presetToggleContainer {"hint":"Container with ToggleGroup for VectorField presets"}'
     - '// @input SceneObject tubeModeToggleContainer {"hint":"Container with ToggleGroup for tube modes (Trails/Particles/Arrows)"}'
+    - '// @input SceneObject lodToggleContainer {"hint":"Container with ToggleGroup for LOD levels"}'
     - '// @input string toggleTextChildName = "Toggle Text" {"hint":"Text child name in toggle prefab"}'
     - '// @input float optionToggleSpacing = 4 {"hint":"Horizontal spacing between option toggles"}'
     - '// @input Component.ScriptComponent fieldController {"hint":"FieldController to notify when field mode changes"}'

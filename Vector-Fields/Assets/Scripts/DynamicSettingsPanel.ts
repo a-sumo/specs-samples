@@ -72,6 +72,10 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     tubeModeToggleContainer: SceneObject;
 
     @input
+    @hint("Container with ToggleGroup for LOD levels")
+    lodToggleContainer: SceneObject;
+
+    @input
     @hint("Text child name in toggle prefab")
     toggleTextChildName: string = "Toggle Text";
 
@@ -87,10 +91,12 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private fieldModeToggles: SceneObject[] = [];
     private presetToggles: SceneObject[] = [];
     private tubeModeToggles: SceneObject[] = [];
+    private lodToggles: SceneObject[] = [];
     private activeComponent: any = null;
     private fieldModesBuilt: boolean = false;
     private presetsBuilt: boolean = false;
     private tubeModesBuilt: boolean = false;
+    private lodBuilt: boolean = false;
 
     private vectorFieldValues: Map<string, number> = new Map();
     private magneticFieldValues: Map<string, number> = new Map();
@@ -115,6 +121,13 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         "Arrows"
     ];
 
+    private lodModes: string[] = [
+        "Low",
+        "Med",
+        "High",
+        "Ultra"
+    ];
+
     private vectorFieldConfigs: SliderConfig[] = [
         { label: "Field Scale", propertyName: "fieldScale", min: 0.1, max: 3.0, defaultValue: 1.0 },
         { label: "Radius", propertyName: "radius", min: 0.01, max: 0.2, defaultValue: 0.05 },
@@ -133,6 +146,7 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private fieldModeCallbackAdded: boolean = false;
     private presetCallbackAdded: boolean = false;
     private tubeModeCallbackAdded: boolean = false;
+    private lodCallbackAdded: boolean = false;
 
     onAwake(): void {
         this.createScriptApi();
@@ -248,9 +262,15 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             this.buildTubeModeToggles();
             this.tubeModesBuilt = true;
         }
+        if (!this.lodBuilt) {
+            this.buildLODToggles();
+            this.lodBuilt = true;
+        }
 
         this.showPresetContainer(true);
+        this.showLODContainer(true);
         this.syncTubeModeSelection();
+        this.syncLODSelection();
         print("DynamicSettingsPanel: Switched to Vector Field");
     }
 
@@ -265,9 +285,15 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             this.buildTubeModeToggles();
             this.tubeModesBuilt = true;
         }
+        if (!this.lodBuilt) {
+            this.buildLODToggles();
+            this.lodBuilt = true;
+        }
 
         this.showPresetContainer(false);
+        this.showLODContainer(true);
         this.syncTubeModeSelection();
+        this.syncLODSelection();
         print("DynamicSettingsPanel: Switched to Magnetic Field");
     }
 
@@ -289,6 +315,89 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         if (this.presetToggleContainer) {
             this.presetToggleContainer.enabled = show;
         }
+    }
+
+    private showLODContainer(show: boolean): void {
+        if (this.lodToggleContainer) {
+            this.lodToggleContainer.enabled = show;
+        }
+    }
+
+    private syncLODSelection(): void {
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const savedLOD = valueMap.get("lod");
+        const currentLOD = savedLOD !== undefined ? savedLOD : 1;  // Default to Medium
+
+        const toggleGroupScript = this.findToggleGroupComponent(this.lodToggleContainer);
+        if (toggleGroupScript) {
+            toggleGroupScript.firstOnToggle = currentLOD;
+            if (toggleGroupScript.resetToggleGroup) {
+                toggleGroupScript.resetToggleGroup();
+            }
+        }
+    }
+
+    private buildLODToggles(): void {
+        if (!this.optionTogglePrefab || !this.lodToggleContainer) {
+            print("DynamicSettingsPanel: No LOD toggle prefab or container - skipping");
+            return;
+        }
+
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const savedLOD = valueMap.get("lod");
+        const currentLOD = savedLOD !== undefined ? savedLOD : 1;  // Default to Medium
+
+        const toggleGroupScript = this.findToggleGroupComponent(this.lodToggleContainer);
+
+        if (toggleGroupScript) {
+            toggleGroupScript.firstOnToggle = currentLOD;
+
+            if (!this.lodCallbackAdded) {
+                toggleGroupScript.onToggleSelected.add((args: any) => {
+                    const index = args.value;
+                    if (index !== undefined) {
+                        this.onLODSelected(index);
+                    }
+                });
+                this.lodCallbackAdded = true;
+            }
+        }
+
+        const toggleCount = this.lodModes.length;
+        for (let i = 0; i < toggleCount; i++) {
+            const toggleScript = this.createToggleInContainer(
+                this.optionTogglePrefab,
+                this.lodToggleContainer,
+                this.lodModes[i],
+                i,
+                toggleCount,
+                this.optionToggleSpacing,
+                i === currentLOD
+            );
+            if (toggleScript) {
+                this.lodToggles.push(toggleScript.getSceneObject());
+                if (toggleGroupScript) {
+                    toggleGroupScript.registerToggleable(toggleScript, i);
+                }
+            }
+        }
+
+        if (toggleGroupScript && toggleGroupScript.resetToggleGroup) {
+            toggleGroupScript.resetToggleGroup();
+        }
+    }
+
+    private onLODSelected(index: number): void {
+        if (!this.activeComponent) return;
+
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        valueMap.set("lod", index);
+
+        const component = this.activeComponent as any;
+        if (component && component.lod !== undefined) {
+            component.lod = index;
+        }
+        print("DynamicSettingsPanel: LOD changed to " + this.lodModes[index]);
     }
 
     private buildPresetToggles(): void {

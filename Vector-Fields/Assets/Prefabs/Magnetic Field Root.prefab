@@ -43,7 +43,7 @@
       _maxVertexCount: !<float> 40000.000000
       _tubeMode: !<float> 0.000000
       _desiredLengthSegments: !<float> 32.000000
-      _radius: 0.020000
+      _radius: 0.040000
       _coneLength: !<float> 4.000000
       _coneRadius: 1.700000
       _arrowScale: 0.600000

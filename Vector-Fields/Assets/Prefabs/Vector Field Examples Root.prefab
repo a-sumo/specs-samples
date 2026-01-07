@@ -105,6 +105,7 @@
   Enabled: true
   ScriptAsset: !<reference> e70ea878-ce68-42de-809a-df95318d9571
   ScriptInputsDefault:
+    _lod: true
     _maxVertexCount: true
     _tubeMode: true
     _stepSize: true
@@ -113,6 +114,7 @@
     {}
   ScriptInputs:
     "":
+      _lod: !<float> 2.000000
       _maxVertexCount: !<float> 40000.000000
       _tubeMode: !<float> 0.000000
       _desiredLengthSegments: !<float> 20.000000
