@@ -12,9 +12,9 @@ A collection of self-contained sample projects for [Lens Studio](https://develop
 
 <img src="assets/color-spaces/demo.gif" width="200">
 
-[WIP] **[Vector Fields](Vector-Fields/)** - Interactive vector field visualization in AR.
+**[Vector Fields](Vector-Fields/)** - Interactive vector field visualization.
 
-<img src="Vector-Fields/vector-field-attractor-demo-cropped.gif" width="150"> <img src="Vector-Fields/vector-field-circulation-demo-cropped.gif" width="150">
+<img src="assets/vector-fields/magnetic-field-demo.gif" width="500">
 
 ---
 
@@ -35,6 +35,7 @@ ProjectName/
     ├── Scripts/
     ├── Materials/
     ├── Images/
+    ├── Meshes/
     └── Prefabs/
 ```
 
