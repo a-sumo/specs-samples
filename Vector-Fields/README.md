@@ -4,11 +4,6 @@
 
 <h1 align="center">Vector Fields</h1>
 
-<p align="center">
-  <strong>3D Vector Field Visualization for Spectacles AR</strong><br>
-  A Lens Studio project for 2024 Spectacles Augmented Reality Glasses
-</p>
-
 ## Overview
 
 This project visualizes vector fields in augmented reality using procedurally generated tube meshes that deform along field lines. The implementation supports multiple field types including mathematical presets and physically-based magnetic dipole fields.
@@ -49,7 +44,14 @@ Tubes are generated procedurally using the MeshBuilder API. Rings of vertices ar
 
 ### GPU Tube Deformation
 
-The shader deforms tubes along parametric curves by computing a T/N/B (Tangent, Normal, Binormal) coordinate frame at each point.
+Deforming tubes while preserving volume requires computing a moving T/N/B (Tangent, Normal, Binormal) coordinate frame at each point. A naive offset where rings stay horizontal produces incorrect endcaps:
+
+<p align="center">
+  <img src="../assets/vector-fields/NaiveOffset.gif" alt="Naive Offset" width="280">
+  &nbsp;&nbsp;&nbsp;
+  <img src="../assets/vector-fields/TNBFrame.gif" alt="TNB Frame" width="280">
+</p>
+<p align="center"><em>Left: Naive offset (rings stay horizontal) | Right: TNB frame (rings perpendicular to tangent)</em></p>
 
 <p align="center">
   <img src="../assets/vector-fields/TubeDeformation.gif" alt="Tube Deformation" width="400">
@@ -62,6 +64,19 @@ Starting from sample points, the shader integrates along the field: `pos += fiel
 <p align="center">
   <img src="../assets/vector-fields/VectorFieldIntegration.gif" alt="Vector Field Integration" width="400">
 </p>
+
+### Visualization Modes
+
+The implementation supports three visualization modes that can be toggled at runtime:
+
+- **Arrows**: Static vectors showing direction and magnitude at discrete sample points. Best for understanding local field behavior.
+- **Flow Lines**: Tubes that follow field lines by integrating through the field. Shows how the field flows through space.
+- **Particles**: Animated points that advect along the field, revealing the dynamic nature of the flow.
+
+<p align="center">
+  <img src="../assets/vector-fields/visualization-modes-demo.gif" alt="Visualization Modes Demo">
+</p>
+<p align="center"><em>Demo showing the three visualization modes: arrows, flow lines, and particles</em></p>
 
 ## Field Types
 
@@ -151,6 +166,16 @@ B = (3(m·r̂)r̂ - m) / r³
 <p align="center"><em>Demo on Spectacles with interactive magnet positioning</em></p>
 
 The magnets can be repositioned interactively to observe field line changes in real-time.
+
+## Performance & LOD
+
+In order to improve performance on Spectacles and avoid freezes due to unintentionally high parameters, a vertex budget has been defined (32K vertices per-mesh limit) and all procedural geometry generation settings are ajusted all parameters to fit within this budget.
+
+An additional Level of Detail (LOD) presets re available via the settings panel. 
+Among others, they control:
+- radial segments: Cross-section smoothness (4 = square-ish, 8 = round)
+- length segments: Curve fidelity and integration steps
+- grid size: Spatial density of field samples
 
 ## Usage
 

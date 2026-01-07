@@ -1,9 +1,10 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 664
+    size: 665
     values:
       - ""
+      - AnimatedSprite
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
@@ -21,7 +22,6 @@ CollapsedEntities:
       - Images
       - Images/circulation_preview.png
       - Images/circulation_sprite.png
-      - Images/circulation_sprite.png.tmp
       - Images/contraction_preview.png
       - Images/contraction_sprite.png
       - Images/expansion_preview.png
@@ -31,6 +31,7 @@ CollapsedEntities:
       - Images/vortex_sprite.png
       - Images/waves_preview.png
       - Images/waves_sprite.png
+      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/IridescentMaterial.mat
