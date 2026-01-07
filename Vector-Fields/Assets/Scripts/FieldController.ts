@@ -30,9 +30,22 @@ export class FieldController extends BaseScriptComponent {
     @hint("Optional: DynamicSettingsPanel to auto-rebuild when switching fields")
     settingsPanel: ScriptComponent;
 
+    @input
+    @hint("Sprite sheet material to sync preset with active field")
+    spriteSheetMaterial: Material;
+
+    @input
+    @hint("Duration of crossfade transition between presets (seconds)")
+    transitionDuration: number = 0.5;
+
     private vectorFieldComponent: any;
     private magneticFieldComponent: any;
     private settingsPanelScript: any;
+    private spriteSheetPass: Pass;
+    private currentSpritePreset: number = 0;
+    private prevSpritePreset: number = 0;
+    private transitionProgress: number = 1.0;
+    private isTransitioning: boolean = false;
 
     onAwake(): void {
         this.cacheComponents();
@@ -43,6 +56,8 @@ export class FieldController extends BaseScriptComponent {
             this.refreshSettingsPanelApi();
             this.applyActiveField();
         });
+
+        this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
     }
 
     private refreshSettingsPanelApi(): void {
@@ -68,6 +83,10 @@ export class FieldController extends BaseScriptComponent {
 
         if (this.settingsPanel) {
             this.settingsPanelScript = (this.settingsPanel as any).panelApi;
+        }
+
+        if (this.spriteSheetMaterial) {
+            this.spriteSheetPass = this.spriteSheetMaterial.mainPass;
         }
     }
 
@@ -110,6 +129,64 @@ export class FieldController extends BaseScriptComponent {
             }
         });
         delayEvent.reset(0.05);
+    }
+
+    private onUpdate(): void {
+        this.syncSpriteSheetPreset();
+        this.updateTransition();
+    }
+
+    private syncSpriteSheetPreset(): void {
+        if (!this.spriteSheetPass) {
+            return;
+        }
+
+        var targetPreset = 0;
+
+        if (this._activeField === FieldType.VectorField) {
+            var vfPreset = 0;
+            if (this.vectorFieldComponent && this.vectorFieldComponent.preset !== undefined) {
+                vfPreset = this.vectorFieldComponent.preset;
+            }
+            targetPreset = vfPreset;
+        } else {
+            targetPreset = 5;
+        }
+
+        if (targetPreset !== this.currentSpritePreset) {
+            this.startTransition(targetPreset);
+        }
+    }
+
+    private startTransition(newPreset: number): void {
+        if (!this.spriteSheetPass) {
+            return;
+        }
+
+        this.prevSpritePreset = this.currentSpritePreset;
+        this.currentSpritePreset = newPreset;
+        this.transitionProgress = 0.0;
+        this.isTransitioning = true;
+
+        this.spriteSheetPass.prevPreset = this.prevSpritePreset;
+        this.spriteSheetPass.preset = this.currentSpritePreset;
+        this.spriteSheetPass.blendAmount = 0.0;
+    }
+
+    private updateTransition(): void {
+        if (!this.spriteSheetPass || !this.isTransitioning) {
+            return;
+        }
+
+        var dt = getDeltaTime();
+        this.transitionProgress += dt / this.transitionDuration;
+
+        if (this.transitionProgress >= 1.0) {
+            this.transitionProgress = 1.0;
+            this.isTransitioning = false;
+        }
+
+        this.spriteSheetPass.blendAmount = this.transitionProgress;
     }
 
     public setActiveField(fieldType: number): void {

@@ -29,6 +29,8 @@
     _activeField: false
     magneticFieldRoot: false
     settingsPanel: false
+    spriteSheetMaterial: false
+    transitionDuration: false
     vectorFieldRoot: false
   ScriptTypesHidden:
     {}
@@ -43,6 +45,8 @@
       vectorFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       magneticFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       settingsPanel: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      spriteSheetMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      transitionDuration: 0.500000
   ScriptTypes:
     -
       {}
@@ -51,3 +55,5 @@
     - '// @input SceneObject vectorFieldRoot {"hint":"Vector Field Examples Root object"}'
     - '// @input SceneObject magneticFieldRoot {"hint":"Magnetic Field Root object"}'
     - '// @input Component.ScriptComponent settingsPanel {"hint":"Optional: DynamicSettingsPanel to auto-rebuild when switching fields"}'
+    - '// @input Asset.Material spriteSheetMaterial {"hint":"Sprite sheet material to sync preset with active field"}'
+    - '// @input float transitionDuration = 0.5 {"hint":"Duration of crossfade transition between presets (seconds)"}'

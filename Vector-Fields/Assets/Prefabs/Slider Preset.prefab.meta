@@ -109,7 +109,7 @@
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
   SizeToFit: false
   FontSize: 40
-  Font: !<reference> c10567f1-6f44-4b00-bdf4-559320d253d5
+  Font: !<reference> bf22fc48-859b-42e2-9de7-55147e9efced
   LayoutRect:
     left: -7.500000
     bottom: -2.250000

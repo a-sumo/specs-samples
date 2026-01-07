@@ -742,6 +742,7 @@
   ScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
   ScriptInputsDefault:
     _maxVertexCount: true
+    _tubeMode: true
     _desiredLengthSegments: true
     _coneLength: true
     _coneRadius: true
@@ -751,9 +752,9 @@
   ScriptInputs:
     "":
       _maxVertexCount: !<float> 40000.000000
-      _tubeMode: !<float> 2.000000
+      _tubeMode: !<float> 0.000000
       _desiredLengthSegments: !<float> 32.000000
-      _radius: 0.020000
+      _radius: 0.040000
       _coneLength: !<float> 4.000000
       _coneRadius: 1.700000
       _arrowScale: 0.600000
@@ -6015,6 +6016,7 @@
     - !<own> b8f9f987-f315-4752-8836-e15d1002c8ff
   Components:
     - !<own> bd630b3b-3811-494e-99b3-006229685c2d
+    - !<own> d06cdf49-37f6-4fb7-a1b5-e82957c6d201
 - !<SceneObject/a2c1c112-7803-4749-ae80-856ff37713dc>
   PrefabRemaps:
     - 01572e89-b2cd-4701-852e-9b25b731941c: be82dcf7-01fa-45e2-6d51-96245bdfce3d
@@ -7619,6 +7621,7 @@
   ScriptAsset: !<reference> 0f661b52-0a7d-4c76-8e8b-7d0b937305c9
   ScriptInputsDefault:
     _activeField: true
+    transitionDuration: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -7627,6 +7630,8 @@
       vectorFieldRoot: !<reference.SceneObject> e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb
       magneticFieldRoot: !<reference.SceneObject> 9e72f614-329f-4e4a-b149-7fe960315346
       settingsPanel: !<reference.ScriptComponent> 7cd6a955-5ca7-4dc4-bbc4-c45e29f12398
+      spriteSheetMaterial: !<reference.Material> bebf204b-109d-4190-8d97-a1f5294a97e2
+      transitionDuration: 0.500000
   ScriptTypes:
     "":
       {}
@@ -8091,6 +8096,32 @@
     - !<own> 7dbdd563-5651-4640-8d68-0be06bbb0b57
   Components:
     - !<own> b426d87f-c8a6-47bf-a64e-7be86f43921d
+- !<ScriptComponent/d06cdf49-37f6-4fb7-a1b5-e82957c6d201>
+  PrefabRemaps:
+    []
+  Name: Billboard
+  Enabled: true
+  ScriptAsset: !<reference> 74eafc23-e98b-4073-ab18-82ca532994e3
+  ScriptInputsDefault:
+    _xAxisEnabled: true
+    _yAxisEnabled: true
+    _zAxisEnabled: true
+    _axisBufferDegrees: true
+    _axisEasing: true
+    duration: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _xAxisEnabled: false
+      _yAxisEnabled: true
+      _zAxisEnabled: false
+      _axisBufferDegrees: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      _axisEasing: !<Vec3> {x: 1.000000, y: 1.000000, z: 1.000000}
+      duration: 0.033000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/d234bc4d-e5aa-4e4a-a0d3-5df9ad83aaab>
   PrefabRemaps:
     []

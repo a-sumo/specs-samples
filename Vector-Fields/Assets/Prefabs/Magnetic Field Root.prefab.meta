@@ -41,6 +41,7 @@
   ScriptAsset: !<reference> 386e15e4-48d6-4a27-90e1-ff4fd6d2b82c
   ScriptInputsDefault:
     _maxVertexCount: true
+    _tubeMode: true
     _desiredLengthSegments: true
     _coneLength: true
     _coneRadius: true
@@ -50,7 +51,7 @@
   ScriptInputs:
     "":
       _maxVertexCount: !<float> 40000.000000
-      _tubeMode: !<float> 2.000000
+      _tubeMode: !<float> 0.000000
       _desiredLengthSegments: !<float> 32.000000
       _radius: 0.020000
       _coneLength: !<float> 4.000000

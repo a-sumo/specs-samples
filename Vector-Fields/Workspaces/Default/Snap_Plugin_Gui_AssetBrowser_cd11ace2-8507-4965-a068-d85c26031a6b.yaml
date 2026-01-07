@@ -1,53 +1,36 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 652
+    size: 664
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
+      - Fonts
+      - Fonts/Source_Sans_3
+      - Fonts/Source_Sans_3/OFL.txt
+      - Fonts/Source_Sans_3/README.txt
+      - Fonts/Source_Sans_3/static
+      - Fonts/Source_Sans_3/static/SourceSans3-SemiBold.ttf
       - Fonts/latin-modern-roman
       - Fonts/latin-modern-roman/GUST-FONT-LICENSE.TXT
       - Fonts/latin-modern-roman/lm-info.pdf
-      - Fonts/latin-modern-roman/lmroman10-bold.otf
-      - Fonts/latin-modern-roman/lmroman10-bolditalic.otf
-      - Fonts/latin-modern-roman/lmroman10-italic.otf
-      - Fonts/latin-modern-roman/lmroman10-regular.otf
-      - Fonts/latin-modern-roman/lmroman12-bold.otf
-      - Fonts/latin-modern-roman/lmroman12-italic.otf
-      - Fonts/latin-modern-roman/lmroman12-regular.otf
-      - Fonts/latin-modern-roman/lmroman17-regular.otf
-      - Fonts/latin-modern-roman/lmroman5-bold.otf
-      - Fonts/latin-modern-roman/lmroman5-regular.otf
-      - Fonts/latin-modern-roman/lmroman6-bold.otf
-      - Fonts/latin-modern-roman/lmroman6-regular.otf
-      - Fonts/latin-modern-roman/lmroman7-bold.otf
-      - Fonts/latin-modern-roman/lmroman7-italic.otf
-      - Fonts/latin-modern-roman/lmroman7-regular.otf
-      - Fonts/latin-modern-roman/lmroman8-bold.otf
-      - Fonts/latin-modern-roman/lmroman8-italic.otf
-      - Fonts/latin-modern-roman/lmroman8-regular.otf
       - Fonts/latin-modern-roman/lmroman9-bold.otf
-      - Fonts/latin-modern-roman/lmroman9-italic.otf
-      - Fonts/latin-modern-roman/lmroman9-regular.otf
-      - Fonts/latin-modern-roman/lmromancaps10-oblique.otf
-      - Fonts/latin-modern-roman/lmromancaps10-regular.otf
-      - Fonts/latin-modern-roman/lmromandemi10-oblique.otf
-      - Fonts/latin-modern-roman/lmromandemi10-regular.otf
-      - Fonts/latin-modern-roman/lmromandunh10-oblique.otf
-      - Fonts/latin-modern-roman/lmromandunh10-regular.otf
-      - Fonts/latin-modern-roman/lmromanslant10-bold.otf
-      - Fonts/latin-modern-roman/lmromanslant10-regular.otf
-      - Fonts/latin-modern-roman/lmromanslant12-regular.otf
-      - Fonts/latin-modern-roman/lmromanslant17-regular.otf
-      - Fonts/latin-modern-roman/lmromanslant8-regular.otf
-      - Fonts/latin-modern-roman/lmromanslant9-regular.otf
-      - Fonts/latin-modern-roman/lmromanunsl10-regular.otf
-      - Images/color_cloud_sprite.png
-      - Materials/BG.mat
-      - Materials/BG.ss_graph
+      - Images
+      - Images/circulation_preview.png
+      - Images/circulation_sprite.png
+      - Images/circulation_sprite.png.tmp
+      - Images/contraction_preview.png
+      - Images/contraction_sprite.png
+      - Images/expansion_preview.png
+      - Images/expansion_sprite.png
+      - Images/magnetic_preview.png
+      - Images/vortex_preview.png
+      - Images/vortex_sprite.png
+      - Images/waves_preview.png
+      - Images/waves_sprite.png
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/IridescentMaterial.mat
@@ -55,6 +38,8 @@ CollapsedEntities:
       - Materials/MagnetPole.mat
       - Materials/MagnetPole.ss_graph
       - Materials/MagneticField.ss_graph
+      - Materials/SpriteSheetBG.mat
+      - Materials/SpriteSheetBG.ss_graph
       - Materials/TestTubeDeformation.mat
       - Materials/TestTubeDeformation.ss_graph
       - Meshes
@@ -74,7 +59,34 @@ CollapsedEntities:
       - Scripts/MagnetPhysics.ts
       - Scripts/MagneticField.ts
       - Scripts/TubeTest.ts
+      - Scripts/Utils
+      - Scripts/Utils/__pycache__
+      - Scripts/Utils/__pycache__/render_all_fields.cpython-313.pyc
+      - Scripts/Utils/__pycache__/render_field_variations.cpython-313.pyc
+      - Scripts/Utils/gradient_1_magnetic.mp4
+      - Scripts/Utils/gradient_2_aurora.mp4
+      - Scripts/Utils/gradient_3_sunset.mp4
+      - Scripts/Utils/render_all_fields.py
+      - Scripts/Utils/render_dipole_mesh_gradient.py
+      - Scripts/Utils/render_field_sprites.py
+      - Scripts/Utils/render_field_variations.py
+      - Scripts/Utils/render_gradient_options.py
+      - Scripts/Utils/renders
+      - Scripts/Utils/renders/circulation.mp4
+      - Scripts/Utils/renders/contraction.mp4
+      - Scripts/Utils/renders/expansion.mp4
+      - Scripts/Utils/renders/magnetic.mp4
+      - Scripts/Utils/renders/vortex.mp4
+      - Scripts/Utils/renders/waves.mp4
+      - Scripts/Utils/sprites
+      - Scripts/Utils/sprites/circulation_preview.png
+      - Scripts/Utils/sprites/contraction_preview.png
+      - Scripts/Utils/sprites/expansion_preview.png
+      - Scripts/Utils/sprites/magnetic_preview.png
+      - Scripts/Utils/sprites/vortex_preview.png
+      - Scripts/Utils/sprites/waves_preview.png
       - Scripts/VectorField.ts
+      - Shaders/AnimatedSpriteSheet.js
       - Shaders/IridescentShader.js
       - Shaders/IridescentSimple.js
       - Shaders/MagnetPole.js
