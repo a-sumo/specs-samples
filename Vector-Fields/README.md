@@ -6,31 +6,13 @@
 
 ## Overview
 
-This project visualizes vector fields in augmented reality using procedurally generated tube meshes that deform along field lines. The implementation supports multiple field types including mathematical presets and physically-based magnetic dipole fields.
+This project visualizes vector fields in augmented reality using procedurally generated tube meshes that deform along field lines. This repository accompanies a blog post that I encourage you to check out!
 
-## Components
-
-### Scripts
-
-| Script | Description |
-|--------|-------------|
-| `VectorField.ts` | Main vector field visualization with multiple preset field types (Expansion, Contraction, Circulation, Vortex, Waves) |
-| `MagneticField.ts` | Magnetic dipole field visualization with two interactive magnets |
-| `TubeTest.ts` | Test component for tube mesh generation and GPU deformation |
-| `FieldController.ts` | Controller for switching between field types and managing field parameters |
-| `DynamicSettingsPanel.ts` | Runtime UI panel for adjusting field parameters |
-| `MagnetPhysics.ts` | Physics simulation for magnet interactions |
-| `IridescentMaterial.ts` | Iridescent material controller for magnet visuals |
-
-### Shaders
-
-| Shader | Description |
-|--------|-------------|
-| `VectorField.js` | GPU shader that integrates field lines and computes T/N/B frames for tube deformation |
-| `MagneticField.js` | Computes magnetic field from two dipole magnets using the formula `B = (3(m·r̂)r̂ - m) / r³` |
-| `TubeTest.js` | Test shader for basic tube deformation along parametric curves |
-| `MagnetPole.js` | Shader for rendering magnet pole indicators |
-| `IridescentShader.js` | Iridescent surface shader for magnet visualization |
+<p align="center">
+  <a href="https://a-sumo.github.io/posts/visualizing-vector-fields-on-ar-glasses/">
+    <strong>Visualizing Vector Fields on AR Glasses</strong>
+  </a>
+</p>
 
 ## Implementation
 
@@ -77,6 +59,32 @@ The implementation supports three visualization modes that can be toggled at run
   <img src="../assets/vector-fields/visualization-modes-demo.gif" alt="Visualization Modes Demo">
 </p>
 <p align="center"><em>Demo showing the three visualization modes: arrows, flow lines, and particles</em></p>
+
+
+## Components
+
+### Scripts
+
+| Script | Description |
+|--------|-------------|
+| `VectorField.ts` | Main vector field visualization with multiple preset field types (Expansion, Contraction, Circulation, Vortex, Waves) |
+| `MagneticField.ts` | Magnetic dipole field visualization with two interactive magnets |
+| `TubeTest.ts` | Test component for tube mesh generation and GPU deformation |
+| `FieldController.ts` | Controller for switching between field types and managing field parameters |
+| `DynamicSettingsPanel.ts` | Runtime UI panel for adjusting field parameters |
+| `MagnetPhysics.ts` | Physics simulation for magnet interactions |
+| `IridescentMaterial.ts` | Iridescent material controller for magnet visuals |
+
+### Shaders
+
+| Shader | Description |
+|--------|-------------|
+| `VectorField.js` | GPU shader that integrates field lines and computes T/N/B frames for tube deformation |
+| `MagneticField.js` | Computes magnetic field from two dipole magnets using the formula `B = (3(m·r̂)r̂ - m) / r³` |
+| `TubeTest.js` | Test shader for basic tube deformation along parametric curves |
+| `MagnetPole.js` | Shader for rendering magnet pole indicators |
+| `IridescentShader.js` | Iridescent surface shader for magnet visualization |
+
 
 ## Field Types
 
@@ -171,7 +179,7 @@ The magnets can be repositioned interactively to observe field line changes in r
 
 In order to improve performance on Spectacles and avoid freezes due to unintentionally high parameters, a vertex budget has been defined (32K vertices per-mesh limit) and all procedural geometry generation settings are ajusted all parameters to fit within this budget.
 
-An additional Level of Detail (LOD) presets re available via the settings panel. 
+Additional Level of Detail (LOD) presets are available via the settings panel. 
 Among others, they control:
 - radial segments: Cross-section smoothness (4 = square-ish, 8 = round)
 - length segments: Curve fidelity and integration steps
