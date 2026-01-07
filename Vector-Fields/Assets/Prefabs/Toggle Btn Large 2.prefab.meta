@@ -1,31 +1,83 @@
-- !<ObjectPrefab/6460a7f4-76ee-4bc0-a15b-a24d542af22a>
-  PackagePath: ""
-  objects:
-    - !<own> 071880d2-5192-45d2-986a-d8649fd0200a
-  LazyLoading: false
-  RetainAssets: true
-- !<SceneObject/06a23810-74c0-4d8c-a150-46c6ab178998>
+- !<AssetImportMetadata/cefdcb57-e5c1-498e-8373-c73bd2319b66>
+  ImportedAssetIds:
+    ObjectPrefab: !<reference> fd1889cb-fea0-49e6-b17c-66a4e5a0898b
+  ImporterName: ObjectPrefabImporter
+  PrimaryAsset: !<reference> fd1889cb-fea0-49e6-b17c-66a4e5a0898b
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    ObjectPrefab: !<own> 9291ab35-ff5a-43bc-91b1-df49d23ccc9d
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<SceneObject/727ddd03-3d1c-4609-4c00-f92a4c895c7e>
   PrefabRemaps:
     []
-  Name: Text
+  Name: Toggle Btn Large
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -1.800000, z: 0.020000}
+    Position: {x: -2.500000, y: 2.500000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
   Children:
-    []
+    - !<own> e9584590-019d-4ced-7b44-2df7ea89dff8
   Components:
-    - !<own> c2f77ffb-476f-4249-be0c-32418b1cea2a
-- !<SceneObject/071880d2-5192-45d2-986a-d8649fd0200a>
+    - !<own> 9987a182-cba1-4348-7acb-aea5443c5841
+- !<ObjectPrefabAssetData/9291ab35-ff5a-43bc-91b1-df49d23ccc9d>
+  Prototype: !<ObjectOwner/5f76c29c-044d-4ce8-af38-b6cd6da2cf76>
+    PackagePath: ""
+    objects:
+      - !<own> 727ddd03-3d1c-4609-4c00-f92a4c895c7e
+- !<ScriptComponent/9987a182-cba1-4348-7acb-aea5443c5841>
   PrefabRemaps:
-    - 06a23810-74c0-4d8c-a150-46c6ab178998: 06a23810-74c0-4d8c-5eaf-b93954e87667
-    - 071880d2-5192-45d2-986a-d8649fd0200a: 071880d2-5192-45d2-6795-279b602fdff5
-    - bb9c5952-4d35-477e-b081-449182d21385: bb9c5952-4d35-477e-4f7e-bb6e7d2dec7a
-    - c2f77ffb-476f-4249-be0c-32418b1cea2a: c2f77ffb-476f-4249-41f3-cdbe74e315d5
-  Name: Slider Preset
+    []
+  Name: RectangleButton
+  Enabled: true
+  ScriptAsset: !<reference> 173d7099-914c-4f24-ac1c-1b67a66ae138
+  ScriptInputsDefault:
+    _renderOrder: true
+    _inactive: true
+    _playAudio: true
+    _style: true
+    _defaultToOn: true
+    addCallbacks: true
+    triggerUpCallbacks: true
+    triggerDownCallbacks: true
+    onValueChangeCallbacks: true
+    onFinishedCallbacks: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      _renderOrder: 0
+      _size: !<Vec3> {x: 7.000000, y: 3.000000, z: 3.000000}
+      _inactive: false
+      _playAudio: false
+      _style: PrimaryNeutral
+      _toggleable: true
+      _defaultToOn: false
+      addCallbacks: false
+      triggerUpCallbacks:
+        []
+      triggerDownCallbacks:
+        []
+      onValueChangeCallbacks:
+        []
+      onFinishedCallbacks:
+        []
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/e9584590-019d-4ced-7b44-2df7ea89dff8>
+  PrefabRemaps:
+    []
+  Name: ToggleText
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -34,50 +86,10 @@
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
   Children:
-    - !<own> 06a23810-74c0-4d8c-a150-46c6ab178998
-  Components:
-    - !<own> bb9c5952-4d35-477e-b081-449182d21385
-- !<ScriptComponent/bb9c5952-4d35-477e-b081-449182d21385>
-  PrefabRemaps:
     []
-  Name: Slider
-  Enabled: true
-  ScriptAsset: !<reference> 585fe530-c944-4f18-8ef9-ea90dc744e78
-  ScriptInputsDefault:
-    _renderOrder: true
-    _inactive: true
-    snapToTriggerPosition: true
-    segmented: true
-    numberOfSegments: true
-    hasTrackVisual: true
-    customKnobSize: true
-    _knobSize: true
-    onFinishedCallbacks: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      _renderOrder: 0
-      _size: !<Vec3> {x: 8.000000, y: 2.000000, z: 1.000000}
-      _inactive: false
-      _playAudio: true
-      _defaultValue: 0.310000
-      snapToTriggerPosition: false
-      segmented: false
-      numberOfSegments: !<float> 5.000000
-      hasTrackVisual: true
-      customKnobSize: false
-      _knobSize: !<Vec2> {x: 3.000000, y: 3.000000}
-      addCallbacks: true
-      onValueChangeCallbacks:
-        - scriptComponent: !<reference.ScriptComponent> eaa5f500-a9c9-4052-b208-001eb4957ad4
-          functionName: setFieldScaleNormalized
-      onFinishedCallbacks:
-        []
-  ScriptTypes:
-    "":
-      {}
-- !<Text/c2f77ffb-476f-4249-be0c-32418b1cea2a>
+  Components:
+    - !<own> ff7324c9-477a-4515-5b48-c74d5feca55b
+- !<Text/ff7324c9-477a-4515-5b48-c74d5feca55b>
   PrefabRemaps:
     []
   Name: Text
@@ -90,13 +102,13 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Text: |
-    Slider Preset
+    Text
 
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
   SizeToFit: false
-  FontSize: 32
+  FontSize: 48
   Font: !<reference> 00000000-0000-0000-0000-000000000000
   LayoutRect:
     left: -7.500000
@@ -113,7 +125,7 @@
     TileCount: 5.000000
     TileZone: Rect
     TextureStretch: FitWidth
-  BlendMode: PremultipliedAlphaAuto
+  BlendMode: PremultipliedAlpha
   Outline: !<OutlineSettings>
     Enabled: false
     Fill: !<TextFill>
@@ -158,5 +170,5 @@
     LetterSpacing: 0.000000
     LineSpacing: 1.000000
     CapitalizationOverride: None
-  DepthTest: true
+  DepthTest: false
   TwoSided: false

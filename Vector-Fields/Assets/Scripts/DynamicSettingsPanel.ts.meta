@@ -26,11 +26,22 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    fieldController: false
+    fieldModeTextChildName: false
+    fieldModeToggleContainer: false
+    fieldModeTogglePrefab: false
+    fieldModeToggleSpacing: false
     labelChildName: false
     magneticFieldComponent: false
+    optionTogglePrefab: false
+    optionToggleSpacing: false
+    presetToggleContainer: false
     sliderContainer: false
+    sliderHorizontalSpacing: false
     sliderPrefab: false
-    sliderSpacing: false
+    sliderVerticalSpacing: false
+    toggleTextChildName: false
+    tubeModeToggleContainer: false
     vectorFieldComponent: false
   ScriptTypesHidden:
     {}
@@ -43,17 +54,39 @@
   DefaultScriptInputs:
     - sliderPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
       sliderContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      sliderSpacing: !<float> 4.000000
+      sliderVerticalSpacing: !<float> 4.000000
+      sliderHorizontalSpacing: !<float> 12.000000
       vectorFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
       magneticFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
       labelChildName: Label
+      fieldModeTogglePrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      fieldModeToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      fieldModeToggleSpacing: !<float> 8.000000
+      fieldModeTextChildName: Text
+      optionTogglePrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      presetToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      tubeModeToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      toggleTextChildName: Toggle Text
+      optionToggleSpacing: !<float> 4.000000
+      fieldController: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   InputLines:
     - '// @input Asset.ObjectPrefab sliderPrefab {"hint":"Prefab containing a Slider component to instantiate"}'
     - '// @input SceneObject sliderContainer {"hint":"Parent object to place instantiated sliders under"}'
-    - '// @input float sliderSpacing = 4 {"hint":"Vertical spacing between sliders"}'
+    - '// @input float sliderVerticalSpacing = 4 {"hint":"Vertical spacing between slider rows"}'
+    - '// @input float sliderHorizontalSpacing = 12 {"hint":"Horizontal spacing between slider columns"}'
     - '// @input Component.ScriptComponent vectorFieldComponent {"hint":"VectorFieldTubes component to control"}'
     - '// @input Component.ScriptComponent magneticFieldComponent {"hint":"MagneticFieldTubes component to control"}'
     - '// @input string labelChildName = "Text" {"hint":"Text component on slider prefab for label (child name)"}'
+    - '// @input Asset.ObjectPrefab fieldModeTogglePrefab {"hint":"Toggle prefab for field mode buttons"}'
+    - '// @input SceneObject fieldModeToggleContainer {"hint":"Container with ToggleGroup for field mode"}'
+    - '// @input float fieldModeToggleSpacing = 8 {"hint":"Spacing between field mode toggles"}'
+    - '// @input string fieldModeTextChildName = "ToggleText" {"hint":"Text child name in field mode toggle prefab"}'
+    - '// @input Asset.ObjectPrefab optionTogglePrefab {"hint":"Toggle prefab for presets and tube mode options"}'
+    - '// @input SceneObject presetToggleContainer {"hint":"Container with ToggleGroup for VectorField presets"}'
+    - '// @input SceneObject tubeModeToggleContainer {"hint":"Container with ToggleGroup for tube modes (Trails/Particles/Arrows)"}'
+    - '// @input string toggleTextChildName = "Toggle Text" {"hint":"Text child name in toggle prefab"}'
+    - '// @input float optionToggleSpacing = 4 {"hint":"Horizontal spacing between option toggles"}'
+    - '// @input Component.ScriptComponent fieldController {"hint":"FieldController to notify when field mode changes"}'

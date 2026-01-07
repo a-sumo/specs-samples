@@ -46,7 +46,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     @input
     @widget(new SliderWidget(0.01, 0.2, 0.01))
     @hint("Tube radius")
-    private _radius: number = 0.05;
+    private _radius: number = 0.04;
 
     @input
     @widget(new SliderWidget(1.0, 30.0, 0.1))
@@ -114,7 +114,8 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     private readonly MAX_VERTICES_PER_MESH = 65000;
 
-    public static readonly NORMALIZED_DEFAULTS: number[] = [0.2, 0.18, 0.21, 0.04, 0.43];
+    // Normalized defaults: [stepSize, fieldStrength, radius, flowSpeed, lengthSegments]
+    public static readonly NORMALIZED_DEFAULTS: number[] = [0.18, 0.09, 0.16, 0.04, 0.48];
 
     // ============ VERTEX BUDGET HELPERS ============
 

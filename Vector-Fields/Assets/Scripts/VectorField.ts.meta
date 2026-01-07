@@ -74,7 +74,7 @@
     - '// @input float _maxVertexCount = 40000 {"hint":"Maximum vertex count budget - geometry adapts to stay below this", "widget":"slider", "min":10000, "max":100000, "step":5000}'
     - '// @input float _tubeMode {"hint":"Trails: flowing tubes, Particles: short flowing trails, Arrows: static oriented", "widget":"combobox", "values":[{"label":"Trails", "value":0}, {"label":"Particles", "value":1}, {"label":"Arrows", "value":2}]}'
     - '// @input float _desiredLengthSegments = 8 {"hint":"Desired segments along tube length (may be reduced to fit vertex budget)", "widget":"slider", "min":2, "max":64, "step":2}'
-    - '// @input float _radius = 0.05 {"hint":"Tube radius", "widget":"slider", "min":0.01, "max":0.2, "step":0.01}'
+    - '// @input float _radius = 0.04 {"hint":"Tube radius", "widget":"slider", "min":0.01, "max":0.2, "step":0.01}'
     - '// @input float _coneLength = 4 {"hint":"Cone tip length multiplier for Arrow mode", "widget":"slider", "min":1, "max":30, "step":0.1}'
     - '// @input float _coneRadius = 1.7 {"hint":"Cone tip radius multiplier for Arrow mode", "widget":"slider", "min":1, "max":2.5, "step":0.1}'
     - '// @input float _arrowScale = 2 {"hint":"Arrow length scale factor (multiplied by field magnitude)", "widget":"slider", "min":0.5, "max":5, "step":0.1}'

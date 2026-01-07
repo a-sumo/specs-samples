@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 606
+    size: 607
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
@@ -16,11 +16,13 @@ CollapsedEntities:
       - Materials/MagneticField.ss_graph
       - Materials/TestTubeDeformation.mat
       - Materials/TestTubeDeformation.ss_graph
-      - Meshes
       - Meshes/Custom CapsuleSphere.mesh
       - Meshes/Custom Sphere.mesh
       - Prefabs/Magnetic Field Root.prefab
       - Prefabs/Slider Preset.prefab
+      - Prefabs/Toggle Btn Large 2.prefab
+      - Prefabs/Toggle Btn Large.prefab
+      - Prefabs/Toggle Btn Small.prefab
       - Prefabs/Vector Field Examples Root.prefab
       - Render Target.renderTarget
       - Scene.scene
@@ -30,7 +32,6 @@ CollapsedEntities:
       - Scripts/MagneticField.ts
       - Scripts/TubeTest.ts
       - Scripts/VectorField.ts
-      - Shaders
       - Shaders/MagnetPole.js
       - Shaders/MagneticField.js
       - Shaders/TubeTest.js

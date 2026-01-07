@@ -13,7 +13,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     // Normalized default values (0-1) for: [preset, scale, radius, speed, length]
     // Use with setters: setPresetNormalized, setFieldScaleNormalized, setRadiusNormalized, setFlowSpeedNormalized, setLengthSegmentsNormalized
-    public static readonly NORMALIZED_DEFAULTS: number[] = [0.0, 0.31, 0.21, 0.5, 0.0];
+    public static readonly NORMALIZED_DEFAULTS: number[] = [0.0, 0.31, 0.16, 0.5, 0.10];
 
     // ============ PERFORMANCE ============
 
@@ -50,7 +50,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
     @input
     @widget(new SliderWidget(0.01, 0.2, 0.01))
     @hint("Tube radius")
-    private _radius: number = 0.05;
+    private _radius: number = 0.04;
 
     @input
     @widget(new SliderWidget(1.0, 30.0, 0.1))

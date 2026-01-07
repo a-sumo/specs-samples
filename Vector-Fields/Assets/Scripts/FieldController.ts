@@ -87,10 +87,10 @@ export class FieldController extends BaseScriptComponent {
 
     private applyActiveField(): void {
         if (this.vectorFieldRoot) {
-            this.vectorFieldRoot.enabled = (this._activeField === FieldType.VectorField);
+            this.vectorFieldRoot.enabled = false;
         }
         if (this.magneticFieldRoot) {
-            this.magneticFieldRoot.enabled = (this._activeField === FieldType.MagneticField);
+            this.magneticFieldRoot.enabled = false;
         }
 
         if (this.settingsPanelScript && this.settingsPanelScript.buildForVectorField) {
@@ -100,6 +100,16 @@ export class FieldController extends BaseScriptComponent {
                 this.settingsPanelScript.buildForMagneticField();
             }
         }
+
+        var delayEvent = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
+        delayEvent.bind(() => {
+            if (this._activeField === FieldType.VectorField && this.vectorFieldRoot) {
+                this.vectorFieldRoot.enabled = true;
+            } else if (this._activeField === FieldType.MagneticField && this.magneticFieldRoot) {
+                this.magneticFieldRoot.enabled = true;
+            }
+        });
+        delayEvent.reset(0.05);
     }
 
     public setActiveField(fieldType: number): void {
