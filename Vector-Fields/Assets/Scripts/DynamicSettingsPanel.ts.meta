@@ -33,6 +33,7 @@
     fieldModeToggleSpacing: false
     labelChildName: false
     lodToggleContainer: false
+    magnetPhysicsComponent: false
     magneticFieldComponent: false
     optionTogglePrefab: false
     optionToggleSpacing: false
@@ -59,6 +60,7 @@
       sliderHorizontalSpacing: !<float> 12.000000
       vectorFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
       magneticFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      magnetPhysicsComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
       labelChildName: Label
       fieldModeTogglePrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
       fieldModeToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
@@ -81,6 +83,7 @@
     - '// @input float sliderHorizontalSpacing = 12 {"hint":"Horizontal spacing between slider columns"}'
     - '// @input Component.ScriptComponent vectorFieldComponent {"hint":"VectorFieldTubes component to control"}'
     - '// @input Component.ScriptComponent magneticFieldComponent {"hint":"MagneticFieldTubes component to control"}'
+    - '// @input Component.ScriptComponent magnetPhysicsComponent {"hint":"MagnetPhysics component to control"}'
     - '// @input string labelChildName = "Text" {"hint":"Text component on slider prefab for label (child name)"}'
     - '// @input Asset.ObjectPrefab fieldModeTogglePrefab {"hint":"Toggle prefab for field mode buttons"}'
     - '// @input SceneObject fieldModeToggleContainer {"hint":"Container with ToggleGroup for field mode"}'

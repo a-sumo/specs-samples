@@ -32,7 +32,7 @@
   RotationTension: 30.000000
   ForceCompound: false
   Intangible: false
-  ShowCollider: false
+  ShowCollider: true
 - !<ScriptComponent/07801f26-d6b3-408d-4797-1b33c0503c03>
   PrefabRemaps:
     []
@@ -45,6 +45,7 @@
     _desiredLengthSegments: true
     _coneLength: true
     _coneRadius: true
+    _gridSpacing: true
     _fieldStrength: true
   ScriptTypesDefault:
     {}
@@ -58,7 +59,7 @@
       _coneRadius: 1.700000
       _arrowScale: 0.600000
       _gridSize: !<float> 8.000000
-      _gridSpacing: 0.600000
+      _gridSpacing: !<float> 1.000000
       _stepSize: 0.050000
       _fieldStrength: !<float> 1.000000
       _flowSpeed: !<float> 50.000000
@@ -119,6 +120,8 @@
   Enabled: true
   ScriptAsset: !<reference> ef6ca5f6-a6eb-4091-91ea-806ae2b23629
   ScriptInputsDefault:
+    referenceDistance: true
+    contactScale: true
     maxVelocity: true
     enabled: true
     forceSmoothing: true
@@ -133,7 +136,9 @@
       forceStrength: !<float> 233.000000
       damping: !<float> 10.000000
       minDistance: 0.100000
+      referenceDistance: !<float> 5.000000
       maxDistance: 8.500000
+      contactScale: 0.500000
       maxVelocity: !<float> 20.000000
       enabled: true
       separationImpulse: !<float> 1.000000

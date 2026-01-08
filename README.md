@@ -4,17 +4,17 @@ A collection of self-contained sample projects for [Lens Studio](https://develop
 
 ## Projects
 
-**[Eyedropper](Eyedropper/)** - A color picker tool that samples colors from the real world.
+**1. [Vector Fields](Vector-Fields/)** - Interactive vector field visualization.
 
-<img src="assets/eyedropper/demo.gif" width="200">
+<img src="assets/vector-fields/magnetic-field-demo.gif" width="500">
 
-**[Color Spaces](Color-Spaces/)** - Interactive visualization of various Color Spaces. Also demonstrates procedural mesh manipulation in Lens Studio.
+**2. [Color Spaces](Color-Spaces/)** - Interactive visualization of various Color Spaces. Also demonstrates procedural mesh manipulation in Lens Studio.
 
 <img src="assets/color-spaces/demo.gif" width="200">
 
-**[Vector Fields](Vector-Fields/)** - Interactive vector field visualization.
+**3. [Eyedropper](Eyedropper/)** - A color picker tool that samples colors from the real world.
 
-<img src="assets/vector-fields/magnetic-field-demo.gif" width="500">
+<img src="assets/eyedropper/demo.gif" width="200">
 
 ---
 

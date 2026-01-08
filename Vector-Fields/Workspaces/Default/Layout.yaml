@@ -30,8 +30,8 @@ dock:
             type: section
             current: 0
         sizes:
-          - 578
-          - 190
+          - 417
+          - 351
         type: splitter
         orientation: vertical
       - items:
@@ -59,25 +59,8 @@ dock:
         current: 0
     sizes:
       - 347
-      - 737
-      - 42
+      - 435
+      - 344
       - 301
     type: splitter
     orientation: horizontal
-  windows:
-    - items:
-        - items:
-            - persistentName: Snap.Plugin.Gui.Graph.Editor
-              Uuid: af28b9dd-2e9a-4711-bc56-12a37b34113d
-          type: section
-          current: 0
-      sizes:
-        - 789
-      type: splitter
-      orientation: vertical
-      geometry:
-        x: 339
-        y: 71
-        w: 1214
-        h: 791
-      screen: Built-in Retina Display

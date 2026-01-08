@@ -24,7 +24,7 @@ export class MagnetPhysics extends BaseScriptComponent {
     collider2: ColliderComponent;
 
     @input
-    @widget(new SliderWidget(1, 500, 1))
+    @widget(new SliderWidget(10, 500, 10))
     @hint("Strength of magnetic force")
     forceStrength: number = 100.0;
 
@@ -39,9 +39,19 @@ export class MagnetPhysics extends BaseScriptComponent {
     minDistance: number = 0.3;
 
     @input
-    @widget(new SliderWidget(0.0, 20.0, 0.5))
+    @widget(new SliderWidget(2.0, 30.0, 1.0))
+    @hint("Distance (cm) where force equals base strength - roughly magnet diameter")
+    referenceDistance: number = 8.0;
+
+    @input
+    @widget(new SliderWidget(10.0, 200.0, 10.0))
     @hint("Maximum distance for force to apply")
-    maxDistance: number = 15.0;
+    maxDistance: number = 100.0;
+
+    @input
+    @widget(new SliderWidget(0.5, 1.5, 0.1))
+    @hint("Scale factor for collision radius (1.0 = exact collider size)")
+    contactScale: number = 1.0;
 
     @input
     @widget(new SliderWidget(1, 100, 1))
@@ -80,6 +90,7 @@ export class MagnetPhysics extends BaseScriptComponent {
     private velocity2 = vec3.zero();
     private smoothedForce = vec3.zero();
     private isStuck = false;
+    private stickOffset = vec3.zero(); // Offset from magnet1 to magnet2 when stuck
 
     // Collision state
     private isColliding = false;
@@ -205,7 +216,9 @@ export class MagnetPhysics extends BaseScriptComponent {
         const axialAlignment = Math.abs(m1FacingM2) * Math.abs(m2FacingM1);
 
         const effectiveDistance = Math.max(distance, this.minDistance);
-        const distanceFactor = effectiveDistance * effectiveDistance;
+        // Normalize by reference distance: at referenceDistance, distanceFactor = 1
+        const normalizedDist = effectiveDistance / this.referenceDistance;
+        const distanceFactor = normalizedDist * normalizedDist * normalizedDist; // r³ falloff
 
         // Close-range boost for attraction only
         const isAttracting = alignment < 0;
@@ -222,6 +235,18 @@ export class MagnetPhysics extends BaseScriptComponent {
         return direction.uniformScale(forceMagnitude * alignment);
     }
 
+    private getContactDistance(): number {
+        // Distance at which magnets should be in contact (touching)
+        // contactScale lets you tune how close they need to be
+        let baseDist: number;
+        if (this.collider1 && this.collider2) {
+            baseDist = this.getColliderRadius(this.collider1) + this.getColliderRadius(this.collider2);
+        } else {
+            baseDist = this.getCollisionRadius(this.magnet1) + this.getCollisionRadius(this.magnet2);
+        }
+        return baseDist * this.contactScale;
+    }
+
     private handleCollision(): boolean {
         if (!this.magnet1 || !this.magnet2) return false;
 
@@ -230,53 +255,55 @@ export class MagnetPhysics extends BaseScriptComponent {
         const delta = pos2.sub(pos1);
         const distance = delta.length;
 
-        let overlap = 0;
-        let normal = vec3.zero();
+        const contactDist = this.getContactDistance();
+        const isClose = distance < contactDist * 1.02; // 2% tolerance - must be nearly touching
 
-        if (this.collider1 && this.collider2) {
-            if (!this.isColliding) {
+        // Check if magnets are close enough to potentially stick
+        if (!isClose) {
+            // Don't immediately unstick - only if we're far enough apart
+            if (this.isStuck && distance < contactDist * 1.2) {
+                // Still close, stay stuck
+            } else {
                 this.isStuck = false;
-                return false;
             }
-            overlap = this.overlapDepth;
-            normal = this.collisionNormal;
-        } else {
-            const minDist = this.getCollisionRadius(this.magnet1) + this.getCollisionRadius(this.magnet2);
-            if (distance >= minDist || distance < 0.001) {
-                this.isStuck = false;
-                return false;
-            }
-            overlap = minDist - distance;
-            normal = delta.normalize();
+            if (!this.isStuck) return false;
         }
 
-        if (overlap <= 0) {
-            this.isStuck = false;
-            return false;
-        }
+        const normal = distance > 0.001 ? delta.normalize() : new vec3(0, 1, 0);
+        const overlap = contactDist - distance;
 
-        // Separate magnets
-        const separation = normal.uniformScale(overlap * 0.5);
-        this.setPosition(this.magnet1, pos1.sub(separation));
-        this.setPosition(this.magnet2, pos2.add(separation));
+        // Separate if overlapping
+        if (overlap > 0) {
+            const separation = normal.uniformScale(overlap * 0.5);
+            this.setPosition(this.magnet1, pos1.sub(separation));
+            this.setPosition(this.magnet2, pos2.add(separation));
+        }
 
         const attracting = this.computeAlignment() < 0;
 
         if (attracting) {
-            // Stick together
+            // Stick together - save the offset so we can maintain it
+            if (!this.isStuck) {
+                // Just became stuck - record the offset
+                const newPos1 = this.getPosition(this.magnet1);
+                const newPos2 = this.getPosition(this.magnet2);
+                this.stickOffset = newPos2.sub(newPos1);
+            }
             this.isStuck = true;
             this.velocity1 = vec3.zero();
             this.velocity2 = vec3.zero();
         } else {
-            // Cancel approaching velocity
+            // Repelling - bounce apart
             this.isStuck = false;
             const relativeVel = this.velocity2.sub(this.velocity1);
             const velAlongNormal = relativeVel.dot(normal);
 
             if (velAlongNormal < 0) {
-                const cancelImpulse = normal.uniformScale(velAlongNormal * 0.5);
-                this.velocity1 = this.velocity1.add(cancelImpulse);
-                this.velocity2 = this.velocity2.sub(cancelImpulse);
+                // Apply repulsion impulse
+                const repulsionStrength = Math.max(1.0, Math.abs(velAlongNormal));
+                const impulse = normal.uniformScale(repulsionStrength);
+                this.velocity1 = this.velocity1.sub(impulse);
+                this.velocity2 = this.velocity2.add(impulse);
             }
         }
 
@@ -358,11 +385,28 @@ export class MagnetPhysics extends BaseScriptComponent {
         this.lastManipVel1 = manipVel1;
         this.lastManipVel2 = manipVel2;
 
-        // Skip physics when stuck
+        // When stuck, keep magnets together
         if (this.isStuck) {
             this.velocity1 = vec3.zero();
             this.velocity2 = vec3.zero();
             this.smoothedForce = vec3.zero();
+
+            // If one magnet is being manipulated, the other follows
+            if (manipulating1 && !manipulating2) {
+                const newPos2 = pos1.add(this.stickOffset);
+                this.setPosition(this.magnet2, newPos2);
+            } else if (manipulating2 && !manipulating1) {
+                const newPos1 = pos2.sub(this.stickOffset);
+                this.setPosition(this.magnet1, newPos1);
+            }
+
+            // Check if still in contact, unstick if pulled apart
+            const currentDist = this.getPosition(this.magnet2).sub(this.getPosition(this.magnet1)).length;
+            const contactDist = this.getContactDistance();
+            if (currentDist > contactDist * 1.3) {
+                this.isStuck = false;
+            }
+
             this.updateTracking(manipulating1, manipulating2);
             return;
         }

@@ -28,6 +28,7 @@
   ScriptInputsHidden:
     collider1: false
     collider2: false
+    contactScale: false
     damping: false
     enabled: false
     forceSmoothing: false
@@ -37,6 +38,7 @@
     maxDistance: false
     maxVelocity: false
     minDistance: false
+    referenceDistance: false
     separationImpulse: false
     shakeCooldown: false
     shakeThreshold: false
@@ -56,7 +58,9 @@
       forceStrength: !<float> 10.000000
       damping: 0.100000
       minDistance: !<float> 1.000000
+      referenceDistance: !<float> 5.000000
       maxDistance: !<float> 15.000000
+      contactScale: 0.500000
       maxVelocity: !<float> 20.000000
       enabled: true
       separationImpulse: !<float> 15.000000
@@ -71,10 +75,12 @@
     - '// @input SceneObject magnet2 {"hint":"Second magnet object"}'
     - '// @input Component.ColliderComponent collider1 {"hint":"Collider for first magnet (optional)"}'
     - '// @input Component.ColliderComponent collider2 {"hint":"Collider for second magnet (optional)"}'
-    - '// @input float forceStrength = 100 {"hint":"Strength of magnetic force", "widget":"slider", "min":1, "max":500, "step":1}'
+    - '// @input float forceStrength = 100 {"hint":"Strength of magnetic force", "widget":"slider", "min":10, "max":500, "step":10}'
     - '// @input float damping = 2 {"hint":"Velocity damping per second", "widget":"slider", "min":0, "max":10, "step":0.1}'
     - '// @input float minDistance = 0.3 {"hint":"Minimum distance to prevent extreme forces", "widget":"slider", "min":0.1, "max":2, "step":0.1}'
-    - '// @input float maxDistance = 15 {"hint":"Maximum distance for force to apply", "widget":"slider", "min":0, "max":20, "step":0.5}'
+    - '// @input float referenceDistance = 8 {"hint":"Distance (cm) where force equals base strength - roughly magnet diameter", "widget":"slider", "min":2, "max":30, "step":1}'
+    - '// @input float maxDistance = 100 {"hint":"Maximum distance for force to apply", "widget":"slider", "min":10, "max":200, "step":10}'
+    - '// @input float contactScale = 1 {"hint":"Scale factor for collision radius (1.0 = exact collider size)", "widget":"slider", "min":0.5, "max":1.5, "step":0.1}'
     - '// @input float maxVelocity = 20 {"hint":"Maximum velocity to prevent flying off", "widget":"slider", "min":1, "max":100, "step":1}'
     - '// @input bool enabled = true {"hint":"Enable physics simulation"}'
     - '// @input float separationImpulse = 15 {"hint":"Impulse strength when shaking to separate", "widget":"slider", "min":1, "max":50, "step":1}'

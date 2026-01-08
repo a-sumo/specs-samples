@@ -40,6 +40,10 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     magneticFieldComponent: ScriptComponent;
 
     @input
+    @hint("MagnetPhysics component to control")
+    magnetPhysicsComponent: ScriptComponent;
+
+    @input
     @hint("Text component on slider prefab for label (child name)")
     labelChildName: string = "Text";
 
@@ -136,11 +140,12 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     ];
 
     private magneticFieldConfigs: SliderConfig[] = [
-        { label: "Field Strength", propertyName: "fieldStrength", min: 0.1, max: 10, defaultValue: 1.0 },
+        { label: "Field Strength", propertyName: "fieldStrength", min: 0.1, max: 5.0, defaultValue: 1.0 },
         { label: "Radius", propertyName: "radius", min: 0.01, max: 0.2, defaultValue: 0.05 },
-        { label: "Flow Speed", propertyName: "flowSpeed", min: 0, max: 50, defaultValue: 2.0 },
-        { label: "Step Size", propertyName: "stepSize", min: 0.01, max: 0.5, defaultValue: 0.1 },
+        { label: "Flow Speed", propertyName: "flowSpeed", min: 0, max: 20, defaultValue: 2.0 },
+        { label: "Step Size", propertyName: "stepSize", min: 0.01, max: 0.3, defaultValue: 0.08 },
         { label: "Arrow Scale", propertyName: "arrowScale", min: 0.05, max: 1.0, defaultValue: 0.15 },
+        { label: "Ref Distance", propertyName: "referenceDistance", min: 2.0, max: 30.0, defaultValue: 8.0 },
     ];
 
     private fieldModeCallbackAdded: boolean = false;
@@ -751,9 +756,35 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private onSliderValueChanged(propertyName: string, value: number): void {
         if (!this.activeComponent) return;
 
-        const component = this.activeComponent as any;
-        if (component[propertyName] !== undefined) {
-            component[propertyName] = value;
+        // referenceDistance goes only to MagnetPhysics
+        if (propertyName === "referenceDistance" && this.magnetPhysicsComponent) {
+            const physics = this.magnetPhysicsComponent as any;
+            if (physics.referenceDistance !== undefined) {
+                physics.referenceDistance = value;
+            }
+        }
+        // fieldStrength goes to BOTH visualization and physics (scaled)
+        else if (propertyName === "fieldStrength") {
+            // Update visualization
+            const component = this.activeComponent as any;
+            if (component.fieldStrength !== undefined) {
+                component.fieldStrength = value;
+            }
+            // Update physics - scale fieldStrength (0.1-5) to forceStrength (20-500)
+            if (this.magnetPhysicsComponent && this.currentFieldType === "magnetic") {
+                const physics = this.magnetPhysicsComponent as any;
+                if (physics.forceStrength !== undefined) {
+                    // Map 0.1-5.0 → 20-500
+                    const normalized = (value - 0.1) / (5.0 - 0.1);
+                    physics.forceStrength = 20 + normalized * 480;
+                }
+            }
+        }
+        else {
+            const component = this.activeComponent as any;
+            if (component[propertyName] !== undefined) {
+                component[propertyName] = value;
+            }
         }
 
         const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
