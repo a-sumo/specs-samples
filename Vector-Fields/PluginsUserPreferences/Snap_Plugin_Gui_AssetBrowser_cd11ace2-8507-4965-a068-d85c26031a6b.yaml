@@ -30,7 +30,6 @@ CollapsedEntities:
       - Fonts/latin-modern-roman/GUST-FONT-LICENSE.TXT
       - Fonts/latin-modern-roman/lm-info.pdf
       - Fonts/latin-modern-roman/lmroman9-bold.otf
-      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/IridescentMaterial.mat
@@ -54,6 +53,7 @@ CollapsedEntities:
       - Prefabs/Vector Field Examples Root.prefab
       - Render Target.renderTarget
       - Scene.scene
+      - Scripts
       - Scripts/DynamicSettingsPanel.ts
       - Scripts/FieldController.ts
       - Scripts/IridescentMaterial.ts

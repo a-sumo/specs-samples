@@ -155,12 +155,12 @@
   ColorMask: {x: true, y: true, z: true, w: true}
   CullMode: Front
   PolygonOffset: {x: 0.000000, y: 0.000000}
-  FrustumCulling: Auto
-  FrustumCullPad: 0.000000
+  FrustumCulling: Extend
+  FrustumCullPad: 10.000000
   InstanceCount: 1
   Defines:
     []
-  BlendMode: PremultipliedAlphaAuto
+  BlendMode: PremultipliedAlpha
   Properties:
     ArrowScale:
       typeIdx: 1

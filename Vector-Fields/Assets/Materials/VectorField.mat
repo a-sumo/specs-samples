@@ -262,6 +262,9 @@
     - Tweak_N9:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - alphaTestThreshold:
+        typeIdx: 1
+        value: 0.500000
     - mainColor:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
@@ -277,7 +280,7 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: AlphaTest
+  BlendMode: PremultipliedAlpha
   Properties:
     ArrowScale:
       typeIdx: 1
@@ -339,7 +342,4 @@
     TubeRadius:
       typeIdx: 1
       value: 1.000000
-    alphaTestThreshold:
-      typeIdx: 1
-      value: 0.500000
   Pass: !<reference> f5440cbc-b54a-4809-8554-48231fc75b02
