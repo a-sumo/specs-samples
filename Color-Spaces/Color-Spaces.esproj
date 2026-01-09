@@ -22,7 +22,7 @@ metaInfo:
   lensClientCompatibilities:
     - Spectacles
   platformBundlesEnabled: false
-  iconHash: eb864d2063760351207d3ead7df8f818
+  iconHash: e6e519999d97e0dd1a9997eedf9a2d50
   videoPreviewHash: ""
   fromTemplateName: Default
   fromTemplateUrl: Lens Studio 5.4.0.24110404

@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 839
+    size: 838
     values:
       - Fonts
       - Fonts/galter
@@ -64,7 +64,6 @@ CollapsedEntities:
       - Materials/Tests/Spectral Color Mixing.ss_graph
       - Materials/Tests/TestEncoder.mat
       - Materials/Tests/TestEncoder.ss_graph
-      - Materials/UI
       - Materials/UI/BG.mat
       - Materials/UI/BG.ss_graph
       - Materials/UI/Cursor.mat

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../assets/color-spaces/preview.png" alt="Color Spaces Preview" width="120">
+  <img src="../assets/color-spaces/logo-color-spaces.png" alt="Color Spaces Preview" width="120">
 </p>
 
 <h1 align="center">Color Spaces</h1>

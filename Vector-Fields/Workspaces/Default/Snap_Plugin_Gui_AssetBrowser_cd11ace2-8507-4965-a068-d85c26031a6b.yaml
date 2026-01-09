@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 666
+    size: 676
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
@@ -17,6 +17,7 @@ CollapsedEntities:
       - Fonts/Images/expansion_preview.png
       - Fonts/Images/expansion_sprite.png
       - Fonts/Images/magnetic_preview.png
+      - Fonts/Images/magnetic_sprite.png
       - Fonts/Images/vortex_preview.png
       - Fonts/Images/vortex_sprite.png
       - Fonts/Images/waves_preview.png
@@ -30,18 +31,23 @@ CollapsedEntities:
       - Fonts/latin-modern-roman/GUST-FONT-LICENSE.TXT
       - Fonts/latin-modern-roman/lm-info.pdf
       - Fonts/latin-modern-roman/lmroman9-bold.otf
+      - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
       - Materials/IridescentMaterial.mat
       - Materials/IridescentMaterial.ss_graph
       - Materials/MagnetPole.mat
       - Materials/MagnetPole.ss_graph
+      - Materials/MagneticField.mat
       - Materials/MagneticField.ss_graph
       - Materials/SpriteSheetBG.mat
       - Materials/SpriteSheetBG.ss_graph
       - Materials/TestTubeDeformation.mat
       - Materials/TestTubeDeformation.ss_graph
+      - Materials/VectorField.mat
+      - Materials/VectorField.ss_graph
       - Meshes
+      - Meshes/Custom BoxMesh.mesh
       - Meshes/Custom CapsuleSphere.mesh
       - Meshes/Custom Sphere.mesh
       - Prefabs
@@ -64,6 +70,11 @@ CollapsedEntities:
       - Scripts/Utils/__pycache__
       - Scripts/Utils/__pycache__/render_all_fields.cpython-313.pyc
       - Scripts/Utils/__pycache__/render_field_variations.cpython-313.pyc
+      - Scripts/Utils/dipole_mesh_gradient.mp4
+      - Scripts/Utils/dipole_trails.mp4
+      - Scripts/Utils/field_double_vortex.mp4
+      - Scripts/Utils/field_saddle.mp4
+      - Scripts/Utils/field_source.mp4
       - Scripts/Utils/gradient_1_magnetic.mp4
       - Scripts/Utils/gradient_2_aurora.mp4
       - Scripts/Utils/gradient_3_sunset.mp4
@@ -95,7 +106,7 @@ CollapsedEntities:
       - Shaders/MagneticField.js
       - Shaders/TubeTest.js
       - Shaders/VectorField.js
-      - SpectaclesInteractionKit.lspkg
+      - Shaders/VectorFieldTransform.js
       - SpectaclesInteractionKit.lspkg/Assets
       - SpectaclesInteractionKit.lspkg/Assets/Audio
       - SpectaclesInteractionKit.lspkg/Assets/Audio/HoverAudioTrack.wav
@@ -473,7 +484,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Providers/TargetProvider/TargetingData.ts
       - SpectaclesInteractionKit.lspkg/README.md
       - SpectaclesInteractionKit.lspkg/SIK.ts
-      - SpectaclesInteractionKit.lspkg/Utils
       - SpectaclesInteractionKit.lspkg/Utils/BinaryHeap.ts
       - SpectaclesInteractionKit.lspkg/Utils/BistableThreshold.ts
       - SpectaclesInteractionKit.lspkg/Utils/ColliderUtils.ts
@@ -482,7 +492,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/Utils/FunctionTimingUtils.ts
       - SpectaclesInteractionKit.lspkg/Utils/InputChecker.ts
       - SpectaclesInteractionKit.lspkg/Utils/InspectorCallbacks.ts
-      - SpectaclesInteractionKit.lspkg/Utils/LensConfig.ts
       - SpectaclesInteractionKit.lspkg/Utils/LogLevel.ts
       - SpectaclesInteractionKit.lspkg/Utils/MovingAverageFilter.ts
       - SpectaclesInteractionKit.lspkg/Utils/NativeLogger.ts
@@ -566,6 +575,7 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/Meshes/DefaultSwitchKnob.mesh
       - SpectaclesUIKit.lspkg/Meshes/StretchableCircle.mesh
       - SpectaclesUIKit.lspkg/Meshes/Unit Plane.mesh
+      - SpectaclesUIKit.lspkg/Prefabs
       - SpectaclesUIKit.lspkg/Prefabs/DropShadow.prefab
       - SpectaclesUIKit.lspkg/Prefabs/ExampleInterface.prefab
       - SpectaclesUIKit.lspkg/Prefabs/FrameButton.prefab
