@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 676
+    size: 647
     values:
       - ""
       - Device Camera Texture.deviceCameraTexture
@@ -9,19 +9,6 @@ CollapsedEntities:
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
       - Fonts
-      - Fonts/Images
-      - Fonts/Images/circulation_preview.png
-      - Fonts/Images/circulation_sprite.png
-      - Fonts/Images/contraction_preview.png
-      - Fonts/Images/contraction_sprite.png
-      - Fonts/Images/expansion_preview.png
-      - Fonts/Images/expansion_sprite.png
-      - Fonts/Images/magnetic_preview.png
-      - Fonts/Images/magnetic_sprite.png
-      - Fonts/Images/vortex_preview.png
-      - Fonts/Images/vortex_sprite.png
-      - Fonts/Images/waves_preview.png
-      - Fonts/Images/waves_sprite.png
       - Fonts/Source_Sans_3
       - Fonts/Source_Sans_3/OFL.txt
       - Fonts/Source_Sans_3/README.txt
@@ -31,6 +18,7 @@ CollapsedEntities:
       - Fonts/latin-modern-roman/GUST-FONT-LICENSE.TXT
       - Fonts/latin-modern-roman/lm-info.pdf
       - Fonts/latin-modern-roman/lmroman9-bold.otf
+      - Images
       - Materials
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
@@ -50,7 +38,6 @@ CollapsedEntities:
       - Meshes/Custom BoxMesh.mesh
       - Meshes/Custom CapsuleSphere.mesh
       - Meshes/Custom Sphere.mesh
-      - Prefabs
       - Prefabs/Magnetic Field Root.prefab
       - Prefabs/Slider Preset.prefab
       - Prefabs/Toggle Btn Large 2.prefab
@@ -67,29 +54,13 @@ CollapsedEntities:
       - Scripts/MagneticField.ts
       - Scripts/TubeTest.ts
       - Scripts/Utils
-      - Scripts/Utils/__pycache__
-      - Scripts/Utils/__pycache__/render_all_fields.cpython-313.pyc
-      - Scripts/Utils/__pycache__/render_field_variations.cpython-313.pyc
-      - Scripts/Utils/dipole_mesh_gradient.mp4
-      - Scripts/Utils/dipole_trails.mp4
-      - Scripts/Utils/field_double_vortex.mp4
-      - Scripts/Utils/field_saddle.mp4
-      - Scripts/Utils/field_source.mp4
       - Scripts/Utils/gradient_1_magnetic.mp4
-      - Scripts/Utils/gradient_2_aurora.mp4
-      - Scripts/Utils/gradient_3_sunset.mp4
       - Scripts/Utils/render_all_fields.py
       - Scripts/Utils/render_dipole_mesh_gradient.py
       - Scripts/Utils/render_field_sprites.py
       - Scripts/Utils/render_field_variations.py
       - Scripts/Utils/render_gradient_options.py
       - Scripts/Utils/renders
-      - Scripts/Utils/renders/circulation.mp4
-      - Scripts/Utils/renders/contraction.mp4
-      - Scripts/Utils/renders/expansion.mp4
-      - Scripts/Utils/renders/magnetic.mp4
-      - Scripts/Utils/renders/vortex.mp4
-      - Scripts/Utils/renders/waves.mp4
       - Scripts/Utils/sprites
       - Scripts/Utils/sprites/circulation_preview.png
       - Scripts/Utils/sprites/contraction_preview.png
