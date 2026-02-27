@@ -1,0 +1,92 @@
+- !<AssetImportMetadata/a3253c68-3991-4858-a62c-3aeda612df67>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> e70ea878-ce68-42de-809a-df95318d9571
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> e70ea878-ce68-42de-809a-df95318d9571
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> fa8ea4f7-3f69-4300-8497-c806c95c80a2
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/fa8ea4f7-3f69-4300-8497-c806c95c80a2>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 3b7fea5c-7c2d-429f-8905-58443edd7dd2
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _arrowScale: false
+    _coneLength: false
+    _coneRadius: false
+    _desiredLengthSegments: false
+    _fieldScale: false
+    _flowSpeed: false
+    _gridSize: false
+    _gridSpacing: false
+    _lod: false
+    _maxVertexCount: false
+    _preset: false
+    _radius: false
+    _stepSize: false
+    _tubeMode: false
+    fieldCollider: false
+    material: false
+    trackedObject: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - _lod: !<float> 2.000000
+      _maxVertexCount: !<float> 40000.000000
+      _tubeMode: !<float> 0.000000
+      _desiredLengthSegments: !<float> 8.000000
+      _radius: 0.050000
+      _coneLength: 1.500000
+      _coneRadius: 1.800000
+      _arrowScale: !<float> 2.000000
+      _gridSize: !<float> 5.000000
+      _gridSpacing: !<float> 1.000000
+      _stepSize: 0.100000
+      _fieldScale: !<float> 1.000000
+      _flowSpeed: !<float> 2.000000
+      _preset: !<float> 0.000000
+      trackedObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      fieldCollider: !<reference.ColliderComponent> 00000000-0000-0000-0000-000000000000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input float _lod = 1 {"hint":"Level of detail - affects radial segments, length segments, and grid size", "widget":"combobox", "values":[{"label":"Low", "value":0}, {"label":"Medium", "value":1}, {"label":"High", "value":2}, {"label":"Ultra", "value":3}]}'
+    - '// @input float _maxVertexCount = 32000 {"hint":"Maximum vertex count budget - geometry adapts to stay below this (UInt16 max: 65535)", "widget":"slider", "min":8000, "max":65000, "step":1000}'
+    - '// @input float _tubeMode {"hint":"Trails: flowing tubes, Particles: short flowing trails, Arrows: static oriented", "widget":"combobox", "values":[{"label":"Trails", "value":0}, {"label":"Particles", "value":1}, {"label":"Arrows", "value":2}]}'
+    - '// @input float _desiredLengthSegments = 8 {"hint":"Desired segments along tube length (may be reduced to fit vertex budget)", "widget":"slider", "min":2, "max":64, "step":2}'
+    - '// @input float _radius = 0.04 {"hint":"Tube radius", "widget":"slider", "min":0.01, "max":0.2, "step":0.01}'
+    - '// @input float _coneLength = 4 {"hint":"Cone tip length multiplier for Arrow mode", "widget":"slider", "min":1, "max":30, "step":0.1}'
+    - '// @input float _coneRadius = 1.7 {"hint":"Cone tip radius multiplier for Arrow mode", "widget":"slider", "min":1, "max":2.5, "step":0.1}'
+    - '// @input float _arrowScale = 2 {"hint":"Arrow length scale factor (multiplied by field magnitude)", "widget":"slider", "min":0.5, "max":5, "step":0.1}'
+    - '// @input float _gridSize = 8 {"hint":"Grid size (NxNxN)", "widget":"slider", "min":1, "max":10, "step":1}'
+    - '// @input float _gridSpacing = 0.6 {"hint":"Spacing between tube start positions", "widget":"slider", "min":0.1, "max":5, "step":0.1}'
+    - '// @input float _stepSize = 0.1 {"hint":"Step size for vector field integration", "widget":"slider", "min":0.01, "max":0.5, "step":0.01}'
+    - '// @input float _fieldScale = 1 {"hint":"Field noise/frequency scale", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
+    - '// @input float _flowSpeed = 50 {"hint":"Speed at which tubes flow along field lines", "widget":"slider", "min":0, "max":100, "step":0.5}'
+    - '// @input float _preset {"hint":"Vector field type", "widget":"combobox", "values":[{"label":"Expansion", "value":0}, {"label":"Contraction", "value":1}, {"label":"Circulation", "value":2}, {"label":"Waves", "value":3}, {"label":"Vortex", "value":4}]}'
+    - '// @input SceneObject trackedObject {"hint":"Object that affects the field - field reacts to its position"}'
+    - '// @input Component.ColliderComponent fieldCollider {"hint":"Box collider - field only animates when tracked object is inside"}'
+    - '// @input Asset.Material material {"hint":"Material with VectorFieldTubesShader.js"}'

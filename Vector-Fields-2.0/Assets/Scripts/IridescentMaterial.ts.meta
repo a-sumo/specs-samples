@@ -1,0 +1,65 @@
+- !<AssetImportMetadata/7e8c604f-e26e-40ad-8a2d-dab7667a3a07>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 56df9236-c491-4c1a-b537-82ca81830bed
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 56df9236-c491-4c1a-b537-82ca81830bed
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 2de14399-7e5a-4cb9-9671-18cefc795e92
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/2de14399-7e5a-4cb9-9671-18cefc795e92>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: bb2863d7-b833-491a-abf5-0495fb2a57cf
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _brightness: false
+    _colorSpeed: false
+    _fresnelPower: false
+    _opacity: false
+    _saturation: false
+    _usePositionVariation: false
+    camera: false
+    material: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      _fresnelPower: !<float> 2.000000
+      _colorSpeed: 0.500000
+      _saturation: 0.800000
+      _brightness: 0.900000
+      _opacity: 0.850000
+      _usePositionVariation: true
+      camera: !<reference.Camera> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.Material material {"hint":"Material to apply iridescence to"}'
+    - '// @input float _fresnelPower = 2 {"hint":"Fresnel power - higher = more edge color", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input float _colorSpeed = 0.5 {"hint":"Speed of color cycling", "widget":"slider", "min":0, "max":5, "step":0.1}'
+    - '// @input float _saturation = 0.8 {"hint":"Saturation of iridescent colors", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input float _brightness = 0.9 {"hint":"Base brightness", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input float _opacity = 0.85 {"hint":"Opacity", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input bool _usePositionVariation = true {"hint":"Use world position for color variation"}'
+    - '// @input Component.Camera camera {"hint":"Camera for view-dependent effects (optional)"}'

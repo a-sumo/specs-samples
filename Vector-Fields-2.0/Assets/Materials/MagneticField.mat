@@ -1,0 +1,231 @@
+- !<Material/08e73cb7-208f-4146-b04c-e78b8e72756f>
+  PackagePath: ""
+  PassesInfo:
+    - !<own> 140573ab-e0a5-434c-8bcb-205a42a38a5a
+- !<PassInfo/140573ab-e0a5-434c-8bcb-205a42a38a5a>
+  CachedProperties:
+    - Port_Amount_N014:
+        typeIdx: 1
+        value: 1.000000
+    - Port_ArrowScale_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ConeLength_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ConeRadius_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Depth_N004:
+        typeIdx: 1
+        value: 1.000000
+    - Port_FieldStrength_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_FinalColor1_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor2_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor3_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FlowSpeed_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_GSplatPointSize_N004:
+        typeIdx: 1
+        value: 0.000000
+    - Port_GSplatRotation_N004:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+    - Port_GSplatScale_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Import_N015:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Input_N014:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_Magnet1Forward_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Magnet1Position_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Magnet2Forward_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Magnet2Position_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_NumSteps_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_PrevWorldPosition_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_RayDirection_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 1.000000, z: 0.000000}
+    - Port_RayOrigin_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_StepSize_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Time_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_TubeRadius_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Value1_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value2_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_Value4_N023:
+        typeIdx: 1
+        value: 0.000000
+    - Port_VectorIn_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldNormal_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 1.000000, z: 0.000000}
+    - Port_WorldPosition_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldTangent_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 1.000000}
+    - Tweak_N10:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - Tweak_N11:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - Tweak_N12:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - Tweak_N2:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N28:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N29:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N3:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N5:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N6:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N7:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N8:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N9:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - alphaTestThreshold:
+        typeIdx: 1
+        value: 0.500000
+    - mainColor:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  DepthWrite: true
+  DepthTest: true
+  DepthFunction: LessEqual
+  TwoSided: false
+  ColorMask: {x: true, y: true, z: true, w: true}
+  CullMode: Front
+  PolygonOffset: {x: 0.000000, y: 0.000000}
+  FrustumCulling: Extend
+  FrustumCullPad: 10.000000
+  InstanceCount: 1
+  Defines:
+    []
+  BlendMode: PremultipliedAlpha
+  Properties:
+    ArrowScale:
+      typeIdx: 1
+      value: 1.000000
+    ConeLength:
+      typeIdx: 1
+      value: 1.000000
+    FieldStrength:
+      typeIdx: 1
+      value: 1.000000
+    FlowSpeed:
+      typeIdx: 1
+      value: 1.000000
+    Magnet1Forward:
+      typeIdx: 4
+      value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Magnet1Position:
+      typeIdx: 4
+      value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Magnet2Forward:
+      typeIdx: 4
+      value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Magnet2Position:
+      typeIdx: 4
+      value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    NumSteps:
+      typeIdx: 1
+      value: 1.000000
+    Port_Import_N017:
+      typeIdx: 1
+      value: 0.000000
+    Port_Import_N019:
+      typeIdx: 1
+      value: 38.000000
+    Port_Import_N021:
+      typeIdx: 1
+      value: 100.000000
+    Port_Input1_N020:
+      typeIdx: 1
+      value: 0.010000
+    Port_Input1_N022:
+      typeIdx: 1
+      value: 0.010000
+    Port_RangeMaxA_N018:
+      typeIdx: 1
+      value: 180.000000
+    Port_RangeMaxB_N018:
+      typeIdx: 1
+      value: 0.500000
+    Port_RangeMinA_N018:
+      typeIdx: 1
+      value: -180.000000
+    Port_RangeMinB_N018:
+      typeIdx: 1
+      value: -0.500000
+    PreviewEnabled:
+      typeIdx: 0
+      value: 0
+    StepSize:
+      typeIdx: 1
+      value: 1.000000
+    Time:
+      typeIdx: 1
+      value: 1.000000
+    TubeRadius:
+      typeIdx: 1
+      value: 1.000000
+  Pass: !<reference> 5d23a7b9-a57d-4a59-959a-fc217e12c6f3

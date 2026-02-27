@@ -1,0 +1,89 @@
+- !<AssetImportMetadata/6c05e31e-e6d9-4bd4-b5d3-fcbaf9f4f472>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> ef6ca5f6-a6eb-4091-91ea-806ae2b23629
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> ef6ca5f6-a6eb-4091-91ea-806ae2b23629
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 0c031a10-6531-4f63-b1b7-06c8c8a4d8e3
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/0c031a10-6531-4f63-b1b7-06c8c8a4d8e3>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: a27144ab-ede8-4878-8596-5b8342924a20
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    collider1: false
+    collider2: false
+    contactScale: false
+    damping: false
+    enabled: false
+    forceSmoothing: false
+    forceStrength: false
+    magnet1: false
+    magnet2: false
+    maxDistance: false
+    maxVelocity: false
+    minDistance: false
+    referenceDistance: false
+    separationImpulse: false
+    shakeCooldown: false
+    shakeThreshold: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - magnet1: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      magnet2: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      collider1: !<reference.ColliderComponent> 00000000-0000-0000-0000-000000000000
+      collider2: !<reference.ColliderComponent> 00000000-0000-0000-0000-000000000000
+      forceStrength: !<float> 10.000000
+      damping: 0.100000
+      minDistance: !<float> 1.000000
+      referenceDistance: !<float> 5.000000
+      maxDistance: !<float> 15.000000
+      contactScale: 0.500000
+      maxVelocity: !<float> 20.000000
+      enabled: true
+      separationImpulse: !<float> 15.000000
+      shakeThreshold: !<float> 8.000000
+      shakeCooldown: 0.300000
+      forceSmoothing: 0.700000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject magnet1 {"hint":"First magnet object"}'
+    - '// @input SceneObject magnet2 {"hint":"Second magnet object"}'
+    - '// @input Component.ColliderComponent collider1 {"hint":"Collider for first magnet (optional)"}'
+    - '// @input Component.ColliderComponent collider2 {"hint":"Collider for second magnet (optional)"}'
+    - '// @input float forceStrength = 100 {"hint":"Strength of magnetic force", "widget":"slider", "min":10, "max":500, "step":10}'
+    - '// @input float damping = 2 {"hint":"Velocity damping per second", "widget":"slider", "min":0, "max":10, "step":0.1}'
+    - '// @input float minDistance = 0.3 {"hint":"Minimum distance to prevent extreme forces", "widget":"slider", "min":0.1, "max":2, "step":0.1}'
+    - '// @input float referenceDistance = 8 {"hint":"Distance (cm) where force equals base strength - roughly magnet diameter", "widget":"slider", "min":2, "max":30, "step":1}'
+    - '// @input float maxDistance = 100 {"hint":"Maximum distance for force to apply", "widget":"slider", "min":10, "max":200, "step":10}'
+    - '// @input float contactScale = 1 {"hint":"Scale factor for collision radius (1.0 = exact collider size)", "widget":"slider", "min":0.5, "max":1.5, "step":0.1}'
+    - '// @input float maxVelocity = 20 {"hint":"Maximum velocity to prevent flying off", "widget":"slider", "min":1, "max":100, "step":1}'
+    - '// @input bool enabled = true {"hint":"Enable physics simulation"}'
+    - '// @input float separationImpulse = 15 {"hint":"Impulse strength when shaking to separate", "widget":"slider", "min":1, "max":50, "step":1}'
+    - '// @input float shakeThreshold = 8 {"hint":"Shake acceleration threshold to trigger separation", "widget":"slider", "min":1, "max":20, "step":1}'
+    - '// @input float shakeCooldown = 0.3 {"hint":"Cooldown between shake separations (seconds)", "widget":"slider", "min":0.1, "max":1, "step":0.1}'
+    - '// @input float forceSmoothing = 0.7 {"hint":"Force smoothing (higher = smoother but slower)", "widget":"slider", "min":0, "max":0.95, "step":0.05}'
