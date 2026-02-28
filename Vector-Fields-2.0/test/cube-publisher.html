@@ -1,40 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <title>Cube Publisher</title>
 <style>
   * { margin: 0; box-sizing: border-box; }
-  body { background: #0a0d11; color: #ccc; font: 14px/1.4 monospace; padding: 12px; }
-  .bar { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
-  input { background: #161b22; color: #ccc; border: 1px solid #333; padding: 4px 8px; font: inherit; }
-  button { padding: 4px 14px; font: inherit; cursor: pointer; border: none; border-radius: 3px; }
-  #connectBtn { background: #1878e0; color: #fff; }
-  #connectBtn.on { background: #e03020; }
-  #status { font-size: 12px; color: #888; }
-  canvas { border: 1px solid #333; image-rendering: pixelated; display: block; margin-top: 8px; }
+  body { background: #0a0d11; color: #ccc; font: 12px/1.4 'SF Mono', monospace; padding: 12px; }
+  .bar { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  input { background: #161b22; color: #aaa; border: 1px solid #333; padding: 3px 6px; font: inherit; border-radius: 3px; }
+  button { padding: 3px 12px; font: inherit; cursor: pointer; border-radius: 3px; }
+  #connectBtn { background: #1a2a1a; color: #7c7; border: 1px solid #2a5a3a; }
+  #connectBtn.on { background: #0a2a0a; color: #4e4; border-color: #1a5a1a; }
+  .stat { color: #555; font-size: 11px; }
+  canvas { border: 1px solid #222; image-rendering: pixelated; display: block; margin-top: 8px; }
+  label { color: #666; font-size: 11px; }
 </style>
 </head>
 <body>
 
 <div class="bar">
-  <input id="relay" value="ws://localhost:8766" style="width:200px" placeholder="relay URL">
-  <input id="channel" value="vector-field" style="width:120px" placeholder="channel">
-  <button id="connectBtn" onclick="toggleConnect()">Broadcast</button>
-  <label style="color:#888;font-size:12px"><input type="checkbox" id="syncCam"> Sync LS Camera</label>
-  <span id="status">disconnected</span>
+  <input id="relay" value="ws://localhost:8766" style="width:180px" placeholder="relay URL">
+  <input id="channel" value="vector-field" style="width:100px" placeholder="channel">
+  <button id="connectBtn">Connect</button>
+  <label><input type="checkbox" id="syncCam"> Sync LS Camera</label>
+  <span class="stat" id="stat"></span>
 </div>
 <canvas id="c" width="256" height="256"></canvas>
 
 <script>
+// ---- Config ----
 const W = 256, H = 256;
+const QUAD_ID = 'panel';
+const FRAME_INTERVAL = 66; // ~15fps
+
 const canvas = document.getElementById('c');
 canvas.style.width = '512px'; canvas.style.height = '512px';
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
 const imgData = ctx.createImageData(W, H);
 const px = imgData.data;
 
-// --- 3D math (matches cube-publisher-canvas.ts) ---
+// ---- 3D state ----
 let S = 15;
 let cubePos = [0, 0, -50];
 let camPos = [0, 0, -120];
@@ -88,81 +93,162 @@ function drawCircle(cx,cy,rad,r,g,b) {
 }
 
 function render() {
-  px.fill(0); for(let i=0;i<px.length;i+=4){px[i]=13;px[i+1]=17;px[i+2]=23;px[i+3]=255;}
+  px.fill(0);
+  for(let i=0;i<px.length;i+=4){px[i]=13;px[i+1]=17;px[i+2]=23;px[i+3]=255;}
   const pr=verts.map(([x,y,z])=>project(x,y,z));
   for(const[a,b]of edges){const pa=pr[a],pb=pr[b];if(pa&&pb)drawLine(pa[0],pa[1],pb[0],pb[1],96,165,250);}
   for(const p of pr){if(p)drawCircle(p[0],p[1],4,147,197,253);}
   ctx.putImageData(imgData,0,0);
 }
 
-// --- WebSocket ---
-let ws = null;
-let frameCount = 0;
+// ---- Binary frame encoding (portal-demo pattern) ----
+function encodeBinaryRGBA(srcCanvas, id) {
+  const w = srcCanvas.width, h = srcCanvas.height;
+  const rgba = srcCanvas.getContext('2d').getImageData(0, 0, w, h).data;
+  const idB = new TextEncoder().encode(id);
+  const buf = new Uint8Array(11 + idB.length + rgba.length);
+  buf[0] = 1;
+  buf[1] = w & 0xff; buf[2] = (w >> 8) & 0xff;
+  buf[3] = h & 0xff; buf[4] = (h >> 8) & 0xff;
+  buf[9] = 1; // RGBA
+  buf[10] = idB.length;
+  buf.set(idB, 11);
+  buf.set(rgba, 11 + idB.length);
+  return buf;
+}
 
-function toggleConnect() {
-  if (ws) { ws.close(); return; }
+// ---- Pixel change detection (portal-demo pattern) ----
+let prevPixels = null;
+function pixelsChanged() {
+  const cur = ctx.getImageData(0, 0, W, H).data;
+  if (!prevPixels || prevPixels.length !== cur.length) {
+    prevPixels = new Uint8Array(cur); return true;
+  }
+  for (let i = 0; i < cur.length; i += 64) {
+    if (cur[i] !== prevPixels[i]) { prevPixels = new Uint8Array(cur); return true; }
+  }
+  return false;
+}
+
+// ---- Scene ops (portal-demo pattern: register as publisher immediately) ----
+function sendScene() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  ws.send(JSON.stringify({
+    event: 'scene',
+    payload: { ops: [
+      { op: 'create', id: QUAD_ID, w: W, h: H, x: 0, y: 0, z: 0.05, layer: 0, interactive: false }
+    ]}
+  }));
+}
+
+// ---- WebSocket (portal-demo pattern) ----
+let ws = null;
+let connected = false;
+let manualStop = false;
+let reconnectTimer = null;
+let reconnectDelay = 500;
+let framesSent = 0;
+let lastFrameSend = 0;
+
+const btn = document.getElementById('connectBtn');
+const statEl = document.getElementById('stat');
+
+function connect() {
+  if (connected || manualStop) return;
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+
   const url = document.getElementById('relay').value.trim();
-  const ch = document.getElementById('channel').value.trim();
-  const full = url + (url.includes('?')?'&':'?') + 'channel=' + encodeURIComponent(ch);
-  ws = new WebSocket(full);
-  ws.binaryType = 'arraybuffer';
-  document.getElementById('connectBtn').textContent = 'Stop';
-  document.getElementById('connectBtn').className = 'on';
-  document.getElementById('status').textContent = 'connecting...';
+  const ch = document.getElementById('channel').value.trim() || 'vector-field';
+  btn.textContent = 'Connecting...'; btn.className = '';
+
+  try {
+    ws = new WebSocket(url + (url.includes('?') ? '&' : '?') + 'channel=' + encodeURIComponent(ch));
+    ws.binaryType = 'arraybuffer';
+  } catch (e) { btn.textContent = 'Connect'; scheduleReconnect(); return; }
 
   ws.onopen = () => {
-    document.getElementById('status').textContent = 'broadcasting';
-    frameCount = 0;
+    connected = true;
+    reconnectDelay = 500;
+    btn.textContent = 'Disconnect'; btn.className = 'on';
+    sendScene(); // register as publisher immediately
+    prevPixels = null;
+    framesSent = 0;
   };
-  ws.onmessage = (e) => {
+
+  ws.onmessage = (ev) => {
+    // Ignore binary (we're a publisher, not subscriber)
+    if (typeof ev.data !== 'string') return;
     try {
-      const msg = JSON.parse(e.data);
-      if (msg.event==='interact'&&msg.payload) {
-        if (msg.payload.type==='camera_state' && document.getElementById('syncCam').checked) {
-          camPos=msg.payload.position; camQuat=msg.payload.rotation;
-        } else if (msg.payload.type==='field_state') {
-          if(msg.payload.collider){
-            const c=msg.payload.collider;
-            if(c.center)cubePos=c.center;
-            if(c.halfSize!==undefined){S=c.halfSize;verts=buildVerts(S);}
-          }
+      const msg = JSON.parse(ev.data);
+      if (msg.event === 'sub_joined') {
+        // New subscriber: resend scene + force next frame
+        sendScene();
+        prevPixels = null;
+      } else if (msg.event === 'interact' && msg.payload) {
+        if (msg.payload.type === 'camera_state' && document.getElementById('syncCam').checked) {
+          camPos = msg.payload.position;
+          camQuat = msg.payload.rotation;
+        } else if (msg.payload.type === 'field_state' && msg.payload.collider) {
+          const c = msg.payload.collider;
+          if (c.center) cubePos = c.center;
+          if (c.halfSize !== undefined) { S = c.halfSize; verts = buildVerts(S); }
         }
       }
-    } catch(e){}
+    } catch (e) {}
   };
-  ws.onclose = () => { ws=null; resetBtn(); };
-  ws.onerror = () => { ws=null; resetBtn(); };
+
+  ws.onclose = () => {
+    connected = false;
+    btn.className = '';
+    if (!manualStop) {
+      btn.textContent = 'Reconnecting...';
+      scheduleReconnect();
+    } else {
+      btn.textContent = 'Connect';
+    }
+  };
+  ws.onerror = () => {};
 }
 
-function resetBtn() {
-  document.getElementById('connectBtn').textContent='Broadcast';
-  document.getElementById('connectBtn').className='';
-  document.getElementById('status').textContent='disconnected';
+function scheduleReconnect() {
+  if (reconnectTimer || manualStop) return;
+  reconnectTimer = setTimeout(() => { reconnectTimer = null; connect(); }, reconnectDelay);
+  reconnectDelay = Math.min(reconnectDelay * 1.5, 3000);
 }
 
-function sendFrame() {
-  if(!ws||ws.readyState!==1) return;
-  const id='panel';
-  const headerSize=11+id.length;
-  const buf=new ArrayBuffer(headerSize+W*H*4);
-  const v=new DataView(buf);
-  const u8=new Uint8Array(buf);
-  v.setUint8(0,0x01);
-  v.setUint16(1,W,true);
-  v.setUint16(3,H,true);
-  v.setUint32(5,Date.now()>>>0,true);
-  v.setUint8(9,1);
-  v.setUint8(10,id.length);
-  for(let i=0;i<id.length;i++) v.setUint8(11+i,id.charCodeAt(i));
-  u8.set(px,headerSize);
-  ws.send(buf);
-  frameCount++;
-  if(frameCount%15===0) document.getElementById('status').textContent='broadcasting | '+frameCount+' frames';
+btn.addEventListener('click', () => {
+  if (connected) {
+    manualStop = true;
+    ws.close();
+  } else {
+    manualStop = false;
+    connect();
+  }
+});
+
+// ---- Render + stream loop ----
+function frame() {
+  render();
+
+  if (connected && ws && ws.readyState === WebSocket.OPEN) {
+    const now = Date.now();
+    if (now - lastFrameSend >= FRAME_INTERVAL && ws.bufferedAmount < 500000) {
+      lastFrameSend = now;
+      if (pixelsChanged()) {
+        ws.send(encodeBinaryRGBA(canvas, QUAD_ID));
+        framesSent++;
+        statEl.textContent = framesSent + 'f';
+      }
+    }
+  }
+
+  requestAnimationFrame(frame);
 }
 
-// --- Render loop ---
-setInterval(()=>{ render(); sendFrame(); }, 1000/15);
+// Auto-connect on load
 render();
+connect();
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>
