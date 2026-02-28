@@ -115,23 +115,27 @@ function quatToMatrix(q: number[]): number[][] {
 }
 
 function project(vx: number, vy: number, vz: number): [number, number] | null {
+  // World-space vector from camera to vertex
   const wx = vx + cubePos[0] - camPos[0];
   const wy = vy + cubePos[1] - camPos[1];
   const wz = vz + cubePos[2] - camPos[2];
 
+  // Transform to camera-local space via inverse rotation (R^T * v)
   const m = quatToMatrix(camQuat);
   const cx = m[0][0]*wx + m[1][0]*wy + m[2][0]*wz;
   const cy = m[0][1]*wx + m[1][1]*wy + m[2][1]*wz;
   const cz = m[0][2]*wx + m[1][2]*wy + m[2][2]*wz;
 
-  if (cz >= -0.1) return null;
+  // LS is left-handed: camera forward is +Z, visible objects have cz > 0
+  if (cz <= 0.1) return null;
 
   const fov = 63.5 * Math.PI / 180;
   const f = 1 / Math.tan(fov / 2);
   const aspect = WIDTH / HEIGHT;
 
-  const sx = (cx * f / (-cz)) / aspect;
-  const sy = (cy * f / (-cz));
+  // Left-handed perspective: divide by +cz (not -cz)
+  const sx = (cx * f / cz) / aspect;
+  const sy = (cy * f / cz);
 
   const px = (sx * 0.5 + 0.5) * WIDTH;
   const py = (0.5 - sy * 0.5) * HEIGHT;
