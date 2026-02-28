@@ -21,6 +21,7 @@
   <input id="relay" value="ws://localhost:8766" style="width:200px" placeholder="relay URL">
   <input id="channel" value="vector-field" style="width:120px" placeholder="channel">
   <button id="connectBtn" onclick="toggleConnect()">Broadcast</button>
+  <label style="color:#888;font-size:12px"><input type="checkbox" id="syncCam"> Sync LS Camera</label>
   <span id="status">disconnected</span>
 </div>
 <canvas id="c" width="256" height="256"></canvas>
@@ -117,7 +118,7 @@ function toggleConnect() {
     try {
       const msg = JSON.parse(e.data);
       if (msg.event==='interact'&&msg.payload) {
-        if (msg.payload.type==='camera_state') {
+        if (msg.payload.type==='camera_state' && document.getElementById('syncCam').checked) {
           camPos=msg.payload.position; camQuat=msg.payload.rotation;
         } else if (msg.payload.type==='field_state') {
           if(msg.payload.collider){
