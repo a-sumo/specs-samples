@@ -184,8 +184,8 @@ function connect() {
         // New subscriber: resend scene + force next frame
         sendScene();
         prevPixels = null;
-      } else if (msg.event === 'interact' && msg.payload) {
-        if (msg.payload.type === 'camera_state' && document.getElementById('syncCam').checked) {
+      } else if (msg.event === 'interact' && msg.payload && document.getElementById('syncCam').checked) {
+        if (msg.payload.type === 'camera_state') {
           camPos = msg.payload.position;
           camQuat = msg.payload.rotation;
         } else if (msg.payload.type === 'field_state' && msg.payload.collider) {
