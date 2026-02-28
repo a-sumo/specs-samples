@@ -112,10 +112,10 @@ export class FieldController extends BaseScriptComponent {
             this.magneticFieldRoot.enabled = false;
         }
 
-        if (this.settingsPanelScript && this.settingsPanelScript.buildForVectorField) {
-            if (this._activeField === FieldType.VectorField) {
+        if (this.settingsPanelScript) {
+            if (this._activeField === FieldType.VectorField && this.settingsPanelScript.buildForVectorField) {
                 this.settingsPanelScript.buildForVectorField();
-            } else {
+            } else if (this._activeField === FieldType.MagneticField && this.settingsPanelScript.buildForMagneticField) {
                 this.settingsPanelScript.buildForMagneticField();
             }
         }
@@ -149,7 +149,7 @@ export class FieldController extends BaseScriptComponent {
                 vfPreset = this.vectorFieldComponent.preset;
             }
             targetPreset = vfPreset;
-        } else {
+        } else if (this._activeField === FieldType.MagneticField) {
             targetPreset = 5;
         }
 
@@ -192,7 +192,8 @@ export class FieldController extends BaseScriptComponent {
     public setActiveField(fieldType: number): void {
         this._activeField = Math.floor(Math.min(1, Math.max(0, fieldType)));
         this.applyActiveField();
-        print("FieldController: Switched to " + (this._activeField === 0 ? "Vector Field" : "Magnetic Field"));
+        const names = ["Vector Field", "Magnetic Field"];
+        print("FieldController: Switched to " + names[this._activeField]);
     }
 
     public showVectorField(): void {
@@ -204,7 +205,7 @@ export class FieldController extends BaseScriptComponent {
     }
 
     public toggle(): void {
-        this.setActiveField(this._activeField === 0 ? 1 : 0);
+        this.setActiveField((this._activeField + 1) % 2);
     }
 
     get activeField(): number {
@@ -216,7 +217,8 @@ export class FieldController extends BaseScriptComponent {
     }
 
     get activeFieldName(): string {
-        return this._activeField === 0 ? "VectorField" : "MagneticField";
+        const names = ["VectorField", "MagneticField"];
+        return names[this._activeField];
     }
 
     public getVectorFieldComponent(): any {

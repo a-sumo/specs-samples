@@ -14,6 +14,29 @@
   ImporterSettings: !<AssetImporterSettings>
     {}
   CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<ScriptComponent/1f4a8d53-b43d-414f-ae62-252afb2d1fd5>
+  PrefabRemaps:
+    []
+  Name: AiFieldGenerator
+  Enabled: true
+  ScriptAsset: !<reference> be9a819e-b35e-4c3f-8499-1712038ec9b8
+  ScriptInputsDefault:
+    _gridSize: true
+    _fieldExtent: true
+    _apiKey: true
+    _apiUrl: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      material: !<reference.Material> 45e7eab8-d8e1-4485-b213-34fcbfe5234f
+      _gridSize: !<float> 32.000000
+      _fieldExtent: !<float> 3.000000
+      _apiKey: ""
+      _apiUrl: "https://api.anthropic.com/v1/messages"
+  ScriptTypes:
+    "":
+      {}
 - !<ColliderComponent/204b33fe-8ed9-4616-b055-6c4ef0c3c9e9>
   PrefabRemaps:
     []
@@ -204,7 +227,7 @@
       _preset: !<float> 0.000000
       trackedObject: !<reference.SceneObject> 993a5b8b-d62f-4329-5f51-f5c9950706b4
       fieldCollider: !<reference.ColliderComponent> 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9
-      material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42
+      material: !<reference.Material> 45e7eab8-d8e1-4485-b213-34fcbfe5234f
   ScriptTypes:
     "":
       {}
@@ -498,3 +521,4 @@
     - !<own> a6da0529-5cc3-453f-b69d-1183d1bc46c3
     - !<own> 4bbbff2f-0888-4975-9fde-cfbc0803a26b
     - !<own> 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9
+    - !<own> 1f4a8d53-b43d-414f-ae62-252afb2d1fd5

@@ -98,7 +98,7 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private lodToggles: SceneObject[] = [];
     private activeComponent: any = null;
     private fieldModesBuilt: boolean = false;
-    private presetsBuilt: boolean = false;
+    private currentPresetType: string = "";
     private tubeModesBuilt: boolean = false;
     private lodBuilt: boolean = false;
 
@@ -259,9 +259,10 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         this.activeComponent = this.vectorFieldComponent;
         this.buildSliders(this.vectorFieldConfigs, this.vectorFieldValues);
 
-        if (!this.presetsBuilt) {
-            this.buildPresetToggles();
-            this.presetsBuilt = true;
+        if (this.currentPresetType !== "vector") {
+            this.clearPresetToggles();
+            this.buildPresetToggles(this.vectorFieldPresets);
+            this.currentPresetType = "vector";
         }
         if (!this.tubeModesBuilt) {
             this.buildTubeModeToggles();
@@ -303,7 +304,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     }
 
     private syncTubeModeSelection(): void {
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues
+            : this.magneticFieldValues;
         const savedMode = valueMap.get("tubeMode");
         const currentMode = savedMode !== undefined ? savedMode : 0;
 
@@ -329,7 +331,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     }
 
     private syncLODSelection(): void {
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues
+            : this.magneticFieldValues;
         const savedLOD = valueMap.get("lod");
         const currentLOD = savedLOD !== undefined ? savedLOD : 1;  // Default to Medium
 
@@ -348,7 +351,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             return;
         }
 
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues
+            : this.magneticFieldValues;
         const savedLOD = valueMap.get("lod");
         const currentLOD = savedLOD !== undefined ? savedLOD : 1;  // Default to Medium
 
@@ -395,7 +399,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private onLODSelected(index: number): void {
         if (!this.activeComponent) return;
 
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues
+            : this.magneticFieldValues;
         valueMap.set("lod", index);
 
         const component = this.activeComponent as any;
@@ -405,13 +410,14 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         print("DynamicSettingsPanel: LOD changed to " + this.lodModes[index]);
     }
 
-    private buildPresetToggles(): void {
+    private buildPresetToggles(presetNames: string[]): void {
         if (!this.optionTogglePrefab || !this.presetToggleContainer) {
             print("DynamicSettingsPanel: No preset toggle prefab or container - skipping");
             return;
         }
 
-        const savedPreset = this.vectorFieldValues.get("preset");
+        const valueMap = this.vectorFieldValues;
+        const savedPreset = valueMap.get("preset");
         const currentPreset = savedPreset !== undefined ? savedPreset : 0;
 
         const toggleGroupScript = this.findToggleGroupComponent(this.presetToggleContainer);
@@ -430,12 +436,12 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             }
         }
 
-        const toggleCount = this.vectorFieldPresets.length;
+        const toggleCount = presetNames.length;
         for (let i = 0; i < toggleCount; i++) {
             const toggleScript = this.createToggleInContainer(
                 this.optionTogglePrefab,
                 this.presetToggleContainer,
-                this.vectorFieldPresets[i],
+                presetNames[i],
                 i,
                 toggleCount,
                 this.optionToggleSpacing,
@@ -460,8 +466,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             return;
         }
 
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
-        const savedMode = valueMap.get("tubeMode");
+        const tubeValueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const savedMode = tubeValueMap.get("tubeMode");
         const currentMode = savedMode !== undefined ? savedMode : 0;
 
         const toggleGroupScript = this.findToggleGroupComponent(this.tubeModeToggleContainer);
@@ -519,7 +525,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private onTubeModeSelected(index: number): void {
         if (!this.activeComponent) return;
 
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues
+            : this.magneticFieldValues;
         valueMap.set("tubeMode", index);
 
         const component = this.activeComponent as any;
@@ -612,7 +619,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private saveCurrentValues(): void {
         if (this.currentFieldType === "") return;
 
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues
+            : this.magneticFieldValues;
 
         this.sliders.forEach((sliderObj, propertyName) => {
             const slider = this.findSliderComponent(sliderObj);
@@ -787,7 +795,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             }
         }
 
-        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
+        const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues
+            : this.magneticFieldValues;
         valueMap.set(propertyName, value);
     }
 

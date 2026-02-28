@@ -2,5 +2,9 @@
 */__pycache__
 */venv
 */.venv
+*/node_modules
 .DS_Store
 .env
+.mcp.json
+*.lock
+CLAUDE.md

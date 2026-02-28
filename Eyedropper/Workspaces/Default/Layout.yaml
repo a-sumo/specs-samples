@@ -30,7 +30,7 @@ dock:
           - persistentName: Snap.Plugin.Gui.PreviewPanel
             Uuid: 4858daf9-5fef-47d2-ac5c-b5a55e54b9de
         type: section
-        current: 0
+        current: 1
       - items:
           - persistentName: Snap.Plugin.Gui.InspectorPanel
             Uuid: 780d9164-e681-4de1-b586-5213ed5523b9
@@ -40,7 +40,7 @@ dock:
         current: 0
     sizes:
       - 707
-      - 372
-      - 351
+      - 207
+      - 516
     type: splitter
     orientation: horizontal
