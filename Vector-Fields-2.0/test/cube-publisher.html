@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cube Publisher</title>
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  body { background: #0a0d11; color: #ccc; font: 14px/1.4 monospace; padding: 12px; }
+  .bar { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  input { background: #161b22; color: #ccc; border: 1px solid #333; padding: 4px 8px; font: inherit; }
+  button { padding: 4px 14px; font: inherit; cursor: pointer; border: none; border-radius: 3px; }
+  #connectBtn { background: #1878e0; color: #fff; }
+  #connectBtn.on { background: #e03020; }
+  #status { font-size: 12px; color: #888; }
+  canvas { border: 1px solid #333; image-rendering: pixelated; display: block; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <input id="relay" value="ws://localhost:8766" style="width:200px" placeholder="relay URL">
+  <input id="channel" value="vector-field" style="width:120px" placeholder="channel">
+  <button id="connectBtn" onclick="toggleConnect()">Broadcast</button>
+  <span id="status">disconnected</span>
+</div>
+<canvas id="c" width="256" height="256"></canvas>
+
+<script>
+const W = 256, H = 256;
+const canvas = document.getElementById('c');
+canvas.style.width = '512px'; canvas.style.height = '512px';
+const ctx = canvas.getContext('2d');
+const imgData = ctx.createImageData(W, H);
+const px = imgData.data;
+
+// --- 3D math (matches cube-publisher-canvas.ts) ---
+let S = 15;
+let cubePos = [0, 0, -50];
+let camPos = [0, 0, -120];
+let camQuat = [0, 0, 0, 1];
+
+function buildVerts(h) {
+  return [[-h,-h,-h],[h,-h,-h],[h,h,-h],[-h,h,-h],[-h,-h,h],[h,-h,h],[h,h,h],[-h,h,h]];
+}
+let verts = buildVerts(S);
+const edges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+
+function quatMat(q) {
+  const [x,y,z,w] = q;
+  return [
+    [1-2*(y*y+z*z), 2*(x*y-z*w), 2*(x*z+y*w)],
+    [2*(x*y+z*w), 1-2*(x*x+z*z), 2*(y*z-x*w)],
+    [2*(x*z-y*w), 2*(y*z+x*w), 1-2*(x*x+y*y)]
+  ];
+}
+
+function project(vx,vy,vz) {
+  const wx=vx+cubePos[0]-camPos[0], wy=vy+cubePos[1]-camPos[1], wz=vz+cubePos[2]-camPos[2];
+  const m=quatMat(camQuat);
+  const cx=m[0][0]*wx+m[1][0]*wy+m[2][0]*wz;
+  const cy=m[0][1]*wx+m[1][1]*wy+m[2][1]*wz;
+  const cz=m[0][2]*wx+m[1][2]*wy+m[2][2]*wz;
+  if (cz<=0.1) return null;
+  const f=1/Math.tan(63.5*Math.PI/360);
+  return [(cx*f/cz*0.5+0.5)*W, (0.5-cy*f/cz*0.5)*H];
+}
+
+function drawLine(x0,y0,x1,y1,r,g,b) {
+  let dx=Math.abs(x1-x0), dy=Math.abs(y1-y0);
+  let sx=x0<x1?1:-1, sy=y0<y1?1:-1, err=dx-dy;
+  while(true) {
+    for(let oy=0;oy<2;oy++) for(let ox=0;ox<2;ox++) {
+      const ix=Math.round(x0)+ox, iy=Math.round(y0)+oy;
+      if(ix>=0&&ix<W&&iy>=0&&iy<H){const o=(iy*W+ix)*4;px[o]=r;px[o+1]=g;px[o+2]=b;px[o+3]=255;}
+    }
+    if(Math.abs(x0-x1)<1&&Math.abs(y0-y1)<1) break;
+    const e2=2*err;
+    if(e2>-dy){err-=dy;x0+=sx;} if(e2<dx){err+=dx;y0+=sy;}
+  }
+}
+
+function drawCircle(cx,cy,rad,r,g,b) {
+  for(let a=0;a<Math.PI*2;a+=0.05){
+    const ix=Math.round(cx+Math.cos(a)*rad), iy=Math.round(cy+Math.sin(a)*rad);
+    if(ix>=0&&ix<W&&iy>=0&&iy<H){const o=(iy*W+ix)*4;px[o]=r;px[o+1]=g;px[o+2]=b;px[o+3]=255;}
+  }
+}
+
+function render() {
+  px.fill(0); for(let i=0;i<px.length;i+=4){px[i]=13;px[i+1]=17;px[i+2]=23;px[i+3]=255;}
+  const pr=verts.map(([x,y,z])=>project(x,y,z));
+  for(const[a,b]of edges){const pa=pr[a],pb=pr[b];if(pa&&pb)drawLine(pa[0],pa[1],pb[0],pb[1],96,165,250);}
+  for(const p of pr){if(p)drawCircle(p[0],p[1],4,147,197,253);}
+  ctx.putImageData(imgData,0,0);
+}
+
+// --- WebSocket ---
+let ws = null;
+let frameCount = 0;
+
+function toggleConnect() {
+  if (ws) { ws.close(); return; }
+  const url = document.getElementById('relay').value.trim();
+  const ch = document.getElementById('channel').value.trim();
+  const full = url + (url.includes('?')?'&':'?') + 'channel=' + encodeURIComponent(ch);
+  ws = new WebSocket(full);
+  ws.binaryType = 'arraybuffer';
+  document.getElementById('connectBtn').textContent = 'Stop';
+  document.getElementById('connectBtn').className = 'on';
+  document.getElementById('status').textContent = 'connecting...';
+
+  ws.onopen = () => {
+    document.getElementById('status').textContent = 'broadcasting';
+    frameCount = 0;
+  };
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.event==='interact'&&msg.payload) {
+        if (msg.payload.type==='camera_state') {
+          camPos=msg.payload.position; camQuat=msg.payload.rotation;
+        } else if (msg.payload.type==='field_state') {
+          if(msg.payload.collider){
+            const c=msg.payload.collider;
+            if(c.center)cubePos=c.center;
+            if(c.halfSize!==undefined){S=c.halfSize;verts=buildVerts(S);}
+          }
+        }
+      }
+    } catch(e){}
+  };
+  ws.onclose = () => { ws=null; resetBtn(); };
+  ws.onerror = () => { ws=null; resetBtn(); };
+}
+
+function resetBtn() {
+  document.getElementById('connectBtn').textContent='Broadcast';
+  document.getElementById('connectBtn').className='';
+  document.getElementById('status').textContent='disconnected';
+}
+
+function sendFrame() {
+  if(!ws||ws.readyState!==1) return;
+  const id='panel';
+  const headerSize=11+id.length;
+  const buf=new ArrayBuffer(headerSize+W*H*4);
+  const v=new DataView(buf);
+  const u8=new Uint8Array(buf);
+  v.setUint8(0,0x01);
+  v.setUint16(1,W,true);
+  v.setUint16(3,H,true);
+  v.setUint32(5,Date.now()>>>0,true);
+  v.setUint8(9,1);
+  v.setUint8(10,id.length);
+  for(let i=0;i<id.length;i++) v.setUint8(11+i,id.charCodeAt(i));
+  u8.set(px,headerSize);
+  ws.send(buf);
+  frameCount++;
+  if(frameCount%15===0) document.getElementById('status').textContent='broadcasting | '+frameCount+' frames';
+}
+
+// --- Render loop ---
+setInterval(()=>{ render(); sendFrame(); }, 1000/15);
+render();
+</script>
+</body>
+</html>
