@@ -88,7 +88,9 @@ function drawCircle(cx: number, cy: number, radius: number, r: number, g: number
 
 let S = 15; // half-size: 30 unit cube matches LS field collider (15x15x15 box * 2x child scale)
 let cubePos = [0, 0, -50]; // LS field collider center in world space
-let camPos = [0, 0, 0];
+// Default camera behind the cube looking along +Z (LS left-handed).
+// Overridden once LS sends camera state.
+let camPos = [0, 0, -120];
 let camQuat = [0, 0, 0, 1];
 
 function buildCubeVerts(half: number): number[][] {
