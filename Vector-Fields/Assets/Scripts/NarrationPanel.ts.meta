@@ -1,0 +1,90 @@
+- !<AssetImportMetadata/e2e00200-0000-4000-b000-000000000001>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> e2e00200-0000-4000-b000-000000000002
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> e2e00200-0000-4000-b000-000000000002
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> e2e00200-0000-4000-b000-000000000003
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/e2e00200-0000-4000-b000-000000000003>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: e2e00200-0000-4000-b000-000000000004
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    bodyText: false
+    chapterLabelChildName: false
+    chapterToggleContainer: false
+    chapterTogglePrefab: false
+    chapterToggleSpacing: false
+    equationText: false
+    nextButtonContainer: false
+    nextButtonLabel: false
+    nextButtonPrefab: false
+    prevButtonContainer: false
+    prevButtonLabel: false
+    prevButtonPrefab: false
+    settingsRoot: false
+    slideIndicator: false
+    vectorFieldComponent: false
+    vizRoots: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - bodyText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      chapterToggleContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      chapterTogglePrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      chapterToggleSpacing: !<float> 4.000000
+      chapterLabelChildName: Toggle Text
+      nextButtonPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      nextButtonContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      nextButtonLabel: Next
+      prevButtonPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      prevButtonContainer: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      prevButtonLabel: Prev
+      slideIndicator: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      equationText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      vizRoots: !<reference.SceneObject[]>
+        []
+      vectorFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      settingsRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Component.Text bodyText {"hint":"Text component that displays the current chapter body"}'
+    - '// @input SceneObject chapterToggleContainer {"hint":"Optional: container with a ToggleGroup for chapter shortcut buttons"}'
+    - '// @input Asset.ObjectPrefab chapterTogglePrefab {"hint":"Optional: prefab to instantiate per chapter (single-toggle style)"}'
+    - '// @input float chapterToggleSpacing = 4 {"hint":"Spacing between chapter shortcut buttons"}'
+    - '// @input string chapterLabelChildName = "Toggle Text" {"hint":"Child name on the chapter toggle prefab that holds the label text"}'
+    - '// @input Asset.ObjectPrefab nextButtonPrefab {"hint":"Optional: prefab to instantiate as the Next button"}'
+    - '// @input SceneObject nextButtonContainer {"hint":"Optional: container to instantiate the Next button under"}'
+    - '// @input string nextButtonLabel = "Next" {"hint":"Label shown on the Next button"}'
+    - '// @input Asset.ObjectPrefab prevButtonPrefab {"hint":"Optional: prefab to instantiate as the Prev button"}'
+    - '// @input SceneObject prevButtonContainer {"hint":"Optional: container to instantiate the Prev button under"}'
+    - '// @input string prevButtonLabel = "Prev" {"hint":"Label shown on the Prev button"}'
+    - "// @input Component.Text slideIndicator {\"hint\":\"Optional: Text component showing 'N / Total' slide indicator\"}"
+    - '// @input Component.Text equationText {"hint":"Optional: Text component showing the field equation for the current slide"}'
+    - "// @input SceneObject[] vizRoots {\"hint\":\"One root SceneObject per slide. Active slide's root is enabled, others disabled.\"}"
+    - '// @input Component.ScriptComponent vectorFieldComponent {"hint":"Optional: VectorField ScriptComponent. Slides with presetIndex call setPreset() on this."}'
+    - '// @input SceneObject settingsRoot {"hint":"Optional: Settings frame to enable once the user reaches the final slide."}'

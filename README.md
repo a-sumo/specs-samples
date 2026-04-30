@@ -4,10 +4,7 @@ A collection of self-contained sample projects for [Lens Studio](https://develop
 
 ## Projects
 
-**1. Vector Fields** - Interactive vector field visualization.
-
-- [Vector Fields 1.0](Vector-Fields-1.0/) - Analytical field presets (expansion, contraction, circulation, vortex, waves) and magnetic dipole visualization.
-- [Vector Fields 2.0](Vector-Fields-2.0/) - Everything in 1.0 plus AI-generated fields from text prompts via Claude API.
+**1. [Vector Fields](Vector-Fields/)** - Interactive vector field visualization with analytical field presets (expansion, contraction, circulation, vortex, waves) and magnetic dipole visualization.
 
 <img src="assets/vector-fields/magnetic-field-demo.gif" width="500">
 
