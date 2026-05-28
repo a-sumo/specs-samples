@@ -4,6 +4,12 @@
     - !<own> a926edd0-316f-4f43-aabc-5943bb6c581a
 - !<PassInfo/a926edd0-316f-4f43-aabc-5943bb6c581a>
   CachedProperties:
+    - EarthTint:
+        typeIdx: 5
+        value: {x: 1.000000, y: 0.280000, z: 0.220000, w: 1.000000}
+    - MoonTint:
+        typeIdx: 5
+        value: {x: 0.300000, y: 0.520000, z: 1.000000, w: 1.000000}
     - PathTex:
         typeIdx: 9
         value:
@@ -378,9 +384,27 @@
     OpacityScale:
       typeIdx: 1
       value: 0.850000
+    FieldLineColor:
+      typeIdx: 5
+      value: {x: 0.180000, y: 0.360000, z: 1.000000, w: 0.580000}
+    ArrowColor:
+      typeIdx: 5
+      value: {x: 1.000000, y: 0.780000, z: 0.860000, w: 0.950000}
+    FieldLineDensity:
+      typeIdx: 1
+      value: 0.820000
     EarthMass:
       typeIdx: 1
       value: 18.000000
+    FieldLineWidth:
+      typeIdx: 1
+      value: 0.065000
+    ArrowSpacing:
+      typeIdx: 1
+      value: 2.800000
+    ArrowScale:
+      typeIdx: 1
+      value: 0.720000
     MoonMass:
       typeIdx: 1
       value: 0.442800

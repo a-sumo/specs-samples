@@ -20,6 +20,12 @@ input_vec4 ColorHigh;
 input_vec4 EarthTint;
 input_vec4 MoonTint;
 input_float OpacityScale;
+input_vec4 FieldLineColor;
+input_vec4 ArrowColor;
+input_float FieldLineDensity;
+input_float FieldLineWidth;
+input_float ArrowSpacing;
+input_float ArrowScale;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
@@ -71,6 +77,53 @@ void main() {
     float isoHalo = 1.0 - smoothstep(isoWidth, min(1.0, isoWidth * 2.8), isoDist);
     float contourMask = clamp(isoCore + isoHalo * 0.32, 0.0, 1.0) * ContourColor.a;
 
+    // Field lines: a procedural tangent-line overlay. The local line coordinate
+    // is measured perpendicular to the gravity vector, so the visible strokes
+    // follow the pull direction while staying separate from the iso-potential rings.
+    vec2 fieldPerp = vec2(-fieldDir.y, fieldDir.x);
+    float fieldLinePhase = dot(vec2(sampleP.x, sampleP.z), fieldPerp) * max(FieldLineDensity, 0.05);
+    float fieldLineDist = abs(fract(fieldLinePhase) - 0.5) * 2.0;
+    float fieldLineWidth = clamp(FieldLineWidth, 0.005, 0.45);
+    float fieldLineMask = (1.0 - smoothstep(fieldLineWidth, fieldLineWidth + 0.055, fieldLineDist))
+                        * FieldLineColor.a
+                        * smoothstep(0.02, 0.32, fieldMag);
+
+    // Arrow glyphs sampled on a grid. Each cell reads the gravity field at
+    // its center, then draws a small shaft + triangular head in that direction.
+    float spacing = max(ArrowSpacing, 0.9);
+    vec2 planeP = vec2(sampleP.x, sampleP.z);
+    vec2 cellCenter = (floor(planeP / spacing) + vec2(0.5)) * spacing;
+    vec3 cellP = vec3(cellCenter.x, 0.0, cellCenter.y);
+    vec3 cdE = cellP - EarthPos;
+    vec3 cdM = cellP - MoonPos;
+    float crE = sqrt(dot(cdE, cdE) + softE2);
+    float crM = sqrt(dot(cdM, cdM) + softM2);
+    vec2 cellField = vec2(EarthPos.x - cellP.x, EarthPos.z - cellP.z) * EarthMass / (crE * crE * crE)
+                   + vec2(MoonPos.x - cellP.x,  MoonPos.z  - cellP.z) * MoonMass  / (crM * crM * crM);
+    float cellMag = length(cellField);
+    vec2 arrowDir = (cellMag > 0.0001) ? cellField / cellMag : vec2(1.0, 0.0);
+    vec2 arrowPerp = vec2(-arrowDir.y, arrowDir.x);
+    vec2 rel = planeP - cellCenter;
+    float arrowLen = spacing * clamp(ArrowScale, 0.1, 1.2);
+    float u = dot(rel, arrowDir);
+    float v = dot(rel, arrowPerp);
+    float tail = -0.34 * arrowLen;
+    float headBase = 0.10 * arrowLen;
+    float tip = 0.36 * arrowLen;
+    float shaftWidth = 0.040 * arrowLen + 0.020;
+    float headWidth = 0.155 * arrowLen + 0.025;
+    float arrowAA = max(0.018, spacing * 0.025);
+    float shaftMask = (1.0 - smoothstep(shaftWidth, shaftWidth + arrowAA, abs(v)))
+                    * step(tail, u) * step(u, headBase);
+    float headT = clamp((tip - u) / max(tip - headBase, 0.001), 0.0, 1.0);
+    float headMask = (1.0 - smoothstep(headWidth * headT, headWidth * headT + arrowAA, abs(v)))
+                   * step(headBase, u) * step(u, tip);
+    float bodyFade = smoothstep(0.50, 1.25, min(crE, crM));
+    float arrowMask = max(shaftMask, headMask)
+                    * ArrowColor.a
+                    * bodyFade
+                    * smoothstep(0.02, 0.45, cellMag);
+
     // Flow stripes: animate along field direction so the field "moves."
     float flowParam = dot(vec2(sampleP.x, sampleP.z), fieldDir) * FlowScale
                     + system.getTimeElapsed() * FlowSpeed;
@@ -80,8 +133,11 @@ void main() {
 
     vec3 finalColor = baseColor;
     finalColor = mix(finalColor, ContourColor.rgb, contourMask);
+    finalColor = mix(finalColor, FieldLineColor.rgb, fieldLineMask);
+    finalColor = mix(finalColor, ArrowColor.rgb, arrowMask);
     finalColor = finalColor + ContourColor.rgb * (flowMask * 0.28 + isoHalo * 0.10);
 
-    float alpha = max(clamp(intensity * 0.85 + 0.18, 0.0, 1.0), contourMask * 0.95) * OpacityScale;
+    float overlayAlpha = max(max(contourMask * 0.95, fieldLineMask * 0.82), arrowMask);
+    float alpha = max(clamp(intensity * 0.85 + 0.18, 0.0, 1.0), overlayAlpha) * OpacityScale;
     vertexColor = vec4(finalColor * alpha, alpha);
 }

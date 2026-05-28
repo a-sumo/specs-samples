@@ -109,6 +109,36 @@ export class GravityFieldPlane extends BaseScriptComponent {
     @widget(new ColorWidget())
     moonTint: vec4 = new vec4(0.30, 0.52, 1.0, 1.0);
 
+    @input
+    @hint("Field-line overlay color.")
+    @widget(new ColorWidget())
+    fieldLineColor: vec4 = new vec4(0.18, 0.36, 1.0, 0.58);
+
+    @input
+    @hint("Arrow overlay color.")
+    @widget(new ColorWidget())
+    arrowColor: vec4 = new vec4(1.0, 0.78, 0.86, 0.95);
+
+    @input
+    @widget(new SliderWidget(0.1, 2.5, 0.05))
+    @hint("Field line density in local plane space.")
+    fieldLineDensity: number = 0.82;
+
+    @input
+    @widget(new SliderWidget(0.01, 0.25, 0.005))
+    @hint("Field line width relative to spacing.")
+    fieldLineWidth: number = 0.065;
+
+    @input
+    @widget(new SliderWidget(1.2, 5.0, 0.1))
+    @hint("Spacing between shader-drawn arrows.")
+    arrowSpacing: number = 2.8;
+
+    @input
+    @widget(new SliderWidget(0.25, 1.1, 0.05))
+    @hint("Size of each shader-drawn arrow within its grid cell.")
+    arrowScale: number = 0.72;
+
     private visual: RenderMeshVisual | null = null;
     private materialInstance: Material | null = null;
     private earthBasePos: vec3 = new vec3(-4.2, 0.82, 0.0);
@@ -209,6 +239,12 @@ export class GravityFieldPlane extends BaseScriptComponent {
         pass.ColorHigh = this.colorHigh;
         pass.EarthTint = this.earthTint;
         pass.MoonTint = this.moonTint;
+        pass.FieldLineColor = this.fieldLineColor;
+        pass.ArrowColor = this.arrowColor;
+        pass.FieldLineDensity = this.fieldLineDensity;
+        pass.FieldLineWidth = this.fieldLineWidth;
+        pass.ArrowSpacing = this.arrowSpacing;
+        pass.ArrowScale = this.arrowScale;
     }
 
     private updateUniforms(): void {
@@ -239,6 +275,12 @@ export class GravityFieldPlane extends BaseScriptComponent {
         pass.FlowSpeed = this.flowSpeed;
         pass.FlowScale = this.flowScale;
         pass.OpacityScale = this.opacityScale;
+        pass.FieldLineColor = this.fieldLineColor;
+        pass.ArrowColor = this.arrowColor;
+        pass.FieldLineDensity = this.fieldLineDensity;
+        pass.FieldLineWidth = this.fieldLineWidth;
+        pass.ArrowSpacing = this.arrowSpacing;
+        pass.ArrowScale = this.arrowScale;
     }
 
     private rebuildMeshIfNeeded(): void {
