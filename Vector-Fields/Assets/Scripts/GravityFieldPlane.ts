@@ -25,14 +25,14 @@ export class GravityFieldPlane extends BaseScriptComponent {
     planeMaterial: Material = null as any;
 
     @input
-    @widget(new SliderWidget(6.0, 30.0, 0.5))
+    @widget(new SliderWidget(6.0, 42.0, 0.5))
     @hint("Plane width/depth in cm.")
-    planeSize: number = 18.0;
+    planeSize: number = 30.0;
 
     @input
     @widget(new SliderWidget(24, 192, 4))
     @hint("Vertices per side of the plane mesh. Higher = smoother well and contours; 96 is a safe Spectacles default.")
-    resolution: number = 96;
+    resolution: number = 128;
 
     @input
     @widget(new SliderWidget(1.0, 30.0, 0.5))
@@ -113,6 +113,8 @@ export class GravityFieldPlane extends BaseScriptComponent {
     private materialInstance: Material | null = null;
     private earthBasePos: vec3 = new vec3(-4.2, 0.82, 0.0);
     private moonBasePos: vec3 = new vec3(5.1, 0.42, 0.0);
+    private builtPlaneSize: number = -1.0;
+    private builtResolution: number = -1;
 
     onAwake(): void {
         this.createEvent("OnStartEvent").bind(() => this.initialize());
@@ -179,10 +181,14 @@ export class GravityFieldPlane extends BaseScriptComponent {
         }
         mb.appendIndices(inds);
 
-        this.visual = this.sceneObject.createComponent("Component.RenderMeshVisual") as RenderMeshVisual;
+        if (!this.visual) {
+            this.visual = this.sceneObject.createComponent("Component.RenderMeshVisual") as RenderMeshVisual;
+        }
         this.visual.mesh = mb.getMesh();
         this.visual.mainMaterial = this.materialInstance!;
         mb.updateMesh();
+        this.builtPlaneSize = this.planeSize;
+        this.builtResolution = res;
     }
 
     private applyStaticUniforms(): void {
@@ -207,6 +213,7 @@ export class GravityFieldPlane extends BaseScriptComponent {
 
     private updateUniforms(): void {
         if (!this.materialInstance) return;
+        this.rebuildMeshIfNeeded();
         const pass = this.materialInstance.mainPass as any;
 
         // Push live body positions, expressed in the plane SceneObject's local space.
@@ -232,5 +239,13 @@ export class GravityFieldPlane extends BaseScriptComponent {
         pass.FlowSpeed = this.flowSpeed;
         pass.FlowScale = this.flowScale;
         pass.OpacityScale = this.opacityScale;
+    }
+
+    private rebuildMeshIfNeeded(): void {
+        const res = Math.max(8, Math.floor(this.resolution));
+        const sizeChanged = Math.abs(this.planeSize - this.builtPlaneSize) > 0.001;
+        if (sizeChanged || res !== this.builtResolution) {
+            this.buildMesh();
+        }
     }
 }
