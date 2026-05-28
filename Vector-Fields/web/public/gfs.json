@@ -1,0 +1,28 @@
+{
+  "source": "NOAA ERDDAP · ncep_global_lon180 (NCEP GFS Atmospheric Model)",
+  "variable": "10 m wind (ugrd10m, vgrd10m)",
+  "refTime": "2026-05-28T06:00:00Z",
+  "endTime": "2026-05-29T03:00:00Z",
+  "stepHours": 3,
+  "nt": 8,
+  "ny": 91,
+  "nx": 180,
+  "lonMin": -180,
+  "lonMax": 178,
+  "latMax": 90,
+  "latMin": -90,
+  "lonRes": 2,
+  "latRes": 2,
+  "times": [
+    "2026-05-28T06:00:00Z",
+    "2026-05-28T09:00:00Z",
+    "2026-05-28T12:00:00Z",
+    "2026-05-28T15:00:00Z",
+    "2026-05-28T18:00:00Z",
+    "2026-05-28T21:00:00Z",
+    "2026-05-29T00:00:00Z",
+    "2026-05-29T03:00:00Z"
+  ],
+  "units": "m/s",
+  "layout": "Float32 little-endian, concatenated [u (nt × ny × nx), v (nt × ny × nx)]"
+}
