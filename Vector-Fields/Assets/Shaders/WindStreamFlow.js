@@ -38,24 +38,28 @@ void main() {
 
     float head = 1.0 - smoothstep(0.0, 0.060, wrappedDistance);
     float wake = 1.0 - smoothstep(0.035, 0.58, behind);
-    float tubeShade = edge * (0.60 + shoulder * 0.18 + core * 0.34);
-    float flowOpacity = 0.16 + wake * 0.34 + head * 0.34;
-    float alpha = clamp(tubeShade * flowOpacity, 0.0, 0.92);
+    float tubeShade = edge * (0.72 + shoulder * 0.20 + core * 0.40);
+    float flowOpacity = 0.24 + wake * 0.42 + head * 0.40;
+    float alpha = clamp(tubeShade * flowOpacity, 0.0, 1.0);
 
     float t = smoothstep(0.0, 1.0, speedColor);
-    vec3 calm = vec3(0.04, 0.20, 0.46);
-    vec3 breeze = vec3(0.00, 0.56, 0.90);
-    vec3 strong = vec3(0.00, 0.78, 0.46);
-    vec3 gale = vec3(0.96, 0.88, 0.18);
-    vec3 storm = vec3(0.96, 0.36, 0.10);
-    vec3 severe = vec3(0.82, 0.06, 0.04);
+    vec3 calm = vec3(0.10, 0.38, 1.00);
+    vec3 breeze = vec3(0.00, 0.86, 1.00);
+    vec3 strong = vec3(0.08, 1.00, 0.56);
+    vec3 gale = vec3(1.00, 0.96, 0.12);
+    vec3 storm = vec3(1.00, 0.44, 0.05);
+    vec3 severe = vec3(1.00, 0.08, 0.08);
     vec3 color = mix(calm, breeze, smoothstep(0.00, 0.22, t));
     color = mix(color, strong, smoothstep(0.18, 0.42, t));
     color = mix(color, gale, smoothstep(0.38, 0.66, t));
     color = mix(color, storm, smoothstep(0.62, 0.84, t));
     color = mix(color, severe, smoothstep(0.80, 1.00, t));
-    color *= 0.82 + core * 0.24;
-    color += vec3(0.08, 0.09, 0.10) * core * head;
+    color = clamp(color * 1.18 + vec3(0.035, 0.045, 0.055), 0.0, 1.0);
+    float luma = dot(color, vec3(0.299, 0.587, 0.114));
+    color = clamp(mix(vec3(luma), color, 1.18), 0.0, 1.0);
+    color *= 0.98 + core * 0.28;
+    color += vec3(0.12, 0.13, 0.14) * core * head;
+    color = clamp(color, 0.0, 1.0);
 
     vec3 nrm = normalize(pos + vec3(0.0, 0.0, 0.0001));
     float wave = sin(Time * 1.2 + templatePhase * 6.2831853) * head;
