@@ -79,6 +79,7 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
             return;
         }
 
+        print("[GlobeRotator] bound to Interactable on '" + owner.name + "', rotating '" + target.name + "'");
         this.addEventListener(this.interactable.onTriggerStart, (event: any) => this.beginDrag(event));
         this.addEventListener(this.interactable.onTriggerUpdate, (event: any) => this.updateSurfaceDrag(event));
         this.addEventListener(this.interactable.onDragUpdate, (event: any) => this.updateFallbackDrag(event));
@@ -88,17 +89,23 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
     }
 
     private beginDrag(event: any): void {
+        print("[GlobeRotator] onTriggerStart (enabled=" + this.enabled + ")");
         if (!this.enabled) return;
         this.gravityApi = this.findGravityApi();
         this.dragging = true;
         this.inertiaSpeed = 0.0;
         this.lastWorldDirection = this.hitWorldDirection(event);
+        print("[GlobeRotator] beginDrag hitDir=" + (this.lastWorldDirection ? "yes" : "NULL"));
     }
 
     private updateSurfaceDrag(event: any): void {
         if (!this.enabled || !this.dragging) return;
         const nextDirection = this.hitWorldDirection(event);
-        if (!nextDirection) return;
+        if (!nextDirection) {
+            print("[GlobeRotator] triggerUpdate: hit dir NULL (cursor off sphere?)");
+            return;
+        }
+        print("[GlobeRotator] triggerUpdate: surface drag applied");
         this.applySurfaceDirection(nextDirection);
     }
 
@@ -107,6 +114,7 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
         if (this.hitWorldDirection(event)) return;
 
         const drag = this.eventDragVector(event);
+        print("[GlobeRotator] dragUpdate fallback drag=" + (drag ? drag.length.toFixed(2) : "NULL"));
         if (!drag || drag.length < 0.0001 || !this.targetTransform) return;
 
         // Fallback when the cursor is off the sphere: spin around world axes
