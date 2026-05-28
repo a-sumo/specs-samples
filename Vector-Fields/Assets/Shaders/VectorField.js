@@ -8,7 +8,7 @@
 //   texture3 = (geoType) geometry type:
 //     0 = trail cap center (flat)
 //     1 = trail body (flow animation + integration)
-//     3 = particle (short trail - flow animation + integration, minimal geometry)
+//     3 = particle (billboard triangle fan, minimal geometry)
 //     4 = arrow body (static, orient by field)
 //     5 = arrow cone (static, orient by field)
 //     6 = arrow cap center (static)
@@ -205,33 +205,125 @@ vec3 fieldVortex(vec3 p) {
     return (vec3(vx, vy, vz) + spin) * 0.35;
 }
 
+// 5: Saddle - flow exits along one axis and returns along another
+vec3 fieldSaddle(vec3 p) {
+    vec3 rel = p - TargetPosition;
+    float s = FieldScale;
+
+    vec3 crossing = vec3(rel.x, -rel.y * 0.35, -rel.z);
+    float len = length(crossing);
+    vec3 shaped = crossing / (1.0 + len);
+    vec3 sparkle = vec3(
+        sin(rel.y * s * 1.7),
+        cos((rel.x - rel.z) * s),
+        sin(rel.x * s * 1.2)
+    ) * 0.12;
+
+    return (shaped + sparkle) * 0.55;
+}
+
+// 6: Helix - a spiral that climbs as it turns
+vec3 fieldHelix(vec3 p) {
+    vec3 rel = p - TargetPosition;
+    float s = FieldScale;
+
+    float distXZ = length(vec2(rel.x, rel.z));
+    vec3 tangent = (distXZ > 0.001) ? vec3(-rel.z, 0.0, rel.x) / distXZ : vec3(1.0, 0.0, 0.0);
+    float climb = 0.35 + 0.20 * sin(distXZ * s + rel.y * 0.5);
+    vec3 inward = (distXZ > 0.001) ? vec3(-rel.x, 0.0, -rel.z) / distXZ : vec3(0.0);
+
+    return (tangent * 0.62 + inward * 0.10 + vec3(0.0, climb, 0.0)) * 0.45;
+}
+
+// 7: River - layered lanes moving at different speeds
+vec3 fieldRiver(vec3 p) {
+    vec3 rel = p - TargetPosition;
+    float s = FieldScale;
+
+    float lane = sin((rel.y + rel.z * 0.55) * s * 1.35);
+    float bend = cos((rel.x * 0.45 + rel.z) * s);
+    return vec3(
+        0.56 + lane * 0.24,
+        bend * 0.16,
+        sin(rel.y * s * 0.8) * 0.22
+    ) * 0.45;
+}
+
+// 8: Surface wind - tangent lanes that can be projected onto a sphere
+vec3 fieldSurfaceWind(vec3 p) {
+    vec3 n = normalize(p + vec3(0.0001, 0.0002, 0.0003));
+    vec3 east = normalize(cross(vec3(0.0, 1.0, 0.0), n) + vec3(0.0001, 0.0, 0.0));
+    vec3 north = normalize(cross(n, east));
+    float latitude = asin(clamp(n.y, -1.0, 1.0));
+    float longitude = atan(n.z, n.x);
+    float jet = 0.46 + 0.18 * sin(latitude * 6.0 + Time * 0.12);
+    float meander = sin(longitude * 3.0 + latitude * 4.0 + Time * 0.18);
+    return (east * jet + north * meander * 0.20) * 0.42;
+}
+
 vec3 getField(vec3 p) {
     if (Preset == 0) return fieldExpansion(p);
     if (Preset == 1) return fieldContraction(p);
     if (Preset == 2) return fieldCirculation(p);
     if (Preset == 3) return fieldWaves(p);
     if (Preset == 4) return fieldVortex(p);
+    if (Preset == 5) return fieldSaddle(p);
+    if (Preset == 6) return fieldHelix(p);
+    if (Preset == 7) return fieldRiver(p);
+    if (Preset == 8) return fieldSurfaceWind(p);
     return fieldWaves(p);
+}
+
+vec3 safeNormalize(vec3 v, vec3 fallback) {
+    float len = length(v);
+    if (len < 0.0001) return fallback;
+    return v / len;
+}
+
+bool usesSphereSurface() {
+    return Preset == 8;
+}
+
+vec3 projectToDomain(vec3 p, float domainRadius) {
+    if (!usesSphereSurface()) return p;
+    return safeNormalize(p, vec3(0.0, 1.0, 0.0)) * domainRadius;
+}
+
+vec3 getDomainField(vec3 p, float domainRadius) {
+    vec3 samplePos = projectToDomain(p, domainRadius);
+    vec3 fieldVec = getField(samplePos);
+    if (usesSphereSurface()) {
+        vec3 normal = safeNormalize(samplePos, vec3(0.0, 1.0, 0.0));
+        fieldVec -= normal * dot(fieldVec, normal);
+    }
+    return fieldVec;
+}
+
+vec3 advanceDomain(vec3 p, float domainRadius, float amount) {
+    vec3 nextPos = p + getDomainField(p, domainRadius) * StepSize * amount;
+    return projectToDomain(nextPos, domainRadius);
 }
 
 // ========================================
 // PLASMA COLOR GRADIENT
 // ========================================
 
-// Plasma: Deep blue -> Purple -> Magenta -> Pink -> White
+// Cosmic classroom palette: cyan -> blue -> purple -> red -> yellow -> green -> white
 vec3 plasmaGradient(float value) {
-    vec3 c0 = vec3(0.04, 0.06, 0.09);  // Charcoal blue
-    vec3 c1 = vec3(0.06, 0.12, 0.22);  // Deep navy
-    vec3 c2 = vec3(0.09, 0.30, 0.55);  // Medium blue
-    vec3 c3 = vec3(0.13, 0.50, 0.85);  // Vivid blue
-    vec3 c4 = vec3(0.65, 0.80, 0.95);  // Pale blue
-    vec3 c5 = vec3(1.0, 1.0, 1.0);     // White
+    vec3 c0 = vec3(0.00, 0.92, 1.00);  // Cyan
+    vec3 c1 = vec3(0.12, 0.38, 1.00);  // Blue
+    vec3 c2 = vec3(0.64, 0.20, 1.00);  // Purple
+    vec3 c3 = vec3(1.00, 0.16, 0.30);  // Red
+    vec3 c4 = vec3(1.00, 0.90, 0.10);  // Yellow
+    vec3 c5 = vec3(0.30, 0.98, 0.32);  // Green
+    vec3 c6 = vec3(1.00, 0.96, 0.88);  // Warm white
 
-    if (value < 0.2) return mix(c0, c1, value * 5.0);
-    else if (value < 0.4) return mix(c1, c2, (value - 0.2) * 5.0);
-    else if (value < 0.6) return mix(c2, c3, (value - 0.4) * 5.0);
-    else if (value < 0.8) return mix(c3, c4, (value - 0.6) * 5.0);
-    else return mix(c4, c5, (value - 0.8) * 5.0);
+    if (value < 0.166) return mix(c0, c1, value * 6.0);
+    else if (value < 0.333) return mix(c1, c2, (value - 0.166) * 6.0);
+    else if (value < 0.500) return mix(c2, c3, (value - 0.333) * 6.0);
+    else if (value < 0.666) return mix(c3, c4, (value - 0.500) * 6.0);
+    else if (value < 0.833) return mix(c4, c5, (value - 0.666) * 6.0);
+    else return mix(c5, c6, (value - 0.833) * 6.0);
 }
 
 vec3 getColor(vec3 vel, float t) {
@@ -257,8 +349,9 @@ void main() {
     float geoType = inUV3.x;
     float radius = TubeRadius;
 
-    // Geometry type: 0=trailCap, 1=trail, 3=particle (short trail), 4=arrow, 5=arrowCone, 6=arrowCap
+    // Geometry type: 0=trailCap, 1=trail, 3=particle billboard, 4=arrow, 5=arrowCone, 6=arrowCap
     bool isTrailCap = (geoType < 0.5);
+    bool isParticle = (geoType > 2.5 && geoType < 3.5);
     bool isArrow = (geoType > 3.5 && geoType < 4.5);
     bool isArrowCone = (geoType > 4.5 && geoType < 5.5);
     bool isArrowCap = (geoType > 5.5);
@@ -278,7 +371,9 @@ void main() {
     // ========================================
     // START AT 3D GRID POSITION
     // ========================================
-    vec3 startPos = vec3(startX, startY, startZ);
+    vec3 encodedStartPos = vec3(startX, startY, startZ);
+    float domainRadius = max(0.001, length(encodedStartPos));
+    vec3 startPos = projectToDomain(encodedStartPos, domainRadius);
     vec3 pos = startPos;
     vec3 prevPos = pos;
 
@@ -292,7 +387,7 @@ void main() {
     // No integration - just sample field once, orient, scale
     // ========================================
     if (isArrowMode) {
-        vec3 fieldVec = getField(startPos);
+        vec3 fieldVec = getDomainField(startPos, domainRadius);
         float magnitude = length(fieldVec);
         vec3 tangent = (magnitude > 0.001) ? fieldVec / magnitude : vec3(0.0, 1.0, 0.0);
 
@@ -309,10 +404,15 @@ void main() {
             frameNormal /= fnLen;
         }
         vec3 frameBinormal = normalize(cross(tangent, frameNormal));
+        if (usesSphereSurface()) {
+            vec3 surfaceNormal = safeNormalize(startPos, vec3(0.0, 1.0, 0.0));
+            frameNormal = safeNormalize(cross(surfaceNormal, tangent), vec3(1.0, 0.0, 0.0));
+            frameBinormal = surfaceNormal;
+        }
 
         // Position along straight arrow (t=0 is base, t=1 is before cone, t=2 is cone tip)
         float alongArrow = tClamped * arrowLength;
-        vec3 arrowPos = startPos + tangent * alongArrow;
+        vec3 arrowPos = projectToDomain(startPos + tangent * alongArrow, domainRadius);
 
         // Cross-section offset
         vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
@@ -321,7 +421,7 @@ void main() {
         // Cone tip: t=2 marks the tip, use ConeLength uniform for height
         if (isArrowCone && t > 1.5) {
             float coneHeight = ConeLength * TubeRadius;
-            finalPos = startPos + tangent * (arrowLength + coneHeight);
+            finalPos = projectToDomain(startPos + tangent * (arrowLength + coneHeight), domainRadius);
         }
 
         color = getColor(fieldVec, tClamped);
@@ -331,8 +431,46 @@ void main() {
         alpha = 1.0;
 
     // ========================================
-    // TRAIL & PARTICLE MODE: Flowing tubes with integration
-    // Particles are just short trails (minimal geometry, same animation)
+    // PARTICLE MODE: flowing billboard fans
+    // ========================================
+    } else if (isParticle) {
+        float maxPreSteps = 36.0;
+        float tubePhase = fract(sin(dot(startPos, vec3(12.9898, 78.233, 45.164))) * 43758.5453) * maxPreSteps;
+        float flowOffset = mod(Time * FlowSpeed + tubePhase, maxPreSteps);
+        int preSteps = int(flowOffset);
+        float fractional = fract(flowOffset);
+
+        for (int i = 0; i < 36; i++) {
+            if (i >= preSteps) break;
+            pos = advanceDomain(pos, domainRadius, 1.0);
+        }
+        pos = advanceDomain(pos, domainRadius, fractional);
+
+        vec3 vel = getDomainField(pos, domainRadius);
+        vec3 viewDir = safeNormalize(system.getCameraPosition() - pos, vec3(0.0, 0.0, 1.0));
+        vec3 right = cross(vec3(0.0, 1.0, 0.0), viewDir);
+        if (length(right) < 0.001) right = cross(vec3(1.0, 0.0, 0.0), viewDir);
+        right = safeNormalize(right, vec3(1.0, 0.0, 0.0));
+        vec3 billboardUp = safeNormalize(cross(viewDir, right), vec3(0.0, 1.0, 0.0));
+
+        if (usesSphereSurface()) {
+            vec3 surfaceNormal = safeNormalize(pos, vec3(0.0, 1.0, 0.0));
+            pos += surfaceNormal * TubeRadius * 0.65;
+        }
+
+        float discRadius = TubeRadius * 3.2;
+        vec2 fanUV = vec2(localX, localY);
+        float disc = length(fanUV);
+        finalPos = pos + (right * fanUV.x + billboardUp * fanUV.y) * discRadius;
+
+        float birthFade = smoothstep(0.0, 5.0, flowOffset);
+        float deathFade = smoothstep(0.0, 5.0, maxPreSteps - flowOffset);
+        float edgeFade = 1.0 - smoothstep(0.74, 1.0, disc);
+        color = getColor(vel, 0.5);
+        alpha = edgeFade * birthFade * deathFade;
+
+    // ========================================
+    // TRAIL MODE: Flowing tubes with integration
     // ========================================
     } else {
         // TIME-BASED FLOW: Pre-integrate to shift starting point
@@ -345,9 +483,9 @@ void main() {
         // Pre-integrate to move the effective starting position
         for (int i = 0; i < 32; i++) {
             if (i >= preSteps) break;
-            pos += getField(pos) * StepSize;
+            pos = advanceDomain(pos, domainRadius, 1.0);
         }
-        pos += getField(pos) * StepSize * fractional;
+        pos = advanceDomain(pos, domainRadius, fractional);
         prevPos = pos;
 
         // Growth + fade near wrap point
@@ -367,11 +505,11 @@ void main() {
         for (int i = 0; i < 64; i++) {
             if (i >= clampedStepIndex) break;
             prevPos = pos;
-            pos += getField(pos) * StepSize;
+            pos = advanceDomain(pos, domainRadius, 1.0);
         }
 
         // Compute tangent
-        vec3 vel = getField(pos);
+        vec3 vel = getDomainField(pos, domainRadius);
         vec3 tangent;
         if (stepIndex > 0 && length(pos - prevPos) > 0.0001) {
             tangent = normalize(pos - prevPos);
@@ -389,6 +527,11 @@ void main() {
             frameNormal /= fnLen;
         }
         vec3 frameBinormal = normalize(cross(tangent, frameNormal));
+        if (usesSphereSurface()) {
+            vec3 surfaceNormal = safeNormalize(pos, vec3(0.0, 1.0, 0.0));
+            frameNormal = safeNormalize(cross(surfaceNormal, tangent), vec3(1.0, 0.0, 0.0));
+            frameBinormal = safeNormalize(cross(tangent, frameNormal), surfaceNormal);
+        }
 
         // Place tube cross-section
         vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;

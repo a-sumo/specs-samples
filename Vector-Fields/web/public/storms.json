@@ -1,0 +1,21 @@
+{
+  "source": "GDACS · Global Disaster Alert and Coordination System",
+  "fetchedAt": "2026-05-28T07:48:05.390Z",
+  "windowSince": "2026-05-14",
+  "count": 1,
+  "storms": [
+    {
+      "key": "1001272-4",
+      "name": "JANGMI-26",
+      "alert": "Green",
+      "lon": 135.9,
+      "lat": 12.7,
+      "country": "Japan",
+      "fromDate": "2026-05-27T06:00:00",
+      "toDate": "2026-05-28T00:00:00",
+      "severity": 175.9248,
+      "severityText": "Tropical Depression (maximum wind speed of 176 km/h)",
+      "url": "https://www.gdacs.org/report.aspx?eventid=1001272&episodeid=4&eventtype=TC"
+    }
+  ]
+}

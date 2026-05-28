@@ -1,0 +1,68 @@
+- !<AssetImportMetadata/76101dae-1a61-44e8-bd6e-cdd3bcebe65c>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 8851bba0-4ac0-4e49-81ef-5b5618c2f19d
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 8851bba0-4ac0-4e49-81ef-5b5618c2f19d
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> b4efbd7f-6789-4dc5-b6ec-1bdf9f296d4c
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/b4efbd7f-6789-4dc5-b6ec-1bdf9f296d4c>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 6cadb94d-b1b0-4ff8-b416-342990dfa7d9
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    aoaDeg: false
+    camber: false
+    gridChoice: false
+    inletSpeed: false
+    speedScale: false
+    stepsPerFrame: false
+    targetMaterial: false
+    thickness: false
+    viscosity: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - targetMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      gridChoice: !<string> 60
+      aoaDeg: !<float> 10.000000
+      inletSpeed: 0.100000
+      viscosity: 0.020000
+      thickness: 0.120000
+      camber: 0.080000
+      stepsPerFrame: 20
+      speedScale: 0.180000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.Material targetMaterial {"hint":"Material whose baseTex will receive the flow field. Assign the panel/quad material here. If the material is shared, duplicate the .mat asset first so other meshes are not affected."}'
+    - '// @input string gridChoice = "60" {"widget":"combobox", "values":[{"label":"40 x 20", "value":"40"}, {"label":"60 x 30", "value":"60"}, {"label":"80 x 40", "value":"80"}, {"label":"120 x 60", "value":"120"}]}'
+    - '// @input float aoaDeg = "10" {"hint":"Angle of attack in degrees", "widget":"slider", "min":-10, "max":25, "step":1}'
+    - '// @input float inletSpeed = "0.10" {"hint":"Inlet speed in lattice units", "widget":"slider", "min":0.02, "max":0.2, "step":0.005}'
+    - '// @input float viscosity = "0.02" {"widget":"slider", "min":0.005, "max":0.05, "step":0.001}'
+    - '// @input float thickness = "0.12" {"widget":"slider", "min":0.02, "max":0.25, "step":0.01}'
+    - '// @input float camber = "0.08" {"widget":"slider", "min":-0.15, "max":0.2, "step":0.01}'
+    - '// @input int stepsPerFrame = "20" {"hint":"LBM steps per Update tick. Higher = faster sim, more CPU per frame.", "widget":"slider", "min":1, "max":60, "step":1}'
+    - '// @input float speedScale = "0.18" {"hint":"Speed magnitude that maps to the top of the inferno colormap."}'

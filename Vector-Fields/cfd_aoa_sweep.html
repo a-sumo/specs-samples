@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CFD Sweep — Cl vs Angle of Attack</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0b0d12;
+    --card: rgba(16, 18, 28, 0.9);
+    --border: rgba(255,255,255,0.06);
+    --accent: #00c8ff;
+    --accent2: #ff6a3d;
+    --green: #34d399;
+    --text: #d0d8e8;
+    --dim: #4a5570;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: #f0f4fa;
+    letter-spacing: -0.3px;
+  }
+
+  .sub {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    backdrop-filter: blur(12px);
+  }
+
+  .section-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+
+  /* Config grid */
+  .config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .ctrl {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ctrl-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #6a7890;
+  }
+
+  .ctrl-val { color: var(--accent); font-weight: 500; }
+
+  input[type="range"], input[type="number"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+
+  input[type="number"] {
+    height: auto;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+
+  .num-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .num-label {
+    font-size: 9px;
+    color: #5a6a85;
+    margin-bottom: 3px;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 9px 20px;
+    background: rgba(0,200,255,0.1);
+    border: 1px solid rgba(0,200,255,0.2);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn:hover { background: rgba(0,200,255,0.18); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-export {
+    background: rgba(52,211,153,0.1);
+    border-color: rgba(52,211,153,0.2);
+    color: var(--green);
+  }
+
+  .btn-export:hover { background: rgba(52,211,153,0.18); }
+
+  /* Progress */
+  .progress-wrap {
+    margin-top: 10px;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--dim);
+    margin-bottom: 4px;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.15s;
+  }
+
+  .progress-detail {
+    font-size: 9px;
+    color: #3a4a65;
+    margin-top: 4px;
+  }
+
+  /* Charts */
+  .charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 700px) {
+    .charts { grid-template-columns: 1fr; }
+    .num-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  canvas.chart {
+    width: 100%;
+    height: 260px;
+    border-radius: 10px;
+    background: rgba(10,12,20,0.6);
+  }
+
+  /* Flow preview */
+  .preview-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  canvas.preview {
+    width: 100%;
+    height: 140px;
+    display: block;
+    image-rendering: auto;
+    border-radius: 10px;
+    background: #0a0c14;
+  }
+
+  .preview-label {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Results table */
+  .results-table {
+    width: 100%;
+    font-size: 10px;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .results-table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--dim);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .results-table td {
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+    color: #8a9ab8;
+  }
+
+  .results-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .result-highlight { color: var(--accent) !important; font-weight: 500; }
+
+  .status-msg {
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 8px;
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="title">Aerodynamic Sweep</div>
+    <div class="sub">LBM D2Q9 · Joukowski Airfoil · Momentum Exchange Forces</div>
+  </div>
+</div>
+
+<!-- Configuration -->
+<div class="card">
+  <div class="section-label">Sweep Configuration</div>
+  <div class="num-grid">
+    <div class="ctrl">
+      <div class="num-label">AoA Start (°)</div>
+      <input type="number" id="aoa_start" value="-5">
+    </div>
+    <div class="ctrl">
+      <div class="num-label">AoA End (°)</div>
+      <input type="number" id="aoa_end" value="25">
+    </div>
+    <div class="ctrl">
+      <div class="num-label">Step (°)</div>
+      <input type="number" id="aoa_step" value="2">
+    </div>
+    <div class="ctrl">
+      <div class="num-label">Settle Steps</div>
+      <input type="number" id="settle_steps" value="3000">
+    </div>
+    <div class="ctrl">
+      <div class="num-label">Avg Steps</div>
+      <input type="number" id="avg_steps" value="1000">
+    </div>
+    <div class="ctrl">
+      <div class="num-label">Grid Size</div>
+      <select id="grid_size" style="height:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:6px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">
+        <option value="small">200×100 (fast)</option>
+        <option value="medium" selected>300×150 (balanced)</option>
+        <option value="large">400×200 (detailed)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="config-grid" style="margin-top: 14px;">
+    <div class="ctrl">
+      <div class="ctrl-header"><span>Inlet Speed</span><span class="ctrl-val" id="d_speed">0.08</span></div>
+      <input type="range" id="in_speed" min="0.02" max="0.2" step="0.005" value="0.08">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-header"><span>Viscosity</span><span class="ctrl-val" id="d_visc">0.015</span></div>
+      <input type="range" id="in_visc" min="0.005" max="0.05" step="0.001" value="0.015">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-header"><span>Thickness</span><span class="ctrl-val" id="d_thick">0.12</span></div>
+      <input type="range" id="in_thick" min="0.02" max="0.25" step="0.01" value="0.12">
+    </div>
+    <div class="ctrl">
+      <div class="ctrl-header"><span>Camber</span><span class="ctrl-val" id="d_camber">0.08</span></div>
+      <input type="range" id="in_camber" min="-0.15" max="0.2" step="0.01" value="0.08">
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="btn_run">▶ Run Sweep</button>
+    <button class="btn" id="btn_stop" disabled>■ Stop</button>
+    <button class="btn btn-export" id="btn_csv" disabled>↓ Export CSV</button>
+  </div>
+
+  <div class="progress-wrap" id="progress_wrap" style="display:none;">
+    <div class="progress-header">
+      <span id="prog_label">Running…</span>
+      <span id="prog_pct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="prog_fill"></div></div>
+    <div class="progress-detail" id="prog_detail"></div>
+  </div>
+
+  <div class="status-msg" id="status"></div>
+</div>
+
+<!-- Live preview + Charts -->
+<div class="charts">
+  <div class="card" style="padding:14px;">
+    <div class="section-label">Cl vs Angle of Attack</div>
+    <canvas class="chart" id="chart_cl"></canvas>
+  </div>
+  <div class="card" style="padding:14px;">
+    <div class="section-label">Cd vs Angle of Attack / Polar</div>
+    <canvas class="chart" id="chart_cd"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-label">Live Flow Preview</div>
+  <div class="preview-wrap">
+    <canvas class="preview" id="preview"></canvas>
+    <div class="preview-label" id="preview_label">—</div>
+  </div>
+</div>
+
+<!-- Results Table -->
+<div class="card" id="results_card" style="display:none;">
+  <div class="section-label">Results</div>
+  <div style="overflow-x:auto;">
+    <table class="results-table" id="results_table">
+      <thead><tr>
+        <th>AoA (°)</th><th>Cl</th><th>Cd</th><th>Cl/Cd</th><th>Re</th>
+      </tr></thead>
+      <tbody id="results_body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// LBM ENGINE (configurable grid)
+// ============================================================
+
+const D2Q9 = {
+  w:  [4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36],
+  ex: [0, 1, 0,-1, 0, 1,-1,-1, 1],
+  ey: [0, 0, 1, 0,-1, 1, 1,-1,-1],
+  opp:[0, 3, 4, 1, 2, 7, 8, 5, 6]
+};
+
+class LBMSolver {
+  constructor(W, H) {
+    this.W = W; this.H = H; this.N = W * H;
+    this.f0 = new Float32Array(this.N * 9);
+    this.f1 = new Float32Array(this.N * 9);
+    this.rho = new Float32Array(this.N);
+    this.ux = new Float32Array(this.N);
+    this.uy = new Float32Array(this.N);
+    this.barrier = new Uint8Array(this.N);
+    this.barrierList = []; // boundary fluid nodes for force calc
+  }
+
+  idx(x, y) { return y * this.W + x; }
+
+  feq(r, u, v, k) {
+    const cu = 3*(D2Q9.ex[k]*u + D2Q9.ey[k]*v);
+    return r * D2Q9.w[k] * (1 + cu + 0.5*cu*cu - 1.5*(u*u+v*v));
+  }
+
+  init(uInlet) {
+    for (let i = 0; i < this.N; i++) {
+      this.rho[i] = 1; this.ux[i] = this.barrier[i] ? 0 : uInlet; this.uy[i] = 0;
+      for (let k = 0; k < 9; k++) {
+        this.f0[i*9+k] = this.feq(1, this.barrier[i] ? 0 : uInlet, 0, k);
+        this.f1[i*9+k] = this.f0[i*9+k];
+      }
+    }
+  }
+
+  buildAirfoil(aoa, thickness, camber) {
+    this.barrier.fill(0);
+    const { W, H } = this;
+    // Walls
+    for (let x = 0; x < W; x++) { this.barrier[x] = 1; this.barrier[x+(H-1)*W] = 1; }
+
+    // Joukowski
+    const angRad = -aoa * Math.PI / 180;
+    const cx = -thickness, cy = camber;
+    const r = Math.sqrt((1-cx)*(1-cx) + cy*cy);
+    const centerX = W * 0.25, centerY = H * 0.5;
+    const scale = H * 0.15;
+
+    const poly = [];
+    const steps = 200;
+    for (let i = 0; i <= steps; i++) {
+      const theta = (i/steps) * 2 * Math.PI;
+      let zx = cx + r*Math.cos(theta), zy = cy + r*Math.sin(theta);
+      let den = zx*zx + zy*zy; if (den < 1e-4) den = 1e-4;
+      let wx = zx*(1+1/den), wy = zy*(1-1/den);
+      let rx = wx*Math.cos(angRad) - wy*Math.sin(angRad);
+      let ry = wx*Math.sin(angRad) + wy*Math.cos(angRad);
+      poly.push({ x: centerX + rx*scale, y: centerY - ry*scale });
+    }
+    this.airfoilPoly = poly;
+
+    // Rasterize
+    let minX=W, maxX=0, minY=H, maxY=0;
+    for (const p of poly) {
+      if (p.x<minX) minX=p.x; if (p.x>maxX) maxX=p.x;
+      if (p.y<minY) minY=p.y; if (p.y>maxY) maxY=p.y;
+    }
+    minX=Math.max(0,Math.floor(minX)); maxX=Math.min(W-1,Math.ceil(maxX));
+    minY=Math.max(0,Math.floor(minY)); maxY=Math.min(H-1,Math.ceil(maxY));
+
+    for (let y=minY; y<=maxY; y++) {
+      for (let x=minX; x<=maxX; x++) {
+        if (this.pip(x, y, poly)) {
+          this.barrier[this.idx(x,y)] = 1;
+        }
+      }
+    }
+
+    // Build boundary list (fluid nodes adjacent to solid)
+    this.barrierList = [];
+    for (let y=1; y<H-1; y++) {
+      for (let x=1; x<W-1; x++) {
+        const i = this.idx(x,y);
+        if (this.barrier[i]) continue;
+        for (let k=1; k<9; k++) {
+          const nx = x+D2Q9.ex[k], ny = y+D2Q9.ey[k];
+          if (nx>=0 && nx<W && ny>=0 && ny<H && this.barrier[this.idx(nx,ny)]) {
+            // This fluid node touches a solid
+            if (nx >= minX-1 && nx <= maxX+1 && ny >= minY-1 && ny <= maxY+1) {
+              this.barrierList.push({ fi: i, k });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  pip(px, py, poly) {
+    let inside = false;
+    for (let i=0, j=poly.length-1; i<poly.length; j=i++) {
+      const xi=poly[i].x, yi=poly[i].y, xj=poly[j].x, yj=poly[j].y;
+      if (((yi>py)!==(yj>py)) && (px<(xj-xi)*(py-yi)/(yj-yi)+xi)) inside=!inside;
+    }
+    return inside;
+  }
+
+  step(uIn, visc, smag) {
+    const { W, H, N } = this;
+    const tau0 = 3*visc + 0.5;
+
+    // Collision
+    for (let y=0; y<H; y++) {
+      for (let x=0; x<W; x++) {
+        const i = x + y*W;
+        if (this.barrier[i]) continue;
+        const off = i*9;
+        let r=0, u=0, v=0;
+        for (let k=0; k<9; k++) r += this.f0[off+k];
+        if (x === 0) { u=uIn; v=0; r=1; }
+        else { for (let k=0;k<9;k++){u+=this.f0[off+k]*D2Q9.ex[k];v+=this.f0[off+k]*D2Q9.ey[k];} u/=r; v/=r; }
+        this.rho[i]=r; this.ux[i]=u; this.uy[i]=v;
+
+        // Smagorinsky
+        let Qxx=0, Qxy=0, Qyy=0;
+        for (let k=0;k<9;k++){
+          const fn=this.f0[off+k]-this.feq(r,u,v,k);
+          Qxx+=D2Q9.ex[k]*D2Q9.ex[k]*fn;
+          Qxy+=D2Q9.ex[k]*D2Q9.ey[k]*fn;
+          Qyy+=D2Q9.ey[k]*D2Q9.ey[k]*fn;
+        }
+        const Pi=Math.sqrt(Qxx*Qxx+2*Qxy*Qxy+Qyy*Qyy);
+        const ta=0.5*(Math.sqrt(tau0*tau0+18*smag*smag*Pi/r)-tau0);
+        const omega=1/(tau0+ta);
+
+        for (let k=0;k<9;k++) this.f0[off+k]+=omega*(this.feq(r,u,v,k)-this.f0[off+k]);
+      }
+    }
+
+    // Stream
+    for (let y=0; y<H; y++) {
+      for (let x=0; x<W; x++) {
+        const i=x+y*W;
+        if (this.barrier[i]) continue;
+        for (let k=0;k<9;k++) {
+          const nx=x+D2Q9.ex[k], ny=y+D2Q9.ey[k];
+          if (nx>=0&&nx<W&&ny>=0&&ny<H) {
+            const ni=nx+ny*W;
+            if (this.barrier[ni]) this.f1[i*9+D2Q9.opp[k]]=this.f0[i*9+k];
+            else this.f1[ni*9+k]=this.f0[i*9+k];
+          }
+        }
+      }
+    }
+
+    // Outlet
+    for (let y=1;y<H-1;y++) {
+      const e=(W-1)+y*W, p=(W-2)+y*W;
+      for (let k=0;k<9;k++) this.f1[e*9+k]=this.f1[p*9+k];
+    }
+
+    const tmp=this.f0; this.f0=this.f1; this.f1=tmp;
+  }
+
+  // Momentum exchange for force computation
+  computeForces() {
+    let fx = 0, fy = 0;
+    for (const { fi, k } of this.barrierList) {
+      const ok = D2Q9.opp[k];
+      // Momentum exchange: f_out - f_in at boundary
+      const fOut = this.f0[fi*9+k];       // going toward solid
+      const fIn  = this.f0[fi*9+ok];      // coming from solid (after bounce)
+      fx += D2Q9.ex[k] * (fOut + fIn);
+      fy += D2Q9.ey[k] * (fOut + fIn);
+    }
+    return { fx, fy };
+  }
+}
+
+// ============================================================
+// SWEEP CONTROLLER
+// ============================================================
+
+const results = [];
+let running = false;
+let solver = null;
+
+function getGridDims() {
+  const v = document.getElementById('grid_size').value;
+  if (v === 'small') return [200, 100];
+  if (v === 'large') return [400, 200];
+  return [300, 150];
+}
+
+function getParams() {
+  return {
+    aoaStart: parseFloat(document.getElementById('aoa_start').value),
+    aoaEnd: parseFloat(document.getElementById('aoa_end').value),
+    aoaStep: parseFloat(document.getElementById('aoa_step').value),
+    settleSteps: parseInt(document.getElementById('settle_steps').value),
+    avgSteps: parseInt(document.getElementById('avg_steps').value),
+    speed: parseFloat(document.getElementById('in_speed').value),
+    visc: parseFloat(document.getElementById('in_visc').value),
+    thick: parseFloat(document.getElementById('in_thick').value),
+    camber: parseFloat(document.getElementById('in_camber').value),
+  };
+}
+
+async function runSweep() {
+  const params = getParams();
+  const [W, H] = getGridDims();
+  const angles = [];
+  for (let a = params.aoaStart; a <= params.aoaEnd + 0.001; a += params.aoaStep) angles.push(parseFloat(a.toFixed(1)));
+
+  results.length = 0;
+  running = true;
+  document.getElementById('btn_run').disabled = true;
+  document.getElementById('btn_stop').disabled = false;
+  document.getElementById('btn_csv').disabled = true;
+  document.getElementById('progress_wrap').style.display = 'block';
+  document.getElementById('results_card').style.display = 'block';
+  document.getElementById('results_body').innerHTML = '';
+
+  const totalWork = angles.length * (params.settleSteps + params.avgSteps);
+  let doneWork = 0;
+
+  const airfoilScale = H * 0.15;
+  const Re = (params.speed * airfoilScale * 2 / params.visc).toFixed(0);
+
+  for (let ai = 0; ai < angles.length; ai++) {
+    if (!running) break;
+    const aoa = angles[ai];
+
+    // Create fresh solver per angle
+    solver = new LBMSolver(W, H);
+    solver.buildAirfoil(aoa, params.thick, params.camber);
+    solver.init(params.speed);
+
+    document.getElementById('preview_label').textContent = `AoA = ${aoa}° — settling`;
+
+    // Settle
+    const CHUNK = 80;
+    for (let s = 0; s < params.settleSteps; s += CHUNK) {
+      if (!running) break;
+      const end = Math.min(s + CHUNK, params.settleSteps);
+      for (let t = s; t < end; t++) solver.step(params.speed, params.visc, 0.12);
+      doneWork += (end - s);
+      updateProgress(doneWork / totalWork, `AoA ${aoa}° — settling (${end}/${params.settleSteps})`);
+      drawPreview(solver, W, H);
+      await yieldFrame();
+    }
+
+    // Average forces
+    let sumFx = 0, sumFy = 0, samples = 0;
+    document.getElementById('preview_label').textContent = `AoA = ${aoa}° — averaging`;
+
+    for (let s = 0; s < params.avgSteps; s += CHUNK) {
+      if (!running) break;
+      const end = Math.min(s + CHUNK, params.avgSteps);
+      for (let t = s; t < end; t++) {
+        solver.step(params.speed, params.visc, 0.12);
+        if (t % 5 === 0) {
+          const { fx, fy } = solver.computeForces();
+          sumFx += fx; sumFy += fy; samples++;
+        }
+      }
+      doneWork += (end - s);
+      updateProgress(doneWork / totalWork, `AoA ${aoa}° — averaging (${end}/${params.avgSteps})`);
+      drawPreview(solver, W, H);
+      await yieldFrame();
+    }
+
+    if (!running) break;
+
+    const avgFx = sumFx / samples;
+    const avgFy = sumFy / samples;
+
+    // Rotate forces to lift/drag frame
+    const aoaRad = aoa * Math.PI / 180;
+    const drag = avgFx * Math.cos(aoaRad) + avgFy * Math.sin(aoaRad);
+    const lift = -avgFx * Math.sin(aoaRad) + avgFy * Math.cos(aoaRad);
+
+    // Normalize to coefficients
+    const chordPx = airfoilScale * 2;
+    const q = 0.5 * 1.0 * params.speed * params.speed * chordPx;
+    const Cl = lift / (q || 1);
+    const Cd = drag / (q || 1);
+    const LD = Cd !== 0 ? (Cl / Cd).toFixed(2) : '—';
+
+    results.push({ aoa, Cl: parseFloat(Cl.toFixed(4)), Cd: parseFloat(Cd.toFixed(4)), LD, Re });
+    addTableRow(aoa, Cl.toFixed(4), Cd.toFixed(4), LD, Re);
+    drawCharts();
+  }
+
+  running = false;
+  document.getElementById('btn_run').disabled = false;
+  document.getElementById('btn_stop').disabled = true;
+  document.getElementById('btn_csv').disabled = results.length === 0;
+  document.getElementById('status').textContent = results.length > 0 ? `Sweep complete — ${results.length} data points.` : 'Sweep stopped.';
+  document.getElementById('preview_label').textContent = 'Done';
+}
+
+function yieldFrame() {
+  return new Promise(r => setTimeout(r, 0));
+}
+
+function updateProgress(frac, detail) {
+  const pct = (frac * 100).toFixed(1);
+  document.getElementById('prog_fill').style.width = pct + '%';
+  document.getElementById('prog_pct').textContent = pct + '%';
+  document.getElementById('prog_detail').textContent = detail;
+}
+
+// ============================================================
+// PREVIEW RENDERER
+// ============================================================
+
+const prevCanvas = document.getElementById('preview');
+const prevCtx = prevCanvas.getContext('2d');
+
+function drawPreview(solver, W, H) {
+  prevCanvas.width = W;
+  prevCanvas.height = H;
+  const img = prevCtx.createImageData(W, H);
+  const d = img.data;
+
+  for (let i = 0; i < solver.N; i++) {
+    const pi = i * 4;
+    if (solver.barrier[i]) {
+      d[pi]=80; d[pi+1]=85; d[pi+2]=95; d[pi+3]=255;
+    } else {
+      const speed = Math.sqrt(solver.ux[i]*solver.ux[i]+solver.uy[i]*solver.uy[i]);
+      const t = Math.max(0, Math.min(1, speed / 0.18));
+      // Inferno approx
+      let r,g,b;
+      if(t<0.12){const s=t/0.12;r=s*30;g=s*5;b=s*50;}
+      else if(t<0.35){const s=(t-0.12)/0.23;r=30+s*130;g=5+s*10;b=50+s*40;}
+      else if(t<0.6){const s=(t-0.35)/0.25;r=160+s*75;g=15+s*65;b=90-s*55;}
+      else if(t<0.82){const s=(t-0.6)/0.22;r=235+s*18;g=80+s*100;b=35-s*20;}
+      else{const s=(t-0.82)/0.18;r=253+s*2;g=180+s*70;b=15+s*100;}
+      d[pi]=r|0; d[pi+1]=g|0; d[pi+2]=b|0; d[pi+3]=255;
+    }
+  }
+  prevCtx.putImageData(img, 0, 0);
+}
+
+// ============================================================
+// CHART RENDERING
+// ============================================================
+
+function drawCharts() {
+  drawClChart();
+  drawCdChart();
+}
+
+function drawClChart() {
+  const c = document.getElementById('chart_cl');
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  c.width = c.clientWidth * dpr;
+  c.height = c.clientHeight * dpr;
+  ctx.scale(dpr, dpr);
+  const W = c.clientWidth, H = c.clientHeight;
+
+  ctx.clearRect(0, 0, W, H);
+  if (results.length < 1) return;
+
+  const pad = { t: 20, r: 20, b: 36, l: 50 };
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+
+  const aoas = results.map(r => r.aoa);
+  const cls = results.map(r => r.Cl);
+  const xMin = Math.min(...aoas) - 2, xMax = Math.max(...aoas) + 2;
+  const yMin = Math.min(...cls, 0) - 0.2, yMax = Math.max(...cls, 0.5) + 0.2;
+
+  const sx = v => pad.l + (v - xMin) / (xMax - xMin) * pw;
+  const sy = v => pad.t + (1 - (v - yMin) / (yMax - yMin)) * ph;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let v = Math.ceil(yMin*5)/5; v <= yMax; v += 0.2) {
+    ctx.beginPath(); ctx.moveTo(pad.l, sy(v)); ctx.lineTo(pad.l+pw, sy(v)); ctx.stroke();
+  }
+
+  // Zero line
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.beginPath(); ctx.moveTo(pad.l, sy(0)); ctx.lineTo(pad.l+pw, sy(0)); ctx.stroke();
+
+  // Axes labels
+  ctx.fillStyle = '#3a4a68';
+  ctx.font = '9px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('Angle of Attack (°)', pad.l + pw/2, H - 4);
+  ctx.textAlign = 'right';
+  for (let v = Math.ceil(yMin*5)/5; v <= yMax; v += 0.4) {
+    ctx.fillText(v.toFixed(1), pad.l - 6, sy(v) + 3);
+  }
+  ctx.textAlign = 'center';
+  for (const a of aoas) ctx.fillText(a + '°', sx(a), H - pad.b + 14);
+
+  // Data line
+  ctx.strokeStyle = '#00c8ff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < results.length; i++) {
+    const x = sx(results[i].aoa), y = sy(results[i].Cl);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Points
+  for (const r of results) {
+    ctx.beginPath();
+    ctx.arc(sx(r.aoa), sy(r.Cl), 3.5, 0, Math.PI*2);
+    ctx.fillStyle = '#00c8ff';
+    ctx.fill();
+    ctx.strokeStyle = '#0b0d12';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Title
+  ctx.fillStyle = '#5a6a88';
+  ctx.font = '10px DM Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText('Cl', pad.l + 4, pad.t - 6);
+}
+
+function drawCdChart() {
+  const c = document.getElementById('chart_cd');
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  c.width = c.clientWidth * dpr;
+  c.height = c.clientHeight * dpr;
+  ctx.scale(dpr, dpr);
+  const W = c.clientWidth, H = c.clientHeight;
+
+  ctx.clearRect(0, 0, W, H);
+  if (results.length < 1) return;
+
+  const pad = { t: 20, r: 20, b: 36, l: 50 };
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+
+  // Drag polar: Cd on X, Cl on Y
+  const cds = results.map(r => r.Cd);
+  const cls = results.map(r => r.Cl);
+  const xMin = Math.min(...cds, 0) - 0.05, xMax = Math.max(...cds) + 0.05;
+  const yMin = Math.min(...cls, 0) - 0.2, yMax = Math.max(...cls, 0.5) + 0.2;
+
+  const sx = v => pad.l + (v - xMin) / (xMax - xMin) * pw;
+  const sy = v => pad.t + (1 - (v - yMin) / (yMax - yMin)) * ph;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let v = Math.ceil(yMin*5)/5; v <= yMax; v += 0.4) {
+    ctx.beginPath(); ctx.moveTo(pad.l, sy(v)); ctx.lineTo(pad.l+pw, sy(v)); ctx.stroke();
+  }
+
+  ctx.fillStyle = '#3a4a68';
+  ctx.font = '9px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('Cd', pad.l + pw/2, H - 4);
+  ctx.textAlign = 'right';
+  for (let v = Math.ceil(yMin*5)/5; v <= yMax; v += 0.4) {
+    ctx.fillText(v.toFixed(1), pad.l - 6, sy(v) + 3);
+  }
+
+  // Polar curve
+  ctx.strokeStyle = '#ff6a3d';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i = 0; i < results.length; i++) {
+    const x = sx(results[i].Cd), y = sy(results[i].Cl);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Points with AoA labels
+  for (const r of results) {
+    const x = sx(r.Cd), y = sy(r.Cl);
+    ctx.beginPath();
+    ctx.arc(x, y, 3.5, 0, Math.PI*2);
+    ctx.fillStyle = '#ff6a3d';
+    ctx.fill();
+    ctx.strokeStyle = '#0b0d12';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '7px DM Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(r.aoa + '°', x + 6, y + 3);
+  }
+
+  ctx.fillStyle = '#5a6a88';
+  ctx.font = '10px DM Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText('Drag Polar (Cl vs Cd)', pad.l + 4, pad.t - 6);
+}
+
+// ============================================================
+// TABLE + CSV
+// ============================================================
+
+function addTableRow(aoa, cl, cd, ld, re) {
+  const tbody = document.getElementById('results_body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${aoa}°</td><td class="result-highlight">${cl}</td><td class="result-highlight">${cd}</td><td>${ld}</td><td>${re}</td>`;
+  tbody.appendChild(tr);
+}
+
+function exportCSV() {
+  let csv = 'AoA_deg,Cl,Cd,Cl_Cd,Re\n';
+  for (const r of results) csv += `${r.aoa},${r.Cl},${r.Cd},${r.LD},${r.Re}\n`;
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cfd_sweep_aoa${results[0]?.aoa}_to_${results[results.length-1]?.aoa}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// EVENT WIRING
+// ============================================================
+
+document.getElementById('btn_run').addEventListener('click', runSweep);
+document.getElementById('btn_stop').addEventListener('click', () => { running = false; });
+document.getElementById('btn_csv').addEventListener('click', exportCSV);
+
+// Slider displays
+for (const [id, param, disp, fmt] of [
+  ['in_speed', 'speed', 'd_speed', v=>v.toFixed(2)],
+  ['in_visc', 'viscosity', 'd_visc', v=>v.toFixed(3)],
+  ['in_thick', 'thickness', 'd_thick', v=>v.toFixed(2)],
+  ['in_camber', 'camber', 'd_camber', v=>v.toFixed(2)],
+]) {
+  document.getElementById(id).addEventListener('input', function() {
+    document.getElementById(disp).textContent = fmt(parseFloat(this.value));
+  });
+}
+</script>
+</body>
+</html>

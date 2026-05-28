@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Earth Winds Lab</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111111;
+      --panel: #f0f0ec;
+      --panel-2: #deded8;
+      --ink: #171716;
+      --muted: #6c6a65;
+      --line: #c7c7bf;
+      --line-dark: #2a2a28;
+      --stage: #0c0d10;
+      --control: #d4d4cd;
+      --control-hover: #c7c7bf;
+      --selected: #171716;
+      --selected-ink: #f3f3ee;
+      --shadow: rgba(0, 0, 0, 0.34);
+    }
+    * { box-sizing: border-box; }
+    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:var(--bg); color:var(--panel);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { display: grid; place-items: stretch; }
+    .app {
+      width: 100vw; height: 100vh;
+      display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+      gap: 16px; padding: 16px; background: var(--bg);
+    }
+    .guide {
+      min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 18px;
+      border-radius: 18px; background: var(--panel); color: var(--ink);
+      box-shadow: 0 22px 55px var(--shadow); overflow: hidden;
+    }
+    .kicker { margin:0; font-size:12px; line-height:1; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); font-weight:760; }
+    h1 { margin:0; font-size: clamp(32px, 4.6vw, 50px); line-height: 0.95; font-weight: 840; }
+    .summary { margin:0; font-size:17px; line-height:1.42; color:#343432; }
+    .rule { height:1px; background:var(--line); margin:2px 0; }
+    .section-title { margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); font-weight:780; }
+    .segmented { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:8px; }
+    button {
+      appearance:none; border:1px solid var(--line-dark); border-radius:12px;
+      background:var(--control); color:var(--ink); font:inherit; font-weight:780;
+      min-height:44px; padding:0 12px; cursor:pointer;
+      transition: transform 130ms ease, background 130ms ease, color 130ms ease;
+    }
+    button:hover { background:var(--control-hover); transform:translateY(-1px); }
+    button:active { transform:translateY(0); }
+    button[aria-pressed="true"] { background:var(--selected); color:var(--selected-ink); }
+    .control-stack { display:flex; flex-direction:column; gap:12px; }
+    .row {
+      min-width:0; display:grid; grid-template-columns: 102px minmax(0, 1fr) 48px;
+      align-items:center; gap:10px; min-height:32px; font-size:15px; font-weight:740; color:#2d2d2a;
+    }
+    .row label, .row output { flex-shrink:0; }
+    .row output { text-align:right; color:var(--muted); font-variant-numeric: tabular-nums; }
+    input[type="range"] { width:0; min-width:0; flex:1 1 0; appearance:none; height:26px; background:transparent; }
+    input[type="range"]::-webkit-slider-runnable-track { height:8px; border-radius:999px; background:#bcbcb4; border:1px solid #9f9f97; }
+    input[type="range"]::-webkit-slider-thumb { appearance:none; width:22px; height:22px; margin-top:-8px; border-radius:50%; background:var(--ink); border:3px solid var(--panel); box-shadow:0 2px 5px rgba(0,0,0,0.22); }
+    input[type="range"]::-moz-range-track { height:8px; border-radius:999px; background:#bcbcb4; border:1px solid #9f9f97; }
+    input[type="range"]::-moz-range-thumb { width:22px; height:22px; border-radius:50%; background:var(--ink); border:3px solid var(--panel); box-shadow:0 2px 5px rgba(0,0,0,0.22); }
+    .stats { margin-top:auto; display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:8px; }
+    .stat { min-width:0; padding:12px; border-radius:12px; background:var(--panel-2); border:1px solid var(--line); }
+    .stat b { display:block; margin-bottom:4px; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); }
+    .stat span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:19px; font-weight:820; color:var(--ink); font-variant-numeric: tabular-nums; }
+    .actions { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+    .source-note { font-size:12px; line-height:1.45; color:var(--muted); }
+    .stage { position:relative; min-width:0; min-height:0; border-radius:18px; background:var(--stage); overflow:hidden; box-shadow:0 22px 55px var(--shadow); }
+    canvas { display:block; width:100%; height:100%; cursor:grab; touch-action:none; }
+    canvas:active { cursor:grabbing; }
+    .overlay-tag {
+      position:absolute; bottom:14px; left:16px; display:flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px; background:rgba(12,13,16,0.7); color:#d8d8d2;
+      font-size:12px; letter-spacing:0.06em; text-transform:uppercase; font-weight:700;
+      backdrop-filter: blur(8px); border:1px solid rgba(255,255,255,0.08);
+    }
+    .overlay-tag .dot { width:8px; height:8px; border-radius:50%; background:#e08818; box-shadow:0 0 8px #e08818aa; }
+    .legend {
+      position:absolute; bottom:14px; right:16px; padding:10px 12px; border-radius:12px;
+      background:rgba(12,13,16,0.7); color:#d8d8d2; font-size:11.5px; letter-spacing:0.04em; font-weight:600;
+      backdrop-filter: blur(8px); border:1px solid rgba(255,255,255,0.08);
+    }
+    .legend-bar { width:200px; height:8px; border-radius:999px; margin:6px 0 4px;
+      /* matplotlib turbo, sampled to ~10 stops */
+      background: linear-gradient(90deg,
+        #30123b 0%, #4145ab 6%, #4675ed 12%, #39a2fc 18%,
+        #1bcfd4 25%, #24eca6 32%, #61fc6c 40%, #a4fc3b 47%,
+        #d1e834 54%, #f3c63a 65%, #fb8022 80%, #d23105 92%, #7a0403 100%); }
+    .legend-scale { display:flex; justify-content:space-between; color:#8a8a86; font-variant-numeric: tabular-nums; font-size:10.5px; }
+    .legend-marks { display:flex; justify-content:space-between; width:200px; font-size:9.5px; color:#777; letter-spacing:0.02em; margin-top:2px; }
+    @media (max-width:820px) {
+      body { overflow:auto; }
+      .app { min-height:100vh; height:auto; grid-template-columns:1fr; grid-template-rows: auto minmax(560px, 68vh); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="guide" aria-label="Earth winds controls">
+      <p class="kicker">Vector fields / winds</p>
+      <h1>Earth winds</h1>
+      <p class="summary">A field of moving air wrapped around a sphere. Streamlines trace where a parcel would drift if the field stayed still.</p>
+      <div class="rule"></div>
+      <section aria-label="Layer">
+        <p class="section-title">Layer</p>
+        <div class="segmented" id="layerButtons">
+          <button type="button" data-layer="wind" aria-pressed="true">Wind</button>
+          <button type="button" data-layer="ocean" aria-pressed="false">Ocean</button>
+          <button type="button" data-layer="jet" aria-pressed="false">Jet stream</button>
+        </div>
+      </section>
+      <section aria-label="Field settings">
+        <p class="section-title">Field</p>
+        <div class="control-stack">
+          <div class="row">
+            <label for="particleCount">Particles</label>
+            <input id="particleCount" type="range" min="800" max="9000" step="100" value="3500">
+            <output for="particleCount">3500</output>
+          </div>
+          <div class="row">
+            <label for="trailLength">Trail length</label>
+            <input id="trailLength" type="range" min="4" max="48" step="1" value="22">
+            <output for="trailLength">22</output>
+          </div>
+          <div class="row">
+            <label for="flowSpeed">Flow speed</label>
+            <input id="flowSpeed" type="range" min="0.2" max="3.0" step="0.05" value="1.20">
+            <output for="flowSpeed">1.20</output>
+          </div>
+          <div class="row">
+            <label for="lineWeight">Line weight</label>
+            <input id="lineWeight" type="range" min="0.6" max="2.4" step="0.05" value="1.25">
+            <output for="lineWeight">1.25</output>
+          </div>
+          <div class="row">
+            <label for="speedScale">Speed scale</label>
+            <input id="speedScale" type="range" min="0.5" max="80" step="0.5" value="30">
+            <output for="speedScale">30</output>
+          </div>
+        </div>
+      </section>
+      <div class="actions">
+        <button type="button" id="resetButton">Reset view</button>
+        <button type="button" id="spinButton" aria-pressed="false">Auto-spin</button>
+      </div>
+      <div class="stats" aria-label="Field readout">
+        <div class="stat">
+          <b>Cursor wind</b>
+          <span id="windReadout">— m/s</span>
+        </div>
+        <div class="stat">
+          <b>Region</b>
+          <span id="regionReadout">—</span>
+        </div>
+      </div>
+      <section aria-label="Active storms">
+        <p class="section-title">Active storms <span id="stormCount" style="font-weight:740;color:#2d2d2a">(loading…)</span></p>
+        <div id="stormList" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow:auto"></div>
+      </section>
+
+      <p class="source-note">Wind: <strong>NOAA NCEP GFS</strong> 10 m forecast, 2°/3-hourly. Ocean: <strong>NASA OSCAR</strong> sea-surface velocity. Storms: <strong>GDACS</strong> global tropical cyclones.</p>
+    </aside>
+    <main class="stage" aria-label="Earth winds visualization">
+      <canvas id="globeCanvas"></canvas>
+      <div class="overlay-tag"><span class="dot"></span><span id="layerLabel">NOAA GFS 10 m wind · loading</span></div>
+      <div class="legend">
+        <div>Wind speed · turbo</div>
+        <div class="legend-bar"></div>
+        <div class="legend-scale"><span>0</span><span>10</span><span>20</span><span>33</span><span>45</span><span>70+ m/s</span></div>
+        <div class="legend-marks"><span>calm</span><span>breeze</span><span>gale</span><span>cat 1</span><span>cat 3</span><span>cat 5</span></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ---- canvas + offscreen Earth ----
+    const canvas = document.getElementById("globeCanvas");
+    const ctx = canvas.getContext("2d");
+    const earthCanvas = document.createElement("canvas");
+    const earthCtx = earthCanvas.getContext("2d");
+    let earthTex = null;
+    let earthDirty = true;
+
+    const controls = {
+      particleCount: document.getElementById("particleCount"),
+      trailLength: document.getElementById("trailLength"),
+      flowSpeed: document.getElementById("flowSpeed"),
+      lineWeight: document.getElementById("lineWeight"),
+      speedScale: document.getElementById("speedScale"),
+    };
+    const windReadout = document.getElementById("windReadout");
+    const regionReadout = document.getElementById("regionReadout");
+    const layerLabel = document.getElementById("layerLabel");
+    const layerButtons = Array.from(document.querySelectorAll("#layerButtons button"));
+    const spinButton = document.getElementById("spinButton");
+
+    const TRAIL_CAP = 48;
+
+    const defaults = {
+      layer: "wind",
+      particleCount: 3500, trailLength: 22, flowSpeed: 1.20, lineWeight: 1.25, speedScale: 30,
+      yaw: 2.4, pitch: 0.32, spin: false,
+      playbackSeconds: 30, // wall-clock seconds for one full GFS forecast cycle
+    };
+    const state = { ...defaults };
+
+    let dpr = 1, viewW = 1, viewH = 1, globeR = 1, globeCx = 0, globeCy = 0;
+    let particles = [];
+    let lastT = 0;
+    let drag = null;
+    let cursor = null;
+
+    // ---- Active storms (GDACS) ----
+    let STORMS = null;
+    async function loadStorms() {
+      try {
+        const r = await fetch("/storms.json");
+        if (!r.ok) throw new Error("storms HTTP " + r.status);
+        STORMS = await r.json();
+        renderStormList();
+      } catch (e) {
+        STORMS = { storms: [], source: "" };
+        renderStormList();
+        console.warn("storms load failed:", e);
+      }
+    }
+    function alertColor(level) {
+      switch ((level || "").toLowerCase()) {
+        case "red":    return "#e03020";
+        case "orange": return "#f3a02a";
+        case "green":  return "#9af0a4";
+        default:       return "#d8d8d2";
+      }
+    }
+    function renderStormList() {
+      const list = document.getElementById("stormList");
+      const count = document.getElementById("stormCount");
+      if (!STORMS) return;
+      const n = STORMS.storms.length;
+      count.textContent = n ? `(${n})` : "(none active)";
+      list.innerHTML = "";
+      for (const s of STORMS.storms) {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 8px;border-radius:8px;background:var(--panel-2);border:1px solid var(--line)";
+        const dot = document.createElement("span");
+        dot.style.cssText = `width:10px;height:10px;border-radius:50%;background:${alertColor(s.alert)};box-shadow:0 0 6px ${alertColor(s.alert)}aa;flex-shrink:0`;
+        const text = document.createElement("div");
+        text.style.cssText = "flex:1;min-width:0;color:#2d2d2a";
+        const sub = s.country ? ` · ${s.country}` : "";
+        text.innerHTML = `<div style="font-weight:780">${s.name}</div><div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.severityText || s.alert}${sub}</div>`;
+        row.appendChild(dot);
+        row.appendChild(text);
+        list.appendChild(row);
+      }
+    }
+
+    function drawStorms() {
+      if (!STORMS || !STORMS.storms.length) return;
+      ctx.save();
+      const time = performance.now() / 1000;
+      for (const s of STORMS.storms) {
+        const p = project(s.lon, s.lat);
+        if (!p.front) continue;
+        const col = alertColor(s.alert);
+        // Outer pulse (1.4 Hz)
+        const pulse = 0.6 + 0.4 * Math.sin(time * 8.8);
+        const r1 = 8 + 6 * pulse;
+        const r2 = 14 + 12 * pulse;
+        ctx.fillStyle = col + "66";
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, r2, 0, TWO_PI); ctx.fill();
+        ctx.fillStyle = col + "cc";
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, r1, 0, TWO_PI); ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, 2.4, 0, TWO_PI); ctx.fill();
+        // Label
+        ctx.fillStyle = "rgba(12,13,16,0.78)";
+        ctx.strokeStyle = "rgba(220,230,245,0.18)";
+        const label = s.name;
+        ctx.font = "700 12px Inter, system-ui, sans-serif";
+        const m = ctx.measureText(label);
+        const lw = m.width + 14, lh = 22;
+        const lx = p.sx + 14, ly = p.sy - lh * 0.5;
+        ctx.beginPath();
+        const r = 6;
+        ctx.moveTo(lx + r, ly);
+        ctx.arcTo(lx + lw, ly, lx + lw, ly + lh, r);
+        ctx.arcTo(lx + lw, ly + lh, lx, ly + lh, r);
+        ctx.arcTo(lx, ly + lh, lx, ly, r);
+        ctx.arcTo(lx, ly, lx + lw, ly, r);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#f0f0ec";
+        ctx.textBaseline = "middle";
+        ctx.fillText(label, lx + 7, ly + lh * 0.5);
+      }
+      ctx.restore();
+    }
+
+    // ---- GFS loader (real-time wind) ----
+    let GFS = null;
+    let gfsLoading = false;
+    async function loadGfs() {
+      if (GFS || gfsLoading) return;
+      gfsLoading = true;
+      try {
+        const [metaRes, binRes] = await Promise.all([fetch('/gfs.json'), fetch('/gfs.bin')]);
+        if (!metaRes.ok || !binRes.ok) throw new Error('GFS fetch failed');
+        const meta = await metaRes.json();
+        const buf = await binRes.arrayBuffer();
+        const cellsPerStep = meta.nx * meta.ny;
+        const totalCells = cellsPerStep * meta.nt;
+        GFS = {
+          ...meta,
+          u: new Float32Array(buf, 0, totalCells),
+          v: new Float32Array(buf, totalCells * 4, totalCells),
+          cellsPerStep,
+        };
+        if (state.layer === "wind") {
+          updateGfsLabel();
+        }
+        console.log('GFS loaded:', meta.nx, 'x', meta.ny, 'x', meta.nt, 'steps');
+      } catch (e) { console.warn('GFS load failed:', e); }
+      finally { gfsLoading = false; }
+    }
+    // Trilinear (lat, lon, time) lookup. Returns m/s.
+    function sampleGfs(lon, lat, tIdxFrac) {
+      const g = GFS;
+      let lo = lon;
+      while (lo < g.lonMin) lo += 360;
+      while (lo > g.lonMax) lo -= 360;
+      if (lat > g.latMax || lat < g.latMin) return { u: 0, v: 0 };
+      const x = (lo - g.lonMin) / g.lonRes;
+      const y = (g.latMax - lat) / g.latRes;
+      const x0 = Math.floor(x), x1 = Math.min(g.nx - 1, x0 + 1);
+      const y0 = Math.max(0, Math.min(g.ny - 1, Math.floor(y)));
+      const y1 = Math.max(0, Math.min(g.ny - 1, y0 + 1));
+      const t0 = Math.floor(tIdxFrac), t1 = Math.min(g.nt - 1, t0 + 1);
+      const fx = x - x0, fy = y - y0, ft = tIdxFrac - t0;
+      // Helper to sample one timestep.
+      const cps = g.cellsPerStep;
+      const samp = (t, arr) => {
+        const base = t * cps;
+        const v00 = arr[base + y0 * g.nx + x0];
+        const v01 = arr[base + y0 * g.nx + x1];
+        const v10 = arr[base + y1 * g.nx + x0];
+        const v11 = arr[base + y1 * g.nx + x1];
+        return (1 - fx) * (1 - fy) * v00 + fx * (1 - fy) * v01
+             + (1 - fx) * fy * v10 + fx * fy * v11;
+      };
+      const uA = samp(t0, g.u), uB = samp(t1, g.u);
+      const vA = samp(t0, g.v), vB = samp(t1, g.v);
+      return { u: uA + (uB - uA) * ft, v: vA + (vB - vA) * ft };
+    }
+    function updateGfsLabel() {
+      if (!GFS) { layerLabel.textContent = "10 m wind · loading GFS…"; return; }
+      const ts = currentGfsTime();
+      layerLabel.textContent = `GFS 10 m wind · ${ts}`;
+    }
+    function currentGfsTime() {
+      if (!GFS) return "";
+      const idx = currentTimeIndex();
+      const t0 = Math.floor(idx), t1 = Math.min(GFS.nt - 1, t0 + 1);
+      const f = idx - t0;
+      const a = Date.parse(GFS.times[t0]);
+      const b = Date.parse(GFS.times[t1]);
+      const t = a + (b - a) * f;
+      const d = new Date(t);
+      const z = (n) => String(n).padStart(2, "0");
+      return `${d.getUTCFullYear()}-${z(d.getUTCMonth()+1)}-${z(d.getUTCDate())} ${z(d.getUTCHours())}:${z(d.getUTCMinutes())} UTC`;
+    }
+    // Map wall-clock time to a fractional timestep index. One cycle through
+    // the forecast window every `state.playbackSeconds` seconds.
+    function currentTimeIndex() {
+      if (!GFS || GFS.nt < 2) return 0;
+      const cycleSec = Math.max(6, state.playbackSeconds);
+      const playT = ((performance.now() / 1000) % cycleSec) / cycleSec;
+      return playT * (GFS.nt - 1);
+    }
+
+    // ---- OSCAR loader ----
+    let OSCAR = null;
+    let oscarLoading = false;
+    async function loadOscar() {
+      if (OSCAR || oscarLoading) return;
+      oscarLoading = true;
+      try {
+        const [metaRes, binRes] = await Promise.all([fetch('/oscar.json'), fetch('/oscar.bin')]);
+        if (!metaRes.ok || !binRes.ok) throw new Error('OSCAR fetch failed');
+        const meta = await metaRes.json();
+        const buf = await binRes.arrayBuffer();
+        const total = meta.nx * meta.ny;
+        OSCAR = { ...meta, u: new Float32Array(buf, 0, total), v: new Float32Array(buf, total*4, total) };
+        if (state.layer === "ocean") {
+          layerLabel.textContent = `OSCAR sea-surface velocity · ${meta.time.slice(0,10)}`;
+          rebuildParticles(state.particleCount);
+        }
+        console.log('OSCAR loaded:', meta.nx, 'x', meta.ny);
+      } catch (e) { console.warn('OSCAR load failed:', e); }
+      finally { oscarLoading = false; }
+    }
+    function sampleOscar(lon, lat) {
+      const { u, v, nx, ny, lonMin, lonMax, latMax, latMin, lonRes, latRes } = OSCAR;
+      let lo = lon;
+      while (lo < lonMin) lo += 360;
+      while (lo > lonMax) lo -= 360;
+      if (lat > latMax || lat < latMin) return { u: 0, v: 0 };
+      const x = (lo - lonMin) / lonRes;
+      const y = (latMax - lat) / latRes;
+      const x0 = Math.floor(x), x1 = Math.min(nx-1, x0+1);
+      const y0 = Math.max(0, Math.min(ny-1, Math.floor(y)));
+      const y1 = Math.max(0, Math.min(ny-1, y0+1));
+      const fx = x - x0, fy = y - y0;
+      const i00 = y0*nx+x0, i01 = y0*nx+x1, i10 = y1*nx+x0, i11 = y1*nx+x1;
+      const w00 = (u[i00]||v[i00]) ? (1-fx)*(1-fy) : 0;
+      const w01 = (u[i01]||v[i01]) ? fx*(1-fy) : 0;
+      const w10 = (u[i10]||v[i10]) ? (1-fx)*fy : 0;
+      const w11 = (u[i11]||v[i11]) ? fx*fy : 0;
+      const W = w00+w01+w10+w11;
+      if (W < 1e-6) return { u: 0, v: 0 };
+      const uu = (w00*u[i00]+w01*u[i01]+w10*u[i10]+w11*u[i11]) / W;
+      const vv = (w00*v[i00]+w01*v[i01]+w10*v[i10]+w11*v[i11]) / W;
+      return { u: uu, v: vv };
+    }
+    function oscarIsLand(lon, lat) {
+      if (!OSCAR) return false;
+      let lo = lon;
+      while (lo < OSCAR.lonMin) lo += 360;
+      while (lo > OSCAR.lonMax) lo -= 360;
+      if (lat > OSCAR.latMax || lat < OSCAR.latMin) return true;
+      const xi = Math.round((lo - OSCAR.lonMin) / OSCAR.lonRes);
+      const yi = Math.round((OSCAR.latMax - lat) / OSCAR.latRes);
+      const i = Math.max(0, Math.min(OSCAR.ny-1, yi)) * OSCAR.nx + Math.max(0, Math.min(OSCAR.nx-1, xi));
+      return OSCAR.u[i] === 0 && OSCAR.v[i] === 0;
+    }
+
+    // ---- field samplers ----
+    const TWO_PI = Math.PI*2, D2R = Math.PI/180, R2D = 180/Math.PI;
+    function hash(x, y) { const h = Math.sin(x*12.9898 + y*78.233) * 43758.5453; return h - Math.floor(h); }
+    function valueNoise2(x, y) {
+      const xi = Math.floor(x), yi = Math.floor(y);
+      const xf = x-xi, yf = y-yi;
+      const a = hash(xi,yi), b = hash(xi+1,yi), c = hash(xi,yi+1), d = hash(xi+1,yi+1);
+      const u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf);
+      return (a*(1-u)+b*u)*(1-v) + (c*(1-u)+d*u)*v;
+    }
+    function fbm(x, y) {
+      let s=0, amp=1, freq=1;
+      for (let i=0; i<4; i++) { s += amp*(valueNoise2(x*freq, y*freq)-0.5); amp*=0.55; freq*=2; }
+      return s;
+    }
+    function sampleWind(lon, lat) {
+      const phi = lat*D2R, lam = lon*D2R;
+      const zonal = -7*Math.cos(phi*2)*Math.exp(-Math.pow(lat/18,2))
+        + 36*Math.cos(phi)*Math.sin(phi)*Math.exp(-Math.pow((Math.abs(lat)-38)/22,2))
+        - 6*Math.exp(-Math.pow((Math.abs(lat)-70)/12,2)) * Math.sign(phi);
+      const rossbyU = 4.5*Math.sin(2*lam+0.3)*Math.cos(phi)*Math.exp(-Math.pow(lat/50,2));
+      const rossbyV = 5.5*Math.cos(2*lam+0.3)*Math.sin(phi*1.4)*Math.exp(-Math.pow(lat/50,2));
+      const t = state._time || 0;
+      const eddyU = fbm(lam*1.5+11.3, phi*2.1+t*0.02) * 6;
+      const eddyV = fbm(lam*1.5+2.7, phi*2.1+7.2+t*0.02) * 6;
+      const meridional = -3.5*Math.sin(phi*2)*Math.exp(-Math.pow(lat/25,2));
+      return { u: zonal+rossbyU+eddyU, v: meridional+rossbyV+eddyV };
+    }
+    function sampleJet(lon, lat) {
+      const phi = lat*D2R, lam = lon*D2R;
+      const t = state._time || 0;
+      const mN = 8*Math.sin(3*lam + 0.6*t);
+      const mS = 8*Math.sin(3*lam + Math.PI + 0.6*t);
+      const jetN = 55*Math.exp(-Math.pow((lat-45-mN)/6,2));
+      const jetS = 50*Math.exp(-Math.pow((lat+45+mS)/6,2));
+      const baseE = jetN + jetS;
+      const trade = -8*Math.exp(-Math.pow(lat/10,2));
+      const u = baseE + trade;
+      const v = 9*(Math.cos(3*lam + 0.6*t)*Math.exp(-Math.pow((lat-45)/6,2))
+                - Math.cos(3*lam + Math.PI + 0.6*t)*Math.exp(-Math.pow((lat+45)/6,2)));
+      return { u, v };
+    }
+    function sampleField(lon, lat) {
+      if (state.layer === "ocean") return OSCAR ? sampleOscar(lon, lat) : { u: 0, v: 0 };
+      if (state.layer === "jet") return sampleJet(lon, lat);
+      if (GFS) return sampleGfs(lon, lat, currentTimeIndex());
+      return sampleWind(lon, lat);
+    }
+
+    // ---- orthographic projection ----
+    function project(lon, lat) {
+      const phi = lat*D2R, lam = lon*D2R - state.yaw;
+      const cphi = Math.cos(phi);
+      const x = cphi*Math.sin(lam), y = Math.sin(phi), z = cphi*Math.cos(lam);
+      const cp = Math.cos(state.pitch), sp = Math.sin(state.pitch);
+      const yr = y*cp - z*sp;
+      const zr = y*sp + z*cp;
+      return { sx: globeCx + x*globeR, sy: globeCy - yr*globeR, front: zr > 0, z: zr };
+    }
+    function unproject(sx, sy) {
+      const x = (sx - globeCx) / globeR;
+      const y = -(sy - globeCy) / globeR;
+      const r2 = x*x + y*y;
+      if (r2 > 1) return null;
+      const z = Math.sqrt(1 - r2);
+      const cp = Math.cos(state.pitch), sp = Math.sin(state.pitch);
+      const yr = y*cp + z*sp;
+      const zr = -y*sp + z*cp;
+      const lat = Math.asin(yr) * R2D;
+      const lon = (Math.atan2(x, zr) + state.yaw) * R2D;
+      return { lon: ((lon+540)%360)-180, lat };
+    }
+
+    function advance(lon, lat, dt) {
+      const { u, v } = sampleField(lon, lat);
+      const cphi = Math.max(0.08, Math.cos(lat*D2R));
+      const dlon = (u/(111000*cphi)) * dt;
+      const dlat = (v/111000) * dt;
+      return { lon: lon+dlon, lat: Math.max(-89.9, Math.min(89.9, lat+dlat)), u, v };
+    }
+
+    // Matplotlib `turbo` colormap (Mikhailov 2019 — perceptual rework of jet).
+    // Canonical wind-speed visualisation used by earth.nullschool, ECMWF, and
+    // NASA Worldview. Stops keyed to m/s thresholds aligned with Beaufort
+    // anchor points and the Saffir-Simpson hurricane scale.
+    //
+    //   m/s   hex       turbo t    Beaufort / SS
+    //    0   #30123b     0.00      calm
+    //    4   #4145ab     0.10      light breeze (Bft 3)
+    //    8   #4675ed     0.20      moderate (Bft 4)
+    //   12   #39a2fc     0.30      fresh breeze (Bft 5)
+    //   17   #1bcfd4     0.40      near gale (Bft 7)
+    //   22   #24eca6     0.50      strong gale (Bft 9)
+    //   27   #a4fc3b     0.70      storm (Bft 10)
+    //   33   #f3c63a     0.85      hurricane cat 1
+    //   45   #fb8022     0.95      hurricane cat 3
+    //   70   #7a0403     1.00      hurricane cat 5
+    const WIND_STOPS = [
+      [  0, 0x30/255, 0x12/255, 0x3b/255],
+      [  4, 0x41/255, 0x45/255, 0xab/255],
+      [  8, 0x46/255, 0x75/255, 0xed/255],
+      [ 12, 0x39/255, 0xa2/255, 0xfc/255],
+      [ 17, 0x1b/255, 0xcf/255, 0xd4/255],
+      [ 22, 0x24/255, 0xec/255, 0xa6/255],
+      [ 27, 0xa4/255, 0xfc/255, 0x3b/255],
+      [ 33, 0xf3/255, 0xc6/255, 0x3a/255],
+      [ 45, 0xfb/255, 0x80/255, 0x22/255],
+      [ 70, 0x7a/255, 0x04/255, 0x03/255],
+    ];
+    function speedColor(speed, alpha) {
+      // Map wind speed directly to turbo via Beaufort-anchored stops. For the
+      // ocean layer (peak ~1 m/s) the absolute mapping makes everything sit at
+      // the low / purple-blue end of the colormap — visually appropriate.
+      let lo = WIND_STOPS[0], hi = WIND_STOPS[WIND_STOPS.length - 1];
+      if (speed >= WIND_STOPS[WIND_STOPS.length - 1][0]) lo = hi;
+      else for (let i = 0; i < WIND_STOPS.length - 1; i++) {
+        if (speed >= WIND_STOPS[i][0] && speed <= WIND_STOPS[i+1][0]) {
+          lo = WIND_STOPS[i]; hi = WIND_STOPS[i+1]; break;
+        }
+      }
+      const span = Math.max(1e-6, hi[0] - lo[0]);
+      const t = Math.max(0, Math.min(1, (speed - lo[0]) / span));
+      const r = Math.round((lo[1] + (hi[1]-lo[1])*t) * 255);
+      const g = Math.round((lo[2] + (hi[2]-lo[2])*t) * 255);
+      const b = Math.round((lo[3] + (hi[3]-lo[3])*t) * 255);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+    function beaufortLabel(speed) {
+      if (speed < 1.5) return "Calm";
+      if (speed < 3.3) return "Light air";
+      if (speed < 5.5) return "Light breeze";
+      if (speed < 7.9) return "Moderate";
+      if (speed < 10.7) return "Fresh breeze";
+      if (speed < 13.8) return "Strong breeze";
+      if (speed < 17.1) return "Near gale";
+      if (speed < 20.7) return "Gale";
+      if (speed < 24.4) return "Strong gale";
+      if (speed < 28.4) return "Storm";
+      if (speed < 32.6) return "Violent storm";
+      if (speed < 42.5) return "Hurricane (cat 1)";
+      if (speed < 49.2) return "Hurricane (cat 2)";
+      if (speed < 58.1) return "Hurricane (cat 3)";
+      if (speed < 70.0) return "Hurricane (cat 4)";
+      return "Hurricane (cat 5)";
+    }
+
+    // ---- particles ----
+    function makeParticle(lon, lat) {
+      return { lon, lat, buf: new Float32Array(TRAIL_CAP*3), head:0, len:0,
+               age: Math.floor(Math.random()*60), maxAge: 240 + Math.random()*260 };
+    }
+    function pushTrail(p, lon, lat, speed) {
+      const i = p.head*3;
+      p.buf[i] = lon; p.buf[i+1] = lat; p.buf[i+2] = speed;
+      p.head = (p.head+1) % TRAIL_CAP;
+      if (p.len < TRAIL_CAP) p.len++;
+    }
+    function spawnParticle() {
+      for (let tries=0; tries<8; tries++) {
+        const r = Math.random()*2-1;
+        const lon = Math.random()*360 - 180;
+        const lat = Math.asin(r) * R2D;
+        if (state.layer === "ocean" && OSCAR && oscarIsLand(lon, lat)) continue;
+        return makeParticle(lon, lat);
+      }
+      return makeParticle(Math.random()*360-180, 0);
+    }
+    function rebuildParticles(target) {
+      particles.length = 0;
+      for (let i=0; i<target; i++) particles.push(spawnParticle());
+    }
+
+    function stepParticles() {
+      const dt = state.flowSpeed * 5000;
+      for (let i=0; i<particles.length; i++) {
+        const p = particles[i];
+        if (p.age >= p.maxAge) { particles[i] = spawnParticle(); continue; }
+        const a = advance(p.lon, p.lat, dt);
+        const speed = Math.hypot(a.u, a.v);
+        if (p.len === 0) pushTrail(p, p.lon, p.lat, speed);
+        p.lon = a.lon; p.lat = a.lat;
+        pushTrail(p, p.lon, p.lat, speed);
+        p.age++;
+      }
+    }
+    function drawTrails() {
+      ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = state.lineWeight;
+      const cap = Math.min(state.trailLength, TRAIL_CAP);
+      const invScale = 1 / state.speedScale;
+      const maxJumpSq = 400;
+
+      for (let i=0; i<particles.length; i++) {
+        const p = particles[i];
+        const n = Math.min(p.len, cap);
+        if (n < 2) continue;
+        const start = (p.head - 1 + TRAIL_CAP) % TRAIL_CAP;
+        const segs = [];
+        let prevSx = null, prevSy = null;
+        let speedSum = 0;
+        for (let k=0; k<n; k++) {
+          const idx = ((start - k) + TRAIL_CAP) % TRAIL_CAP;
+          const base = idx*3;
+          const pr = project(p.buf[base], p.buf[base+1]);
+          if (!pr.front) { prevSx = null; continue; }
+          if (prevSx !== null) {
+            const dx = pr.sx - prevSx, dy = pr.sy - prevSy;
+            if (dx*dx + dy*dy < maxJumpSq) {
+              segs.push({ x0: prevSx, y0: prevSy, x1: pr.sx, y1: pr.sy, sp: p.buf[base+2], t: k });
+              speedSum += p.buf[base+2];
+            }
+          }
+          prevSx = pr.sx; prevSy = pr.sy;
+        }
+        if (segs.length === 0) continue;
+        const avgSpeed = speedSum / segs.length;
+        const tint = Math.min(1, Math.max(0, (avgSpeed*invScale - 0.04) * 1.6));
+        if (tint < 0.02) continue;
+        const ageFade = 1 - p.age / p.maxAge;
+        for (let s=0; s<segs.length; s++) {
+          const seg = segs[s];
+          const headBias = 1 - seg.t / (cap - 1);
+          const alpha = Math.max(0, Math.min(1, ageFade * (0.10 + 0.95*headBias) * (0.30 + 0.80*tint)));
+          if (alpha < 0.02) continue;
+          ctx.strokeStyle = speedColor(seg.sp, alpha);
+          ctx.beginPath();
+          ctx.moveTo(seg.x0, seg.y0);
+          ctx.lineTo(seg.x1, seg.y1);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // ---- Earth texture ----
+    function loadEarthTexture(src) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const c = document.createElement("canvas");
+        c.width = img.width; c.height = img.height;
+        const cx2 = c.getContext("2d");
+        cx2.drawImage(img, 0, 0);
+        earthTex = cx2.getImageData(0, 0, img.width, img.height);
+        earthDirty = true;
+      };
+      img.onerror = () => console.warn("Earth texture failed to load:", src);
+      img.src = src;
+    }
+    function renderEarthCache() {
+      if (!earthTex) return false;
+      const w = Math.max(1, Math.floor(globeR * 2 + 4));
+      const h = w;
+      if (earthCanvas.width !== w*dpr || earthCanvas.height !== h*dpr) {
+        earthCanvas.width = w*dpr;
+        earthCanvas.height = h*dpr;
+      }
+      const out = earthCtx.createImageData(w*dpr, h*dpr);
+      const data = out.data;
+      const cx = w*0.5*dpr, cy = h*0.5*dpr;
+      const r = globeR*dpr;
+      const r2 = r*r;
+      const cp = Math.cos(state.pitch), sp = Math.sin(state.pitch);
+      const tw = earthTex.width, th = earthTex.height, td = earthTex.data;
+      for (let py=0; py<h*dpr; py++) {
+        for (let px=0; px<w*dpr; px++) {
+          const dx = px - cx, dy = py - cy;
+          const d2 = dx*dx + dy*dy;
+          if (d2 > r2) continue;
+          const x = dx/r, y = -dy/r;
+          const z = Math.sqrt(1 - x*x - y*y);
+          const yr = y*cp + z*sp;
+          const zr = -y*sp + z*cp;
+          const lat = Math.asin(yr);
+          let lon = Math.atan2(x, zr) + state.yaw;
+          lon = lon - TWO_PI * Math.floor((lon + Math.PI) / TWO_PI);
+          const u = (lon + Math.PI) / TWO_PI;
+          const v = (Math.PI*0.5 - lat) / Math.PI;
+          const tx = Math.min(tw-1, Math.max(0, Math.floor(u*tw)));
+          const ty = Math.min(th-1, Math.max(0, Math.floor(v*th)));
+          const ti = (ty*tw + tx) * 4;
+          const limb = 0.35 + 0.65 * Math.sqrt(1 - d2/r2);
+          const oi = (py * w*dpr + px) * 4;
+          data[oi]   = td[ti]   * limb;
+          data[oi+1] = td[ti+1] * limb;
+          data[oi+2] = td[ti+2] * limb;
+          data[oi+3] = 255;
+        }
+      }
+      earthCtx.putImageData(out, 0, 0);
+      earthDirty = false;
+      return true;
+    }
+    function drawEarth() {
+      if (earthDirty) renderEarthCache();
+      if (!earthTex) return;
+      const w = earthCanvas.width / dpr;
+      const h = earthCanvas.height / dpr;
+      ctx.drawImage(earthCanvas, globeCx - w*0.5, globeCy - h*0.5, w, h);
+    }
+
+    function clearStage() { ctx.fillStyle = "#0c0d10"; ctx.fillRect(0, 0, viewW, viewH); }
+    function drawGlobeHalo() {
+      const grad = ctx.createRadialGradient(globeCx, globeCy, globeR*0.95, globeCx, globeCy, globeR*1.18);
+      grad.addColorStop(0, "rgba(24,120,224,0.05)");
+      grad.addColorStop(1, "rgba(24,120,224,0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(globeCx, globeCy, globeR*1.18, 0, TWO_PI); ctx.fill();
+    }
+    function drawSphereShading() {
+      const dark = ctx.createRadialGradient(globeCx, globeCy, globeR*0.55, globeCx, globeCy, globeR);
+      dark.addColorStop(0, "rgba(0,0,0,0)");
+      dark.addColorStop(0.75, "rgba(0,0,0,0.22)");
+      dark.addColorStop(1, "rgba(0,0,0,0.6)");
+      ctx.fillStyle = dark;
+      ctx.beginPath(); ctx.arc(globeCx, globeCy, globeR, 0, TWO_PI); ctx.fill();
+      const hi = ctx.createRadialGradient(globeCx - globeR*0.42, globeCy - globeR*0.42, globeR*0.04,
+                                          globeCx - globeR*0.42, globeCy - globeR*0.42, globeR*0.55);
+      hi.addColorStop(0, "rgba(255,244,222,0.10)");
+      hi.addColorStop(1, "rgba(255,244,222,0)");
+      ctx.fillStyle = hi;
+      ctx.beginPath(); ctx.arc(globeCx, globeCy, globeR, 0, TWO_PI); ctx.fill();
+    }
+    function drawGraticule() {
+      ctx.save(); ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(180,200,230,0.07)";
+      for (let lon=-180; lon<180; lon+=30) {
+        ctx.beginPath(); let first = true;
+        for (let lat=-85; lat<=85; lat+=4) {
+          const p = project(lon, lat);
+          if (!p.front) { first = true; continue; }
+          if (first) { ctx.moveTo(p.sx, p.sy); first = false; } else ctx.lineTo(p.sx, p.sy);
+        }
+        ctx.stroke();
+      }
+      for (let lat=-80; lat<=80; lat+=20) {
+        ctx.beginPath(); let first = true;
+        for (let lon=-180; lon<=180; lon+=4) {
+          const p = project(lon, lat);
+          if (!p.front) { first = true; continue; }
+          if (first) { ctx.moveTo(p.sx, p.sy); first = false; } else ctx.lineTo(p.sx, p.sy);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    function drawRim() {
+      ctx.save();
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = "rgba(220,230,245,0.20)";
+      ctx.beginPath(); ctx.arc(globeCx, globeCy, globeR, 0, TWO_PI); ctx.stroke();
+      ctx.restore();
+    }
+
+    function frame(t) {
+      const dt = Math.min(0.05, (t - lastT) / 1000 || 0.016);
+      lastT = t;
+      state._time = (state._time || 0) + dt;
+      if (state.spin) { state.yaw += dt * 0.08; earthDirty = true; }
+
+      clearStage();
+      drawGlobeHalo();
+      stepParticles();
+      ctx.save();
+      ctx.beginPath(); ctx.arc(globeCx, globeCy, globeR, 0, TWO_PI); ctx.clip();
+      drawEarth();
+      drawGraticule();
+      drawTrails();
+      drawSphereShading();
+      ctx.restore();
+      drawRim();
+      drawStorms();
+
+      if (state.layer === "wind" && GFS) updateGfsLabel();
+      updateStats();
+      requestAnimationFrame(frame);
+    }
+
+    function updateStats() {
+      if (!cursor) { windReadout.textContent = "— m/s"; regionReadout.textContent = "—"; return; }
+      const f = sampleField(cursor.lon, cursor.lat);
+      const speed = Math.hypot(f.u, f.v);
+      const dirDeg = ((Math.atan2(-f.u, -f.v) * R2D) + 360) % 360;
+      windReadout.textContent = `${speed.toFixed(2)} m/s · ${dirDeg.toFixed(0)}°`;
+      regionReadout.textContent = state.layer === "ocean" ? labelRegion(cursor.lon, cursor.lat) : beaufortLabel(speed);
+    }
+    function labelRegion(lon, lat) {
+      const onLand = state.layer === "ocean" && OSCAR ? oscarIsLand(lon, lat) : false;
+      const zone = Math.abs(lat) < 10 ? "tropics" : Math.abs(lat) < 30 ? "subtropics"
+                 : Math.abs(lat) < 60 ? "mid-lat" : "polar";
+      return `${onLand ? "land" : "ocean"} · ${zone}`;
+    }
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      viewW = Math.max(1, Math.floor(rect.width));
+      viewH = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(viewW * dpr);
+      canvas.height = Math.floor(viewH * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      globeCx = viewW * 0.5;
+      globeCy = viewH * 0.5;
+      globeR = Math.min(viewW, viewH) * 0.44;
+      ctx.fillStyle = "#0c0d10";
+      ctx.fillRect(0, 0, viewW, viewH);
+      earthDirty = true;
+    }
+
+    function onPointerDown(e) {
+      drag = { x: e.clientX, y: e.clientY, yaw: state.yaw, pitch: state.pitch, id: e.pointerId };
+      canvas.setPointerCapture(e.pointerId);
+    }
+    function onPointerMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      cursor = unproject(e.clientX - rect.left, e.clientY - rect.top);
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      state.yaw = drag.yaw - dx*0.005;
+      state.pitch = Math.max(-1.2, Math.min(1.2, drag.pitch + dy*0.005));
+      earthDirty = true;
+    }
+    function onPointerUp(e) { if (drag && drag.id === e.pointerId) drag = null; }
+    function onPointerLeave() { cursor = null; }
+
+    Object.entries(controls).forEach(([key, input]) => {
+      input.addEventListener("input", () => {
+        state[key] = Number(input.value);
+        updateOutputs();
+        if (key === "particleCount") rebuildParticles(state.particleCount);
+        if (key === "speedScale") updateLegend();
+      });
+    });
+    layerButtons.forEach((b) => b.addEventListener("click", () => setLayer(b.dataset.layer)));
+    spinButton.addEventListener("click", () => {
+      state.spin = !state.spin;
+      spinButton.setAttribute("aria-pressed", String(state.spin));
+    });
+    document.getElementById("resetButton").addEventListener("click", () => {
+      state.yaw = defaults.yaw; state.pitch = defaults.pitch; state.spin = false;
+      spinButton.setAttribute("aria-pressed", "false");
+      earthDirty = true;
+    });
+    function setLayer(layer) {
+      state.layer = layer;
+      layerButtons.forEach((b) => b.setAttribute("aria-pressed", b.dataset.layer === layer ? "true" : "false"));
+      const labels = {
+        wind: GFS ? `NOAA GFS 10 m wind · loading` : "NOAA GFS 10 m wind · loading",
+        ocean: OSCAR ? `OSCAR sea-surface velocity · ${OSCAR.time.slice(0,10)}` : "Ocean surface currents · loading OSCAR…",
+        jet: "200 hPa jet stream · analytic preview",
+      };
+      layerLabel.textContent = labels[layer];
+      if (layer === "ocean") controls.speedScale.value = 0.5;
+      else if (layer === "jet") controls.speedScale.value = 55;
+      else controls.speedScale.value = 25; // GFS 10 m winds peak around 20-25 m/s
+      state.speedScale = Number(controls.speedScale.value);
+      updateOutputs();
+      updateLegend();
+      rebuildParticles(state.particleCount);
+      if (layer === "ocean") loadOscar();
+      if (layer === "wind") loadGfs();
+    }
+    function updateLegend() {
+      // Legend is now anchored to absolute m/s (Beaufort/turbo); nothing to
+      // refresh when the speedScale slider moves.
+    }
+    function updateOutputs() {
+      Object.entries(controls).forEach(([key, input]) => {
+        const out = input.parentElement.querySelector("output");
+        const v = Number(input.value);
+        out.textContent = Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/0$/, '').replace(/\.$/, '');
+      });
+    }
+
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
+    canvas.addEventListener("pointerleave", onPointerLeave);
+    window.addEventListener("resize", () => { resize(); });
+
+    resize();
+    updateOutputs();
+    loadEarthTexture("/earth.jpg");
+    setLayer(state.layer);
+    loadStorms();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

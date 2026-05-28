@@ -1,0 +1,119 @@
+- !<AssetImportMetadata/5cc12926-48ae-4613-a86d-37f0ea3518bf>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 80c05993-b909-4c91-94d9-9e48d8344b9e
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 80c05993-b909-4c91-94d9-9e48d8344b9e
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 054bd835-3768-41f2-8068-491997db30ec
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/054bd835-3768-41f2-8068-491997db30ec>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 01cc097b-260f-482e-a11c-227583df2ce5
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    arrowResolution: false
+    arrowScale: false
+    arrowWidth: false
+    earthAxialMotionEnabled: false
+    earthMass: false
+    earthObject: false
+    fieldLineCount: false
+    fieldLineSteps: false
+    initialStage: false
+    issOrbitMotionEnabled: false
+    issOrbitRadius: false
+    lineWidth: false
+    material: false
+    moonMass: false
+    moonObject: false
+    moonOrbitMotionEnabled: false
+    moonSynchronousRotationEnabled: false
+    motionRebuildInterval: false
+    planeSize: false
+    satelliteObject: false
+    showSatelliteOrbitCurve: false
+    simulatedHoursPerSecond: false
+    softening: false
+    useModelPositions: false
+    wellDepth: false
+    wellResolution: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - earthObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      moonObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      satelliteObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      useModelPositions: false
+      showSatelliteOrbitCurve: false
+      earthAxialMotionEnabled: false
+      issOrbitMotionEnabled: false
+      moonOrbitMotionEnabled: false
+      moonSynchronousRotationEnabled: false
+      simulatedHoursPerSecond: 0.500000
+      issOrbitRadius: 1.550000
+      motionRebuildInterval: 0.180000
+      earthMass: !<float> 18.000000
+      moonMass: !<float> 2.000000
+      planeSize: !<float> 18.000000
+      arrowResolution: !<float> 7.000000
+      wellResolution: !<float> 18.000000
+      fieldLineCount: !<float> 72.000000
+      fieldLineSteps: !<float> 96.000000
+      softening: 0.850000
+      arrowScale: 0.340000
+      arrowWidth: 0.070000
+      lineWidth: 0.055000
+      wellDepth: 1.450000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      initialStage: !<float> 2.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject earthObject {"hint":"Optional Earth object. If unset, a generated flat shaded Earth is used."}'
+    - '// @input SceneObject moonObject {"hint":"Optional Moon object. If unset, a generated flat shaded Moon is used."}'
+    - '// @input SceneObject satelliteObject {"hint":"Optional ISS/satellite object. If unset, a generated flat shaded satellite is used."}'
+    - '// @input bool useModelPositions = true {"hint":"When on, the field samples the live Earth/Moon transforms so orbital motion deforms the visualization."}'
+    - '// @input bool showSatelliteOrbitCurve {"hint":"Optional debug orbit guide. Off by default so the ISS orbit curve stays hidden."}'
+    - '// @input bool earthAxialMotionEnabled = true {"hint":"When on, the Earth spins on its tilted axis. The 23.4 degree tilt itself is always applied."}'
+    - '// @input bool issOrbitMotionEnabled = true {"hint":"When on, moves the ISS/satellite model around Earth on a 51.6 degree inclined orbit."}'
+    - '// @input bool moonOrbitMotionEnabled = true {"hint":"When on, moves the Moon model around Earth."}'
+    - '// @input bool moonSynchronousRotationEnabled = true {"hint":"When on, the Moon is tidally locked: the same face always points toward Earth."}'
+    - '// @input float simulatedHoursPerSecond = 8 {"hint":"Simulated hours per real second for celestial motion toggles. 8.0 makes a Moon orbit complete in ~80 s.", "widget":"slider", "min":0.05, "max":48, "step":0.05}'
+    - '// @input float issOrbitRadius = 1.55 {"hint":"Display radius in cm for ISS orbit. Real ISS altitude is close to Earth, so this remains adjustable for AR readability.", "widget":"slider", "min":1.45, "max":4, "step":0.05}'
+    - '// @input float motionRebuildInterval = 0.33 {"hint":"Minimum seconds between field rebuilds while the Moon orbit is animated.", "widget":"slider", "min":0.05, "max":1, "step":0.05}'
+    - '// @input float earthMass = 18 {"hint":"Relative Earth mass", "widget":"slider", "min":1, "max":30, "step":0.5}'
+    - '// @input float moonMass = 2 {"hint":"Moon mass multiplier. 1 means the real Earth/Moon mass ratio.", "widget":"slider", "min":0.25, "max":8, "step":0.25}'
+    - '// @input float planeSize = 18 {"hint":"Width/depth of the sampled plane in centimeters", "widget":"slider", "min":8, "max":28, "step":1}'
+    - '// @input float arrowResolution = 7 {"hint":"Number of arrows per side on the flat vector plane", "widget":"slider", "min":5, "max":17, "step":1}'
+    - '// @input float wellResolution = 18 {"hint":"Resolution for scalar contours and well guide curves", "widget":"slider", "min":8, "max":28, "step":1}'
+    - '// @input float fieldLineCount = 72 {"hint":"Number of integrated gravity field lines", "widget":"slider", "min":24, "max":120, "step":4}'
+    - '// @input float fieldLineSteps = 168 {"hint":"Integration steps per field line", "widget":"slider", "min":36, "max":240, "step":4}'
+    - '// @input float softening = 0.85 {"hint":"Body-relative softening multiplier. Keeps lines stable near bodies.", "widget":"slider", "min":0.1, "max":2, "step":0.05}'
+    - '// @input float arrowScale = 0.34 {"hint":"Visual arrow length scale", "widget":"slider", "min":0.05, "max":1.2, "step":0.05}'
+    - '// @input float arrowWidth = 0.07 {"hint":"Arrow shaft width", "widget":"slider", "min":0.02, "max":0.35, "step":0.01}'
+    - '// @input float lineWidth = 0.08 {"hint":"Tube diameter for gravity field and same-potential curves", "widget":"slider", "min":0.025, "max":0.22, "step":0.005}'
+    - '// @input float wellDepth = 2.4 {"hint":"How far the scalar gravity well falls along local Y. Depth scales with body mass so Earth dominates the Moon.", "widget":"slider", "min":0.15, "max":6, "step":0.05}'
+    - '// @input Asset.Material material {"hint":"Flat/toon material cloned for generated gravity meshes"}'
+    - '// @input float initialStage = 2 {"hint":"Standalone preview stage used when the component wakes up.", "widget":"combobox", "values":[{"label":"Bodies", "value":0}, {"label":"Arrows", "value":1}, {"label":"Field Lines", "value":2}]}'

@@ -32,6 +32,15 @@ vec4 samplePreset(int p, vec2 frameUV) {
         return vortexSheet.sample(frameUV);
     }
     if (p == 5) {
+        return circulationSheet.sample(frameUV);
+    }
+    if (p == 6) {
+        return vortexSheet.sample(frameUV);
+    }
+    if (p == 7) {
+        return wavesSheet.sample(frameUV);
+    }
+    if (p == 8) {
         return magneticSheet.sample(frameUV);
     }
     return vec4(0.0);

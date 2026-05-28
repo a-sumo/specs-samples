@@ -1,0 +1,59 @@
+- !<AssetImportMetadata/72817c08-2695-4ec2-bf14-1fe6c87cf931>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> df996528-653a-4558-83ca-61ac40ebc7a6
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> df996528-653a-4558-83ca-61ac40ebc7a6
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 0a19d05b-eee2-48e4-b60e-c15070f7d953
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/0a19d05b-eee2-48e4-b60e-c15070f7d953>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: f854a272-bb22-4c97-86a9-4a27e56f7f4a
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    calibrationObject: false
+    markerPrefab: false
+    markerScale: false
+    markerTemplate: false
+    pulseAmount: false
+    pulseHz: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - calibrationObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      markerPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      markerTemplate: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      markerScale: 0.800000
+      pulseAmount: 0.350000
+      pulseHz: 1.400000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject calibrationObject {"hint":"Globe Calibration SceneObject (its WindGlobeCalibration script is read)."}'
+    - '// @input Asset.ObjectPrefab markerPrefab {"hint":"Optional prefab to instantiate per storm. Leave empty to use auto sphere markers."}'
+    - '// @input SceneObject markerTemplate {"hint":"Optional template SceneObject — duplicated per storm if no prefab is supplied."}'
+    - // @input float markerScale = 0.8
+    - '// @input float pulseAmount = 0.35 {"hint":"Multiplier on the pulse amplitude. 0 = static, 1 = breathing."}'
+    - '// @input float pulseHz = 1.4 {"hint":"Pulse frequency in Hz."}'

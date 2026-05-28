@@ -4,121 +4,94 @@
     - !<own> 2e8e9f00-8fa3-41c9-a3ef-4cd2b674933e
 - !<PassInfo/2e8e9f00-8fa3-41c9-a3ef-4cd2b674933e>
   CachedProperties:
-    - Brightness:
+    - Port_Depth_N001:
         typeIdx: 1
         value: 1.000000
-    - ColorSpeed:
-        typeIdx: 1
-        value: 1.000000
-    - FilmThickness:
-        typeIdx: 1
-        value: 1.000000
-    - FresnelPower:
-        typeIdx: 1
-        value: 1.000000
-    - Opacity:
-        typeIdx: 1
-        value: 1.000000
-    - Port_Brightness_N000:
-        typeIdx: 1
-        value: 0.000000
-    - Port_ColorSpeed_N000:
-        typeIdx: 1
-        value: 0.000000
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
-    - Port_FilmThickness_N000:
-        typeIdx: 1
-        value: 0.000000
+    - Port_FinalColor1_N001:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_FinalColor1_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor2_N001:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_FinalColor2_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor3_N001:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Port_FinalColor3_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-    - Port_FresnelPower_N000:
+    - Port_FinalColor_N001:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FlatColor_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_GSplatPointSize_N001:
         typeIdx: 1
         value: 0.000000
     - Port_GSplatPointSize_N004:
         typeIdx: 1
         value: 0.000000
+    - Port_GSplatRotation_N001:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
     - Port_GSplatRotation_N004:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+    - Port_GSplatScale_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_GSplatScale_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
-    - Port_Opacity_N000:
-        typeIdx: 1
-        value: 0.000000
-    - Port_Power_N000:
-        typeIdx: 1
-        value: 0.000000
+    - Port_PrevWorldPosition_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_PrevWorldPosition_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_RayDirection_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 1.000000, z: 0.000000}
     - Port_RayDirection_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 1.000000, z: 0.000000}
+    - Port_RayOrigin_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
     - Port_RayOrigin_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
-    - Port_Saturation_N000:
-        typeIdx: 1
-        value: 0.000000
-    - Port_Speed_N000:
-        typeIdx: 1
-        value: 0.000000
-    - Port_Time_N000:
-        typeIdx: 1
-        value: 0.000000
-    - Port_Value1_N000:
-        typeIdx: 5
-        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
-    - Port_Value2_N000:
-        typeIdx: 5
-        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_WorldNormal_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 1.000000, z: 0.000000}
     - Port_WorldNormal_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 1.000000, z: 0.000000}
-    - Port_WorldPosition_N004:
+    - Port_WorldPosition_N001:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldTangent_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 1.000000}
     - Port_WorldTangent_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 1.000000}
-    - Power:
-        typeIdx: 1
-        value: 1.000000
-    - Saturation:
-        typeIdx: 1
-        value: 1.000000
-    - Speed:
-        typeIdx: 1
-        value: 1.000000
-    - Time:
-        typeIdx: 1
-        value: 1.000000
-    - Tweak_N5:
-        typeIdx: 1
-        value: 1.000000
-    - Tweak_N6:
-        typeIdx: 1
-        value: 1.000000
-    - Tweak_N7:
-        typeIdx: 1
-        value: 1.000000
-    - Tweak_N8:
-        typeIdx: 1
-        value: 1.000000
-  DepthWrite: true
+    - Tweak_N2:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  DepthWrite: false
   DepthTest: true
   DepthFunction: LessEqual
-  TwoSided: false
+  TwoSided: true
   ColorMask: {x: true, y: true, z: true, w: true}
   CullMode: Back
   PolygonOffset: {x: 0.000000, y: 0.000000}
@@ -127,9 +100,9 @@
   InstanceCount: 1
   Defines:
     []
-  BlendMode: Disabled
+  BlendMode: PremultipliedAlpha
   Properties:
-    Port_FinalColor_N004:
+    FlatColor:
       typeIdx: 5
       value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     PreviewEnabled:

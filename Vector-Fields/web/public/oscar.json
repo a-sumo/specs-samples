@@ -1,0 +1,16 @@
+{
+  "source": "NOAA ERDDAP · jplOscar (Earth & Space Research / JPL)",
+  "time": "2016-09-26T00:00:00Z",
+  "depth_m": 15,
+  "nx": 361,
+  "ny": 161,
+  "lonMin": 20,
+  "lonMax": 380,
+  "latMax": 80,
+  "latMin": -80,
+  "lonRes": 1,
+  "latRes": 1,
+  "units": "m/s",
+  "byteOrder": "little-endian",
+  "layout": "concatenated [u (Float32, ny×nx, north-to-south, west-to-east), v (same shape)]"
+}

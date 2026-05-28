@@ -26,6 +26,9 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    arrowColor: false
+    arrowScale: false
+    arrowSpacing: false
     colorHigh: false
     colorLow: false
     contourColor: false
@@ -35,6 +38,9 @@
     earthMass: false
     earthObject: false
     earthTint: false
+    fieldLineColor: false
+    fieldLineDensity: false
+    fieldLineWidth: false
     flowScale: false
     flowSpeed: false
     moonMass: false
@@ -75,6 +81,12 @@
       contourColor: !<Vec4> {x: 0.950000, y: 0.300000, z: 0.300000, w: 0.850000}
       earthTint: !<Vec4> {x: 0.620000, y: 0.850000, z: 1.000000, w: 1.000000}
       moonTint: !<Vec4> {x: 1.000000, y: 0.950000, z: 0.780000, w: 1.000000}
+      fieldLineColor: !<Vec4> {x: 0.180000, y: 0.360000, z: 1.000000, w: 0.580000}
+      arrowColor: !<Vec4> {x: 1.000000, y: 0.780000, z: 0.860000, w: 0.950000}
+      fieldLineDensity: 0.820000
+      fieldLineWidth: 0.065000
+      arrowSpacing: 2.800000
+      arrowScale: 0.720000
   ScriptTypes:
     -
       {}
@@ -82,8 +94,8 @@
     - '// @input SceneObject earthObject {"hint":"Earth SceneObject. The script reads its world position into the EarthPos uniform."}'
     - '// @input SceneObject moonObject {"hint":"Moon SceneObject. The script reads its world position into the MoonPos uniform."}'
     - '// @input Asset.Material planeMaterial {"hint":"Material instanced from GravityFieldPlane.mat. The script clones it so multiple plane instances stay independent."}'
-    - '// @input float planeSize = 18 {"hint":"Plane width/depth in cm.", "widget":"slider", "min":6, "max":30, "step":0.5}'
-    - '// @input float resolution = 96 {"hint":"Vertices per side of the plane mesh. Higher = smoother well and contours; 96 is a safe Spectacles default.", "widget":"slider", "min":24, "max":192, "step":4}'
+    - '// @input float planeSize = 30 {"hint":"Plane width/depth in cm.", "widget":"slider", "min":6, "max":42, "step":0.5}'
+    - '// @input float resolution = 128 {"hint":"Vertices per side of the plane mesh. Higher = smoother well and contours; 96 is a safe Spectacles default.", "widget":"slider", "min":24, "max":192, "step":4}'
     - '// @input float earthMass = 18 {"hint":"Earth mass (relative units).", "widget":"slider", "min":1, "max":30, "step":0.5}'
     - '// @input float moonMass = 2 {"hint":"Moon mass multiplier vs. real Earth/Moon ratio.", "widget":"slider", "min":0.25, "max":8, "step":0.25}'
     - '// @input float softening = 0.35 {"hint":"Softening radius. Caps the 1/r singularity at body centers.", "widget":"slider", "min":0.05, "max":1.5, "step":0.05}'
@@ -93,9 +105,15 @@
     - '// @input float contourThickness = 0.18 {"hint":"Contour line half-width (relative to ring spacing).", "widget":"slider", "min":0, "max":0.5, "step":0.01}'
     - '// @input float flowSpeed = 0.6 {"hint":"Animation speed for the flow stripes along the field direction.", "widget":"slider", "min":0, "max":4, "step":0.05}'
     - '// @input float flowScale = 1.6 {"hint":"Spatial frequency of the flow stripes.", "widget":"slider", "min":0.2, "max":8, "step":0.1}'
-    - '// @input float opacityScale = 0.85 {"hint":"Overall plane opacity scale.", "widget":"slider", "min":0, "max":1, "step":0.05}'
-    - '// @input vec4 colorLow = {0.05,0.07,0.18,1} {"hint":"Low-potential heatmap color (far from masses).", "widget":"color"}'
-    - '// @input vec4 colorHigh = {1,0.55,0.2,1} {"hint":"High-potential heatmap color (near masses).", "widget":"color"}'
-    - '// @input vec4 contourColor = {0.95,0.3,0.3,0.85} {"hint":"Contour ring color (alpha controls strength).", "widget":"color"}'
-    - '// @input vec4 earthTint = {0.62,0.85,1,1} {"hint":"Tint applied where Earth dominates the field.", "widget":"color"}'
-    - '// @input vec4 moonTint = {1,0.95,0.78,1} {"hint":"Tint applied where the Moon dominates the field.", "widget":"color"}'
+    - '// @input float opacityScale = 0.92 {"hint":"Overall plane opacity scale.", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input vec4 colorLow = {0.12,0.36,1,1} {"hint":"Low-potential heatmap color (far from masses).", "widget":"color"}'
+    - '// @input vec4 colorHigh = {1,0.08,0.1,1} {"hint":"High-potential heatmap color (near masses).", "widget":"color"}'
+    - '// @input vec4 contourColor = {1,0.16,0.22,0.98} {"hint":"Contour ring color (alpha controls strength).", "widget":"color"}'
+    - '// @input vec4 earthTint = {1,0.28,0.22,1} {"hint":"Tint applied where Earth dominates the field.", "widget":"color"}'
+    - '// @input vec4 moonTint = {0.22,0.6,1,1} {"hint":"Tint applied where the Moon dominates the field.", "widget":"color"}'
+    - '// @input vec4 fieldLineColor = {0.3,0.62,1,0.78} {"hint":"Field-line overlay color.", "widget":"color"}'
+    - '// @input vec4 arrowColor = {1,0.9,0.96,0.98} {"hint":"Arrow overlay color.", "widget":"color"}'
+    - '// @input float fieldLineDensity = 0.82 {"hint":"Field line density in local plane space.", "widget":"slider", "min":0.1, "max":2.5, "step":0.05}'
+    - '// @input float fieldLineWidth = 0.065 {"hint":"Field line width relative to spacing.", "widget":"slider", "min":0.01, "max":0.25, "step":0.005}'
+    - '// @input float arrowSpacing = 2.8 {"hint":"Spacing between shader-drawn arrows.", "widget":"slider", "min":1.2, "max":5, "step":0.1}'
+    - '// @input float arrowScale = 0.72 {"hint":"Size of each shader-drawn arrow within its grid cell.", "widget":"slider", "min":0.25, "max":1.1, "step":0.05}'

@@ -1,0 +1,74 @@
+- !<AssetImportMetadata/17fd6005-ddf3-4a6d-aebe-786f71712ef1>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 1069c323-cdef-4c0f-852f-8ac750e78891
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 1069c323-cdef-4c0f-852f-8ac750e78891
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> ac28d7d0-7a28-40d6-97d7-629e36e3de93
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/ac28d7d0-7a28-40d6-97d7-629e36e3de93>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 67d01c31-1b46-491e-9b67-e9c9a05e0eda
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    _lineCount: false
+    _radialSegments: false
+    _seedRadius: false
+    _segments: false
+    _stepSize: false
+    _strengthA: false
+    _strengthB: false
+    _tubeRadius: false
+    chargeA: false
+    chargeB: false
+    material: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      chargeA: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      chargeB: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      _strengthA: !<float> 1.000000
+      _strengthB: !<float> -1.000000
+      _lineCount: !<float> 12.000000
+      _segments: !<float> 32.000000
+      _radialSegments: !<float> 6.000000
+      _seedRadius: !<float> 2.000000
+      _stepSize: !<float> 1.000000
+      _tubeRadius: 0.400000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input Asset.Material material {"hint":"Any material that renders triangles (FlatMaterial works)"}'
+    - // @input SceneObject chargeA
+    - // @input SceneObject chargeB
+    - '// @input float _strengthA = 1 {"widget":"slider", "min":-5, "max":5, "step":0.1}'
+    - '// @input float _strengthB = -1 {"widget":"slider", "min":-5, "max":5, "step":0.1}'
+    - '// @input float _lineCount = 12 {"widget":"slider", "min":1, "max":24, "step":1}'
+    - '// @input float _segments = 32 {"widget":"slider", "min":8, "max":48, "step":1}'
+    - '// @input float _radialSegments = 6 {"widget":"slider", "min":3, "max":12, "step":1}'
+    - '// @input float _seedRadius = 2 {"widget":"slider", "min":0.3, "max":8, "step":0.1}'
+    - '// @input float _stepSize = 1 {"widget":"slider", "min":0.1, "max":4, "step":0.05}'
+    - '// @input float _tubeRadius = 0.4 {"widget":"slider", "min":0.05, "max":1.5, "step":0.01}'

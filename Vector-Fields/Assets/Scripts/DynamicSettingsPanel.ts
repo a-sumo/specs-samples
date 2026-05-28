@@ -1,3 +1,6 @@
+import { FieldButtonBinding, VectorFieldUIStyle } from "./VectorFieldUIStyle";
+import { RectangleButton } from "SpectaclesUIKit.lspkg/Scripts/Components/Button/RectangleButton";
+
 // DynamicSettingsPanel.ts
 // Dynamically creates sliders and toggles from prefabs and binds them to field components
 // Field Mode: Toggle group with "Vector" and "Magnetic" buttons
@@ -91,61 +94,75 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     @hint("FieldController to notify when field mode changes")
     fieldController: ScriptComponent;
 
+    @input
+    @allowUndefined
+    @hint("Flat/toon material cloned for custom button and panel meshes")
+    uiMaterial: Material = null as any;
+
+    @input
+    @allowUndefined
+    @hint("SceneObject that visually frames the settings controls")
+    panelRoot: SceneObject = null as any;
+
     private sliders: Map<string, SceneObject> = new Map();
     private fieldModeToggles: SceneObject[] = [];
     private presetToggles: SceneObject[] = [];
     private tubeModeToggles: SceneObject[] = [];
     private lodToggles: SceneObject[] = [];
+    private fieldModeButtonStyles: FieldButtonBinding[] = [];
+    private presetButtonStyles: FieldButtonBinding[] = [];
+    private tubeModeButtonStyles: FieldButtonBinding[] = [];
+    private lodButtonStyles: FieldButtonBinding[] = [];
     private activeComponent: any = null;
     private fieldModesBuilt: boolean = false;
     private presetsBuilt: boolean = false;
     private tubeModesBuilt: boolean = false;
     private lodBuilt: boolean = false;
+    private panelStyled: boolean = false;
 
     private vectorFieldValues: Map<string, number> = new Map();
     private magneticFieldValues: Map<string, number> = new Map();
     private currentFieldType: string = "";
 
     private fieldModes: string[] = [
-        "Vector",
-        "Magnetic"
+        "Patterns",
+        "Magnets"
     ];
 
     private vectorFieldPresets: string[] = [
-        "Expansion",
-        "Contraction",
-        "Circulation",
-        "Waves",
-        "Vortex"
+        "Burst",
+        "Pull",
+        "Orbit",
+        "Waves"
     ];
 
     private tubeModes: string[] = [
-        "Trails",
-        "Particles",
+        "Lines",
+        "Dots",
         "Arrows"
     ];
 
     private lodModes: string[] = [
-        "Low",
-        "Med",
-        "High",
-        "Ultra"
+        "Fast",
+        "Balanced",
+        "Detailed",
+        "Dense"
     ];
 
     private vectorFieldConfigs: SliderConfig[] = [
-        { label: "Field Scale", propertyName: "fieldScale", min: 0.1, max: 3.0, defaultValue: 1.0 },
-        { label: "Radius", propertyName: "radius", min: 0.01, max: 0.2, defaultValue: 0.05 },
-        { label: "Flow Speed", propertyName: "flowSpeed", min: 0, max: 100, defaultValue: 50.0 },
-        { label: "Step Size", propertyName: "stepSize", min: 0.01, max: 0.5, defaultValue: 0.1 },
+        { label: "Field Size", propertyName: "fieldScale", min: 0.1, max: 3.0, defaultValue: 1.0 },
+        { label: "Line Width", propertyName: "radius", min: 0.01, max: 0.2, defaultValue: 0.05 },
+        { label: "Motion Speed", propertyName: "flowSpeed", min: 0, max: 100, defaultValue: 50.0 },
+        { label: "Curve Detail", propertyName: "stepSize", min: 0.01, max: 0.5, defaultValue: 0.1 },
     ];
 
     private magneticFieldConfigs: SliderConfig[] = [
-        { label: "Field Strength", propertyName: "fieldStrength", min: 0.1, max: 5.0, defaultValue: 1.0 },
-        { label: "Radius", propertyName: "radius", min: 0.01, max: 0.2, defaultValue: 0.05 },
-        { label: "Flow Speed", propertyName: "flowSpeed", min: 0, max: 20, defaultValue: 2.0 },
-        { label: "Step Size", propertyName: "stepSize", min: 0.01, max: 0.3, defaultValue: 0.08 },
-        { label: "Arrow Scale", propertyName: "arrowScale", min: 0.05, max: 1.0, defaultValue: 0.15 },
-        { label: "Ref Distance", propertyName: "referenceDistance", min: 2.0, max: 30.0, defaultValue: 8.0 },
+        { label: "Magnet Power", propertyName: "fieldStrength", min: 0.1, max: 5.0, defaultValue: 1.0 },
+        { label: "Line Width", propertyName: "radius", min: 0.01, max: 0.2, defaultValue: 0.05 },
+        { label: "Motion Speed", propertyName: "flowSpeed", min: 0, max: 20, defaultValue: 2.0 },
+        { label: "Curve Detail", propertyName: "stepSize", min: 0.01, max: 0.3, defaultValue: 0.08 },
+        { label: "Arrow Size", propertyName: "arrowScale", min: 0.05, max: 1.0, defaultValue: 0.15 },
+        { label: "Pull Range", propertyName: "referenceDistance", min: 2.0, max: 30.0, defaultValue: 8.0 },
     ];
 
     private fieldModeCallbackAdded: boolean = false;
@@ -157,9 +174,13 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         this.createScriptApi();
 
         this.createEvent("OnStartEvent").bind(() => {
+            this.stylePanelShell();
+            this.layoutControlContainers();
             this.buildFieldModeToggles();
             this.buildForVectorField();
         });
+
+        this.createEvent("UpdateEvent").bind(() => this.updateButtonStyles());
     }
 
     private createScriptApi(): void {
@@ -172,63 +193,34 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     }
 
     private buildFieldModeToggles(): void {
-        if (!this.fieldModeTogglePrefab || !this.fieldModeToggleContainer) {
-            print("DynamicSettingsPanel: No field mode toggle prefab or container - skipping");
+        if (!this.fieldModeToggleContainer) {
+            print("DynamicSettingsPanel: No field mode container - skipping");
             return;
         }
 
         if (this.fieldModesBuilt) return;
 
-        const toggleGroupScript = this.findToggleGroupComponent(this.fieldModeToggleContainer);
-
-        if (toggleGroupScript) {
-            toggleGroupScript.firstOnToggle = 0;
-
-            if (!this.fieldModeCallbackAdded) {
-                toggleGroupScript.onToggleSelected.add((args: any) => {
-                    const index = args.value;
-                    if (index !== undefined) {
-                        this.onFieldModeSelected(index);
-                    }
-                });
-                this.fieldModeCallbackAdded = true;
-            }
-        }
-
         const toggleCount = this.fieldModes.length;
         for (let i = 0; i < toggleCount; i++) {
-            const toggleObj = this.fieldModeTogglePrefab.instantiate(this.fieldModeToggleContainer);
-            toggleObj.name = "FieldMode_" + i;
-
             const totalWidth = (toggleCount - 1) * this.fieldModeToggleSpacing;
             const startOffset = -totalWidth / 2;
             const xPos = startOffset + (i * this.fieldModeToggleSpacing);
-
-            const localPos = toggleObj.getTransform().getLocalPosition();
-            toggleObj.getTransform().setLocalPosition(new vec3(
-                xPos,
-                localPos.y,
-                localPos.z
-            ));
-
-            const textChild = this.findChildByName(toggleObj, this.fieldModeTextChildName);
-            if (textChild) {
-                const textComp = textChild.getComponent("Component.Text") as Text;
-                if (textComp) {
-                    textComp.text = this.fieldModes[i];
-                }
+            const style = this.createProgrammaticToggle(
+                this.fieldModeToggleContainer,
+                "FieldMode_" + i,
+                this.fieldModes[i],
+                new vec3(xPos, 0.0, 0.0),
+                9.2,
+                3.2,
+                42,
+                i,
+                () => this.onFieldModeSelected(i)
+            );
+            if (style) {
+                this.fieldModeButtonStyles.push(style);
+                VectorFieldUIStyle.setSelected(style, i === 0);
+                this.fieldModeToggles.push(style.button);
             }
-
-            const toggleScript = this.findToggleComponent(toggleObj);
-            if (toggleScript && toggleGroupScript) {
-                toggleGroupScript.registerToggleable(toggleScript, i);
-            }
-
-            this.fieldModeToggles.push(toggleObj);
-        }
-
-        if (toggleGroupScript && toggleGroupScript.resetToggleGroup) {
-            toggleGroupScript.resetToggleGroup();
         }
 
         this.fieldModesBuilt = true;
@@ -236,17 +228,21 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     }
 
     private onFieldModeSelected(index: number): void {
-        if (index === 0) {
-            this.buildForVectorField();
-        } else {
-            this.buildForMagneticField();
-        }
+        this.setSelectedButton(this.fieldModeButtonStyles, index);
 
         if (this.fieldController) {
             const controller = this.fieldController as any;
             if (controller.setActiveField) {
                 controller.setActiveField(index);
+                print("DynamicSettingsPanel: Field mode changed to " + this.fieldModes[index]);
+                return;
             }
+        }
+
+        if (index === 0) {
+            this.buildForVectorField();
+        } else {
+            this.buildForMagneticField();
         }
 
         print("DynamicSettingsPanel: Field mode changed to " + this.fieldModes[index]);
@@ -256,7 +252,8 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         this.saveCurrentValues();
         this.clearSliders();
         this.currentFieldType = "vector";
-        this.activeComponent = this.vectorFieldComponent;
+        const vf = this.vectorFieldComponent as any;
+        this.activeComponent = vf ? (vf.fieldApi || vf) : null;
         this.buildSliders(this.vectorFieldConfigs, this.vectorFieldValues);
 
         if (!this.presetsBuilt) {
@@ -267,15 +264,10 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             this.buildTubeModeToggles();
             this.tubeModesBuilt = true;
         }
-        if (!this.lodBuilt) {
-            this.buildLODToggles();
-            this.lodBuilt = true;
-        }
-
         this.showPresetContainer(true);
-        this.showLODContainer(true);
+        this.showLODContainer(false);
+        this.syncPresetSelection();
         this.syncTubeModeSelection();
-        this.syncLODSelection();
         print("DynamicSettingsPanel: Switched to Vector Field");
     }
 
@@ -283,37 +275,31 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         this.saveCurrentValues();
         this.clearSliders();
         this.currentFieldType = "magnetic";
-        this.activeComponent = this.magneticFieldComponent;
+        const mf = this.magneticFieldComponent as any;
+        this.activeComponent = mf ? (mf.fieldApi || mf) : null;
         this.buildSliders(this.magneticFieldConfigs, this.magneticFieldValues);
 
         if (!this.tubeModesBuilt) {
             this.buildTubeModeToggles();
             this.tubeModesBuilt = true;
         }
-        if (!this.lodBuilt) {
-            this.buildLODToggles();
-            this.lodBuilt = true;
-        }
-
         this.showPresetContainer(false);
-        this.showLODContainer(true);
+        this.showLODContainer(false);
         this.syncTubeModeSelection();
-        this.syncLODSelection();
         print("DynamicSettingsPanel: Switched to Magnetic Field");
     }
 
     private syncTubeModeSelection(): void {
         const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
         const savedMode = valueMap.get("tubeMode");
-        const currentMode = savedMode !== undefined ? savedMode : 0;
+        const currentMode = savedMode !== undefined ? savedMode : 1;
+        this.setSelectedButton(this.tubeModeButtonStyles, currentMode);
+    }
 
-        const toggleGroupScript = this.findToggleGroupComponent(this.tubeModeToggleContainer);
-        if (toggleGroupScript) {
-            toggleGroupScript.firstOnToggle = currentMode;
-            if (toggleGroupScript.resetToggleGroup) {
-                toggleGroupScript.resetToggleGroup();
-            }
-        }
+    private syncPresetSelection(): void {
+        const savedPreset = this.vectorFieldValues.get("preset");
+        const currentPreset = savedPreset !== undefined ? savedPreset : 0;
+        this.setSelectedButton(this.presetButtonStyles, currentPreset);
     }
 
     private showPresetContainer(show: boolean): void {
@@ -331,69 +317,46 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private syncLODSelection(): void {
         const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
         const savedLOD = valueMap.get("lod");
-        const currentLOD = savedLOD !== undefined ? savedLOD : 1;  // Default to Medium
-
-        const toggleGroupScript = this.findToggleGroupComponent(this.lodToggleContainer);
-        if (toggleGroupScript) {
-            toggleGroupScript.firstOnToggle = currentLOD;
-            if (toggleGroupScript.resetToggleGroup) {
-                toggleGroupScript.resetToggleGroup();
-            }
-        }
+        const currentLOD = savedLOD !== undefined ? savedLOD : 0;
+        this.setSelectedButton(this.lodButtonStyles, currentLOD);
     }
 
     private buildLODToggles(): void {
-        if (!this.optionTogglePrefab || !this.lodToggleContainer) {
-            print("DynamicSettingsPanel: No LOD toggle prefab or container - skipping");
+        if (!this.lodToggleContainer) {
+            print("DynamicSettingsPanel: No LOD container - skipping");
             return;
         }
 
         const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
         const savedLOD = valueMap.get("lod");
-        const currentLOD = savedLOD !== undefined ? savedLOD : 1;  // Default to Medium
-
-        const toggleGroupScript = this.findToggleGroupComponent(this.lodToggleContainer);
-
-        if (toggleGroupScript) {
-            toggleGroupScript.firstOnToggle = currentLOD;
-
-            if (!this.lodCallbackAdded) {
-                toggleGroupScript.onToggleSelected.add((args: any) => {
-                    const index = args.value;
-                    if (index !== undefined) {
-                        this.onLODSelected(index);
-                    }
-                });
-                this.lodCallbackAdded = true;
-            }
-        }
+        const currentLOD = savedLOD !== undefined ? savedLOD : 0;
 
         const toggleCount = this.lodModes.length;
         for (let i = 0; i < toggleCount; i++) {
-            const toggleScript = this.createToggleInContainer(
-                this.optionTogglePrefab,
+            const style = this.createToggleInContainer(
                 this.lodToggleContainer,
                 this.lodModes[i],
                 i,
                 toggleCount,
                 this.optionToggleSpacing,
-                i === currentLOD
+                i === currentLOD,
+                this.lodButtonStyles,
+                i + 2,
+                toggleCount,
+                3.8,
+                6.4,
+                2.8,
+                () => this.onLODSelected(i)
             );
-            if (toggleScript) {
-                this.lodToggles.push(toggleScript.getSceneObject());
-                if (toggleGroupScript) {
-                    toggleGroupScript.registerToggleable(toggleScript, i);
-                }
+            if (style) {
+                this.lodToggles.push(style.button);
             }
-        }
-
-        if (toggleGroupScript && toggleGroupScript.resetToggleGroup) {
-            toggleGroupScript.resetToggleGroup();
         }
     }
 
     private onLODSelected(index: number): void {
         if (!this.activeComponent) return;
+        this.setSelectedButton(this.lodButtonStyles, index);
 
         const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
         valueMap.set("lod", index);
@@ -406,106 +369,73 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     }
 
     private buildPresetToggles(): void {
-        if (!this.optionTogglePrefab || !this.presetToggleContainer) {
-            print("DynamicSettingsPanel: No preset toggle prefab or container - skipping");
+        if (!this.presetToggleContainer) {
+            print("DynamicSettingsPanel: No preset container - skipping");
             return;
         }
 
         const savedPreset = this.vectorFieldValues.get("preset");
         const currentPreset = savedPreset !== undefined ? savedPreset : 0;
 
-        const toggleGroupScript = this.findToggleGroupComponent(this.presetToggleContainer);
-
-        if (toggleGroupScript) {
-            toggleGroupScript.firstOnToggle = currentPreset;
-
-            if (!this.presetCallbackAdded) {
-                toggleGroupScript.onToggleSelected.add((args: any) => {
-                    const index = args.value;
-                    if (index !== undefined) {
-                        this.onPresetSelected(index);
-                    }
-                });
-                this.presetCallbackAdded = true;
-            }
-        }
-
         const toggleCount = this.vectorFieldPresets.length;
         for (let i = 0; i < toggleCount; i++) {
-            const toggleScript = this.createToggleInContainer(
-                this.optionTogglePrefab,
+            const style = this.createToggleInContainer(
                 this.presetToggleContainer,
                 this.vectorFieldPresets[i],
                 i,
                 toggleCount,
                 this.optionToggleSpacing,
-                i === currentPreset
+                i === currentPreset,
+                this.presetButtonStyles,
+                i,
+                4,
+                3.8,
+                6.8,
+                2.8,
+                () => this.onPresetSelected(i)
             );
-            if (toggleScript) {
-                this.presetToggles.push(toggleScript.getSceneObject());
-                if (toggleGroupScript) {
-                    toggleGroupScript.registerToggleable(toggleScript, i);
-                }
+            if (style) {
+                this.presetToggles.push(style.button);
             }
-        }
-
-        if (toggleGroupScript && toggleGroupScript.resetToggleGroup) {
-            toggleGroupScript.resetToggleGroup();
         }
     }
 
     private buildTubeModeToggles(): void {
-        if (!this.optionTogglePrefab || !this.tubeModeToggleContainer) {
-            print("DynamicSettingsPanel: No tube mode toggle prefab or container - skipping");
+        if (!this.tubeModeToggleContainer) {
+            print("DynamicSettingsPanel: No tube mode container - skipping");
             return;
         }
 
         const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
         const savedMode = valueMap.get("tubeMode");
-        const currentMode = savedMode !== undefined ? savedMode : 0;
-
-        const toggleGroupScript = this.findToggleGroupComponent(this.tubeModeToggleContainer);
-
-        if (toggleGroupScript) {
-            toggleGroupScript.firstOnToggle = currentMode;
-
-            if (!this.tubeModeCallbackAdded) {
-                toggleGroupScript.onToggleSelected.add((args: any) => {
-                    const index = args.value;
-                    if (index !== undefined) {
-                        this.onTubeModeSelected(index);
-                    }
-                });
-                this.tubeModeCallbackAdded = true;
-            }
-        }
+        const currentMode = savedMode !== undefined ? savedMode : 1;
 
         const toggleCount = this.tubeModes.length;
         for (let i = 0; i < toggleCount; i++) {
-            const toggleScript = this.createToggleInContainer(
-                this.optionTogglePrefab,
+            const style = this.createToggleInContainer(
                 this.tubeModeToggleContainer,
                 this.tubeModes[i],
                 i,
                 toggleCount,
                 this.optionToggleSpacing,
-                i === currentMode
+                i === currentMode,
+                this.tubeModeButtonStyles,
+                i + 4,
+                toggleCount,
+                3.8,
+                7.0,
+                2.8,
+                () => this.onTubeModeSelected(i)
             );
-            if (toggleScript) {
-                this.tubeModeToggles.push(toggleScript.getSceneObject());
-                if (toggleGroupScript) {
-                    toggleGroupScript.registerToggleable(toggleScript, i);
-                }
+            if (style) {
+                this.tubeModeToggles.push(style.button);
             }
-        }
-
-        if (toggleGroupScript && toggleGroupScript.resetToggleGroup) {
-            toggleGroupScript.resetToggleGroup();
         }
     }
 
     private onPresetSelected(index: number): void {
         if (!this.activeComponent) return;
+        this.setSelectedButton(this.presetButtonStyles, index);
 
         const component = this.activeComponent as any;
         if (component.preset !== undefined) {
@@ -518,6 +448,7 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
 
     private onTubeModeSelected(index: number): void {
         if (!this.activeComponent) return;
+        this.setSelectedButton(this.tubeModeButtonStyles, index);
 
         const valueMap = this.currentFieldType === "vector" ? this.vectorFieldValues : this.magneticFieldValues;
         valueMap.set("tubeMode", index);
@@ -529,7 +460,27 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         print("DynamicSettingsPanel: Tube mode changed to " + this.tubeModes[index]);
     }
 
+    private setSelectedButton(styles: FieldButtonBinding[], selectedIndex: number): void {
+        for (let i = 0; i < styles.length; i++) {
+            VectorFieldUIStyle.setSelected(styles[i], i === selectedIndex);
+        }
+    }
+
+    private updateButtonStyles(): void {
+        this.updateButtonStyleList(this.fieldModeButtonStyles);
+        this.updateButtonStyleList(this.presetButtonStyles);
+        this.updateButtonStyleList(this.tubeModeButtonStyles);
+        this.updateButtonStyleList(this.lodButtonStyles);
+    }
+
+    private updateButtonStyleList(styles: FieldButtonBinding[]): void {
+        for (let i = 0; i < styles.length; i++) {
+            VectorFieldUIStyle.update(styles[i]);
+        }
+    }
+
     private findToggleGroupComponent(obj: SceneObject): any {
+        if (!obj) return null;
         const scripts = obj.getComponents("Component.ScriptComponent");
         for (let i = 0; i < scripts.length; i++) {
             const script = scripts[i] as any;
@@ -541,37 +492,84 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     }
 
     private createToggleInContainer(
-        prefab: ObjectPrefab,
         container: SceneObject,
         label: string,
         index: number,
         totalCount: number,
         spacing: number,
-        isSelected: boolean
-    ): any {
-        const toggleObj = prefab.instantiate(container);
-        toggleObj.name = "Toggle_" + index;
-
-        const totalWidth = (totalCount - 1) * spacing;
+        isSelected: boolean,
+        styleList: FieldButtonBinding[] | null = null,
+        paletteIndex: number = 0,
+        maxColumns: number = 0,
+        verticalSpacing: number = 3.2,
+        widthCm: number = 6.0,
+        heightCm: number = 2.2,
+        onTap: () => void = () => {}
+    ): FieldButtonBinding | null {
+        const columns = maxColumns > 0 ? Math.min(maxColumns, totalCount) : totalCount;
+        const rows = Math.ceil(totalCount / columns);
+        const col = index % columns;
+        const row = Math.floor(index / columns);
+        const totalWidth = (columns - 1) * spacing;
+        const totalHeight = (rows - 1) * verticalSpacing;
         const startOffset = -totalWidth / 2;
 
-        const localPos = toggleObj.getTransform().getLocalPosition();
-        toggleObj.getTransform().setLocalPosition(new vec3(
-            localPos.x + startOffset + (index * spacing),
-            localPos.y,
-            localPos.z
-        ));
+        return this.createProgrammaticToggle(container, "Toggle_" + index, label, new vec3(
+            startOffset + (col * spacing),
+            (totalHeight / 2) - (row * verticalSpacing),
+            0.0
+        ), widthCm, heightCm, label.length <= 5 ? 40 : 34, paletteIndex, onTap, isSelected, styleList);
+    }
 
-        const labelObj = this.findChildByName(toggleObj, this.toggleTextChildName);
-        if (labelObj) {
-            const textComp = this.findTextComponent(labelObj);
-            if (textComp) {
-                textComp.text = label;
+    private createProgrammaticToggle(
+        parent: SceneObject,
+        name: string,
+        label: string,
+        position: vec3,
+        widthCm: number,
+        heightCm: number,
+        labelFontSize: number,
+        paletteIndex: number,
+        onTap: () => void,
+        isSelected: boolean = false,
+        styleList: FieldButtonBinding[] | null = null
+    ): FieldButtonBinding | null {
+        const toggleObj = global.scene.createSceneObject(name);
+        toggleObj.setParent(parent);
+        this.placeInstancedObject(toggleObj, position);
+
+        const button = toggleObj.createComponent(RectangleButton.getTypeName()) as RectangleButton;
+        button.size = new vec3(widthCm, heightCm, 1.4);
+        button.initialize();
+
+        const labelObj = global.scene.createSceneObject(this.toggleTextChildName);
+        labelObj.setParent(toggleObj);
+        this.placeInstancedObject(labelObj, new vec3(0.0, 0.0, 0.9));
+        const textComp = labelObj.createComponent("Component.Text") as Text;
+        textComp.text = label;
+        textComp.size = labelFontSize;
+        textComp.horizontalAlignment = HorizontalAlignment.Center;
+        textComp.verticalAlignment = VerticalAlignment.Center;
+        textComp.horizontalOverflow = HorizontalOverflow.Truncate;
+        textComp.verticalOverflow = VerticalOverflow.Truncate;
+        textComp.worldSpaceRect = Rect.create(-widthCm * 0.42, widthCm * 0.42, -heightCm * 0.42, heightCm * 0.42);
+
+        const style = VectorFieldUIStyle.prepareButton(toggleObj, label, {
+            widthCm,
+            heightCm,
+            labelFontSize,
+            renderOrder: 80,
+            paletteIndex,
+            buttonMaterial: this.uiMaterial,
+        });
+        if (style) {
+            VectorFieldUIStyle.setSelected(style, isSelected);
+            if (styleList) {
+                styleList.push(style);
             }
         }
-
-        const toggleScript = this.findToggleComponent(toggleObj);
-        return toggleScript;
+        button.onTriggerUp.add(onTap);
+        return style;
     }
 
     private findToggleComponent(obj: SceneObject): any {
@@ -663,12 +661,7 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         const xOffset = (col === 0 ? -1 : 1) * (this.sliderHorizontalSpacing / 2);
         const yOffset = startY - (row * this.sliderVerticalSpacing);
 
-        const localPos = sliderObj.getTransform().getLocalPosition();
-        sliderObj.getTransform().setLocalPosition(new vec3(
-            localPos.x + xOffset,
-            localPos.y + yOffset,
-            localPos.z
-        ));
+        this.placeInstancedObject(sliderObj, new vec3(xOffset, yOffset, 0.0));
 
         this.setSliderLabel(sliderObj, config.label);
 
@@ -686,13 +679,29 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             const textComp = this.findTextComponent(labelObj);
             if (textComp) {
                 textComp.text = label;
+                this.configureSliderLabelRect(textComp);
+                VectorFieldUIStyle.configureText(textComp, new vec4(1.0, 0.98, 0.94, 1.0), new vec4(0.08, 0.08, 0.09, 1.0), 82);
             }
         } else {
             const textComp = this.findTextComponent(sliderObj);
             if (textComp) {
                 textComp.text = label;
+                this.configureSliderLabelRect(textComp);
+                VectorFieldUIStyle.configureText(textComp, new vec4(1.0, 0.98, 0.94, 1.0), new vec4(0.08, 0.08, 0.09, 1.0), 82);
             }
         }
+    }
+
+    private configureSliderLabelRect(textComp: Text): void {
+        const t = textComp as any;
+        try {
+            t.size = 42;
+            t.horizontalAlignment = HorizontalAlignment.Center;
+            t.verticalAlignment = VerticalAlignment.Center;
+            t.horizontalOverflow = HorizontalOverflow.Wrap;
+            t.verticalOverflow = VerticalOverflow.Truncate;
+            t.worldSpaceRect = Rect.create(-5.8, 5.8, -1.15, 1.15);
+        } catch (e) {}
     }
 
     private findTextComponent(obj: SceneObject): Text | null {
@@ -800,6 +809,67 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
             const found = this.findChildByName(child, name);
             if (found) return found;
         }
+        return null;
+    }
+
+    private stylePanelShell(): void {
+        if (this.panelStyled) return;
+        const root = this.panelRoot || this.inferPanelRoot();
+        if (!root) return;
+        this.panelStyled = true;
+        root.getTransform().setLocalPosition(new vec3(-19.0, -6.4, -64.0));
+        root.getTransform().setLocalRotation(quat.quatIdentity());
+        root.getTransform().setLocalScale(new vec3(1.0, 1.0, 1.0));
+        VectorFieldUIStyle.preparePanel(root, {
+            widthCm: 30.0,
+            heightCm: 33.0,
+            depthCm: 0.34,
+            cornerRadiusCm: 0.9,
+            frameThicknessCm: 0.24,
+            renderOrder: 2,
+            panelMaterial: this.uiMaterial,
+            backplateColor: new vec4(0.38, 0.38, 0.39, 0.97),
+            frameColor: new vec4(0.92, 0.92, 0.88, 1.0),
+        });
+    }
+
+    private layoutControlContainers(): void {
+        this.sliderVerticalSpacing = 5.2;
+        this.sliderHorizontalSpacing = 12.2;
+        this.fieldModeToggleSpacing = 10.4;
+        this.optionToggleSpacing = 7.4;
+        this.setContainerPosition(this.fieldModeToggleContainer, new vec3(0.0, 12.8, 1.0));
+        this.setContainerPosition(this.tubeModeToggleContainer, new vec3(0.0, 8.8, 1.0));
+        this.setContainerPosition(this.presetToggleContainer, new vec3(0.0, 4.8, 1.0));
+        this.setContainerPosition(this.sliderContainer, new vec3(0.0, -2.3, 1.0));
+        this.setContainerPosition(this.lodToggleContainer, new vec3(0.0, -11.8, 1.0));
+    }
+
+    private setContainerPosition(container: SceneObject | null, position: vec3): void {
+        if (!container) return;
+        const tr = container.getTransform();
+        tr.setLocalPosition(position);
+        tr.setLocalRotation(quat.quatIdentity());
+        tr.setLocalScale(new vec3(1.0, 1.0, 1.0));
+    }
+
+    private placeInstancedObject(obj: SceneObject, position: vec3): void {
+        const tr = obj.getTransform();
+        tr.setLocalPosition(position);
+        tr.setLocalRotation(quat.quatIdentity());
+        tr.setLocalScale(new vec3(1.0, 1.0, 1.0));
+    }
+
+    private inferPanelRoot(): SceneObject | null {
+        const anyContainer = this.fieldModeToggleContainer || this.sliderContainer || this.presetToggleContainer;
+        if (!anyContainer) return null;
+        try {
+            const parentGetter = (anyContainer as any).getParent;
+            if (parentGetter && typeof parentGetter === "function") {
+                const parent = parentGetter.call(anyContainer) as SceneObject;
+                if (parent) return parent;
+            }
+        } catch (e) {}
         return null;
     }
 

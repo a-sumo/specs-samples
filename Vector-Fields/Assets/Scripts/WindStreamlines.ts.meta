@@ -52,7 +52,7 @@
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
       templateCount: !<float> 700.000000
       segmentsPerDash: !<float> 18.000000
-      ribbonWidthRel: 0.010000
+      ribbonWidthRel: 0.012000
       _tubeMode: !<float> 0.000000
       pointRadiusRel: 0.013000
       arrowLengthRel: 0.055000

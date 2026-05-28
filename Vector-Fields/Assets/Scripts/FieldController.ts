@@ -7,6 +7,12 @@ enum FieldType {
     MagneticField = 1
 }
 
+enum FieldLifecycleState {
+    Idle = 0,
+    Loading = 1,
+    Active = 2
+}
+
 @component
 export class FieldController extends BaseScriptComponent {
 
@@ -38,6 +44,19 @@ export class FieldController extends BaseScriptComponent {
     @hint("Duration of crossfade transition between presets (seconds)")
     transitionDuration: number = 0.5;
 
+    @input
+    @hint("If false, narration owns first activation; settings can still switch fields later.")
+    activateOnAwake: boolean = false;
+
+    @input
+    @hint("Delay before enabling a requested field, giving the UI one frame to show loading state.")
+    loadingDelay: number = 0.08;
+
+    @input
+    @allowUndefined
+    @hint("Optional loading object shown between field switches.")
+    loadingRoot: SceneObject = null as any;
+
     private vectorFieldComponent: any;
     private magneticFieldComponent: any;
     private settingsPanelScript: any;
@@ -46,15 +65,23 @@ export class FieldController extends BaseScriptComponent {
     private prevSpritePreset: number = 0;
     private transitionProgress: number = 1.0;
     private isTransitioning: boolean = false;
+    private lifecycleState: FieldLifecycleState = FieldLifecycleState.Idle;
+    private switchToken: number = 0;
 
     onAwake(): void {
         this.cacheComponents();
-        this.applyActiveField();
+        this.setLoadingVisible(false);
+        if (this.activateOnAwake) {
+            this.hideFieldRoots();
+            this.applyActiveField();
+        }
         print("FieldController: Initialized with " + (this._activeField === 0 ? "Vector Field" : "Magnetic Field"));
 
         this.createEvent("OnStartEvent").bind(() => {
             this.refreshSettingsPanelApi();
-            this.applyActiveField();
+            if (this.activateOnAwake) {
+                this.applyActiveField();
+            }
         });
 
         this.createEvent("UpdateEvent").bind(this.onUpdate.bind(this));
@@ -105,12 +132,10 @@ export class FieldController extends BaseScriptComponent {
     }
 
     private applyActiveField(): void {
-        if (this.vectorFieldRoot) {
-            this.vectorFieldRoot.enabled = false;
-        }
-        if (this.magneticFieldRoot) {
-            this.magneticFieldRoot.enabled = false;
-        }
+        const token = ++this.switchToken;
+        this.lifecycleState = FieldLifecycleState.Loading;
+        this.setLoadingVisible(true);
+        this.hideFieldRoots();
 
         if (this.settingsPanelScript && this.settingsPanelScript.buildForVectorField) {
             if (this._activeField === FieldType.VectorField) {
@@ -122,13 +147,43 @@ export class FieldController extends BaseScriptComponent {
 
         var delayEvent = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
         delayEvent.bind(() => {
+            if (token !== this.switchToken) return;
             if (this._activeField === FieldType.VectorField && this.vectorFieldRoot) {
                 this.vectorFieldRoot.enabled = true;
+                this.requestComponentRefresh(this.vectorFieldComponent);
             } else if (this._activeField === FieldType.MagneticField && this.magneticFieldRoot) {
                 this.magneticFieldRoot.enabled = true;
+                this.requestComponentRefresh(this.magneticFieldComponent);
             }
+            this.lifecycleState = FieldLifecycleState.Active;
+            this.setLoadingVisible(false);
         });
-        delayEvent.reset(0.05);
+        delayEvent.reset(Math.max(0.01, this.loadingDelay));
+    }
+
+    private hideFieldRoots(): void {
+        if (this.vectorFieldRoot) {
+            this.vectorFieldRoot.enabled = false;
+        }
+        if (this.magneticFieldRoot) {
+            this.magneticFieldRoot.enabled = false;
+        }
+    }
+
+    private setLoadingVisible(visible: boolean): void {
+        if (this.loadingRoot) {
+            this.loadingRoot.enabled = visible;
+        }
+    }
+
+    private requestComponentRefresh(component: any): void {
+        if (!component) return;
+        const api = component.fieldApi || component;
+        if (api.queueRefresh) {
+            api.queueRefresh(0.01);
+        } else if (api.refresh) {
+            api.refresh();
+        }
     }
 
     private onUpdate(): void {
@@ -145,12 +200,13 @@ export class FieldController extends BaseScriptComponent {
 
         if (this._activeField === FieldType.VectorField) {
             var vfPreset = 0;
-            if (this.vectorFieldComponent && this.vectorFieldComponent.preset !== undefined) {
-                vfPreset = this.vectorFieldComponent.preset;
+            const vf = this.vectorFieldComponent ? (this.vectorFieldComponent.fieldApi || this.vectorFieldComponent) : null;
+            if (vf && vf.preset !== undefined) {
+                vfPreset = vf.preset;
             }
             targetPreset = vfPreset;
         } else {
-            targetPreset = 5;
+            targetPreset = 8;
         }
 
         if (targetPreset !== this.currentSpritePreset) {
@@ -190,7 +246,11 @@ export class FieldController extends BaseScriptComponent {
     }
 
     public setActiveField(fieldType: number): void {
-        this._activeField = Math.floor(Math.min(1, Math.max(0, fieldType)));
+        const nextField = Math.floor(Math.min(1, Math.max(0, fieldType)));
+        if (nextField === this._activeField && this.lifecycleState === FieldLifecycleState.Active) {
+            return;
+        }
+        this._activeField = nextField;
         this.applyActiveField();
         print("FieldController: Switched to " + (this._activeField === 0 ? "Vector Field" : "Magnetic Field"));
     }
@@ -225,5 +285,9 @@ export class FieldController extends BaseScriptComponent {
 
     public getMagneticFieldComponent(): any {
         return this.magneticFieldComponent;
+    }
+
+    get state(): number {
+        return this.lifecycleState;
     }
 }

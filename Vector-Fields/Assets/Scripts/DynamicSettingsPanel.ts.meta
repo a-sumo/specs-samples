@@ -37,6 +37,7 @@
     magneticFieldComponent: false
     optionTogglePrefab: false
     optionToggleSpacing: false
+    panelRoot: false
     presetToggleContainer: false
     sliderContainer: false
     sliderHorizontalSpacing: false
@@ -44,6 +45,7 @@
     sliderVerticalSpacing: false
     toggleTextChildName: false
     tubeModeToggleContainer: false
+    uiMaterial: false
     vectorFieldComponent: false
   ScriptTypesHidden:
     {}
@@ -73,6 +75,8 @@
       toggleTextChildName: Toggle Text
       optionToggleSpacing: !<float> 4.000000
       fieldController: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
+      uiMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      panelRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
@@ -96,3 +100,5 @@
     - '// @input string toggleTextChildName = "Toggle Text" {"hint":"Text child name in toggle prefab"}'
     - '// @input float optionToggleSpacing = 4 {"hint":"Horizontal spacing between option toggles"}'
     - '// @input Component.ScriptComponent fieldController {"hint":"FieldController to notify when field mode changes"}'
+    - '// @input Asset.Material uiMaterial {"hint":"Flat/toon material cloned for custom button and panel meshes"}'
+    - '// @input SceneObject panelRoot {"hint":"SceneObject that visually frames the settings controls"}'

@@ -1,0 +1,68 @@
+- !<AssetImportMetadata/ee25cab9-ac82-46a3-ab5d-cd85074db223>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 7041785c-9dd9-4f7b-af5c-4e2b3d47148c
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 7041785c-9dd9-4f7b-af5c-4e2b3d47148c
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> ba7cc602-6127-4717-aa85-41f5f725eed2
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/ba7cc602-6127-4717-aa85-41f5f725eed2>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 1d4b5715-b8e3-422e-8dc1-7ebc2885786d
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    enabled: false
+    fallbackDragRadiansPerCm: false
+    gravityFieldObject: false
+    inertiaDamping: false
+    inertiaStrength: false
+    interactableObject: false
+    maxStepDegrees: false
+    sensitivity: false
+    targetObject: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - targetObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      interactableObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      gravityFieldObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      enabled: true
+      sensitivity: !<float> 1.000000
+      maxStepDegrees: !<float> 16.000000
+      inertiaStrength: 0.080000
+      inertiaDamping: !<float> 8.000000
+      fallbackDragRadiansPerCm: 0.120000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject targetObject {"hint":"Object to rotate. Defaults to this SceneObject."}'
+    - '// @input SceneObject interactableObject {"hint":"Object with the SIK Interactable. Defaults to this SceneObject."}'
+    - '// @input SceneObject gravityFieldObject {"hint":"Optional object containing GravityField. If set, drag is composed with Earth tilt/spin."}'
+    - '// @input bool enabled = true {"hint":"Enables touch/hand/mouse drag rotation."}'
+    - '// @input float sensitivity = 1 {"hint":"Multiplier for surface-drag rotation.", "widget":"slider", "min":0.15, "max":2.5, "step":0.05}'
+    - '// @input float maxStepDegrees = 16 {"hint":"Maximum degrees of rotation accepted per frame.", "widget":"slider", "min":2, "max":35, "step":1}'
+    - '// @input float inertiaStrength = 0.08 {"hint":"How much momentum remains after release.", "widget":"slider", "min":0, "max":0.4, "step":0.01}'
+    - '// @input float inertiaDamping = 8 {"hint":"Higher values stop release momentum faster.", "widget":"slider", "min":1, "max":16, "step":0.25}'
+    - '// @input float fallbackDragRadiansPerCm = 0.12 {"hint":"Fallback rotation scale when no surface hit point is available.", "widget":"slider", "min":0.01, "max":0.45, "step":0.01}'

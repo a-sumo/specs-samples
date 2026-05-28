@@ -11,6 +11,7 @@ enum MagneticTubeMode {
 
 @component
 export class MagneticFieldTubes extends BaseScriptComponent {
+    private static readonly FIELD_RENDER_ORDER: number = 40;
 
     // ============ PERFORMANCE ============
 
@@ -233,8 +234,18 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         if (this.material) {
             mv.mainMaterial = this.material;
         }
+        this.setVisualRenderOrder(mv, MagneticFieldTubes.FIELD_RENDER_ORDER);
         this.meshVisuals.push(mv);
         return mv;
+    }
+
+    private setVisualRenderOrder(visual: RenderMeshVisual, renderOrder: number): void {
+        const anyVisual = visual as any;
+        try {
+            if (typeof anyVisual.setRenderOrder === "function") anyVisual.setRenderOrder(renderOrder);
+            if (anyVisual.renderOrder !== undefined) anyVisual.renderOrder = renderOrder;
+            if (anyVisual.RenderOrder !== undefined) anyVisual.RenderOrder = renderOrder;
+        } catch (e) {}
     }
 
     private getForwardVector(obj: SceneObject): vec3 {

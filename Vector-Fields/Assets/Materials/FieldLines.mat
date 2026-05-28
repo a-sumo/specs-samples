@@ -1,0 +1,84 @@
+- !<Material/da5420cb-faf0-4c47-bf0c-cc7ea9ab0cf8>
+  PackagePath: ""
+  PassesInfo:
+    - !<own> 4eafd279-ff06-4032-bb8f-f08ad2696619
+- !<PassInfo/4eafd279-ff06-4032-bb8f-f08ad2696619>
+  CachedProperties:
+    - ChargeAPos:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - ChargeBPos:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - MaxSteps:
+        typeIdx: 1
+        value: 0.000000
+    - Port_Depth_N001:
+        typeIdx: 1
+        value: 1.000000
+    - Port_FinalColor1_N001:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor2_N001:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor3_N001:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_GSplatPointSize_N001:
+        typeIdx: 1
+        value: 0.000000
+    - Port_GSplatRotation_N001:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_GSplatScale_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_PrevWorldPosition_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_RayDirection_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_RayOrigin_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldNormal_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldTangent_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - SeedRadius:
+        typeIdx: 1
+        value: 0.000000
+    - StepSize:
+        typeIdx: 1
+        value: 0.000000
+    - StrengthA:
+        typeIdx: 1
+        value: 0.000000
+    - StrengthB:
+        typeIdx: 1
+        value: 0.000000
+    - TubeRadius:
+        typeIdx: 1
+        value: 0.000000
+  DepthWrite: true
+  DepthTest: true
+  DepthFunction: LessEqual
+  TwoSided: false
+  ColorMask: {x: true, y: true, z: true, w: true}
+  CullMode: Back
+  PolygonOffset: {x: 0.000000, y: 0.000000}
+  FrustumCulling: Auto
+  FrustumCullPad: 0.000000
+  InstanceCount: 1
+  Defines:
+    []
+  BlendMode: Disabled
+  Properties:
+    PreviewEnabled:
+      typeIdx: 0
+      value: 0
+  Pass: !<reference> b5313505-40c9-4618-a165-e9939e5f8bb9

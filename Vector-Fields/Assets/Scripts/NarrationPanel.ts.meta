@@ -40,6 +40,7 @@
     prevButtonPrefab: false
     settingsRoot: false
     slideIndicator: false
+    uiMaterial: false
     vectorFieldComponent: false
     vizRoots: false
   ScriptTypesHidden:
@@ -68,6 +69,7 @@
         []
       vectorFieldComponent: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
       settingsRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      uiMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
@@ -88,3 +90,4 @@
     - "// @input SceneObject[] vizRoots {\"hint\":\"One root SceneObject per slide. Active slide's root is enabled, others disabled.\"}"
     - '// @input Component.ScriptComponent vectorFieldComponent {"hint":"Optional: VectorField ScriptComponent. Slides with presetIndex call setPreset() on this."}'
     - '// @input SceneObject settingsRoot {"hint":"Optional: Settings frame to enable once the user reaches the final slide."}'
+    - '// @input Asset.Material uiMaterial {"hint":"Flat/toon material cloned for custom button and panel meshes"}'

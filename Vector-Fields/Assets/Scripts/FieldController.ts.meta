@@ -27,6 +27,9 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     _activeField: false
+    activateOnAwake: false
+    loadingDelay: false
+    loadingRoot: false
     magneticFieldRoot: false
     settingsPanel: false
     spriteSheetMaterial: false
@@ -47,6 +50,9 @@
       settingsPanel: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
       spriteSheetMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
       transitionDuration: 0.500000
+      activateOnAwake: false
+      loadingDelay: 0.080000
+      loadingRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
@@ -57,3 +63,6 @@
     - '// @input Component.ScriptComponent settingsPanel {"hint":"Optional: DynamicSettingsPanel to auto-rebuild when switching fields"}'
     - '// @input Asset.Material spriteSheetMaterial {"hint":"Sprite sheet material to sync preset with active field"}'
     - '// @input float transitionDuration = 0.5 {"hint":"Duration of crossfade transition between presets (seconds)"}'
+    - '// @input bool activateOnAwake {"hint":"If false, narration owns first activation; settings can still switch fields later."}'
+    - '// @input float loadingDelay = 0.08 {"hint":"Delay before enabling a requested field, giving the UI one frame to show loading state."}'
+    - '// @input SceneObject loadingRoot {"hint":"Optional loading object shown between field switches."}'

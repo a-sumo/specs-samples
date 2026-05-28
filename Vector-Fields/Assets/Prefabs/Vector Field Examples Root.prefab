@@ -108,6 +108,8 @@
     _lod: true
     _maxVertexCount: true
     _tubeMode: true
+    _domainMode: true
+    _sphereRadius: true
     _stepSize: true
     _preset: true
   ScriptTypesDefault:
@@ -124,6 +126,8 @@
       _arrowScale: 1.300000
       _gridSize: !<float> 8.000000
       _gridSpacing: 0.600000
+      _domainMode: !<float> 0.000000
+      _sphereRadius: 4.800000
       _stepSize: 0.100000
       _fieldScale: 1.100000
       _flowSpeed: !<float> 48.000000

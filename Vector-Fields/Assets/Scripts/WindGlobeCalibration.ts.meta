@@ -1,0 +1,65 @@
+- !<AssetImportMetadata/405857ae-9bf1-4b05-be43-638d81a7aca8>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 3a079eb6-d292-4f25-bde3-5e389732988c
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 3a079eb6-d292-4f25-bde3-5e389732988c
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> cfe6f06c-2466-42c3-8193-3bbc670f332b
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/cfe6f06c-2466-42c3-8193-3bbc670f332b>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: eb20c12a-1f2d-433c-99de-d9081cadd6db
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    anchor: false
+    anchorLat: false
+    anchorLon: false
+    desiredRadiusWorld: false
+    earthSphere: false
+    verifier: false
+    verifyLat: false
+    verifyLon: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - earthSphere: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      anchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      anchorLat: 40.709999
+      anchorLon: -74.010002
+      verifier: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      verifyLat: 51.509998
+      verifyLon: -0.130000
+      desiredRadiusWorld: !<float> 12.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject earthSphere {"hint":"Root SceneObject containing the Earth mesh. World position = sphere center."}'
+    - '// @input SceneObject anchor {"hint":"Marker you drag onto a known landmark."}'
+    - '// @input float anchorLat = 40.71 {"hint":"Anchor latitude (NYC = 40.71)."}'
+    - '// @input float anchorLon = -74.01 {"hint":"Anchor longitude (NYC = -74.01)."}'
+    - '// @input SceneObject verifier {"hint":"Verify marker — auto-positions at its lat/lon using the calibration."}'
+    - '// @input float verifyLat = 51.51 {"hint":"Verifier latitude (London = 51.51)."}'
+    - '// @input float verifyLon = -0.13 {"hint":"Verifier longitude (London = -0.13)."}'
+    - '// @input float desiredRadiusWorld = 12 {"hint":"If > 0, rescale the Earth so its bbox radius matches this (cm). Otherwise leave natural size."}'
