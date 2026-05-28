@@ -55,8 +55,10 @@ void main() {
     float fieldMag = length(fieldXZ);
     vec2 fieldDir = (fieldMag > 0.0001) ? fieldXZ / fieldMag : vec2(1.0, 0.0);
 
-    // Heatmap by potential intensity (log compression — gravity ranges over orders of magnitude).
-    float intensity = clamp(log(1.0 + potential * 0.6) * 0.6, 0.0, 1.0);
+    // Heatmap by potential intensity. The log keeps the Earth well readable
+    // while preserving the Moon's smaller field.
+    float logPotential = log(1.0 + potential * 0.6);
+    float intensity = clamp(logPotential * 0.6, 0.0, 1.0);
     vec3 heatColor = mix(ColorLow.rgb, ColorHigh.rgb, intensity);
 
     // Dominance tint: which body owns this point.
@@ -64,10 +66,14 @@ void main() {
     vec3 dominanceTint = mix(MoonTint.rgb, EarthTint.rgb, dominanceE);
     vec3 baseColor = mix(heatColor, heatColor * dominanceTint, 0.45);
 
-    // Iso-potential contour lines via fract() boundary. Anti-aliased with smoothstep.
-    float contourPhase = potential * ContourCount;
-    float contourDist = abs(fract(contourPhase) - 0.5) * 2.0;
-    float contourMask = smoothstep(ContourThickness, 0.0, contourDist) * ContourColor.a;
+    // Iso-potential contour lines. Using log-potential spaces the isolines
+    // evenly across the gravity well and keeps the density readable near masses.
+    float isoPhase = logPotential * ContourCount;
+    float isoDist = abs(fract(isoPhase) - 0.5) * 2.0;
+    float isoWidth = clamp(ContourThickness, 0.01, 0.45);
+    float isoCore = 1.0 - smoothstep(0.0, isoWidth, isoDist);
+    float isoHalo = 1.0 - smoothstep(isoWidth, min(1.0, isoWidth * 2.8), isoDist);
+    float contourMask = clamp(isoCore + isoHalo * 0.32, 0.0, 1.0) * ContourColor.a;
 
     // Flow stripes: animate along field direction so the field "moves."
     float flowParam = dot(vec2(sampleP.x, sampleP.z), fieldDir) * FlowScale
@@ -78,8 +84,8 @@ void main() {
 
     vec3 finalColor = baseColor;
     finalColor = mix(finalColor, ContourColor.rgb, contourMask);
-    finalColor = finalColor + vec3(flowMask);
+    finalColor = finalColor + vec3(flowMask) + ContourColor.rgb * isoHalo * 0.08;
 
-    float alpha = clamp(intensity * 0.85 + 0.18, 0.0, 1.0) * OpacityScale;
+    float alpha = max(clamp(intensity * 0.85 + 0.18, 0.0, 1.0), contourMask * 0.95) * OpacityScale;
     vertexColor = vec4(finalColor * alpha, alpha);
 }

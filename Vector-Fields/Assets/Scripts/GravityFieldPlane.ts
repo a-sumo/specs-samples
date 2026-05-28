@@ -87,27 +87,27 @@ export class GravityFieldPlane extends BaseScriptComponent {
     @input
     @hint("Low-potential heatmap color (far from masses).")
     @widget(new ColorWidget())
-    colorLow: vec4 = new vec4(0.05, 0.07, 0.18, 1.0);
+    colorLow: vec4 = new vec4(0.04, 0.10, 0.48, 1.0);
 
     @input
     @hint("High-potential heatmap color (near masses).")
     @widget(new ColorWidget())
-    colorHigh: vec4 = new vec4(1.0, 0.55, 0.20, 1.0);
+    colorHigh: vec4 = new vec4(1.0, 0.12, 0.08, 1.0);
 
     @input
     @hint("Contour ring color (alpha controls strength).")
     @widget(new ColorWidget())
-    contourColor: vec4 = new vec4(0.95, 0.30, 0.30, 0.85);
+    contourColor: vec4 = new vec4(1.0, 0.92, 0.82, 0.95);
 
     @input
     @hint("Tint applied where Earth dominates the field.")
     @widget(new ColorWidget())
-    earthTint: vec4 = new vec4(0.62, 0.85, 1.0, 1.0);
+    earthTint: vec4 = new vec4(1.0, 0.28, 0.22, 1.0);
 
     @input
     @hint("Tint applied where the Moon dominates the field.")
     @widget(new ColorWidget())
-    moonTint: vec4 = new vec4(1.0, 0.95, 0.78, 1.0);
+    moonTint: vec4 = new vec4(0.30, 0.52, 1.0, 1.0);
 
     private visual: RenderMeshVisual | null = null;
     private materialInstance: Material | null = null;
