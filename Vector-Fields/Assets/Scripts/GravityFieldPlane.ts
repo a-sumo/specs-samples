@@ -82,22 +82,22 @@ export class GravityFieldPlane extends BaseScriptComponent {
     @input
     @hint("Overall plane opacity scale.")
     @widget(new SliderWidget(0.0, 1.0, 0.05))
-    opacityScale: number = 0.85;
+    opacityScale: number = 0.92;
 
     @input
     @hint("Low-potential heatmap color (far from masses).")
     @widget(new ColorWidget())
-    colorLow: vec4 = new vec4(0.02, 0.08, 0.64, 1.0);
+    colorLow: vec4 = new vec4(0.12, 0.36, 1.0, 1.0);
 
     @input
     @hint("High-potential heatmap color (near masses).")
     @widget(new ColorWidget())
-    colorHigh: vec4 = new vec4(1.0, 0.04, 0.06, 1.0);
+    colorHigh: vec4 = new vec4(1.0, 0.08, 0.10, 1.0);
 
     @input
     @hint("Contour ring color (alpha controls strength).")
     @widget(new ColorWidget())
-    contourColor: vec4 = new vec4(1.0, 0.10, 0.16, 0.95);
+    contourColor: vec4 = new vec4(1.0, 0.16, 0.22, 0.98);
 
     @input
     @hint("Tint applied where Earth dominates the field.")
@@ -107,17 +107,17 @@ export class GravityFieldPlane extends BaseScriptComponent {
     @input
     @hint("Tint applied where the Moon dominates the field.")
     @widget(new ColorWidget())
-    moonTint: vec4 = new vec4(0.30, 0.52, 1.0, 1.0);
+    moonTint: vec4 = new vec4(0.22, 0.60, 1.0, 1.0);
 
     @input
     @hint("Field-line overlay color.")
     @widget(new ColorWidget())
-    fieldLineColor: vec4 = new vec4(0.18, 0.36, 1.0, 0.58);
+    fieldLineColor: vec4 = new vec4(0.30, 0.62, 1.0, 0.78);
 
     @input
     @hint("Arrow overlay color.")
     @widget(new ColorWidget())
-    arrowColor: vec4 = new vec4(1.0, 0.78, 0.86, 0.95);
+    arrowColor: vec4 = new vec4(1.0, 0.90, 0.96, 0.98);
 
     @input
     @widget(new SliderWidget(0.1, 2.5, 0.05))

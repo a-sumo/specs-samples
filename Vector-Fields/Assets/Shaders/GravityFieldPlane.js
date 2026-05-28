@@ -136,8 +136,9 @@ void main() {
     finalColor = mix(finalColor, FieldLineColor.rgb, fieldLineMask);
     finalColor = mix(finalColor, ArrowColor.rgb, arrowMask);
     finalColor = finalColor + ContourColor.rgb * (flowMask * 0.28 + isoHalo * 0.10);
+    finalColor = clamp(finalColor * 1.15, 0.0, 1.0);
 
     float overlayAlpha = max(max(contourMask * 0.95, fieldLineMask * 0.82), arrowMask);
-    float alpha = max(clamp(intensity * 0.85 + 0.18, 0.0, 1.0), overlayAlpha) * OpacityScale;
+    float alpha = max(clamp(intensity * 0.82 + 0.26, 0.0, 1.0), overlayAlpha) * OpacityScale;
     vertexColor = vec4(finalColor * alpha, alpha);
 }
