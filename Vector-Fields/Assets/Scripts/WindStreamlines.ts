@@ -1,5 +1,11 @@
 import { loadGfsArrays, GFS_META } from "./GfsData";
 
+enum WindTubeMode {
+  Trails = 0,
+  Points = 1,
+  Arrows = 2
+}
+
 // Wind streamlines on a calibrated globe — static-template version.
 //
 // Architecture (after iteration):
@@ -14,12 +20,8 @@ import { loadGfsArrays, GFS_META } from "./GfsData";
 //      derived from the local speed at each vertex, so opacity scrolling cannot
 //      create false colour gradients along a trail.
 //
-// All the heavy work happens once. Per-frame cost is dominated by writing
-// alpha into the cached vertex array and a single mesh update.
-//
-// Promotion path: move the alpha modulation into the vertex shader (read a
-// Time uniform + per-vertex phaseT attribute) and the CPU side becomes a
-// no-op. Until then, the JS hot loop is just a flat memory walk.
+// All the heavy work happens once. Per-frame cost is just pushing the
+// Time/PhaseSpeed/Displace uniforms; hue and opacity stay in the shader.
 
 @component
 export class WindStreamlines extends BaseScriptComponent {
@@ -43,6 +45,27 @@ export class WindStreamlines extends BaseScriptComponent {
   ribbonWidthRel: number = 0.010;
 
   @input
+  @widget(new ComboBoxWidget([
+    new ComboBoxItem("Trails", 0),
+    new ComboBoxItem("Points", 1),
+    new ComboBoxItem("Arrows", 2)
+  ]))
+  @hint("Trails: flowing paths, Points: sampled wind tracers, Arrows: sampled wind direction.")
+  private _tubeMode: number = 0;
+
+  @input
+  @hint("Point radius as fraction of sphere radius.")
+  pointRadiusRel: number = 0.013;
+
+  @input
+  @hint("Arrow length as fraction of sphere radius.")
+  arrowLengthRel: number = 0.055;
+
+  @input
+  @hint("Arrow width as fraction of sphere radius.")
+  arrowWidthRel: number = 0.016;
+
+  @input
   @hint("Simulated seconds advanced between path samples during init integration.")
   integrationStepSeconds: number = 2500;
 
@@ -64,22 +87,24 @@ export class WindStreamlines extends BaseScriptComponent {
   private cal: any = null;
   private meshVisual: RenderMeshVisual | null = null;
   private builder: MeshBuilder | null = null;
+  private static readonly MAX_VERTEX_COUNT: number = 62000;
+  private static readonly CAP_SEGMENTS: number = 8;
+  private meshReady: boolean = false;
 
   // Cached at init.
   // Vertex layout (9 floats):
   //   position (3) | texture0 (2: pathT, templatePhase) | texture1 (2: speedColor, speedRatioRaw)
-  //   texture2 (2: crossSection, capRadial)
+  //   texture2 (2: crossSection, capRadial/shapeTag)
   //
   // - pathT       ∈ [0, 1]   distance along the dash, 0=tail, 1=head
   // - templatePhase ∈ [0, 1] random per-template offset
   // - speedColor  ∈ [0, 1]   wind speed at this sample / speedScale
   // - speedRatioRaw >= 0     unclamped wind speed / speedScale, retained for diagnostics/future modes
   // - crossSection ∈ [-1, 1]  left/right ribbon coordinate for soft tube shading
-  // - capRadial    ∈ [-1, 1]  -1 on ribbon body; 0..1 radial fan coordinate on caps
+  // - capRadial    body=-1, caps=0..1, points=1.02..1.98, arrows=2
   //
-  // The WindStreamFlow Code Node consumes these to compute alpha
-  // (moving-head window) and optional per-vertex displacement along the
-  // surface normal without changing the hue for a vertex.
+  // The WindStreamFlow Code Node consumes these to shade trails, points, and
+  // arrows without changing hue as opacity scrolls.
   private vertexData!: Float32Array;
   private vertexCount: number = 0;
 
@@ -91,8 +116,23 @@ export class WindStreamlines extends BaseScriptComponent {
   private readonly STRIDE = 9;
 
   onAwake() {
+    this.createScriptApi();
     this.createEvent("OnStartEvent").bind(() => this.init());
     this.createEvent("UpdateEvent").bind(() => this.tick());
+  }
+
+  private createScriptApi(): void {
+    const self = this;
+    const api = {
+      setTubeMode: (mode: number) => self.setTubeMode(mode),
+      refresh: () => self.refresh(),
+      get tubeMode(): number { return self.tubeMode; },
+      set tubeMode(value: number) { self.tubeMode = value; },
+      get flowSpeed(): number { return self.phaseSpeed; },
+      set flowSpeed(value: number) { self.phaseSpeed = Math.max(0, value); },
+    };
+    (this as any).fieldApi = api;
+    (this as any).windApi = api;
   }
 
   // ----- field model: NCEP GFS 10 m wind, baked at project build time -----
@@ -183,15 +223,33 @@ export class WindStreamlines extends BaseScriptComponent {
     this.buildStaticMesh();
   }
 
-  // Build the entire ribbon mesh once. Returns nothing; populates this.vertexData
-  // + this.builder. All per-frame work later just updates alphas.
+  // Build one static mesh for the active wind view mode.
   private buildStaticMesh() {
-    const N = Math.max(1, this.templateCount);
-    const M = Math.max(2, this.segmentsPerDash);
+    const mode = this.clampTubeMode(this._tubeMode);
+    this.meshReady = false;
+    const requestedN = Math.max(1, Math.floor(this.templateCount));
+    const M = Math.min(64, Math.max(2, Math.floor(this.segmentsPerDash)));
     const radius = this.cal.radiusWorld as number;
     const radiusBoost = 1.004;
     const halfWidthBase = Math.max(0.001, radius * this.ribbonWidthRel);
+    const pointRadiusBase = Math.max(0.001, radius * this.pointRadiusRel);
+    const arrowLengthBase = Math.max(0.001, radius * this.arrowLengthRel);
+    const arrowWidthBase = Math.max(0.001, radius * this.arrowWidthRel);
     const maxJumpSq = (radius * 0.4) * (radius * 0.4);
+    const capSegments = WindStreamlines.CAP_SEGMENTS;
+    const pointVertsPerGlyph = capSegments + 2;
+    const arrowVertsPerGlyph = 7;
+    const trailVertsPerTemplate = M * 2 + pointVertsPerGlyph * 2;
+    const templateLimit = mode === WindTubeMode.Trails
+      ? Math.min(requestedN, Math.max(1, Math.floor(WindStreamlines.MAX_VERTEX_COUNT / trailVertsPerTemplate)))
+      : requestedN;
+    const N = templateLimit;
+    const totalSamples = requestedN * M;
+    const pointSampleStride = Math.max(1, Math.ceil((totalSamples * pointVertsPerGlyph) / WindStreamlines.MAX_VERTEX_COUNT));
+    const arrowSampleStride = Math.max(1, Math.ceil((totalSamples * arrowVertsPerGlyph) / WindStreamlines.MAX_VERTEX_COUNT));
+    const maxVerts = mode === WindTubeMode.Trails
+      ? Math.max(trailVertsPerTemplate, N * trailVertsPerTemplate)
+      : WindStreamlines.MAX_VERTEX_COUNT;
 
     const inv = this.sceneObject.getTransform().getInvertedWorldTransform();
     const earthCenter = (this.calibrationObject.getTransform() as Transform).getWorldPosition();
@@ -201,14 +259,12 @@ export class WindStreamlines extends BaseScriptComponent {
     this.dashFirstVertex = new Int32Array(N);
     this.dashRingCount = new Int32Array(N);
 
-    // Worst-case allocation: every template fills M rings plus two rounded cap fans.
-    const capSegments = 8;
-    const maxVerts = N * (M * 2 + (capSegments + 2) * 2);
     const vData = new Float32Array(maxVerts * this.STRIDE);
     const indices: number[] = [];
 
     const goldenAngle = Math.PI * (3 - Math.sqrt(5));
     let vertCursor = 0;
+    let sampleCursor = 0;
 
     // Per-template centerline scratch (local positions + speeds for one dash).
     const pathX = new Float32Array(M);
@@ -236,6 +292,7 @@ export class WindStreamlines extends BaseScriptComponent {
       vertCursor++;
       return idx;
     };
+    const hasRoom = (count: number): boolean => vertCursor + count <= maxVerts;
 
     for (let i = 0; i < N; i++) {
       // Fibonacci sphere seed → (lat, lon).
@@ -276,12 +333,13 @@ export class WindStreamlines extends BaseScriptComponent {
       this.dashFirstVertex[i] = vertCursor;
       this.dashRingCount[i] = rings;
 
-      if (rings < 2) continue;
+      if (rings < 1) continue;
 
-      // Emit left/right ribbon vertices per ring.
       const getFrame = (k: number): number[] => {
         let tx: number, ty: number, tz: number;
-        if (k === 0) {
+        if (rings < 2) {
+          tx = 1; ty = 0; tz = 0;
+        } else if (k === 0) {
           tx = pathX[1] - pathX[0]; ty = pathY[1] - pathY[0]; tz = pathZ[1] - pathZ[0];
         } else if (k === rings - 1) {
           tx = pathX[k] - pathX[k-1]; ty = pathY[k] - pathY[k-1]; tz = pathZ[k] - pathZ[k-1];
@@ -296,6 +354,22 @@ export class WindStreamlines extends BaseScriptComponent {
         let nz = pathZ[k] - earthCenterLocal.z;
         const nl = Math.sqrt(nx*nx + ny*ny + nz*nz);
         if (nl > 1e-6) { nx /= nl; ny /= nl; nz /= nl; } else { nx = 0; ny = 1; nz = 0; }
+
+        const tangentDotNormal = tx*nx + ty*ny + tz*nz;
+        tx -= nx * tangentDotNormal;
+        ty -= ny * tangentDotNormal;
+        tz -= nz * tangentDotNormal;
+        let tl2 = Math.sqrt(tx*tx + ty*ty + tz*tz);
+        if (tl2 <= 1e-6) {
+          const rx = Math.abs(ny) < 0.92 ? 0 : 1;
+          const ry = Math.abs(ny) < 0.92 ? 1 : 0;
+          const rz = 0;
+          tx = ry*nz - rz*ny;
+          ty = rz*nx - rx*nz;
+          tz = rx*ny - ry*nx;
+          tl2 = Math.sqrt(tx*tx + ty*ty + tz*tz);
+        }
+        if (tl2 > 1e-6) { tx /= tl2; ty /= tl2; tz /= tl2; } else { tx = 1; ty = 0; tz = 0; }
 
         let wx = ny*tz - nz*ty;
         let wy = nz*tx - nx*tz;
@@ -330,6 +404,85 @@ export class WindStreamlines extends BaseScriptComponent {
         }
       };
 
+      const emitPointFan = (k: number) => {
+        if (!hasRoom(pointVertsPerGlyph)) return;
+        const frame = getFrame(k);
+        const tx = frame[0], ty = frame[1], tz = frame[2];
+        const wx = frame[3], wy = frame[4], wz = frame[5];
+        const pathT = rings > 1 ? k / (rings - 1) : 0.5;
+        const speedN = pathSpeed[k];
+        const speedRatioN = pathSpeedRatio[k];
+        const radiusScale = pointRadiusBase * (0.86 + speedN * 0.34);
+        const center = emitVertex(pathX[k], pathY[k], pathZ[k], pathT, tphase, speedN, speedRatioN, 0, 1.02);
+        let prev = -1;
+        for (let s = 0; s <= capSegments; s++) {
+          const a = (s / capSegments) * Math.PI * 2.0;
+          const ca = Math.cos(a);
+          const sa = Math.sin(a);
+          const x = pathX[k] + (wx * ca + tx * sa) * radiusScale;
+          const y = pathY[k] + (wy * ca + ty * sa) * radiusScale;
+          const z = pathZ[k] + (wz * ca + tz * sa) * radiusScale;
+          const arc = emitVertex(x, y, z, pathT, tphase, speedN, speedRatioN, ca, 1.98);
+          if (prev >= 0) {
+            indices.push(center, prev, arc);
+          }
+          prev = arc;
+        }
+      };
+
+      const emitArrow = (k: number) => {
+        if (!hasRoom(arrowVertsPerGlyph)) return;
+        const frame = getFrame(k);
+        const tx = frame[0], ty = frame[1], tz = frame[2];
+        const wx = frame[3], wy = frame[4], wz = frame[5];
+        const pathT = rings > 1 ? k / (rings - 1) : 0.5;
+        const speedN = pathSpeed[k];
+        const speedRatioN = pathSpeedRatio[k];
+        const speedScale = 0.70 + Math.min(1.0, speedRatioN) * 0.65;
+        const len = arrowLengthBase * speedScale;
+        const headLen = len * 0.40;
+        const shaftHalf = arrowWidthBase * (0.24 + speedN * 0.10);
+        const headHalf = arrowWidthBase * (0.82 + speedN * 0.24);
+        const cx = pathX[k], cy = pathY[k], cz = pathZ[k];
+        const tailX = cx - tx * len * 0.50;
+        const tailY = cy - ty * len * 0.50;
+        const tailZ = cz - tz * len * 0.50;
+        const tipX = cx + tx * len * 0.50;
+        const tipY = cy + ty * len * 0.50;
+        const tipZ = cz + tz * len * 0.50;
+        const neckX = tipX - tx * headLen;
+        const neckY = tipY - ty * headLen;
+        const neckZ = tipZ - tz * headLen;
+
+        const tailL = emitVertex(tailX + wx * shaftHalf, tailY + wy * shaftHalf, tailZ + wz * shaftHalf, pathT, tphase, speedN, speedRatioN, -1, 2.0);
+        const tailR = emitVertex(tailX - wx * shaftHalf, tailY - wy * shaftHalf, tailZ - wz * shaftHalf, pathT, tphase, speedN, speedRatioN, 1, 2.0);
+        const neckL = emitVertex(neckX + wx * shaftHalf, neckY + wy * shaftHalf, neckZ + wz * shaftHalf, pathT, tphase, speedN, speedRatioN, -0.55, 2.0);
+        const neckR = emitVertex(neckX - wx * shaftHalf, neckY - wy * shaftHalf, neckZ - wz * shaftHalf, pathT, tphase, speedN, speedRatioN, 0.55, 2.0);
+        const headL = emitVertex(neckX + wx * headHalf, neckY + wy * headHalf, neckZ + wz * headHalf, pathT, tphase, speedN, speedRatioN, -1, 2.0);
+        const headR = emitVertex(neckX - wx * headHalf, neckY - wy * headHalf, neckZ - wz * headHalf, pathT, tphase, speedN, speedRatioN, 1, 2.0);
+        const tip = emitVertex(tipX, tipY, tipZ, pathT, tphase, speedN, speedRatioN, 0, 2.0);
+        indices.push(tailL, tailR, neckR, tailL, neckR, neckL, headL, headR, tip);
+      };
+
+      if (mode === WindTubeMode.Points) {
+        for (let k = 0; k < rings; k++) {
+          if ((sampleCursor % pointSampleStride) === 0) emitPointFan(k);
+          sampleCursor++;
+        }
+        continue;
+      }
+
+      if (mode === WindTubeMode.Arrows) {
+        for (let k = 0; k < rings; k++) {
+          if ((sampleCursor % arrowSampleStride) === 0) emitArrow(k);
+          sampleCursor++;
+        }
+        continue;
+      }
+
+      if (rings < 2) continue;
+
+      // Emit left/right ribbon vertices per ring.
       for (let k = 0; k < rings; k++) {
         const frame = getFrame(k);
         const wx = frame[3], wy = frame[4], wz = frame[5];
@@ -394,14 +547,15 @@ export class WindStreamlines extends BaseScriptComponent {
     if (this.builder.isValid()) {
       this.meshVisual!.mesh = this.builder.getMesh();
       this.builder.updateMesh();
+      this.meshReady = true;
     }
-    print("[WindStreamlines] static mesh: " + this.vertexCount + " verts, " + (indices.length / 3) + " tris.");
+    const modeNames = ["Trails", "Points", "Arrows"];
+    print("[WindStreamlines] " + modeNames[mode] + " mesh: " + this.vertexCount + " verts, " + (indices.length / 3) + " tris.");
   }
 
   // ----- per-frame -----
   // The mesh is fully static after init. The Code Node shader reads texture0,
-  // texture1, and texture2 to animate opacity and render each ribbon as a
-  // soft rounded tube without further CPU-side mesh updates.
+  // texture1, and texture2 to animate opacity and render each active mode.
   private tick() {
     if (!this.meshVisual || !this.meshVisual.mainMaterial) return;
     const pass = this.meshVisual.mainMaterial.mainPass as any;
@@ -410,4 +564,31 @@ export class WindStreamlines extends BaseScriptComponent {
     pass.PhaseSpeed = this.phaseSpeed;
     pass.Displace = this.displace;
   }
+
+  public setTubeMode(mode: number): void {
+    const nextMode = this.clampTubeMode(mode);
+    if (nextMode === this._tubeMode) return;
+    this._tubeMode = nextMode;
+    this.refresh();
+  }
+
+  public refresh(): void {
+    if (!this.cal || !this.gfsU || !this.gfsV || !this.meshVisual) return;
+    this.buildStaticMesh();
+  }
+
+  public queueRefresh(_delaySeconds?: number): void {
+    this.refresh();
+  }
+
+  private clampTubeMode(mode: number): WindTubeMode {
+    return Math.floor(Math.min(2, Math.max(0, mode))) as WindTubeMode;
+  }
+
+  get tubeMode(): number { return this._tubeMode; }
+  set tubeMode(value: number) {
+    this.setTubeMode(value);
+  }
+
+  get hasMesh(): boolean { return this.meshReady; }
 }

@@ -3,7 +3,7 @@
 // Consumes packed UVs from WindStreamlines.ts:
 //   texture0 = (pathT, templatePhase)
 //   texture1 = (speedColor, speedRatioRaw)
-//   texture2 = (crossSection, capRadial)
+//   texture2 = (crossSection, capRadial/shapeTag)
 //
 // The output is premultiplied because WindStreamFlow.mat uses
 // PremultipliedAlpha blending.
@@ -25,8 +25,17 @@ void main() {
     float templatePhase = fract(uv0.y);
     float speedColor = clamp(uv1.x, 0.0, 1.0);
     float crossSection = clamp(uv2.x, -1.0, 1.0);
-    float capMask = step(0.0, uv2.y);
-    float radial = clamp(mix(abs(crossSection), uv2.y, capMask), 0.0, 1.0);
+    float shapeTag = uv2.y;
+    float pointMask = step(1.001, shapeTag) * (1.0 - step(2.0, shapeTag));
+    float arrowMask = step(2.0, shapeTag);
+    float trailMask = 1.0 - max(pointMask, arrowMask);
+    float capMask = step(0.0, shapeTag) * trailMask;
+    float bodyMask = (1.0 - step(0.0, shapeTag)) * trailMask;
+    float pointRadial = clamp((shapeTag - 1.02) / 0.96, 0.0, 1.0);
+    float radial = clamp(bodyMask * abs(crossSection)
+                       + capMask * shapeTag
+                       + pointMask * pointRadial
+                       + arrowMask * abs(crossSection), 0.0, 1.0);
 
     float phase = fract(Time * PhaseSpeed + templatePhase);
     float behind = fract(phase - pathT + 1.0);
@@ -40,7 +49,10 @@ void main() {
     float wake = 1.0 - smoothstep(0.035, 0.58, behind);
     float tubeShade = edge * (0.72 + shoulder * 0.20 + core * 0.40);
     float flowOpacity = 0.30 + wake * 0.44 + head * 0.44;
-    float alpha = clamp(tubeShade * flowOpacity, 0.0, 1.0);
+    float trailAlpha = clamp(tubeShade * flowOpacity, 0.0, 1.0);
+    float pointAlpha = clamp(edge * (0.70 + core * 0.36) * (0.72 + head * 0.28), 0.0, 1.0);
+    float arrowAlpha = clamp(edge * (0.78 + core * 0.22 + head * 0.16), 0.0, 1.0);
+    float alpha = trailAlpha * trailMask + pointAlpha * pointMask + arrowAlpha * arrowMask;
 
     float t = smoothstep(0.0, 1.0, speedColor);
     vec3 calm = vec3(0.18, 0.50, 1.00);
@@ -58,7 +70,7 @@ void main() {
     float luma = dot(color, vec3(0.299, 0.587, 0.114));
     color = clamp(mix(vec3(luma), color, 1.25), 0.0, 1.0);
     color *= 0.98 + core * 0.28;
-    color += vec3(0.12, 0.13, 0.14) * core * head;
+    color += vec3(0.12, 0.13, 0.14) * core * (head * trailMask + pointMask * 0.42 + arrowMask * 0.25);
     color = clamp(color, 0.0, 1.0);
 
     vec3 nrm = normalize(pos + vec3(0.0, 0.0, 0.0001));

@@ -26,7 +26,19 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
-    {}
+    _tubeMode: false
+    arrowLengthRel: false
+    arrowWidthRel: false
+    calibrationObject: false
+    displace: false
+    integrationStepSeconds: false
+    material: false
+    phaseSpeed: false
+    pointRadiusRel: false
+    ribbonWidthRel: false
+    segmentsPerDash: false
+    speedScale: false
+    templateCount: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -36,10 +48,33 @@
   Attachments:
     []
   DefaultScriptInputs:
-    -
-      {}
+    - calibrationObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      templateCount: !<float> 700.000000
+      segmentsPerDash: !<float> 18.000000
+      ribbonWidthRel: 0.010000
+      _tubeMode: !<float> 0.000000
+      pointRadiusRel: 0.013000
+      arrowLengthRel: 0.055000
+      arrowWidthRel: 0.016000
+      integrationStepSeconds: !<float> 2500.000000
+      phaseSpeed: 0.450000
+      displace: !<float> 0.000000
+      speedScale: !<float> 30.000000
   ScriptTypes:
     -
       {}
   InputLines:
-    []
+    - '// @input SceneObject calibrationObject {"hint":"Globe Calibration SceneObject (its WindGlobeCalibration script is read)."}'
+    - // @input Asset.Material material
+    - '// @input float templateCount = 700 {"hint":"Number of streamline templates uniformly scattered across the sphere."}'
+    - '// @input float segmentsPerDash = 18 {"hint":"Samples per template path. More = longer-looking streamlines."}'
+    - '// @input float ribbonWidthRel = 0.01 {"hint":"Ribbon half-width as fraction of sphere radius."}'
+    - '// @input float _tubeMode {"hint":"Trails: flowing paths, Points: sampled wind tracers, Arrows: sampled wind direction.", "widget":"combobox", "values":[{"label":"Trails", "value":0}, {"label":"Points", "value":1}, {"label":"Arrows", "value":2}]}'
+    - '// @input float pointRadiusRel = 0.013 {"hint":"Point radius as fraction of sphere radius."}'
+    - '// @input float arrowLengthRel = 0.055 {"hint":"Arrow length as fraction of sphere radius."}'
+    - '// @input float arrowWidthRel = 0.016 {"hint":"Arrow width as fraction of sphere radius."}'
+    - '// @input float integrationStepSeconds = 2500 {"hint":"Simulated seconds advanced between path samples during init integration."}'
+    - '// @input float phaseSpeed = 0.45 {"hint":"Phase cycles per second along each dash. Higher = faster flow."}'
+    - '// @input float displace {"hint":"Vertex displacement amplitude along surface normal — set > 0 to test vertex-shader deformation."}'
+    - '// @input float speedScale = 30 {"hint":"Reference speed (m/s) that maps to peak warm colour."}'
