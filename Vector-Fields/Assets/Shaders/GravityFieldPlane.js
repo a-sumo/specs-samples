@@ -58,13 +58,9 @@ void main() {
     // Heatmap by potential intensity. The log keeps the Earth well readable
     // while preserving the Moon's smaller field.
     float logPotential = log(1.0 + potential * 0.6);
-    float intensity = clamp(logPotential * 0.6, 0.0, 1.0);
-    vec3 heatColor = mix(ColorLow.rgb, ColorHigh.rgb, intensity);
-
-    // Dominance tint: which body owns this point.
-    float dominanceE = potE / (potE + potM + 0.0001);
-    vec3 dominanceTint = mix(MoonTint.rgb, EarthTint.rgb, dominanceE);
-    vec3 baseColor = mix(heatColor, heatColor * dominanceTint, 0.45);
+    float intensity = smoothstep(0.75, 2.65, logPotential);
+    intensity = pow(clamp(intensity, 0.0, 1.0), 1.35);
+    vec3 baseColor = mix(ColorLow.rgb, ColorHigh.rgb, intensity);
 
     // Iso-potential contour lines. Using log-potential spaces the isolines
     // evenly across the gravity well and keeps the density readable near masses.
@@ -84,7 +80,7 @@ void main() {
 
     vec3 finalColor = baseColor;
     finalColor = mix(finalColor, ContourColor.rgb, contourMask);
-    finalColor = finalColor + vec3(flowMask) + ContourColor.rgb * isoHalo * 0.08;
+    finalColor = finalColor + ContourColor.rgb * (flowMask * 0.28 + isoHalo * 0.10);
 
     float alpha = max(clamp(intensity * 0.85 + 0.18, 0.0, 1.0), contourMask * 0.95) * OpacityScale;
     vertexColor = vec4(finalColor * alpha, alpha);
