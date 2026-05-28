@@ -1,0 +1,101 @@
+- !<AssetImportMetadata/4c229f37-c313-4e4e-887b-8d4f21624734>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 7cf94e0f-e6b6-418a-a20f-e19c70f1c723
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 7cf94e0f-e6b6-418a-a20f-e19c70f1c723
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 30741229-3421-4210-b8f3-84905562f884
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/30741229-3421-4210-b8f3-84905562f884>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: c82856d8-3b2f-41cc-872f-febf0db78a12
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    colorHigh: false
+    colorLow: false
+    contourColor: false
+    contourCount: false
+    contourThickness: false
+    depthScale: false
+    earthMass: false
+    earthObject: false
+    earthTint: false
+    flowScale: false
+    flowSpeed: false
+    moonMass: false
+    moonObject: false
+    moonTint: false
+    opacityScale: false
+    planeMaterial: false
+    planeSize: false
+    resolution: false
+    softening: false
+    wellDepth: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - earthObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      moonObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      planeMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      planeSize: !<float> 18.000000
+      resolution: !<float> 96.000000
+      earthMass: !<float> 18.000000
+      moonMass: !<float> 2.000000
+      softening: 0.350000
+      wellDepth: !<float> 1.000000
+      depthScale: 0.180000
+      contourCount: !<float> 9.000000
+      contourThickness: 0.180000
+      flowSpeed: 0.600000
+      flowScale: 1.600000
+      opacityScale: 0.850000
+      colorLow: !<Vec4> {x: 0.050000, y: 0.070000, z: 0.180000, w: 1.000000}
+      colorHigh: !<Vec4> {x: 1.000000, y: 0.550000, z: 0.200000, w: 1.000000}
+      contourColor: !<Vec4> {x: 0.950000, y: 0.300000, z: 0.300000, w: 0.850000}
+      earthTint: !<Vec4> {x: 0.620000, y: 0.850000, z: 1.000000, w: 1.000000}
+      moonTint: !<Vec4> {x: 1.000000, y: 0.950000, z: 0.780000, w: 1.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject earthObject {"hint":"Earth SceneObject. The script reads its world position into the EarthPos uniform."}'
+    - '// @input SceneObject moonObject {"hint":"Moon SceneObject. The script reads its world position into the MoonPos uniform."}'
+    - '// @input Asset.Material planeMaterial {"hint":"Material instanced from GravityFieldPlane.mat. The script clones it so multiple plane instances stay independent."}'
+    - '// @input float planeSize = 18 {"hint":"Plane width/depth in cm.", "widget":"slider", "min":6, "max":30, "step":0.5}'
+    - '// @input float resolution = 96 {"hint":"Vertices per side of the plane mesh. Higher = smoother well and contours; 96 is a safe Spectacles default.", "widget":"slider", "min":24, "max":192, "step":4}'
+    - '// @input float earthMass = 18 {"hint":"Earth mass (relative units).", "widget":"slider", "min":1, "max":30, "step":0.5}'
+    - '// @input float moonMass = 2 {"hint":"Moon mass multiplier vs. real Earth/Moon ratio.", "widget":"slider", "min":0.25, "max":8, "step":0.25}'
+    - '// @input float softening = 0.35 {"hint":"Softening radius. Caps the 1/r singularity at body centers.", "widget":"slider", "min":0.05, "max":1.5, "step":0.05}'
+    - '// @input float wellDepth = 1 {"hint":"Vertical scale of the gravity well displacement.", "widget":"slider", "min":0.05, "max":4, "step":0.05}'
+    - '// @input float depthScale = 0.18 {"hint":"Multiplier inside the shader; tune with wellDepth for the visual look.", "widget":"slider", "min":0.01, "max":0.5, "step":0.01}'
+    - '// @input float contourCount = 9 {"hint":"Number of iso-potential contour rings drawn across the plane.", "widget":"slider", "min":2, "max":24, "step":0.5}'
+    - '// @input float contourThickness = 0.18 {"hint":"Contour line half-width (relative to ring spacing).", "widget":"slider", "min":0, "max":0.5, "step":0.01}'
+    - '// @input float flowSpeed = 0.6 {"hint":"Animation speed for the flow stripes along the field direction.", "widget":"slider", "min":0, "max":4, "step":0.05}'
+    - '// @input float flowScale = 1.6 {"hint":"Spatial frequency of the flow stripes.", "widget":"slider", "min":0.2, "max":8, "step":0.1}'
+    - '// @input float opacityScale = 0.85 {"hint":"Overall plane opacity scale.", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input vec4 colorLow = {0.05,0.07,0.18,1} {"hint":"Low-potential heatmap color (far from masses).", "widget":"color"}'
+    - '// @input vec4 colorHigh = {1,0.55,0.2,1} {"hint":"High-potential heatmap color (near masses).", "widget":"color"}'
+    - '// @input vec4 contourColor = {0.95,0.3,0.3,0.85} {"hint":"Contour ring color (alpha controls strength).", "widget":"color"}'
+    - '// @input vec4 earthTint = {0.62,0.85,1,1} {"hint":"Tint applied where Earth dominates the field.", "widget":"color"}'
+    - '// @input vec4 moonTint = {1,0.95,0.78,1} {"hint":"Tint applied where the Moon dominates the field.", "widget":"color"}'
