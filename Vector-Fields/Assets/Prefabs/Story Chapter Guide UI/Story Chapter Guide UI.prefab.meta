@@ -30,6 +30,7 @@
     showOnStart: true
     controlContentRoots: true
     hideLegacySystems: true
+    isolateSceneInteractors: true
     panelOffset: true
     cameraRoot: true
     followUser: true
@@ -47,6 +48,7 @@
       showOnStart: true
       controlContentRoots: true
       hideLegacySystems: true
+      isolateSceneInteractors: true
       panelOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
       cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       followUser: true

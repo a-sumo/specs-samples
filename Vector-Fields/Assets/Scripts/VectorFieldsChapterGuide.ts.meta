@@ -27,10 +27,13 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     cameraRoot: false
+    controlContentRoots: false
     directorRoot: false
     folded: false
     followSmoothing: false
     followUser: false
+    hideLegacySystems: false
+    isolateSceneInteractors: false
     menuDistanceCm: false
     menuHorizontalOffsetCm: false
     menuVerticalOffsetCm: false
@@ -49,6 +52,9 @@
     - scaffoldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       directorRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       showOnStart: true
+      controlContentRoots: true
+      hideLegacySystems: true
+      isolateSceneInteractors: true
       panelOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
       cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       followUser: true
@@ -64,6 +70,9 @@
     - '// @input SceneObject scaffoldRoot {"hint":"VF Story Scaffold root. If empty, the script searches for it by name."}'
     - '// @input SceneObject directorRoot {"hint":"Optional Story Step Director root. If empty, the script searches for it by name."}'
     - '// @input bool showOnStart = true {"hint":"Start visible and immediately stage the first chapter."}'
+    - '// @input bool controlContentRoots = true {"hint":"When no Story Step Director is present, enable the real content roots for each guide step."}'
+    - '// @input bool hideLegacySystems = true {"hint":"When this guide owns staging, park the older narration panel and slide stage."}'
+    - '// @input bool isolateSceneInteractors = true {"hint":"While open, pause nearby scene colliders so content cannot steal menu touches."}'
     - '// @input vec3 panelOffset = {0,0,0} {"hint":"Offset from this root in centimeters."}'
     - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor for Follow mode. Empty searches for Camera Object."}'
     - '// @input bool followUser = true {"hint":"Keep the menu in front of the user."}'

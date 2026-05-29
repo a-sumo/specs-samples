@@ -2,7 +2,7 @@
 // Texture-backed chapter guide with UIKit hit targets.
 
 import { RectangleButton } from "SpectaclesUIKit.lspkg/Scripts/Components/Button/RectangleButton";
-import { STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_STEPS, STORY_GUIDE_UTILITY } from "./StoryGuideLayoutGenerated";
+import { STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_STEPS, STORY_GUIDE_UTILITY, STORY_GUIDE_UTILITY_FOLDED } from "./StoryGuideLayoutGenerated";
 
 type StoryGuideSlot = {
     x: number;
@@ -34,6 +34,9 @@ type ButtonBinding = {
     selectedOverlay: Texture | null;
     pressedOverlay: Texture | null;
     slot: StoryGuideSlot;
+    homeSlot: StoryGuideSlot;
+    targetSlot: StoryGuideSlot;
+    targetZ: number;
     hovered: boolean;
     pressedState: boolean;
     selected: boolean;
@@ -42,6 +45,11 @@ type ButtonBinding = {
     visualLift: number;
     targetLift: number;
     label: Text | null;
+};
+
+type ColliderBinding = {
+    collider: ColliderComponent;
+    enabled: boolean;
 };
 
 type ExampleFieldOption = {
@@ -108,6 +116,29 @@ const TEX_CURSOR_HOVER = requireAsset("../Images/StoryUI/cursor_hover.png") as T
 const TEX_CURSOR_PRESSED = requireAsset("../Images/StoryUI/cursor_pressed.png") as Texture;
 const TEX_PANEL_CURSOR_WASH = requireAsset("../Images/StoryUI/panel_cursor_wash.png") as Texture;
 
+const BUTTON_HIT_Z = 0.34;
+const FOLDED_BUTTON_HIT_Z = 5.2;
+const BUTTON_HIT_DEPTH_CM = 24.0;
+const BUTTON_CURSOR_Z_OFFSET = 0.6;
+const PANEL_HIT_Z = 0.04;
+const PANEL_HIT_DEPTH_CM = 0.42;
+const FOLD_DOCK_DELAY_SEC = 0.12;
+
+const INTERACTION_ISOLATION_ROOTS = [
+    "VF Story Scaffold",
+    "Field Controller",
+    "Motion Field Root",
+    "Vector Field Examples Root",
+    "Magnetic Field Root",
+    "Gravity Field Root",
+    "Globe Calibration",
+    "Globe Wind",
+    "Globe Spin-Lock Button",
+    "Proxy_Interactable_Handle_Test",
+    "Flow Slice",
+    "TubeTest",
+];
+
 const EXAMPLE_FIELD_OPTIONS: ExampleFieldOption[] = [
     { id: "gravity", label: "Gravity", slot: { x: -8.7, y: -5.28, width: 7.6, height: 1.46 } },
     { id: "magnetism", label: "Magnetism", slot: { x: 0.0, y: -5.28, width: 7.6, height: 1.46 } },
@@ -137,6 +168,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     @input
     @hint("When this guide owns staging, park the older narration panel and slide stage.")
     hideLegacySystems: boolean = true;
+
+    @input
+    @hint("While open, pause nearby scene colliders so content cannot steal menu touches.")
+    isolateSceneInteractors: boolean = true;
 
     @input
     @hint("Offset from this root in centimeters.")
@@ -197,6 +232,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private fieldSelectorButtons: ButtonBinding[] = [];
     private scaffoldApi: any = null;
     private directorApi: any = null;
+    private isolatedColliders: ColliderBinding[] = [];
+    private dockFoldControls: boolean = false;
+    private foldDockDelayRemaining: number = 0.0;
     private built: boolean = false;
     private startEventRef: any = null;
     private updateEventRef: any = null;
@@ -207,6 +245,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateEventRef = this.createEvent("UpdateEvent");
         this.updateEventRef.bind(() => {
             this.updateMenuPose();
+            this.updateFoldDockDelay();
             this.updateButtonAnimations();
             this.updatePanelCursorAnimation();
             this.updateCursorAnimation();
@@ -245,6 +284,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.scaffoldApi = this.findScaffoldApi();
         this.directorApi = this.findDirectorApi();
         this.sceneObject.enabled = this.showOnStart;
+        this.dockFoldControls = this.folded;
+        this.foldDockDelayRemaining = 0.0;
 
         const panelImage = this.createImage(this.sceneObject, "__GuidePanelImage", {
             x: this.panelOffset.x,
@@ -338,8 +379,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             TEX_UTILITY_FOLD_PRESSED,
             248,
             () => {
-                this.folded = !this.folded;
-                this.syncVisualState();
+                this.setFolded(!this.folded);
             },
             false,
             TEX_UTILITY_OVERLAY_HOVER,
@@ -365,7 +405,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         pressedOverlay: Texture | null = null
     ): ButtonBinding {
         const buttonObject = this.ensureChild(this.sceneObject, name);
-        this.place(buttonObject, slot.x, slot.y, 0.34);
+        this.place(buttonObject, slot.x, slot.y, BUTTON_HIT_Z);
         if (foldable) {
             this.registerFoldable(buttonObject);
         }
@@ -375,7 +415,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             button = buttonObject.createComponent(RectangleButton.getTypeName()) as RectangleButton;
         }
         (button as any)._style = "Ghost";
-        button.size = new vec3(slot.width, slot.height, 1.2);
+        button.size = new vec3(slot.width, slot.height, BUTTON_HIT_DEPTH_CM);
         button.renderOrder = renderOrder - 2;
         button.initialize();
         this.hideUIKitVisual(button);
@@ -405,7 +445,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             hoverOverlay,
             selectedOverlay,
             pressedOverlay,
-            slot,
+            slot: this.cloneSlot(slot),
+            homeSlot: this.cloneSlot(slot),
+            targetSlot: this.cloneSlot(slot),
+            targetZ: BUTTON_HIT_Z,
             hovered: false,
             pressedState: false,
             selected: false,
@@ -567,7 +610,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private createPanelHitTarget(): void {
         const object = this.ensureChild(this.sceneObject, "__GuidePanelHitTarget");
-        this.place(object, this.panelOffset.x, this.panelOffset.y, -0.18);
+        this.place(object, this.panelOffset.x, this.panelOffset.y, PANEL_HIT_Z);
         this.registerFoldable(object);
 
         let button = object.getComponent(RectangleButton.getTypeName()) as RectangleButton;
@@ -575,7 +618,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             button = object.createComponent(RectangleButton.getTypeName()) as RectangleButton;
         }
         (button as any)._style = "Ghost";
-        button.size = new vec3(STORY_GUIDE_PANEL.width, STORY_GUIDE_PANEL.height, 0.24);
+        button.size = new vec3(STORY_GUIDE_PANEL.width, STORY_GUIDE_PANEL.height, PANEL_HIT_DEPTH_CM);
         button.renderOrder = 218;
         button.initialize();
         this.hideUIKitVisual(button);
@@ -624,6 +667,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateBindings(this.utilityButtons);
         this.syncFoldState();
         this.syncFieldSelectorState();
+        this.syncUtilityDockTargets();
+        this.refreshSceneInteractionIsolation();
     }
 
     private stageCurrentRoot(): void {
@@ -753,6 +798,15 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         };
     }
 
+    private cloneSlot(slot: StoryGuideSlot): StoryGuideSlot {
+        return {
+            x: slot.x,
+            y: slot.y,
+            width: slot.width,
+            height: slot.height,
+        };
+    }
+
     private place(object: SceneObject, x: number, y: number, z: number): void {
         const t = object.getTransform();
         t.setLocalPosition(new vec3(x, y, z));
@@ -848,6 +902,29 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private syncUtilityDockTargets(): void {
+        const docked = this.folded && this.dockFoldControls;
+        if (this.followButton) {
+            this.setButtonTargetSlot(
+                this.followButton,
+                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.follow : STORY_GUIDE_UTILITY.follow),
+                docked ? FOLDED_BUTTON_HIT_Z : BUTTON_HIT_Z
+            );
+        }
+        if (this.foldButton) {
+            this.setButtonTargetSlot(
+                this.foldButton,
+                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.fold : STORY_GUIDE_UTILITY.fold),
+                docked ? FOLDED_BUTTON_HIT_Z : BUTTON_HIT_Z
+            );
+        }
+    }
+
+    private setButtonTargetSlot(binding: ButtonBinding, slot: StoryGuideSlot, z: number): void {
+        binding.targetSlot = this.cloneSlot(slot);
+        binding.targetZ = z;
+    }
+
     private syncFieldSelectorState(): void {
         const visible = !this.folded && STORY_GUIDE_STEPS[this.currentIndex].id === "examples";
         for (let i = 0; i < this.fieldSelectorButtons.length; i++) {
@@ -855,6 +932,16 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             binding.object.enabled = visible;
             binding.selected = binding.id === "field:" + this.selectedExampleField;
             this.updateBindingVisual(binding);
+        }
+    }
+
+    private updateFoldDockDelay(): void {
+        if (!this.folded || this.dockFoldControls || this.foldDockDelayRemaining <= 0.0) return;
+        this.foldDockDelayRemaining -= getDeltaTime();
+        if (this.foldDockDelayRemaining <= 0.0) {
+            this.foldDockDelayRemaining = 0.0;
+            this.dockFoldControls = true;
+            this.syncUtilityDockTargets();
         }
     }
 
@@ -866,14 +953,33 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private updateBindingAnimations(bindings: ButtonBinding[]): void {
-        const alpha = this.clamp(getDeltaTime() * 14.0, 0.0, 1.0);
+        const dt = getDeltaTime();
+        const alpha = this.clamp(dt * 14.0, 0.0, 1.0);
+        const positionAlpha = this.clamp(dt * 10.5, 0.0, 1.0);
         for (let i = 0; i < bindings.length; i++) {
             const binding = bindings[i];
+            this.updateBindingPosition(binding, positionAlpha);
             binding.visualScale += (binding.targetScale - binding.visualScale) * alpha;
             binding.visualLift += (binding.targetLift - binding.visualLift) * alpha;
             this.placeImageVisual(binding.image, binding.visualScale, binding.visualLift);
             this.placeImageVisual(binding.overlay, binding.visualScale, binding.visualLift + 0.02);
         }
+    }
+
+    private updateBindingPosition(binding: ButtonBinding, alpha: number): void {
+        const target = binding.targetSlot || binding.homeSlot;
+        const transform = binding.object.getTransform();
+        const current = transform.getLocalPosition();
+        const next = this.mixVec3(current, new vec3(target.x, target.y, binding.targetZ), alpha);
+        transform.setLocalPosition(next);
+        transform.setLocalRotation(quat.quatIdentity());
+        transform.setLocalScale(new vec3(1, 1, 1));
+        binding.slot = {
+            x: next.x,
+            y: next.y,
+            width: target.width,
+            height: target.height,
+        };
     }
 
     private placeImageVisual(binding: ImageBinding, scale: number, lift: number): void {
@@ -945,7 +1051,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const fallbackY = this.cursorOwner === binding ? this.cursorTarget.y : binding.slot.y;
         const targetX = localPoint ? this.clamp(localPoint.x, minX, maxX) : fallbackX;
         const targetY = localPoint ? this.clamp(localPoint.y, minY, maxY) : fallbackY;
-        this.cursorTarget = new vec3(targetX, targetY, this.cursorImage.z);
+        const buttonZ = binding.object.getTransform().getLocalPosition().z;
+        this.cursorTarget = new vec3(targetX, targetY, buttonZ + BUTTON_CURSOR_Z_OFFSET);
         this.cursorTargetScale = pressed ? 0.84 : 1.0;
     }
 
@@ -1064,6 +1171,51 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private refreshSceneInteractionIsolation(): void {
+        this.restoreSceneInteractionIsolation();
+        if (!this.isolateSceneInteractors || this.folded || !this.sceneObject.isEnabledInHierarchy) return;
+
+        for (let i = 0; i < INTERACTION_ISOLATION_ROOTS.length; i++) {
+            const root = this.findObjectByName(INTERACTION_ISOLATION_ROOTS[i]);
+            if (root && root !== this.sceneObject && root.isEnabledInHierarchy) {
+                this.captureCollidersInTree(root);
+            }
+        }
+    }
+
+    private captureCollidersInTree(root: SceneObject): void {
+        const colliders = root.getComponents("Physics.ColliderComponent");
+        for (let i = 0; i < colliders.length; i++) {
+            this.captureCollider(colliders[i] as ColliderComponent);
+        }
+        for (let i = 0; i < root.getChildrenCount(); i++) {
+            this.captureCollidersInTree(root.getChild(i));
+        }
+    }
+
+    private captureCollider(collider: ColliderComponent): void {
+        if (!collider || !collider.enabled || this.hasCapturedCollider(collider)) return;
+        this.isolatedColliders.push({ collider, enabled: collider.enabled });
+        collider.enabled = false;
+    }
+
+    private hasCapturedCollider(collider: ColliderComponent): boolean {
+        for (let i = 0; i < this.isolatedColliders.length; i++) {
+            if (this.isolatedColliders[i].collider === collider) return true;
+        }
+        return false;
+    }
+
+    private restoreSceneInteractionIsolation(): void {
+        for (let i = 0; i < this.isolatedColliders.length; i++) {
+            const binding = this.isolatedColliders[i];
+            if (binding.collider) {
+                binding.collider.enabled = binding.enabled;
+            }
+        }
+        this.isolatedColliders = [];
+    }
+
     private listen(eventApi: any, callback: (event?: any) => void): void {
         if (eventApi && typeof eventApi.add === "function") {
             eventApi.add(callback);
@@ -1101,6 +1253,18 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             if (STORY_GUIDE_STEPS[i].id === id) return i;
         }
         return 0;
+    }
+
+    private setFolded(folded: boolean): void {
+        const nextFolded = folded ? true : false;
+        if (this.folded === nextFolded) {
+            this.syncVisualState();
+            return;
+        }
+        this.folded = nextFolded;
+        this.dockFoldControls = false;
+        this.foldDockDelayRemaining = nextFolded ? FOLD_DOCK_DELAY_SEC : 0.0;
+        this.syncVisualState();
     }
 
     private exampleFieldLabel(field: ExampleFieldId): string {

@@ -125,6 +125,38 @@ window.STORY_UI_LAYOUT = {
       }
     },
     {
+      "id": "utility_follow_folded",
+      "role": "utility_folded",
+      "px": {
+        "x": 1080,
+        "y": 914,
+        "width": 190,
+        "height": 76
+      },
+      "cm": {
+        "x": 8.5,
+        "y": -9.04,
+        "width": 3.8,
+        "height": 1.52
+      }
+    },
+    {
+      "id": "utility_fold_folded",
+      "role": "utility_folded",
+      "px": {
+        "x": 1295,
+        "y": 914,
+        "width": 190,
+        "height": 76
+      },
+      "cm": {
+        "x": 12.8,
+        "y": -9.04,
+        "width": 3.8,
+        "height": 1.52
+      }
+    },
+    {
       "id": "card_intro",
       "role": "card",
       "px": {

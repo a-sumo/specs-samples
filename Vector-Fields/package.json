@@ -7,6 +7,7 @@
     "dedupe:pbr": "node test/dedupe_pbr_materials.mjs"
   },
   "devDependencies": {
-    "puppeteer": "^25.1.0"
+    "puppeteer": "^25.1.0",
+    "typescript": "^6.0.3"
   }
 }
