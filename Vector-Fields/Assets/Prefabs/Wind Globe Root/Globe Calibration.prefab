@@ -156,7 +156,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Materials:
-    - !<reference> 457b2884-4e87-48a6-bee9-94c38367711e
+    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
   Mesh: !<reference> 3d3ea586-332a-451f-983a-a39e0b4b5e14
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
@@ -274,7 +274,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Materials:
-    - !<reference> eafa6a77-e907-4915-a53b-670e4bc7b1ca
+    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
   Mesh: !<reference> 3d3ea586-332a-451f-983a-a39e0b4b5e14
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
@@ -562,7 +562,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Materials:
-    - !<reference> c08c0413-961a-4fc4-b272-9818a611775f
+    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
   Mesh: !<reference> 3d3ea586-332a-451f-983a-a39e0b4b5e14
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true

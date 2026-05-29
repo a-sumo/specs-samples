@@ -3,7 +3,8 @@
     "refresh:storms": "node test/fetch_storms.mjs",
     "bake:ls": "node test/bake_for_ls.mjs",
     "refresh:gfs": "node test/fetch_gfs.mjs && node test/bake_for_ls.mjs",
-    "reload:lens": "node test/reload_lens_project.mjs"
+    "reload:lens": "node test/reload_lens_project.mjs",
+    "dedupe:pbr": "node test/dedupe_pbr_materials.mjs"
   },
   "devDependencies": {
     "puppeteer": "^25.1.0"

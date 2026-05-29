@@ -131,7 +131,7 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Materials:
-    - !<reference> e7449178-a9c1-4e60-985d-60e1a44a446d
+    - !<reference> 6b93edd3-80a7-493c-ad6f-624202005066
   Mesh: !<reference> 3d3ea586-332a-451f-983a-a39e0b4b5e14
   Skin: !<reference> 00000000-0000-0000-0000-000000000000
   BlendShapesEnabled: true
