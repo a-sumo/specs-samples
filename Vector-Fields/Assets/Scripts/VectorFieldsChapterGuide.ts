@@ -363,6 +363,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             targetLift: 0.0,
         };
 
+        this.bindCursorEvents(button, binding);
         this.listen((button as any).onHoverEnter, () => {
             binding.hovered = true;
             this.showCursor(binding, false);
@@ -563,6 +564,16 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         } catch (e) {}
     }
 
+    private bindCursorEvents(button: RectangleButton, binding: ButtonBinding): void {
+        const interactable = (button as any).interactable;
+        if (!interactable) return;
+
+        this.listen(interactable.onHoverEnter, (event: any) => this.showCursorFromEvent(binding, false, event));
+        this.listen(interactable.onHoverUpdate, (event: any) => this.showCursorFromEvent(binding, false, event));
+        this.listen(interactable.onTriggerStart, (event: any) => this.showCursorFromEvent(binding, true, event));
+        this.listen(interactable.onTriggerUpdate, (event: any) => this.showCursorFromEvent(binding, true, event));
+    }
+
     private findScaffoldApi(): any {
         const root = this.scaffoldRoot || this.findObjectByName("VF Story Scaffold");
         if (!root) return null;
@@ -638,14 +649,57 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private showCursor(binding: ButtonBinding, pressed: boolean): void {
+        this.showCursorAt(binding, pressed, null);
+    }
+
+    private showCursorFromEvent(binding: ButtonBinding, pressed: boolean, event: any): void {
+        this.showCursorAt(binding, pressed, this.cursorLocalPointFromEvent(event));
+    }
+
+    private showCursorAt(binding: ButtonBinding, pressed: boolean, localPoint: vec3 | null): void {
         if (!this.cursorImage) return;
         this.cursorOwner = binding;
         this.cursorImage.object.enabled = true;
         this.applyTexture(this.cursorImage.material, pressed ? TEX_CURSOR_PRESSED : TEX_CURSOR_HOVER, this.cursorImage.component);
 
-        const xOffset = Math.max(-binding.slot.width * 0.5 + 0.55, Math.min(binding.slot.width * 0.38, binding.slot.width * 0.5 - 0.55));
-        this.cursorTarget = new vec3(binding.slot.x + xOffset, binding.slot.y, this.cursorImage.z);
+        const margin = Math.max(0.34, this.cursorImage.width * 0.42);
+        const minX = binding.slot.x - binding.slot.width * 0.5 + margin;
+        const maxX = binding.slot.x + binding.slot.width * 0.5 - margin;
+        const minY = binding.slot.y - binding.slot.height * 0.5 + margin;
+        const maxY = binding.slot.y + binding.slot.height * 0.5 - margin;
+        const targetX = localPoint ? this.clamp(localPoint.x, minX, maxX) : binding.slot.x;
+        const targetY = localPoint ? this.clamp(localPoint.y, minY, maxY) : binding.slot.y;
+        this.cursorTarget = new vec3(targetX, targetY, this.cursorImage.z);
         this.cursorTargetScale = pressed ? 0.84 : 1.0;
+    }
+
+    private cursorLocalPointFromEvent(event: any): vec3 | null {
+        const interactor = event && event.interactor ? event.interactor : null;
+        if (!interactor) return null;
+
+        let worldPoint: vec3 | null = null;
+        try {
+            if (typeof interactor.raycastPlaneIntersection === "function") {
+                worldPoint = interactor.raycastPlaneIntersection(event.target || event.interactable);
+            }
+        } catch (e) {}
+        try {
+            if (!worldPoint && interactor.planecastPoint) {
+                worldPoint = interactor.planecastPoint;
+            }
+        } catch (e) {}
+        try {
+            if (!worldPoint && interactor.targetHitInfo && interactor.targetHitInfo.hit && interactor.targetHitInfo.hit.position) {
+                worldPoint = interactor.targetHitInfo.hit.position;
+            }
+        } catch (e) {}
+        if (!worldPoint) return null;
+
+        try {
+            return this.sceneObject.getTransform().getInvertedWorldTransform().multiplyPoint(worldPoint);
+        } catch (e) {
+            return null;
+        }
     }
 
     private hideCursor(): void {
@@ -727,7 +781,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         return null;
     }
 
-    private listen(eventApi: any, callback: () => void): void {
+    private listen(eventApi: any, callback: (event?: any) => void): void {
         if (eventApi && typeof eventApi.add === "function") {
             eventApi.add(callback);
         }
