@@ -11,6 +11,8 @@ type StoryGuideSlot = {
     height: number;
 };
 
+type ExampleFieldId = "gravity" | "magnetism" | "wind";
+
 type ImageBinding = {
     object: SceneObject;
     component: Image;
@@ -39,6 +41,13 @@ type ButtonBinding = {
     targetScale: number;
     visualLift: number;
     targetLift: number;
+    label: Text | null;
+};
+
+type ExampleFieldOption = {
+    id: ExampleFieldId;
+    label: string;
+    slot: StoryGuideSlot;
 };
 
 const IMAGE_MATERIAL = requireAsset("../Image.mat") as Material;
@@ -98,6 +107,12 @@ const TEX_UTILITY_OVERLAY_PRESSED = requireAsset("../Images/StoryUI/overlay_util
 const TEX_CURSOR_HOVER = requireAsset("../Images/StoryUI/cursor_hover.png") as Texture;
 const TEX_CURSOR_PRESSED = requireAsset("../Images/StoryUI/cursor_pressed.png") as Texture;
 const TEX_PANEL_CURSOR_WASH = requireAsset("../Images/StoryUI/panel_cursor_wash.png") as Texture;
+
+const EXAMPLE_FIELD_OPTIONS: ExampleFieldOption[] = [
+    { id: "gravity", label: "Gravity", slot: { x: -8.7, y: -5.28, width: 7.6, height: 1.46 } },
+    { id: "magnetism", label: "Magnetism", slot: { x: 0.0, y: -5.28, width: 7.6, height: 1.46 } },
+    { id: "wind", label: "Wind", slot: { x: 8.7, y: -5.28, width: 7.6, height: 1.46 } },
+];
 
 @component
 export class VectorFieldsChapterGuide extends BaseScriptComponent {
@@ -178,6 +193,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private foldableObjects: SceneObject[] = [];
     private progressText: Text | null = null;
     private currentIndex: number = 0;
+    private selectedExampleField: ExampleFieldId = "gravity";
+    private fieldSelectorButtons: ButtonBinding[] = [];
     private scaffoldApi: any = null;
     private directorApi: any = null;
     private built: boolean = false;
@@ -197,6 +214,14 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     public next(): void {
+        if (STORY_GUIDE_STEPS[this.currentIndex].id === "intro") {
+            this.goTo(this.stepIndexForId("motion"));
+            return;
+        }
+        if (STORY_GUIDE_STEPS[this.currentIndex].id === "examples") {
+            this.cycleExampleField(1);
+            return;
+        }
         this.goTo(Math.min(STORY_GUIDE_STEPS.length - 1, this.currentIndex + 1));
     }
 
@@ -257,6 +282,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.cards.push(card);
         }
 
+        this.createExampleFieldSelectors();
         this.createNavButton("__GuideBack", "back", this.offsetSlot(STORY_GUIDE_NAV.back), TEX_NAV_BACK_NORMAL, TEX_NAV_BACK_PRESSED, 244, () => this.prev());
         this.createNavButton("__GuideNext", "next", this.offsetSlot(STORY_GUIDE_NAV.next), TEX_NAV_NEXT_NORMAL, TEX_NAV_NEXT_PRESSED, 244, () => this.next());
         this.createUtilityButtons();
@@ -387,6 +413,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             targetScale: 1.0,
             visualLift: 0.0,
             targetLift: 0.0,
+            label: null,
         };
 
         this.bindCursorEvents(button, binding);
@@ -419,6 +446,54 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.syncVisualState();
         });
         return binding;
+    }
+
+    private createExampleFieldSelectors(): void {
+        for (let i = 0; i < EXAMPLE_FIELD_OPTIONS.length; i++) {
+            const option = EXAMPLE_FIELD_OPTIONS[i];
+            const binding = this.createTextureButton(
+                "__GuideField_" + option.id,
+                "field:" + option.id,
+                this.offsetSlot(option.slot),
+                TEX_CARD_OVERLAY_HOVER,
+                TEX_CARD_OVERLAY_SELECTED,
+                TEX_CARD_OVERLAY_PRESSED,
+                246,
+                () => this.selectExampleField(option.id),
+                false,
+                null,
+                null,
+                null
+            );
+            binding.label = this.createButtonLabel(binding.object, "__Label", option.label, option.slot.width, option.slot.height, 267);
+            binding.object.enabled = false;
+            this.fieldSelectorButtons.push(binding);
+        }
+    }
+
+    private createButtonLabel(parent: SceneObject, name: string, text: string, width: number, height: number, renderOrder: number): Text {
+        const object = this.ensureChild(parent, name);
+        this.place(object, 0, 0, 0.62);
+
+        let label = object.getComponent("Component.Text") as Text;
+        if (!label) {
+            label = object.createComponent("Component.Text") as Text;
+        }
+        label.text = text;
+        label.size = 30;
+        label.font = GUIDE_FONT;
+        label.horizontalAlignment = HorizontalAlignment.Center;
+        label.verticalAlignment = VerticalAlignment.Center;
+        label.horizontalOverflow = HorizontalOverflow.Truncate;
+        label.verticalOverflow = VerticalOverflow.Truncate;
+        label.worldSpaceRect = Rect.create(-width * 0.5, width * 0.5, -height * 0.44, height * 0.44);
+        label.depthTest = false;
+        label.twoSided = true;
+        label.renderOrder = renderOrder;
+        try {
+            label.textFill.color = new vec4(0.78, 0.80, 0.82, 1.0);
+        } catch (e) {}
+        return label;
     }
 
     private createImage(parent: SceneObject, name: string, slot: StoryGuideSlot, texture: Texture, renderOrder: number, z: number): ImageBinding {
@@ -522,8 +597,14 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.updateBindingVisual(binding);
         }
         if (this.progressText) {
-            const current = STORY_GUIDE_STEPS[this.currentIndex].index;
-            this.progressText.text = current + " / " + this.twoDigit(STORY_GUIDE_STEPS.length);
+            const step = STORY_GUIDE_STEPS[this.currentIndex];
+            let suffix = "";
+            if (step.id === "definition") {
+                suffix = " · Math";
+            } else if (step.id === "examples") {
+                suffix = " · " + this.exampleFieldLabel(this.selectedExampleField);
+            }
+            this.progressText.text = step.index + " / " + this.twoDigit(STORY_GUIDE_STEPS.length) + suffix;
         }
         if (this.followButton) {
             const texture = this.followUser ? TEX_UTILITY_FOLLOW_ON : TEX_UTILITY_FOLLOW_OFF;
@@ -542,12 +623,14 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateBindings(this.navButtons);
         this.updateBindings(this.utilityButtons);
         this.syncFoldState();
+        this.syncFieldSelectorState();
     }
 
     private stageCurrentRoot(): void {
         const step = STORY_GUIDE_STEPS[this.currentIndex];
         if (this.directorApi && typeof this.directorApi.stageStep === "function") {
             this.directorApi.stageStep(step.id, step.root, this.currentIndex);
+            this.syncDirectorExampleField(step.id);
             return;
         }
         if (this.directorApi && typeof this.directorApi.showRoot === "function") {
@@ -560,18 +643,28 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.stageFallbackContent(step.id);
     }
 
+    private syncDirectorExampleField(stepId: string): void {
+        if (stepId !== "examples") return;
+        if (this.directorApi && typeof this.directorApi.selectExampleField === "function") {
+            this.directorApi.selectExampleField(this.selectedExampleField);
+        }
+    }
+
     private stageFallbackContent(stepId: string): void {
         if (!this.controlContentRoots) return;
 
         const showMotion = stepId === "motion" || stepId === "patterns" || stepId === "metrics";
         const showVector = stepId === "patterns";
-        const showExamples = stepId === "examples";
+        const showGravity = stepId === "examples" && this.selectedExampleField === "gravity";
+        const showMagnetic = stepId === "examples" && this.selectedExampleField === "magnetism";
+        const showWind = stepId === "examples" && this.selectedExampleField === "wind";
 
         this.setObjectEnabledByName("Motion Field Root", showMotion);
         this.setObjectEnabledByName("Vector Field Examples Root", showVector);
-        this.setObjectEnabledByName("Magnetic Field Root", showExamples);
-        this.setObjectEnabledByName("Gravity Field Root", showExamples);
-        this.setObjectEnabledByName("Globe Calibration", showExamples);
+        this.setObjectEnabledByName("Magnetic Field Root", showMagnetic);
+        this.setObjectEnabledByName("Gravity Field Root", showGravity);
+        this.setObjectEnabledByName("Globe Calibration", showWind);
+        this.setObjectEnabledByName("Globe Wind", showWind);
         this.setObjectEnabledByName("Story Widgets", false);
 
         if (this.hideLegacySystems) {
@@ -617,6 +710,15 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.applyTexture(binding.overlay.material, overlayTexture, binding.overlay.component);
         } else {
             binding.overlay.object.enabled = false;
+        }
+
+        if (binding.label) {
+            const color = binding.selected
+                ? new vec4(1.0, 1.0, 1.0, 1.0)
+                : (binding.hovered ? new vec4(0.96, 0.97, 0.98, 1.0) : new vec4(0.78, 0.80, 0.82, 1.0));
+            try {
+                binding.label.textFill.color = color;
+            } catch (e) {}
         }
     }
 
@@ -746,8 +848,19 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private syncFieldSelectorState(): void {
+        const visible = !this.folded && STORY_GUIDE_STEPS[this.currentIndex].id === "examples";
+        for (let i = 0; i < this.fieldSelectorButtons.length; i++) {
+            const binding = this.fieldSelectorButtons[i];
+            binding.object.enabled = visible;
+            binding.selected = binding.id === "field:" + this.selectedExampleField;
+            this.updateBindingVisual(binding);
+        }
+    }
+
     private updateButtonAnimations(): void {
         this.updateBindingAnimations(this.cards);
+        this.updateBindingAnimations(this.fieldSelectorButtons);
         this.updateBindingAnimations(this.navButtons);
         this.updateBindingAnimations(this.utilityButtons);
     }
@@ -959,5 +1072,41 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private twoDigit(value: number): string {
         return value < 10 ? "0" + value : "" + value;
+    }
+
+    private selectExampleField(field: ExampleFieldId): void {
+        this.selectedExampleField = field;
+        if (STORY_GUIDE_STEPS[this.currentIndex].id !== "examples") {
+            this.goTo(this.stepIndexForId("examples"));
+            return;
+        }
+        this.stageCurrentRoot();
+        this.syncVisualState();
+    }
+
+    private cycleExampleField(direction: number): void {
+        let current = 0;
+        for (let i = 0; i < EXAMPLE_FIELD_OPTIONS.length; i++) {
+            if (EXAMPLE_FIELD_OPTIONS[i].id === this.selectedExampleField) {
+                current = i;
+                break;
+            }
+        }
+        const nextIndex = (current + direction + EXAMPLE_FIELD_OPTIONS.length) % EXAMPLE_FIELD_OPTIONS.length;
+        this.selectExampleField(EXAMPLE_FIELD_OPTIONS[nextIndex].id);
+    }
+
+    private stepIndexForId(id: string): number {
+        for (let i = 0; i < STORY_GUIDE_STEPS.length; i++) {
+            if (STORY_GUIDE_STEPS[i].id === id) return i;
+        }
+        return 0;
+    }
+
+    private exampleFieldLabel(field: ExampleFieldId): string {
+        for (let i = 0; i < EXAMPLE_FIELD_OPTIONS.length; i++) {
+            if (EXAMPLE_FIELD_OPTIONS[i].id === field) return EXAMPLE_FIELD_OPTIONS[i].label;
+        }
+        return "Gravity";
     }
 }

@@ -12,6 +12,8 @@ type StoryStepConfig = {
     storyWidgets: boolean;
 };
 
+type ExampleFieldId = "gravity" | "magnetism" | "wind";
+
 const STORY_STEP_CONFIGS: StoryStepConfig[] = [
     {
         id: "intro",
@@ -149,6 +151,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     private currentStep: StoryStepConfig = STORY_STEP_CONFIGS[0];
     private currentRootName: string = STORY_STEP_CONFIGS[0].scaffoldRoot;
+    private selectedExampleField: ExampleFieldId = "gravity";
     private appliedKey: string = "";
     private elapsed: number = 0.0;
 
@@ -182,6 +185,14 @@ export class StoryStepDirector extends BaseScriptComponent {
         this.stageStep("", rootName, 0);
     }
 
+    public selectExampleField(fieldName: string): void {
+        this.selectedExampleField = this.normalizeExampleField(fieldName);
+        if (this.currentStep.id === "examples") {
+            this.appliedKey = "";
+            this.applyCurrent(true);
+        }
+    }
+
     private onUpdate(): void {
         if (!this.applyOnStart) return;
         if (this.elapsed > this.settleSeconds) return;
@@ -190,7 +201,7 @@ export class StoryStepDirector extends BaseScriptComponent {
     }
 
     private applyCurrent(force: boolean): void {
-        const key = this.currentStep.id + ":" + this.currentRootName;
+        const key = this.currentStep.id + ":" + this.currentRootName + ":" + this.selectedExampleField;
         if (!force && key === this.appliedKey) return;
         this.appliedKey = key;
 
@@ -205,7 +216,8 @@ export class StoryStepDirector extends BaseScriptComponent {
             this.setEnabled(this.legacySlideStageRoot || this.findObjectByName("SlideStage"), false);
         }
 
-        print("StoryStepDirector: " + this.currentStep.id + " -> " + this.currentRootName);
+        const fieldSuffix = this.currentStep.id === "examples" ? " [" + this.selectedExampleField + "]" : "";
+        print("StoryStepDirector: " + this.currentStep.id + " -> " + this.currentRootName + fieldSuffix);
     }
 
     private applyScaffoldRoot(rootName: string): void {
@@ -219,12 +231,24 @@ export class StoryStepDirector extends BaseScriptComponent {
     }
 
     private applyContentRoots(step: StoryStepConfig): void {
+        const selectingExample = step.id === "examples";
+        const showMagnetic = step.magnetic && (!selectingExample || this.selectedExampleField === "magnetism");
+        const showGravity = step.gravity && (!selectingExample || this.selectedExampleField === "gravity");
+        const showWind = step.wind && (!selectingExample || this.selectedExampleField === "wind");
+
         this.setEnabled(this.motionFieldRoot || this.findObjectByName("Motion Field Root"), step.motion);
         this.setEnabled(this.vectorFieldRoot || this.findObjectByName("Vector Field Examples Root"), step.vector);
-        this.setEnabled(this.magneticFieldRoot || this.findObjectByName("Magnetic Field Root"), step.magnetic);
-        this.setEnabled(this.gravityFieldRoot || this.findObjectByName("Gravity Field Root"), step.gravity);
-        this.setEnabled(this.windGlobeRoot || this.findObjectByName("Globe Calibration"), step.wind);
+        this.setEnabled(this.magneticFieldRoot || this.findObjectByName("Magnetic Field Root"), showMagnetic);
+        this.setEnabled(this.gravityFieldRoot || this.findObjectByName("Gravity Field Root"), showGravity);
+        this.setEnabled(this.windGlobeRoot || this.findObjectByName("Globe Calibration") || this.findObjectByName("Globe Wind"), showWind);
         this.setEnabled(this.storyWidgetsRoot || this.findObjectByName("Story Widgets"), step.storyWidgets);
+    }
+
+    private normalizeExampleField(fieldName: string): ExampleFieldId {
+        const key = (fieldName || "").toLowerCase();
+        if (key === "magnetic" || key === "magnetism") return "magnetism";
+        if (key === "wind" || key === "globe") return "wind";
+        return "gravity";
     }
 
     private findStep(stepId: string, rootName: string, index: number): StoryStepConfig {
