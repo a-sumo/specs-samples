@@ -1,0 +1,75 @@
+- !<AssetImportMetadata/11312a7f-1a2a-486f-b283-a8fc478ea2ee>
+  ImportedAssetIds:
+    ObjectPrefab: !<reference> 024f493b-2c8b-4940-8546-715de3072ddb
+  ImporterName: ObjectPrefabImporter
+  PrimaryAsset: !<reference> 024f493b-2c8b-4940-8546-715de3072ddb
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    ObjectPrefab: !<own> 3752f560-4311-4f4b-b950-0c0369c0cdbf
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<ObjectPrefabAssetData/3752f560-4311-4f4b-b950-0c0369c0cdbf>
+  Prototype: !<ObjectOwner/d1340830-5438-4fb3-a70f-90986a1471d0>
+    PackagePath: ""
+    objects:
+      - !<own> 9b3489d5-d593-4f23-5a6d-8d9f186a7057
+- !<ScriptComponent/6910715e-a0df-4fbe-7d04-70ec51bed09d>
+  PrefabRemaps:
+    []
+  Name: VectorFieldsChapterGuide
+  Enabled: true
+  ScriptAsset: !<reference> b396410b-822b-464c-9f05-ca9a9a098fe8
+  ScriptInputsDefault:
+    directorRoot: true
+    showOnStart: true
+    controlContentRoots: true
+    hideLegacySystems: true
+    panelOffset: true
+    cameraRoot: true
+    followUser: true
+    folded: true
+    menuDistanceCm: true
+    menuVerticalOffsetCm: true
+    menuHorizontalOffsetCm: true
+    followSmoothing: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      scaffoldRoot: !<reference.SceneObject> a198c9da-c135-470d-beea-4a0f196a20e0
+      directorRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      showOnStart: true
+      controlContentRoots: true
+      hideLegacySystems: true
+      panelOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      followUser: true
+      folded: false
+      menuDistanceCm: !<float> 68.000000
+      menuVerticalOffsetCm: !<float> -7.000000
+      menuHorizontalOffsetCm: !<float> 0.000000
+      followSmoothing: !<float> 9.000000
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/9b3489d5-d593-4f23-5a6d-8d9f186a7057>
+  PrefabRemaps:
+    []
+  Name: Story Chapter Guide UI
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -7.000000, z: -68.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 6910715e-a0df-4fbe-7d04-70ec51bed09d

@@ -107,8 +107,21 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     scaffoldRoot: SceneObject = null as any;
 
     @input
+    @allowUndefined
+    @hint("Optional Story Step Director root. If empty, the script searches for it by name.")
+    directorRoot: SceneObject = null as any;
+
+    @input
     @hint("Start visible and immediately stage the first chapter.")
     showOnStart: boolean = true;
+
+    @input
+    @hint("When no Story Step Director is present, enable the real content roots for each guide step.")
+    controlContentRoots: boolean = true;
+
+    @input
+    @hint("When this guide owns staging, park the older narration panel and slide stage.")
+    hideLegacySystems: boolean = true;
 
     @input
     @hint("Offset from this root in centimeters.")
@@ -166,6 +179,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private progressText: Text | null = null;
     private currentIndex: number = 0;
     private scaffoldApi: any = null;
+    private directorApi: any = null;
     private built: boolean = false;
     private startEventRef: any = null;
     private updateEventRef: any = null;
@@ -204,6 +218,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         this.built = true;
         this.scaffoldApi = this.findScaffoldApi();
+        this.directorApi = this.findDirectorApi();
         this.sceneObject.enabled = this.showOnStart;
 
         const panelImage = this.createImage(this.sceneObject, "__GuidePanelImage", {
@@ -531,8 +546,37 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private stageCurrentRoot(): void {
         const step = STORY_GUIDE_STEPS[this.currentIndex];
+        if (this.directorApi && typeof this.directorApi.stageStep === "function") {
+            this.directorApi.stageStep(step.id, step.root, this.currentIndex);
+            return;
+        }
+        if (this.directorApi && typeof this.directorApi.showRoot === "function") {
+            this.directorApi.showRoot(step.root);
+            return;
+        }
         if (this.scaffoldApi && typeof this.scaffoldApi.showRoot === "function") {
             this.scaffoldApi.showRoot(step.root);
+        }
+        this.stageFallbackContent(step.id);
+    }
+
+    private stageFallbackContent(stepId: string): void {
+        if (!this.controlContentRoots) return;
+
+        const showMotion = stepId === "motion" || stepId === "patterns" || stepId === "metrics";
+        const showVector = stepId === "patterns";
+        const showExamples = stepId === "examples";
+
+        this.setObjectEnabledByName("Motion Field Root", showMotion);
+        this.setObjectEnabledByName("Vector Field Examples Root", showVector);
+        this.setObjectEnabledByName("Magnetic Field Root", showExamples);
+        this.setObjectEnabledByName("Gravity Field Root", showExamples);
+        this.setObjectEnabledByName("Globe Calibration", showExamples);
+        this.setObjectEnabledByName("Story Widgets", false);
+
+        if (this.hideLegacySystems) {
+            this.setObjectEnabledByName("Guide", false);
+            this.setObjectEnabledByName("SlideStage", false);
         }
     }
 
@@ -640,6 +684,23 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         for (let i = 0; i < scripts.length; i++) {
             const script = scripts[i] as any;
             if (script && typeof script.showRoot === "function") return script;
+        }
+        return null;
+    }
+
+    private findDirectorApi(): any {
+        const preferredRoot = this.directorRoot || this.findObjectByName("Story Step Director");
+        const preferred = this.findScriptApi(preferredRoot, "stageStep");
+        if (preferred) return preferred;
+        return this.findScriptApi(this.sceneObject, "stageStep");
+    }
+
+    private findScriptApi(root: SceneObject | null, methodName: string): any {
+        if (!root) return null;
+        const scripts = root.getComponents("Component.ScriptComponent");
+        for (let i = 0; i < scripts.length; i++) {
+            const script = scripts[i] as any;
+            if (script && typeof script[methodName] === "function") return script;
         }
         return null;
     }
@@ -881,6 +942,13 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             if (found) return found;
         }
         return null;
+    }
+
+    private setObjectEnabledByName(name: string, enabled: boolean): void {
+        const object = this.findObjectByName(name);
+        if (object) {
+            object.enabled = enabled;
+        }
     }
 
     private listen(eventApi: any, callback: (event?: any) => void): void {

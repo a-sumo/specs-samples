@@ -1,0 +1,61 @@
+- !<ObjectPrefab/024f493b-2c8b-4940-8546-715de3072ddb>
+  PackagePath: ""
+  objects:
+    - !<own> 9b3489d5-d593-4f23-a592-7260e7958fa8
+  LazyLoading: false
+  RetainAssets: true
+- !<ScriptComponent/6910715e-a0df-4fbe-82fb-8f13ae412f62>
+  PrefabRemaps:
+    []
+  Name: VectorFieldsChapterGuide
+  Enabled: true
+  ScriptAsset: !<reference> b396410b-822b-464c-9f05-ca9a9a098fe8
+  ScriptInputsDefault:
+    directorRoot: true
+    showOnStart: true
+    controlContentRoots: true
+    hideLegacySystems: true
+    panelOffset: true
+    cameraRoot: true
+    followUser: true
+    folded: true
+    menuDistanceCm: true
+    menuVerticalOffsetCm: true
+    menuHorizontalOffsetCm: true
+    followSmoothing: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      scaffoldRoot: !<reference.SceneObject> a198c9da-c135-470d-beea-4a0f196a20e0
+      directorRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      showOnStart: true
+      controlContentRoots: true
+      hideLegacySystems: true
+      panelOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      followUser: true
+      folded: false
+      menuDistanceCm: !<float> 68.000000
+      menuVerticalOffsetCm: !<float> -7.000000
+      menuHorizontalOffsetCm: !<float> 0.000000
+      followSmoothing: !<float> 9.000000
+  ScriptTypes:
+    "":
+      {}
+- !<SceneObject/9b3489d5-d593-4f23-a592-7260e7958fa8>
+  PrefabRemaps:
+    - 6910715e-a0df-4fbe-82fb-8f13ae412f62: 6910715e-a0df-4fbe-7d04-70ec51bed09d
+    - 9b3489d5-d593-4f23-a592-7260e7958fa8: 9b3489d5-d593-4f23-5a6d-8d9f186a7057
+  Name: Story Chapter Guide UI
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: -7.000000, z: -68.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 6910715e-a0df-4fbe-82fb-8f13ae412f62

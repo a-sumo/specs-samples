@@ -1,0 +1,57 @@
+- !<ObjectPrefab/3f1451d4-29e3-4779-8119-49090c6a873e>
+  PackagePath: ""
+  objects:
+    - !<own> f79e1bf2-21b2-4786-b963-2a72e63c8423
+  LazyLoading: false
+  RetainAssets: true
+- !<SceneObject/f79e1bf2-21b2-4786-b963-2a72e63c8423>
+  PrefabRemaps:
+    - f79e1bf2-21b2-4786-b963-2a72e63c8423: f79e1bf2-21b2-4786-469c-d58d19c37bdc
+    - fa1494a1-f3be-4b62-8a56-639b4ec866be: fa1494a1-f3be-4b62-75a9-9c64b1379941
+  Name: Story Step Director
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> fa1494a1-f3be-4b62-8a56-639b4ec866be
+- !<ScriptComponent/fa1494a1-f3be-4b62-8a56-639b4ec866be>
+  PrefabRemaps:
+    []
+  Name: StoryStepDirector
+  Enabled: true
+  ScriptAsset: !<reference> d80f0a0d-1625-4d52-887a-307078659a91
+  ScriptInputsDefault:
+    applyOnStart: true
+    initialStep: true
+    showScaffold: true
+    controlContentRoots: true
+    hideLegacySystems: true
+    settleSeconds: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      scaffoldRoot: !<reference.SceneObject> a198c9da-c135-470d-beea-4a0f196a20e0
+      motionFieldRoot: !<reference.SceneObject> 99b17862-d9e9-410a-8319-599c8e6ed774
+      vectorFieldRoot: !<reference.SceneObject> e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb
+      magneticFieldRoot: !<reference.SceneObject> 9e72f614-329f-4e4a-b149-7fe960315346
+      gravityFieldRoot: !<reference.SceneObject> a0d85fd6-b271-46c7-b4cd-229a9b924811
+      windGlobeRoot: !<reference.SceneObject> 33f7d2ff-6a63-4beb-b027-12bbe1f65b9d
+      storyWidgetsRoot: !<reference.SceneObject> 28ac247e-927a-4de4-84f2-d3f89f3b9bf4
+      legacyGuideRoot: !<reference.SceneObject> a1197dda-ad88-4710-8bf0-0d3185bf5c08
+      legacySlideStageRoot: !<reference.SceneObject> c1c00500-0000-4000-a000-000000000000
+      applyOnStart: true
+      initialStep: !<float> 0.000000
+      showScaffold: true
+      controlContentRoots: true
+      hideLegacySystems: true
+      settleSeconds: 1.250000
+  ScriptTypes:
+    "":
+      {}
