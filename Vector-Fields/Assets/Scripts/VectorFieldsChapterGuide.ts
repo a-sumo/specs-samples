@@ -251,6 +251,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private scaffoldApi: any = null;
     private directorApi: any = null;
     private isolatedColliders: ColliderBinding[] = [];
+    private hiddenUIKitButtons: RectangleButton[] = [];
     private built: boolean = false;
     private startEventRef: any = null;
     private updateEventRef: any = null;
@@ -261,6 +262,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateEventRef = this.createEvent("UpdateEvent");
         this.updateEventRef.bind(() => {
             this.updateMenuPose();
+            this.hideRegisteredUIKitVisuals();
             this.updateButtonAnimations();
             this.updatePanelCursorAnimation();
             this.updateCursorAnimation();
@@ -441,7 +443,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         button.size = new vec3(slot.width, slot.height, BUTTON_HIT_DEPTH_CM);
         button.renderOrder = renderOrder - 2;
         button.initialize();
-        this.hideUIKitVisual(button);
+        this.registerHiddenUIKitButton(button);
 
         const image = this.createImage(buttonObject, "__Image", {
             x: 0,
@@ -667,7 +669,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         button.size = new vec3(STORY_GUIDE_PANEL.width, STORY_GUIDE_PANEL.height, PANEL_HIT_DEPTH_CM);
         button.renderOrder = 218;
         button.initialize();
-        this.hideUIKitVisual(button);
+        this.registerHiddenUIKitButton(button);
 
         const interactable = (button as any).interactable;
         if (interactable) {
@@ -871,9 +873,30 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         t.setLocalScale(new vec3(1, 1, 1));
     }
 
+    private registerHiddenUIKitButton(button: RectangleButton): void {
+        for (let i = 0; i < this.hiddenUIKitButtons.length; i++) {
+            if (this.hiddenUIKitButtons[i] === button) {
+                this.hideUIKitVisual(button);
+                return;
+            }
+        }
+        this.hiddenUIKitButtons.push(button);
+        this.hideUIKitVisual(button);
+    }
+
+    private hideRegisteredUIKitVisuals(): void {
+        for (let i = 0; i < this.hiddenUIKitButtons.length; i++) {
+            this.hideUIKitVisual(this.hiddenUIKitButtons[i]);
+        }
+    }
+
     private hideUIKitVisual(button: RectangleButton): void {
         try {
             const visual = (button as any).visual;
+            if (visual) {
+                try { visual.hasBorder = false; } catch (e) {}
+                try { visual.borderSize = 0.0; } catch (e) {}
+            }
             if (visual && visual.renderMeshVisual) {
                 visual.renderMeshVisual.enabled = false;
             }
