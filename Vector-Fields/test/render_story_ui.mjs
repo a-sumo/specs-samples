@@ -28,6 +28,15 @@ const captures = [
   ["#utility_fold_open", "utility_fold_open.png"],
   ["#utility_fold_closed", "utility_fold_closed.png"],
   ["#utility_fold_pressed", "utility_fold_pressed.png"],
+  ["#overlay_card_hover", "overlay_card_hover.png"],
+  ["#overlay_card_selected", "overlay_card_selected.png"],
+  ["#overlay_card_pressed", "overlay_card_pressed.png"],
+  ["#overlay_nav_hover", "overlay_nav_hover.png"],
+  ["#overlay_nav_pressed", "overlay_nav_pressed.png"],
+  ["#overlay_utility_hover", "overlay_utility_hover.png"],
+  ["#overlay_utility_pressed", "overlay_utility_pressed.png"],
+  ["#cursor_hover", "cursor_hover.png"],
+  ["#cursor_pressed", "cursor_pressed.png"],
 ];
 
 await fs.mkdir(outDir, { recursive: true });

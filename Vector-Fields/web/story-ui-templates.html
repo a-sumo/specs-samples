@@ -215,6 +215,127 @@
         var(--pressed);
       transform: scale(0.984);
     }
+
+    .overlay {
+      background: transparent;
+    }
+
+    .overlay::before,
+    .overlay::after,
+    .cursor::before,
+    .cursor::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .overlay.card::before {
+      inset: 4px;
+      border-radius: 30px;
+      border: 4px solid rgba(250, 248, 239, 0.82);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02) 34%, rgba(255,255,255,0.09)),
+        radial-gradient(circle at 86% 50%, rgba(255,255,255,0.22), rgba(255,255,255,0) 38%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.34),
+        inset 0 0 28px rgba(255,255,255,0.10),
+        0 0 20px rgba(245,242,232,0.22);
+    }
+
+    .overlay.card.selected::before {
+      inset: 1px;
+      border-width: 5px;
+      border-color: rgba(255, 252, 242, 0.96);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.03) 44%, rgba(255,255,255,0.12)),
+        radial-gradient(circle at 12% 50%, rgba(255,255,255,0.18), rgba(255,255,255,0) 34%);
+      box-shadow:
+        inset 0 0 0 3px rgba(255,255,255,0.13),
+        inset 0 0 34px rgba(255,255,255,0.13),
+        0 0 26px rgba(245,242,232,0.26);
+    }
+
+    .overlay.card.pressed::before {
+      inset: 8px;
+      border-width: 4px;
+      border-color: rgba(255, 252, 242, 0.74);
+      background: rgba(255,255,255,0.11);
+      box-shadow:
+        inset 0 0 24px rgba(255,255,255,0.18),
+        0 0 10px rgba(245,242,232,0.16);
+    }
+
+    .overlay.card::after {
+      left: 30px;
+      right: 30px;
+      top: 12px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.74), rgba(255,255,255,0.10));
+      opacity: 0.72;
+    }
+
+    .overlay.nav::before,
+    .overlay.utility::before {
+      inset: 4px;
+      border-radius: 28px;
+      border: 4px solid rgba(250, 248, 239, 0.84);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02)),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.24), rgba(255,255,255,0) 42%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.36),
+        0 0 18px rgba(245,242,232,0.22);
+    }
+
+    .overlay.nav.pressed::before,
+    .overlay.utility.pressed::before {
+      inset: 7px;
+      border-color: rgba(255, 252, 242, 0.72);
+      background: rgba(255,255,255,0.11);
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.17);
+    }
+
+    .overlay.utility::before {
+      border-radius: 22px;
+    }
+
+    .cursor {
+      width: 72px;
+      height: 72px;
+      background: transparent;
+    }
+
+    .cursor::before {
+      inset: 9px;
+      border-radius: 999px;
+      border: 6px solid rgba(255, 252, 242, 0.9);
+      box-shadow:
+        inset 0 0 12px rgba(255,255,255,0.22),
+        0 0 20px rgba(245,242,232,0.28);
+    }
+
+    .cursor::after {
+      left: 50%;
+      top: 50%;
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 252, 242, 0.96);
+      box-shadow: 0 0 14px rgba(245,242,232,0.34);
+    }
+
+    .cursor.pressed::before {
+      inset: 13px;
+      border-width: 7px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .cursor.pressed::after {
+      width: 15px;
+      height: 15px;
+    }
   </style>
 </head>
 <body>
@@ -290,6 +411,32 @@
       button.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
       button.textContent = utility.label;
       document.body.appendChild(button);
+    }
+
+    const overlaySpecs = [
+      { id: "overlay_card_hover", slot: "card_intro", classes: "overlay card hover" },
+      { id: "overlay_card_selected", slot: "card_intro", classes: "overlay card selected" },
+      { id: "overlay_card_pressed", slot: "card_intro", classes: "overlay card pressed" },
+      { id: "overlay_nav_hover", slot: "nav_next", classes: "overlay nav hover" },
+      { id: "overlay_nav_pressed", slot: "nav_next", classes: "overlay nav pressed" },
+      { id: "overlay_utility_hover", slot: "utility_follow", classes: "overlay utility hover" },
+      { id: "overlay_utility_pressed", slot: "utility_follow", classes: "overlay utility pressed" },
+    ];
+
+    for (const item of overlaySpecs) {
+      const slot = spec.slots.find((s) => s.id === item.slot);
+      const overlay = document.createElement("div");
+      overlay.id = item.id;
+      overlay.className = `capture ${item.classes}`;
+      overlay.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
+      document.body.appendChild(overlay);
+    }
+
+    for (const state of ["hover", "pressed"]) {
+      const cursor = document.createElement("div");
+      cursor.id = `cursor_${state}`;
+      cursor.className = `capture cursor ${state}`;
+      document.body.appendChild(cursor);
     }
 
     window.storyUiReady = true;
