@@ -26,37 +26,42 @@
       "id": "intro",
       "index": "01",
       "title": "Intro",
-      "root": "C00_Intro_Field_Basics"
+      "root": "C00_Intro"
     },
     {
-      "id": "definition",
+      "id": "motion_fields",
       "index": "02",
-      "title": "Definition",
-      "root": "C01_Math_Definition"
+      "title": "Motion Fields",
+      "root": "C01_Motion_Fields"
     },
     {
-      "id": "motion",
+      "id": "theory",
       "index": "03",
-      "title": "Motion",
-      "root": "C02_Motion_Field_Plane"
-    },
-    {
-      "id": "patterns",
-      "index": "04",
-      "title": "Patterns",
-      "root": "C02_Transition_Field_Cubes"
-    },
-    {
-      "id": "metrics",
-      "index": "05",
-      "title": "Metrics",
-      "root": "C02_Metrics_Probe"
+      "title": "Theory",
+      "root": "C02_Theory"
     },
     {
       "id": "examples",
-      "index": "06",
-      "title": "Three fields",
-      "root": "C03_Three_Fields_Gravity_Magnetism_Wind"
+      "index": "04",
+      "title": "Real World Examples",
+      "root": "C03_Real_World_Examples"
+    }
+  ],
+  "examples": [
+    {
+      "id": "gravity",
+      "index": "01",
+      "title": "Gravity"
+    },
+    {
+      "id": "magnetism",
+      "index": "02",
+      "title": "Magnetism"
+    },
+    {
+      "id": "wind",
+      "index": "03",
+      "title": "Wind"
     }
   ],
   "slots": [
@@ -73,6 +78,22 @@
         "x": -5.8,
         "y": 7.6,
         "width": 15.6,
+        "height": 2.32
+      }
+    },
+    {
+      "id": "examples_title",
+      "role": "title",
+      "px": {
+        "x": 350,
+        "y": 62,
+        "width": 640,
+        "height": 116
+      },
+      "cm": {
+        "x": -1.6,
+        "y": 7.6,
+        "width": 12.8,
         "height": 2.32
       }
     },
@@ -125,115 +146,51 @@
       }
     },
     {
-      "id": "utility_follow_folded",
-      "role": "utility_folded",
-      "px": {
-        "x": 1020,
-        "y": 877,
-        "width": 190,
-        "height": 76
-      },
-      "cm": {
-        "x": 7.3,
-        "y": -8.3,
-        "width": 3.8,
-        "height": 1.52
-      }
-    },
-    {
-      "id": "utility_fold_folded",
-      "role": "utility_folded",
-      "px": {
-        "x": 1232,
-        "y": 877,
-        "width": 190,
-        "height": 76
-      },
-      "cm": {
-        "x": 11.54,
-        "y": -8.3,
-        "width": 3.8,
-        "height": 1.52
-      }
-    },
-    {
       "id": "card_intro",
       "role": "card",
       "px": {
         "x": 70,
-        "y": 230,
+        "y": 238,
         "width": 660,
-        "height": 136
+        "height": 170
       },
       "cm": {
         "x": -7,
-        "y": 4.04,
+        "y": 3.54,
         "width": 13.2,
-        "height": 2.72
+        "height": 3.4
       }
     },
     {
-      "id": "card_definition",
+      "id": "card_motion_fields",
       "role": "card",
       "px": {
         "x": 770,
-        "y": 230,
+        "y": 238,
         "width": 660,
-        "height": 136
+        "height": 170
       },
       "cm": {
         "x": 7,
-        "y": 4.04,
+        "y": 3.54,
         "width": 13.2,
-        "height": 2.72
+        "height": 3.4
       }
     },
     {
-      "id": "card_motion",
+      "id": "card_theory",
       "role": "card",
       "px": {
         "x": 70,
-        "y": 396,
+        "y": 446,
         "width": 660,
-        "height": 136
+        "height": 170
       },
       "cm": {
         "x": -7,
-        "y": 0.72,
+        "y": -0.62,
         "width": 13.2,
-        "height": 2.72
-      }
-    },
-    {
-      "id": "card_patterns",
-      "role": "card",
-      "px": {
-        "x": 770,
-        "y": 396,
-        "width": 660,
-        "height": 136
-      },
-      "cm": {
-        "x": 7,
-        "y": 0.72,
-        "width": 13.2,
-        "height": 2.72
-      }
-    },
-    {
-      "id": "card_metrics",
-      "role": "card",
-      "px": {
-        "x": 70,
-        "y": 562,
-        "width": 660,
-        "height": 136
-      },
-      "cm": {
-        "x": -7,
-        "y": -2.6,
-        "width": 13.2,
-        "height": 2.72
+        "height": 3.4
       }
     },
     {
@@ -241,15 +198,79 @@
       "role": "card",
       "px": {
         "x": 770,
-        "y": 562,
+        "y": 446,
         "width": 660,
-        "height": 136
+        "height": 170
       },
       "cm": {
         "x": 7,
-        "y": -2.6,
+        "y": -0.62,
         "width": 13.2,
-        "height": 2.72
+        "height": 3.4
+      }
+    },
+    {
+      "id": "examples_back",
+      "role": "examples_button",
+      "px": {
+        "x": 70,
+        "y": 70,
+        "width": 240,
+        "height": 84
+      },
+      "cm": {
+        "x": -11.2,
+        "y": 7.76,
+        "width": 4.8,
+        "height": 1.68
+      }
+    },
+    {
+      "id": "example_gravity",
+      "role": "example_card",
+      "px": {
+        "x": 70,
+        "y": 238,
+        "width": 1360,
+        "height": 154
+      },
+      "cm": {
+        "x": 0,
+        "y": 3.7,
+        "width": 27.2,
+        "height": 3.08
+      }
+    },
+    {
+      "id": "example_magnetism",
+      "role": "example_card",
+      "px": {
+        "x": 70,
+        "y": 430,
+        "width": 1360,
+        "height": 154
+      },
+      "cm": {
+        "x": 0,
+        "y": -0.14,
+        "width": 27.2,
+        "height": 3.08
+      }
+    },
+    {
+      "id": "example_wind",
+      "role": "example_card",
+      "px": {
+        "x": 70,
+        "y": 622,
+        "width": 1360,
+        "height": 154
+      },
+      "cm": {
+        "x": 0,
+        "y": -3.98,
+        "width": 27.2,
+        "height": 3.08
       }
     },
     {

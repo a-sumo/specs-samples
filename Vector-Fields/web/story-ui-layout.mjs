@@ -20,27 +20,32 @@ export const STORY_UI_LAYOUT = (() => {
   });
 
   const steps = [
-    { id: "intro", index: "01", title: "Intro", root: "C00_Intro_Field_Basics" },
-    { id: "definition", index: "02", title: "Definition", root: "C01_Math_Definition" },
-    { id: "motion", index: "03", title: "Motion", root: "C02_Motion_Field_Plane" },
-    { id: "patterns", index: "04", title: "Patterns", root: "C02_Transition_Field_Cubes" },
-    { id: "metrics", index: "05", title: "Metrics", root: "C02_Metrics_Probe" },
-    { id: "examples", index: "06", title: "Three fields", root: "C03_Three_Fields_Gravity_Magnetism_Wind" },
+    { id: "intro", index: "01", title: "Intro", root: "C00_Intro" },
+    { id: "motion_fields", index: "02", title: "Motion Fields", root: "C01_Motion_Fields" },
+    { id: "theory", index: "03", title: "Theory", root: "C02_Theory" },
+    { id: "examples", index: "04", title: "Real World Examples", root: "C03_Real_World_Examples" },
+  ];
+
+  const examples = [
+    { id: "gravity", index: "01", title: "Gravity" },
+    { id: "magnetism", index: "02", title: "Magnetism" },
+    { id: "wind", index: "03", title: "Wind" },
   ];
 
   const slots = [
     rect("title", 70, 62, 780, 116, "title"),
+    rect("examples_title", 350, 62, 640, 116, "title"),
     rect("status", 1016, 70, 414, 96, "status"),
     rect("utility_follow", 1008, 70, 190, 76, "utility"),
     rect("utility_fold", 1228, 70, 190, 76, "utility"),
-    rect("utility_follow_folded", 1020, 877, 190, 76, "utility_folded"),
-    rect("utility_fold_folded", 1232, 877, 190, 76, "utility_folded"),
-    rect("card_intro", 70, 230, 660, 136, "card"),
-    rect("card_definition", 770, 230, 660, 136, "card"),
-    rect("card_motion", 70, 396, 660, 136, "card"),
-    rect("card_patterns", 770, 396, 660, 136, "card"),
-    rect("card_metrics", 70, 562, 660, 136, "card"),
-    rect("card_examples", 770, 562, 660, 136, "card"),
+    rect("card_intro", 70, 238, 660, 170, "card"),
+    rect("card_motion_fields", 770, 238, 660, 170, "card"),
+    rect("card_theory", 70, 446, 660, 170, "card"),
+    rect("card_examples", 770, 446, 660, 170, "card"),
+    rect("examples_back", 70, 70, 240, 84, "examples_button"),
+    rect("example_gravity", 70, 238, 1360, 154, "example_card"),
+    rect("example_magnetism", 70, 430, 1360, 154, "example_card"),
+    rect("example_wind", 70, 622, 1360, 154, "example_card"),
     rect("progress", 390, 816, 720, 112, "progress"),
     rect("nav_back", 70, 816, 260, 112, "button"),
     rect("nav_next", 1170, 816, 260, 112, "button"),
@@ -58,6 +63,7 @@ export const STORY_UI_LAYOUT = (() => {
       cardGapCm: { x: 40 / texture.pixelsPerCm, y: 30 / texture.pixelsPerCm },
     },
     steps,
+    examples,
     slots,
   };
 })();

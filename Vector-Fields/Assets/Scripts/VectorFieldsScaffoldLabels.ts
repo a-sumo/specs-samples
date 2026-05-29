@@ -68,6 +68,7 @@ export class VectorFieldsScaffoldLabels extends BaseScriptComponent {
     private textFromName(name: string): string {
         let value = name.substr(6);
         value = value.replace(/^C[0-9][0-9]_/, "");
+        value = value.replace(/^Library_/, "");
         value = value.replace(/^Title_/, "");
         value = value.replace(/^SLOT_/, "Prefab slot: ");
         value = value.replace(/([a-z])([A-Z])/g, "$1 $2");

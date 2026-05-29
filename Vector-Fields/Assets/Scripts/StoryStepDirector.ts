@@ -17,7 +17,7 @@ type ExampleFieldId = "gravity" | "magnetism" | "wind";
 const STORY_STEP_CONFIGS: StoryStepConfig[] = [
     {
         id: "intro",
-        scaffoldRoot: "C00_Intro_Field_Basics",
+        scaffoldRoot: "C00_Intro",
         motion: false,
         vector: false,
         magnetic: false,
@@ -26,18 +26,8 @@ const STORY_STEP_CONFIGS: StoryStepConfig[] = [
         storyWidgets: false,
     },
     {
-        id: "definition",
-        scaffoldRoot: "C01_Math_Definition",
-        motion: false,
-        vector: false,
-        magnetic: false,
-        gravity: false,
-        wind: false,
-        storyWidgets: false,
-    },
-    {
-        id: "motion",
-        scaffoldRoot: "C02_Motion_Field_Plane",
+        id: "motion_fields",
+        scaffoldRoot: "C01_Motion_Fields",
         motion: true,
         vector: false,
         magnetic: false,
@@ -46,18 +36,8 @@ const STORY_STEP_CONFIGS: StoryStepConfig[] = [
         storyWidgets: false,
     },
     {
-        id: "patterns",
-        scaffoldRoot: "C02_Transition_Field_Cubes",
-        motion: true,
-        vector: true,
-        magnetic: false,
-        gravity: false,
-        wind: false,
-        storyWidgets: false,
-    },
-    {
-        id: "metrics",
-        scaffoldRoot: "C02_Metrics_Probe",
+        id: "theory",
+        scaffoldRoot: "C02_Theory",
         motion: true,
         vector: false,
         magnetic: false,
@@ -67,7 +47,7 @@ const STORY_STEP_CONFIGS: StoryStepConfig[] = [
     },
     {
         id: "examples",
-        scaffoldRoot: "C03_Three_Fields_Gravity_Magnetism_Wind",
+        scaffoldRoot: "C03_Real_World_Examples",
         motion: false,
         vector: false,
         magnetic: true,
@@ -129,7 +109,7 @@ export class StoryStepDirector extends BaseScriptComponent {
     applyOnStart: boolean = true;
 
     @input
-    @widget(new SliderWidget(0, 5, 1))
+    @widget(new SliderWidget(0, 3, 1))
     @hint("Initial step index when applyOnStart is enabled.")
     initialStep: number = 0;
 

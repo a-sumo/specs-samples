@@ -16,6 +16,13 @@ export type StoryGuideStep = {
     slot: StoryGuideSlot;
 };
 
+export type StoryGuideExample = {
+    id: string;
+    index: string;
+    title: string;
+    slot: StoryGuideSlot;
+};
+
 export const STORY_GUIDE_TEXTURE = {
     widthPx: 1500,
     heightPx: 1000,
@@ -34,75 +41,90 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "id": "intro",
         "index": "01",
         "title": "Intro",
-        "root": "C00_Intro_Field_Basics",
+        "root": "C00_Intro",
         "slot": {
             "x": -7,
-            "y": 4.04,
+            "y": 3.54,
             "width": 13.2,
-            "height": 2.72
+            "height": 3.4
         }
     },
     {
-        "id": "definition",
+        "id": "motion_fields",
         "index": "02",
-        "title": "Definition",
-        "root": "C01_Math_Definition",
+        "title": "Motion Fields",
+        "root": "C01_Motion_Fields",
         "slot": {
             "x": 7,
-            "y": 4.04,
+            "y": 3.54,
             "width": 13.2,
-            "height": 2.72
+            "height": 3.4
         }
     },
     {
-        "id": "motion",
+        "id": "theory",
         "index": "03",
-        "title": "Motion",
-        "root": "C02_Motion_Field_Plane",
+        "title": "Theory",
+        "root": "C02_Theory",
         "slot": {
             "x": -7,
-            "y": 0.72,
+            "y": -0.62,
             "width": 13.2,
-            "height": 2.72
-        }
-    },
-    {
-        "id": "patterns",
-        "index": "04",
-        "title": "Patterns",
-        "root": "C02_Transition_Field_Cubes",
-        "slot": {
-            "x": 7,
-            "y": 0.72,
-            "width": 13.2,
-            "height": 2.72
-        }
-    },
-    {
-        "id": "metrics",
-        "index": "05",
-        "title": "Metrics",
-        "root": "C02_Metrics_Probe",
-        "slot": {
-            "x": -7,
-            "y": -2.6,
-            "width": 13.2,
-            "height": 2.72
+            "height": 3.4
         }
     },
     {
         "id": "examples",
-        "index": "06",
-        "title": "Three fields",
-        "root": "C03_Three_Fields_Gravity_Magnetism_Wind",
+        "index": "04",
+        "title": "Real World Examples",
+        "root": "C03_Real_World_Examples",
         "slot": {
             "x": 7,
-            "y": -2.6,
+            "y": -0.62,
             "width": 13.2,
-            "height": 2.72
+            "height": 3.4
         }
     }
 ];
+
+export const STORY_GUIDE_EXAMPLES = {
+    back: {"x":-11.2,"y":7.76,"width":4.8,"height":1.68},
+    cards: [
+    {
+        "id": "gravity",
+        "index": "01",
+        "title": "Gravity",
+        "slot": {
+            "x": 0,
+            "y": 3.7,
+            "width": 27.2,
+            "height": 3.08
+        }
+    },
+    {
+        "id": "magnetism",
+        "index": "02",
+        "title": "Magnetism",
+        "slot": {
+            "x": 0,
+            "y": -0.14,
+            "width": 27.2,
+            "height": 3.08
+        }
+    },
+    {
+        "id": "wind",
+        "index": "03",
+        "title": "Wind",
+        "slot": {
+            "x": 0,
+            "y": -3.98,
+            "width": 27.2,
+            "height": 3.08
+        }
+    }
+] as StoryGuideExample[],
+};
 
 export const STORY_GUIDE_NAV = {
     back: {"x":-11,"y":-7.44,"width":5.2,"height":2.24},
@@ -113,9 +135,4 @@ export const STORY_GUIDE_NAV = {
 export const STORY_GUIDE_UTILITY = {
     follow: {"x":7.06,"y":7.84,"width":3.8,"height":1.52},
     fold: {"x":11.46,"y":7.84,"width":3.8,"height":1.52},
-};
-
-export const STORY_GUIDE_UTILITY_FOLDED = {
-    follow: {"x":7.3,"y":-8.3,"width":3.8,"height":1.52},
-    fold: {"x":11.54,"y":-8.3,"width":3.8,"height":1.52},
 };

@@ -2,7 +2,7 @@
 // Texture-backed chapter guide with UIKit hit targets.
 
 import { RectangleButton } from "SpectaclesUIKit.lspkg/Scripts/Components/Button/RectangleButton";
-import { STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_STEPS, STORY_GUIDE_UTILITY, STORY_GUIDE_UTILITY_FOLDED } from "./StoryGuideLayoutGenerated";
+import { STORY_GUIDE_EXAMPLES, STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_STEPS, STORY_GUIDE_UTILITY } from "./StoryGuideLayoutGenerated";
 
 type StoryGuideSlot = {
     x: number;
@@ -63,7 +63,8 @@ type ExampleFieldOption = {
 
 const IMAGE_MATERIAL = requireAsset("../Image.mat") as Material;
 const GUIDE_FONT = requireAsset("../Fonts/Nunito_Sans/NunitoSans.ttf") as Font;
-const TEX_PANEL = requireAsset("../Images/StoryUI/chapter_panel.png") as Texture;
+const TEX_PANEL_MAIN = requireAsset("../Images/StoryUI/chapter_panel.png") as Texture;
+const TEX_PANEL_EXAMPLES = requireAsset("../Images/StoryUI/examples_panel.png") as Texture;
 
 const CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture; pressed: Texture } } = {
     intro: {
@@ -71,25 +72,15 @@ const CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture; presse
         active: requireAsset("../Images/StoryUI/card_intro_active.png") as Texture,
         pressed: requireAsset("../Images/StoryUI/card_intro_pressed.png") as Texture,
     },
-    definition: {
-        normal: requireAsset("../Images/StoryUI/card_definition_normal.png") as Texture,
-        active: requireAsset("../Images/StoryUI/card_definition_active.png") as Texture,
-        pressed: requireAsset("../Images/StoryUI/card_definition_pressed.png") as Texture,
+    motion_fields: {
+        normal: requireAsset("../Images/StoryUI/card_motion_fields_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/card_motion_fields_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/card_motion_fields_pressed.png") as Texture,
     },
-    motion: {
-        normal: requireAsset("../Images/StoryUI/card_motion_normal.png") as Texture,
-        active: requireAsset("../Images/StoryUI/card_motion_active.png") as Texture,
-        pressed: requireAsset("../Images/StoryUI/card_motion_pressed.png") as Texture,
-    },
-    patterns: {
-        normal: requireAsset("../Images/StoryUI/card_patterns_normal.png") as Texture,
-        active: requireAsset("../Images/StoryUI/card_patterns_active.png") as Texture,
-        pressed: requireAsset("../Images/StoryUI/card_patterns_pressed.png") as Texture,
-    },
-    metrics: {
-        normal: requireAsset("../Images/StoryUI/card_metrics_normal.png") as Texture,
-        active: requireAsset("../Images/StoryUI/card_metrics_active.png") as Texture,
-        pressed: requireAsset("../Images/StoryUI/card_metrics_pressed.png") as Texture,
+    theory: {
+        normal: requireAsset("../Images/StoryUI/card_theory_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/card_theory_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/card_theory_pressed.png") as Texture,
     },
     examples: {
         normal: requireAsset("../Images/StoryUI/card_examples_normal.png") as Texture,
@@ -98,10 +89,30 @@ const CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture; presse
     },
 };
 
+const EXAMPLE_CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture; pressed: Texture } } = {
+    gravity: {
+        normal: requireAsset("../Images/StoryUI/example_gravity_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/example_gravity_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/example_gravity_pressed.png") as Texture,
+    },
+    magnetism: {
+        normal: requireAsset("../Images/StoryUI/example_magnetism_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/example_magnetism_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/example_magnetism_pressed.png") as Texture,
+    },
+    wind: {
+        normal: requireAsset("../Images/StoryUI/example_wind_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/example_wind_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/example_wind_pressed.png") as Texture,
+    },
+};
+
 const TEX_NAV_BACK_NORMAL = requireAsset("../Images/StoryUI/nav_back_normal.png") as Texture;
 const TEX_NAV_BACK_PRESSED = requireAsset("../Images/StoryUI/nav_back_pressed.png") as Texture;
 const TEX_NAV_NEXT_NORMAL = requireAsset("../Images/StoryUI/nav_next_normal.png") as Texture;
 const TEX_NAV_NEXT_PRESSED = requireAsset("../Images/StoryUI/nav_next_pressed.png") as Texture;
+const TEX_EXAMPLES_BACK_NORMAL = requireAsset("../Images/StoryUI/examples_back_normal.png") as Texture;
+const TEX_EXAMPLES_BACK_PRESSED = requireAsset("../Images/StoryUI/examples_back_pressed.png") as Texture;
 const TEX_UTILITY_FOLLOW_ON = requireAsset("../Images/StoryUI/utility_follow_on.png") as Texture;
 const TEX_UTILITY_FOLLOW_OFF = requireAsset("../Images/StoryUI/utility_follow_off.png") as Texture;
 const TEX_UTILITY_FOLLOW_PRESSED = requireAsset("../Images/StoryUI/utility_follow_pressed.png") as Texture;
@@ -124,7 +135,6 @@ const BUTTON_HIT_DEPTH_CM = 1.6;
 const FOLDED_UTILITY_HIT_PAD_CM = 1.15;
 const PANEL_HIT_Z = 0.04;
 const PANEL_HIT_DEPTH_CM = 0.42;
-const FOLD_DOCK_DELAY_SEC = 0.12;
 
 const INTERACTION_ISOLATION_ROOTS = [
     "VF Story Scaffold",
@@ -142,9 +152,9 @@ const INTERACTION_ISOLATION_ROOTS = [
 ];
 
 const EXAMPLE_FIELD_OPTIONS: ExampleFieldOption[] = [
-    { id: "gravity", label: "Gravity", slot: { x: -8.7, y: -5.28, width: 7.6, height: 1.46 } },
-    { id: "magnetism", label: "Magnetism", slot: { x: 0.0, y: -5.28, width: 7.6, height: 1.46 } },
-    { id: "wind", label: "Wind", slot: { x: 8.7, y: -5.28, width: 7.6, height: 1.46 } },
+    { id: "gravity", label: "Gravity", slot: STORY_GUIDE_EXAMPLES.cards[0].slot },
+    { id: "magnetism", label: "Magnetism", slot: STORY_GUIDE_EXAMPLES.cards[1].slot },
+    { id: "wind", label: "Wind", slot: STORY_GUIDE_EXAMPLES.cards[2].slot },
 ];
 
 @component
@@ -214,6 +224,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private utilityButtons: ButtonBinding[] = [];
     private followButton: ButtonBinding | null = null;
     private foldButton: ButtonBinding | null = null;
+    private examplesBackButton: ButtonBinding | null = null;
     private panelCursorImage: ImageBinding | null = null;
     private panelCursorCurrent: vec3 = new vec3(0, 0, 0.16);
     private panelCursorTarget: vec3 = new vec3(0, 0, 0.16);
@@ -229,14 +240,14 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private cursorTargetScale: number = 1.0;
     private foldableObjects: SceneObject[] = [];
     private progressText: Text | null = null;
+    private progressObject: SceneObject | null = null;
     private currentIndex: number = 0;
     private selectedExampleField: ExampleFieldId = "gravity";
+    private examplesMenuOpen: boolean = false;
     private fieldSelectorButtons: ButtonBinding[] = [];
     private scaffoldApi: any = null;
     private directorApi: any = null;
     private isolatedColliders: ColliderBinding[] = [];
-    private dockFoldControls: boolean = false;
-    private foldDockDelayRemaining: number = 0.0;
     private built: boolean = false;
     private startEventRef: any = null;
     private updateEventRef: any = null;
@@ -247,7 +258,6 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateEventRef = this.createEvent("UpdateEvent");
         this.updateEventRef.bind(() => {
             this.updateMenuPose();
-            this.updateFoldDockDelay();
             this.updateButtonAnimations();
             this.updatePanelCursorAnimation();
             this.updateCursorAnimation();
@@ -255,8 +265,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     public next(): void {
+        if (this.examplesMenuOpen) {
+            this.cycleExampleField(1);
+            return;
+        }
         if (STORY_GUIDE_STEPS[this.currentIndex].id === "intro") {
-            this.goTo(this.stepIndexForId("motion"));
+            this.goTo(this.stepIndexForId("motion_fields"));
             return;
         }
         if (STORY_GUIDE_STEPS[this.currentIndex].id === "examples") {
@@ -267,12 +281,17 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     public prev(): void {
+        if (this.examplesMenuOpen) {
+            this.returnToChapterList();
+            return;
+        }
         this.goTo(Math.max(0, this.currentIndex - 1));
     }
 
     public goTo(index: number): void {
         const nextIndex = Math.max(0, Math.min(STORY_GUIDE_STEPS.length - 1, Math.floor(index)));
         this.currentIndex = nextIndex;
+        this.examplesMenuOpen = STORY_GUIDE_STEPS[this.currentIndex].id === "examples";
         this.stageCurrentRoot();
         this.syncVisualState();
     }
@@ -286,15 +305,13 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.scaffoldApi = this.findScaffoldApi();
         this.directorApi = this.findDirectorApi();
         this.sceneObject.enabled = this.showOnStart;
-        this.dockFoldControls = this.folded;
-        this.foldDockDelayRemaining = 0.0;
 
         const panelImage = this.createImage(this.sceneObject, "__GuidePanelImage", {
             x: this.panelOffset.x,
             y: this.panelOffset.y,
             width: STORY_GUIDE_PANEL.width,
             height: STORY_GUIDE_PANEL.height,
-        }, TEX_PANEL, 220, 0.0);
+        }, TEX_PANEL_MAIN, 220, 0.0);
         this.panelImage = panelImage;
         this.registerFoldable(panelImage.object);
 
@@ -326,6 +343,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
 
         this.createExampleFieldSelectors();
+        this.createExamplesBackButton();
         this.createNavButton("__GuideBack", "back", this.offsetSlot(STORY_GUIDE_NAV.back), TEX_NAV_BACK_NORMAL, TEX_NAV_BACK_PRESSED, 244, () => this.prev());
         this.createNavButton("__GuideNext", "next", this.offsetSlot(STORY_GUIDE_NAV.next), TEX_NAV_NEXT_NORMAL, TEX_NAV_NEXT_PRESSED, 244, () => this.next());
         this.createUtilityButtons();
@@ -499,24 +517,43 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private createExampleFieldSelectors(): void {
         for (let i = 0; i < EXAMPLE_FIELD_OPTIONS.length; i++) {
             const option = EXAMPLE_FIELD_OPTIONS[i];
+            const tex = EXAMPLE_CARD_TEXTURES[option.id];
             const binding = this.createTextureButton(
-                "__GuideField_" + option.id,
+                "__GuideExample_" + option.id,
                 "field:" + option.id,
                 this.offsetSlot(option.slot),
-                TEX_CARD_OVERLAY_HOVER,
-                TEX_CARD_OVERLAY_SELECTED,
-                TEX_CARD_OVERLAY_PRESSED,
+                tex.normal,
+                tex.active,
+                tex.pressed,
                 246,
                 () => this.selectExampleField(option.id),
-                false,
-                null,
-                null,
-                null
+                true,
+                TEX_CARD_OVERLAY_HOVER,
+                TEX_CARD_OVERLAY_SELECTED,
+                TEX_CARD_OVERLAY_PRESSED
             );
-            binding.label = this.createButtonLabel(binding.object, "__Label", option.label, option.slot.width, option.slot.height, 267);
             binding.object.enabled = false;
             this.fieldSelectorButtons.push(binding);
         }
+    }
+
+    private createExamplesBackButton(): void {
+        const binding = this.createTextureButton(
+            "__GuideExamplesBack",
+            "examples_back",
+            this.offsetSlot(STORY_GUIDE_EXAMPLES.back),
+            TEX_EXAMPLES_BACK_NORMAL,
+            TEX_EXAMPLES_BACK_NORMAL,
+            TEX_EXAMPLES_BACK_PRESSED,
+            246,
+            () => this.returnToChapterList(),
+            true,
+            TEX_NAV_OVERLAY_HOVER,
+            null,
+            TEX_NAV_OVERLAY_PRESSED
+        );
+        binding.object.enabled = false;
+        this.examplesBackButton = binding;
     }
 
     private createButtonLabel(parent: SceneObject, name: string, text: string, width: number, height: number, renderOrder: number): Text {
@@ -571,6 +608,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const object = this.ensureChild(this.sceneObject, "__GuideProgressText");
         this.place(object, slot.x, slot.y, 0.62);
         this.registerFoldable(object);
+        this.progressObject = object;
 
         this.progressText = object.getComponent("Component.Text") as Text;
         if (!this.progressText) {
@@ -639,6 +677,13 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private syncVisualState(): void {
+        if (this.panelImage) {
+            this.applyTexture(
+                this.panelImage.material,
+                this.examplesMenuOpen ? TEX_PANEL_EXAMPLES : TEX_PANEL_MAIN,
+                this.panelImage.component
+            );
+        }
         for (let i = 0; i < this.cards.length; i++) {
             const binding = this.cards[i];
             binding.selected = i === this.currentIndex;
@@ -647,8 +692,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (this.progressText) {
             const step = STORY_GUIDE_STEPS[this.currentIndex];
             let suffix = "";
-            if (step.id === "definition") {
-                suffix = " · Math";
+            if (step.id === "theory") {
+                suffix = " · curl + div";
             } else if (step.id === "examples") {
                 suffix = " · " + this.exampleFieldLabel(this.selectedExampleField);
             }
@@ -670,7 +715,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         this.updateBindings(this.navButtons);
         this.updateBindings(this.utilityButtons);
+        if (this.examplesBackButton) {
+            this.updateBindingVisual(this.examplesBackButton);
+        }
         this.syncFoldState();
+        this.syncMenuModeVisibility();
         this.syncFieldSelectorState();
         this.syncUtilityDockTargets();
         this.refreshSceneInteractionIsolation();
@@ -703,8 +752,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private stageFallbackContent(stepId: string): void {
         if (!this.controlContentRoots) return;
 
-        const showMotion = stepId === "motion" || stepId === "patterns" || stepId === "metrics";
-        const showVector = stepId === "patterns";
+        const showMotion = stepId === "motion_fields" || stepId === "theory";
+        const showVector = false;
         const showGravity = stepId === "examples" && this.selectedExampleField === "gravity";
         const showMagnetic = stepId === "examples" && this.selectedExampleField === "magnetism";
         const showWind = stepId === "examples" && this.selectedExampleField === "wind";
@@ -907,18 +956,33 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private syncMenuModeVisibility(): void {
+        const showMainMenu = !this.folded && !this.examplesMenuOpen;
+        for (let i = 0; i < this.cards.length; i++) {
+            this.cards[i].object.enabled = showMainMenu;
+        }
+        for (let i = 0; i < this.navButtons.length; i++) {
+            this.navButtons[i].object.enabled = showMainMenu;
+        }
+        if (this.progressObject) {
+            this.progressObject.enabled = showMainMenu;
+        }
+        if (this.examplesBackButton) {
+            this.examplesBackButton.object.enabled = !this.folded && this.examplesMenuOpen;
+        }
+    }
+
     private syncUtilityDockTargets(): void {
-        const docked = this.folded && this.dockFoldControls;
         if (this.followButton) {
             this.setButtonTargetSlot(
                 this.followButton,
-                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.follow : STORY_GUIDE_UTILITY.follow)
+                this.offsetSlot(STORY_GUIDE_UTILITY.follow)
             );
         }
         if (this.foldButton) {
             this.setButtonTargetSlot(
                 this.foldButton,
-                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.fold : STORY_GUIDE_UTILITY.fold)
+                this.offsetSlot(STORY_GUIDE_UTILITY.fold)
             );
         }
     }
@@ -928,7 +992,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private syncFieldSelectorState(): void {
-        const visible = !this.folded && STORY_GUIDE_STEPS[this.currentIndex].id === "examples";
+        const visible = !this.folded && this.examplesMenuOpen;
         for (let i = 0; i < this.fieldSelectorButtons.length; i++) {
             const binding = this.fieldSelectorButtons[i];
             binding.object.enabled = visible;
@@ -937,21 +1001,14 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
-    private updateFoldDockDelay(): void {
-        if (!this.folded || this.dockFoldControls || this.foldDockDelayRemaining <= 0.0) return;
-        this.foldDockDelayRemaining -= getDeltaTime();
-        if (this.foldDockDelayRemaining <= 0.0) {
-            this.foldDockDelayRemaining = 0.0;
-            this.dockFoldControls = true;
-            this.syncUtilityDockTargets();
-        }
-    }
-
     private updateButtonAnimations(): void {
         this.updateBindingAnimations(this.cards);
         this.updateBindingAnimations(this.fieldSelectorButtons);
         this.updateBindingAnimations(this.navButtons);
         this.updateBindingAnimations(this.utilityButtons);
+        if (this.examplesBackButton) {
+            this.updateBindingAnimations([this.examplesBackButton]);
+        }
     }
 
     private updateBindingAnimations(bindings: ButtonBinding[]): void {
@@ -1193,7 +1250,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private refreshSceneInteractionIsolation(): void {
         this.restoreSceneInteractionIsolation();
-        if (!this.isolateSceneInteractors || this.folded || !this.sceneObject.isEnabledInHierarchy) return;
+        if (!this.isolateSceneInteractors || !this.sceneObject.isEnabledInHierarchy) return;
 
         for (let i = 0; i < INTERACTION_ISOLATION_ROOTS.length; i++) {
             const root = this.findObjectByName(INTERACTION_ISOLATION_ROOTS[i]);
@@ -1252,7 +1309,13 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.goTo(this.stepIndexForId("examples"));
             return;
         }
+        this.examplesMenuOpen = true;
         this.stageCurrentRoot();
+        this.syncVisualState();
+    }
+
+    private returnToChapterList(): void {
+        this.examplesMenuOpen = false;
         this.syncVisualState();
     }
 
@@ -1282,8 +1345,6 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             return;
         }
         this.folded = nextFolded;
-        this.dockFoldControls = false;
-        this.foldDockDelayRemaining = nextFolded ? FOLD_DOCK_DELAY_SEC : 0.0;
         this.syncVisualState();
     }
 

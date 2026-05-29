@@ -8,12 +8,12 @@ export class VectorFieldsStoryScaffold extends BaseScriptComponent {
     showAll: boolean = true;
 
     @input
-    @widget(new SliderWidget(0, 8, 1))
-    @hint("Visible chapter index when showAll is off. Children named C00, C01, ... are used.")
+    @widget(new SliderWidget(0, 3, 1))
+    @hint("Visible chapter index when showAll is off. Children named C00_Intro through C03_Real_World_Examples are used.")
     activeChapter: number = 0;
 
     @input
-    @hint("Optional exact child root to show, e.g. C02_Motion_Field_Plane. Empty uses activeChapter.")
+    @hint("Optional exact child root to show, e.g. C02_Theory. Empty uses activeChapter.")
     activeRootName: string = "";
 
     @input
@@ -54,13 +54,18 @@ export class VectorFieldsStoryScaffold extends BaseScriptComponent {
 
     private applyVisibility(): void {
         const chapter = Math.max(0, Math.floor(this.activeChapter));
-        const rootName = this.activeRootName || "";
+        const requestedRootName = this.activeRootName || "";
+        const rootName = requestedRootName.length > 0 ? this.resolveRootName(requestedRootName) : "";
         const key = (this.showAll ? "all" : (rootName.length > 0 ? "root:" + rootName : "one:" + chapter));
         if (key === this.appliedKey) return;
         this.appliedKey = key;
 
         for (let i = 0; i < this.sceneObject.getChildrenCount(); i++) {
             const child = this.sceneObject.getChild(i);
+            if (this.isLibraryRoot(child.name)) {
+                child.enabled = this.showAll;
+                continue;
+            }
             if (!this.isChapterRoot(child.name)) continue;
             const visible = this.showAll || (rootName.length > 0 ? child.name === rootName : this.chapterIndex(child.name) === chapter);
             if (visible && !this.showAll && this.centerStagedContent) {
@@ -140,6 +145,36 @@ export class VectorFieldsStoryScaffold extends BaseScriptComponent {
 
     private isChapterRoot(name: string): boolean {
         return name.length >= 3 && name.charAt(0) === "C" && this.isDigit(name.charAt(1)) && this.isDigit(name.charAt(2));
+    }
+
+    private isLibraryRoot(name: string): boolean {
+        return name.indexOf("Library_") === 0;
+    }
+
+    private resolveRootName(rootName: string): string {
+        if (this.hasDirectChild(rootName)) return rootName;
+        const alias = this.rootAlias(rootName);
+        if (alias.length > 0 && this.hasDirectChild(alias)) return alias;
+        return rootName;
+    }
+
+    private hasDirectChild(name: string): boolean {
+        for (let i = 0; i < this.sceneObject.getChildrenCount(); i++) {
+            if (this.sceneObject.getChild(i).name === name) return true;
+        }
+        return false;
+    }
+
+    private rootAlias(rootName: string): string {
+        if (rootName === "C00_Intro") return "C00_Intro_Field_Basics";
+        if (rootName === "C00_Intro_Field_Basics") return "C00_Intro";
+        if (rootName === "C01_Motion_Fields") return "C02_Motion_Field_Plane";
+        if (rootName === "C02_Motion_Field_Plane") return "C01_Motion_Fields";
+        if (rootName === "C02_Theory") return "C02_Metrics_Probe";
+        if (rootName === "C02_Metrics_Probe") return "C02_Theory";
+        if (rootName === "C03_Real_World_Examples") return "C03_Three_Fields_Gravity_Magnetism_Wind";
+        if (rootName === "C03_Three_Fields_Gravity_Magnetism_Wind") return "C03_Real_World_Examples";
+        return "";
     }
 
     private chapterIndex(name: string): number {

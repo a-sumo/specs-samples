@@ -22,11 +22,25 @@
   VersionMajor: 0
   VersionMinor: 0
   VersionPatch: 0
-  ComponentUid: 00000000-0000-0000-0000-000000000000
+  ComponentUid: 19400121-a2ee-47c3-9d2c-53c6733c65dd
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
-    {}
+    applyOnStart: false
+    controlContentRoots: false
+    gravityFieldRoot: false
+    hideLegacySystems: false
+    initialStep: false
+    legacyGuideRoot: false
+    legacySlideStageRoot: false
+    magneticFieldRoot: false
+    motionFieldRoot: false
+    scaffoldRoot: false
+    settleSeconds: false
+    showScaffold: false
+    storyWidgetsRoot: false
+    vectorFieldRoot: false
+    windGlobeRoot: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -36,10 +50,37 @@
   Attachments:
     []
   DefaultScriptInputs:
-    -
-      {}
+    - scaffoldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      motionFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      vectorFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      magneticFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      gravityFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      windGlobeRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      storyWidgetsRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      legacyGuideRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      legacySlideStageRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      applyOnStart: true
+      initialStep: !<float> 0.000000
+      showScaffold: true
+      controlContentRoots: true
+      hideLegacySystems: true
+      settleSeconds: 1.250000
   ScriptTypes:
     -
       {}
   InputLines:
-    []
+    - '// @input SceneObject scaffoldRoot {"hint":"Storyboard scaffold root. Falls back to VF Story Scaffold by name."}'
+    - '// @input SceneObject motionFieldRoot {"hint":"Planar motion field rig."}'
+    - '// @input SceneObject vectorFieldRoot {"hint":"Legacy abstract vector field rig."}'
+    - '// @input SceneObject magneticFieldRoot {"hint":"Magnetic field example rig."}'
+    - '// @input SceneObject gravityFieldRoot {"hint":"Gravity field example rig."}'
+    - '// @input SceneObject windGlobeRoot {"hint":"Wind globe example rig."}'
+    - '// @input SceneObject storyWidgetsRoot {"hint":"Older image widget group. Usually hidden while the new scaffold is active."}'
+    - '// @input SceneObject legacyGuideRoot {"hint":"Older narration panel root to park while this director owns the story."}'
+    - '// @input SceneObject legacySlideStageRoot {"hint":"Older slide stage root to park while this director owns the story."}'
+    - '// @input bool applyOnStart = true {"hint":"Stage a step at startup."}'
+    - '// @input float initialStep {"hint":"Initial step index when applyOnStart is enabled.", "widget":"slider", "min":0, "max":3, "step":1}'
+    - '// @input bool showScaffold = true {"hint":"Show the matching proxy/root in VF Story Scaffold."}'
+    - '// @input bool controlContentRoots = true {"hint":"Enable the real content roots associated with the selected story step."}'
+    - '// @input bool hideLegacySystems = true {"hint":"Hide the older narration and slide systems."}'
+    - '// @input float settleSeconds = 1.25 {"hint":"Keep applying briefly after startup so other setup scripts settle first."}'
