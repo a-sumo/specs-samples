@@ -12,8 +12,21 @@ export class MissionInfoPanel extends BaseScriptComponent {
 
     @input
     @allowUndefined
-    @hint("Text to write the readout into. Defaults to a Text component on this object.")
+    @hint("Left column: row labels. Defaults to a Text component on this object.")
     readoutText: Text = null as any;
+
+    @input
+    @allowUndefined
+    @hint("Right column: row values (kept in a separate Text so columns line up in any font).")
+    valueText: Text = null as any;
+
+    @input
+    @hint("Header line shown above the rows.")
+    title: string = "ARTEMIS II";
+
+    @input
+    @hint("Write the label column. Turn OFF for the hybrid card (labels are baked into the texture; only values stay live).")
+    showLabels: boolean = true;
 
     @input
     @widget(new SliderWidget(0.0, 1.0, 0.05))
@@ -63,20 +76,29 @@ export class MissionInfoPanel extends BaseScriptComponent {
         this.acc += getDeltaTime();
         if (this.acc < this.refreshInterval) return;
         this.acc = 0;
-        this.readoutText.text = this.format(this.orbit.getMissionInfo());
-    }
 
-    private format(i: any): string {
-        const lines: string[] = [];
-        lines.push("ARTEMIS II  —  " + i.phase);
-        lines.push("Mission day  " + i.missionDay.toFixed(2));
-        if (this.showMET) lines.push(i.met);
-        if (this.showUTC) lines.push(i.utc);
-        if (this.showDistances) {
-            lines.push("To Moon   " + this.km(i.spacecraftToMoonKm));
-            lines.push("To Earth  " + this.km(i.spacecraftToEarthKm));
+        const i = this.orbit.getMissionInfo();
+        const labels: string[] = ["Phase", "Day"];
+        const values: string[] = [i.phase, i.missionDay.toFixed(2)];
+        if (this.showMET) {
+            labels.push("MET");
+            values.push(i.met);
         }
-        return lines.join("\n");
+        if (this.showUTC) {
+            labels.push("UTC");
+            values.push(i.utc);
+        }
+        if (this.showDistances) {
+            labels.push("To Moon");
+            values.push(this.km(i.spacecraftToMoonKm));
+            labels.push("To Earth");
+            values.push(this.km(i.spacecraftToEarthKm));
+        }
+
+        // Header sits on the label column; a blank first value keeps rows aligned.
+        if (this.showLabels) this.readoutText.text = this.title + "\n" + labels.join("\n");
+        else this.readoutText.text = "";
+        if (this.valueText) this.valueText.text = "\n" + values.join("\n");
     }
 
     // Thousands-separated integer km.

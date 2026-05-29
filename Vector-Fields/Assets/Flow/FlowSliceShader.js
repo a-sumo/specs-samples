@@ -3,13 +3,18 @@
 // speckle pattern along the velocity (two-phase flow map), colors by speed.
 // Direct color out (no PBR). Dark = transparent on Spectacles additive display.
 
-input_texture_2d FieldTex;     // baked field atlas
-input_float SliceT;            // 0..1 -> which Z slice
+// baked field atlas (RG=velocity, B=speed)
+input_texture_2d FieldTex;
+// 0..1 -> which Z slice
+input_float SliceT;
 input_float Time;
-input_float FlowSpeed;         // streak travel rate
-input_float Density;           // speckle frequency
+// streak travel rate
+input_float FlowSpeed;
+// speckle frequency
+input_float Density;
 input_float Brightness;
 
+output_vec3 transformedPosition;
 output_vec4 vertexColor;
 
 // atlas layout (must match export meta)
@@ -59,4 +64,8 @@ void main(){
 
     vec3 col3 = ramp(speed) * intensity;
     vertexColor = vec4(col3, intensity);
+
+    // undeformed flat plane: pass object-space position through; the graph's
+    // Object->World Transform Vector node converts it to drive WorldPosition.
+    transformedPosition = system.getSurfacePositionObjectSpace();
 }

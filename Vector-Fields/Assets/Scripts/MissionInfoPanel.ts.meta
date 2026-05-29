@@ -22,11 +22,19 @@
   VersionMajor: 0
   VersionMinor: 0
   VersionPatch: 0
-  ComponentUid: 00000000-0000-0000-0000-000000000000
+  ComponentUid: 6de4f813-d12a-48de-98e3-4ded10dccd36
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
-    {}
+    orbitObject: false
+    readoutText: false
+    refreshInterval: false
+    showDistances: false
+    showLabels: false
+    showMET: false
+    showUTC: false
+    title: false
+    valueText: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -36,10 +44,25 @@
   Attachments:
     []
   DefaultScriptInputs:
-    -
-      {}
+    - orbitObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      readoutText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      valueText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      title: ARTEMIS II
+      showLabels: true
+      refreshInterval: 0.100000
+      showUTC: true
+      showMET: true
+      showDistances: true
   ScriptTypes:
     -
       {}
   InputLines:
-    []
+    - '// @input SceneObject orbitObject {"hint":"Object holding the ArtemisOrbit component (e.g. Gravity Field Root)."}'
+    - '// @input Component.Text readoutText {"hint":"Left column: row labels. Defaults to a Text component on this object."}'
+    - '// @input Component.Text valueText {"hint":"Right column: row values (kept in a separate Text so columns line up in any font)."}'
+    - '// @input string title = "ARTEMIS II" {"hint":"Header line shown above the rows."}'
+    - '// @input bool showLabels = true {"hint":"Write the label column. Turn OFF for the hybrid card (labels are baked into the texture; only values stay live)."}'
+    - '// @input float refreshInterval = 0.1 {"hint":"Seconds between text refreshes (throttle).", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input bool showUTC = true {"hint":"Show the absolute UTC clock line."}'
+    - '// @input bool showMET = true {"hint":"Show mission-elapsed-time (T+) line."}'
+    - '// @input bool showDistances = true {"hint":"Show spacecraft → Moon / Earth distance lines."}'

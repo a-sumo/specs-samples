@@ -404,7 +404,7 @@
       color: 0xffffff,
       transparent: true,
       opacity: 0.92,
-      vertexColors: true,
+      vertexColors: false,
       depthWrite: true,
       toneMapped: false,
     });
@@ -423,7 +423,6 @@
     heads.renderOrder = 4;
     fieldGroup.add(shafts);
     fieldGroup.add(heads);
-    window.__ambientDebug = { shafts, heads, vectorMaterial, headMaterial };
 
     const deepVector = new THREE.Color(0x1d46ff);
     const cyanVector = new THREE.Color(0x23d6ff);
