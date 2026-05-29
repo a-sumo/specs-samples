@@ -2,7 +2,7 @@
 // Texture-backed chapter guide with UIKit hit targets.
 
 import { RectangleButton } from "SpectaclesUIKit.lspkg/Scripts/Components/Button/RectangleButton";
-import { STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_STEPS } from "./StoryGuideLayoutGenerated";
+import { STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_STEPS, STORY_GUIDE_UTILITY } from "./StoryGuideLayoutGenerated";
 
 type StoryGuideSlot = {
     x: number;
@@ -68,6 +68,12 @@ const TEX_NAV_BACK_NORMAL = requireAsset("../Images/StoryUI/nav_back_normal.png"
 const TEX_NAV_BACK_PRESSED = requireAsset("../Images/StoryUI/nav_back_pressed.png") as Texture;
 const TEX_NAV_NEXT_NORMAL = requireAsset("../Images/StoryUI/nav_next_normal.png") as Texture;
 const TEX_NAV_NEXT_PRESSED = requireAsset("../Images/StoryUI/nav_next_pressed.png") as Texture;
+const TEX_UTILITY_FOLLOW_ON = requireAsset("../Images/StoryUI/utility_follow_on.png") as Texture;
+const TEX_UTILITY_FOLLOW_OFF = requireAsset("../Images/StoryUI/utility_follow_off.png") as Texture;
+const TEX_UTILITY_FOLLOW_PRESSED = requireAsset("../Images/StoryUI/utility_follow_pressed.png") as Texture;
+const TEX_UTILITY_FOLD_OPEN = requireAsset("../Images/StoryUI/utility_fold_open.png") as Texture;
+const TEX_UTILITY_FOLD_CLOSED = requireAsset("../Images/StoryUI/utility_fold_closed.png") as Texture;
+const TEX_UTILITY_FOLD_PRESSED = requireAsset("../Images/StoryUI/utility_fold_pressed.png") as Texture;
 
 @component
 export class VectorFieldsChapterGuide extends BaseScriptComponent {
@@ -84,14 +90,54 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     @hint("Offset from this root in centimeters.")
     panelOffset: vec3 = new vec3(0, 0, 0);
 
+    @input
+    @allowUndefined
+    @hint("Optional head/camera anchor for Follow mode. Empty searches for Camera Object.")
+    cameraRoot: SceneObject = null as any;
+
+    @input
+    @hint("Keep the menu in front of the user.")
+    followUser: boolean = true;
+
+    @input
+    @hint("Start with only Fold/Open and Follow/Fixed controls visible.")
+    folded: boolean = false;
+
+    @input
+    @hint("Distance from head anchor in centimeters when Follow is active.")
+    menuDistanceCm: number = 68.0;
+
+    @input
+    @hint("Vertical offset from head anchor in centimeters when Follow is active.")
+    menuVerticalOffsetCm: number = -7.0;
+
+    @input
+    @hint("Horizontal offset from head anchor in centimeters when Follow is active.")
+    menuHorizontalOffsetCm: number = 0.0;
+
+    @input
+    @hint("Higher values make the menu catch up faster.")
+    followSmoothing: number = 9.0;
+
     private panelImage: ImageBinding | null = null;
     private cards: ButtonBinding[] = [];
+    private navButtons: ButtonBinding[] = [];
+    private utilityButtons: ButtonBinding[] = [];
+    private followButton: ButtonBinding | null = null;
+    private foldButton: ButtonBinding | null = null;
+    private foldableObjects: SceneObject[] = [];
     private progressText: Text | null = null;
     private currentIndex: number = 0;
     private scaffoldApi: any = null;
+    private built: boolean = false;
+    private startEventRef: any = null;
+    private updateEventRef: any = null;
 
     onAwake(): void {
-        this.createEvent("OnStartEvent").bind(() => this.build());
+        this.startEventRef = this.createEvent("OnStartEvent");
+        this.startEventRef.bind(() => this.build());
+        this.updateEventRef = this.createEvent("UpdateEvent");
+        this.updateEventRef.bind(() => this.updateMenuPose());
     }
 
     public next(): void {
@@ -110,15 +156,22 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private build(): void {
+        if (this.built) {
+            this.syncVisualState();
+            return;
+        }
+        this.built = true;
         this.scaffoldApi = this.findScaffoldApi();
         this.sceneObject.enabled = this.showOnStart;
 
-        this.panelImage = this.createImage(this.sceneObject, "__GuidePanelImage", {
+        const panelImage = this.createImage(this.sceneObject, "__GuidePanelImage", {
             x: this.panelOffset.x,
             y: this.panelOffset.y,
             width: STORY_GUIDE_PANEL.width,
             height: STORY_GUIDE_PANEL.height,
         }, TEX_PANEL, 220, 0.0);
+        this.panelImage = panelImage;
+        this.registerFoldable(panelImage.object);
 
         this.createProgressText();
 
@@ -127,7 +180,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             const tex = CARD_TEXTURES[step.id];
             if (!tex) continue;
             const slot = this.offsetSlot(step.slot);
-            this.cards.push(this.createTextureButton(
+            const card = this.createTextureButton(
                 "__GuideCard_" + step.id,
                 step.id,
                 slot,
@@ -136,24 +189,65 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 tex.pressed,
                 242,
                 () => this.goTo(i)
-            ));
+            );
+            this.cards.push(card);
         }
 
         this.createNavButton("__GuideBack", "back", this.offsetSlot(STORY_GUIDE_NAV.back), TEX_NAV_BACK_NORMAL, TEX_NAV_BACK_PRESSED, 244, () => this.prev());
         this.createNavButton("__GuideNext", "next", this.offsetSlot(STORY_GUIDE_NAV.next), TEX_NAV_NEXT_NORMAL, TEX_NAV_NEXT_PRESSED, 244, () => this.next());
+        this.createUtilityButtons();
 
         this.goTo(this.currentIndex);
         print("VectorFieldsChapterGuide: built " + STORY_GUIDE_STEPS.length + " slots at 50 px/cm");
     }
 
     private createNavButton(name: string, id: string, slot: StoryGuideSlot, normal: Texture, pressed: Texture, renderOrder: number, action: () => void): void {
-        this.createTextureButton(name, id, slot, normal, normal, pressed, renderOrder, action);
+        this.navButtons.push(this.createTextureButton(name, id, slot, normal, normal, pressed, renderOrder, action));
     }
 
-    private createTextureButton(name: string, id: string, slot: StoryGuideSlot, normal: Texture, active: Texture, pressed: Texture, renderOrder: number, action: () => void): ButtonBinding {
+    private createUtilityButtons(): void {
+        const followButton = this.createTextureButton(
+            "__GuideFollow",
+            "follow",
+            this.offsetSlot(STORY_GUIDE_UTILITY.follow),
+            this.followUser ? TEX_UTILITY_FOLLOW_ON : TEX_UTILITY_FOLLOW_OFF,
+            TEX_UTILITY_FOLLOW_ON,
+            TEX_UTILITY_FOLLOW_PRESSED,
+            248,
+            () => {
+                this.followUser = !this.followUser;
+                this.syncVisualState();
+            },
+            false
+        );
+        this.followButton = followButton;
+        this.utilityButtons.push(followButton);
+
+        const foldButton = this.createTextureButton(
+            "__GuideFold",
+            "fold",
+            this.offsetSlot(STORY_GUIDE_UTILITY.fold),
+            this.folded ? TEX_UTILITY_FOLD_CLOSED : TEX_UTILITY_FOLD_OPEN,
+            TEX_UTILITY_FOLD_OPEN,
+            TEX_UTILITY_FOLD_PRESSED,
+            248,
+            () => {
+                this.folded = !this.folded;
+                this.syncVisualState();
+            },
+            false
+        );
+        this.foldButton = foldButton;
+        this.utilityButtons.push(foldButton);
+    }
+
+    private createTextureButton(name: string, id: string, slot: StoryGuideSlot, normal: Texture, active: Texture, pressed: Texture, renderOrder: number, action: () => void, foldable: boolean = true): ButtonBinding {
         const buttonObject = global.scene.createSceneObject(name);
         buttonObject.setParent(this.sceneObject);
         this.place(buttonObject, slot.x, slot.y, 0.34);
+        if (foldable) {
+            this.registerFoldable(buttonObject);
+        }
 
         const button = buttonObject.createComponent(RectangleButton.getTypeName()) as RectangleButton;
         (button as any)._style = "Ghost";
@@ -204,6 +298,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             image.clearMaterials();
             image.mainMaterial = material;
             image.renderOrder = renderOrder;
+            (image as any).twoSided = true;
             (image.mainPass as any).depthTest = false;
             (image.mainPass as any).depthWrite = false;
         } catch (e) {}
@@ -216,6 +311,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const object = global.scene.createSceneObject("__GuideProgressText");
         object.setParent(this.sceneObject);
         this.place(object, slot.x, slot.y, 0.62);
+        this.registerFoldable(object);
 
         this.progressText = object.createComponent("Component.Text") as Text;
         this.progressText.text = "";
@@ -244,6 +340,21 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             const current = STORY_GUIDE_STEPS[this.currentIndex].index;
             this.progressText.text = current + " / " + this.twoDigit(STORY_GUIDE_STEPS.length);
         }
+        if (this.followButton) {
+            const texture = this.followUser ? TEX_UTILITY_FOLLOW_ON : TEX_UTILITY_FOLLOW_OFF;
+            this.followButton.normal = texture;
+            this.followButton.active = texture;
+            this.followButton.selected = false;
+            this.setBindingTexture(this.followButton, texture);
+        }
+        if (this.foldButton) {
+            const texture = this.folded ? TEX_UTILITY_FOLD_CLOSED : TEX_UTILITY_FOLD_OPEN;
+            this.foldButton.normal = texture;
+            this.foldButton.active = texture;
+            this.foldButton.selected = false;
+            this.setBindingTexture(this.foldButton, texture);
+        }
+        this.syncFoldState();
     }
 
     private stageCurrentRoot(): void {
@@ -303,6 +414,70 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             if (script && typeof script.showRoot === "function") return script;
         }
         return null;
+    }
+
+    private updateMenuPose(): void {
+        if (!this.followUser) return;
+        const camera = this.cameraRoot || this.findObjectByName("Camera Object") || this.findObjectByName("Camera");
+        if (!camera) return;
+
+        const cameraTransform = camera.getTransform();
+        const cameraPosition = cameraTransform.getWorldPosition();
+        const right = this.safeDirection(cameraTransform.right, new vec3(1.0, 0.0, 0.0));
+        const up = this.safeDirection(cameraTransform.up, new vec3(0.0, 1.0, 0.0));
+        const forward = this.safeDirection(cameraTransform.forward, new vec3(0.0, 0.0, -1.0));
+        const target = cameraPosition
+            .add(right.uniformScale(this.menuHorizontalOffsetCm))
+            .add(up.uniformScale(this.menuVerticalOffsetCm))
+            .add(forward.uniformScale(this.menuDistanceCm));
+
+        const transform = this.sceneObject.getTransform();
+        const current = transform.getWorldPosition();
+        const alpha = this.clamp(getDeltaTime() * Math.max(0.0, this.followSmoothing), 0.05, 1.0);
+        const next = this.mixVec3(current, target, alpha);
+        transform.setWorldPosition(next);
+
+        const toCamera = cameraPosition.sub(next);
+        if (toCamera.length > 0.0001) {
+            transform.setWorldRotation(quat.lookAt(this.normalizeVec(toCamera), up));
+        }
+    }
+
+    private syncFoldState(): void {
+        for (let i = 0; i < this.foldableObjects.length; i++) {
+            this.foldableObjects[i].enabled = !this.folded;
+        }
+        for (let i = 0; i < this.utilityButtons.length; i++) {
+            this.utilityButtons[i].object.enabled = true;
+        }
+    }
+
+    private registerFoldable(object: SceneObject): void {
+        if (!object) return;
+        this.foldableObjects.push(object);
+    }
+
+    private mixVec3(a: vec3, b: vec3, t: number): vec3 {
+        return new vec3(
+            a.x + (b.x - a.x) * t,
+            a.y + (b.y - a.y) * t,
+            a.z + (b.z - a.z) * t
+        );
+    }
+
+    private safeDirection(value: vec3, fallback: vec3): vec3 {
+        if (!value || value.length < 0.0001) return fallback;
+        return this.normalizeVec(value);
+    }
+
+    private normalizeVec(value: vec3): vec3 {
+        const len = Math.sqrt(value.x * value.x + value.y * value.y + value.z * value.z);
+        if (len < 0.0001) return new vec3(0.0, 0.0, -1.0);
+        return new vec3(value.x / len, value.y / len, value.z / len);
+    }
+
+    private clamp(value: number, lo: number, hi: number): number {
+        return Math.max(lo, Math.min(hi, value));
     }
 
     private findObjectByName(name: string): SceneObject | null {

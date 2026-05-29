@@ -28,6 +28,8 @@
   ScriptInputsHidden:
     activeChapter: false
     activeRootName: false
+    centerDepth: false
+    centerStagedContent: false
     showAll: false
   ScriptTypesHidden:
     {}
@@ -41,6 +43,8 @@
     - showAll: true
       activeChapter: !<float> 0.000000
       activeRootName: ""
+      centerStagedContent: true
+      centerDepth: false
   ScriptTypes:
     -
       {}
@@ -48,3 +52,5 @@
     - '// @input bool showAll = true {"hint":"Show every scaffold chapter root at once while blocking the story."}'
     - '// @input float activeChapter {"hint":"Visible chapter index when showAll is off. Children named C00, C01, ... are used.", "widget":"slider", "min":0, "max":8, "step":1}'
     - '// @input string activeRootName {"hint":"Optional exact child root to show, e.g. C02_Motion_Field_Plane. Empty uses activeChapter."}'
+    - '// @input bool centerStagedContent = true {"hint":"Center the active chapter root around its proxy or slot content when a step is staged."}'
+    - '// @input bool centerDepth {"hint":"Also center depth. Usually off so chapters keep their authored distance from the user."}'

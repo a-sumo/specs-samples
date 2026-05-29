@@ -26,6 +26,13 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    cameraRoot: false
+    folded: false
+    followSmoothing: false
+    followUser: false
+    menuDistanceCm: false
+    menuHorizontalOffsetCm: false
+    menuVerticalOffsetCm: false
     panelOffset: false
     scaffoldRoot: false
     showOnStart: false
@@ -41,6 +48,13 @@
     - scaffoldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       showOnStart: true
       panelOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      followUser: true
+      folded: false
+      menuDistanceCm: !<float> 68.000000
+      menuVerticalOffsetCm: !<float> -7.000000
+      menuHorizontalOffsetCm: !<float> 0.000000
+      followSmoothing: !<float> 9.000000
   ScriptTypes:
     -
       {}
@@ -48,3 +62,10 @@
     - '// @input SceneObject scaffoldRoot {"hint":"VF Story Scaffold root. If empty, the script searches for it by name."}'
     - '// @input bool showOnStart = true {"hint":"Start visible and immediately stage the first chapter."}'
     - '// @input vec3 panelOffset = {0,0,0} {"hint":"Offset from this root in centimeters."}'
+    - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor for Follow mode. Empty searches for Camera Object."}'
+    - '// @input bool followUser = true {"hint":"Keep the menu in front of the user."}'
+    - '// @input bool folded {"hint":"Start with only Fold/Open and Follow/Fixed controls visible."}'
+    - '// @input float menuDistanceCm = 68 {"hint":"Distance from head anchor in centimeters when Follow is active."}'
+    - '// @input float menuVerticalOffsetCm = -7 {"hint":"Vertical offset from head anchor in centimeters when Follow is active."}'
+    - '// @input float menuHorizontalOffsetCm {"hint":"Horizontal offset from head anchor in centimeters when Follow is active."}'
+    - '// @input float followSmoothing = 9 {"hint":"Higher values make the menu catch up faster."}'

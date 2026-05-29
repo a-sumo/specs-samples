@@ -31,6 +31,8 @@ export const STORY_UI_LAYOUT = (() => {
   const slots = [
     rect("title", 70, 62, 780, 116, "title"),
     rect("status", 1016, 70, 414, 96, "status"),
+    rect("utility_follow", 1008, 70, 190, 76, "utility"),
+    rect("utility_fold", 1228, 70, 190, 76, "utility"),
     rect("card_intro", 70, 230, 660, 136, "card"),
     rect("card_definition", 770, 230, 660, 136, "card"),
     rect("card_motion", 70, 396, 660, 136, "card"),

@@ -93,6 +93,38 @@
       }
     },
     {
+      "id": "utility_follow",
+      "role": "utility",
+      "px": {
+        "x": 1008,
+        "y": 70,
+        "width": 190,
+        "height": 76
+      },
+      "cm": {
+        "x": 7.06,
+        "y": 7.84,
+        "width": 3.8,
+        "height": 1.52
+      }
+    },
+    {
+      "id": "utility_fold",
+      "role": "utility",
+      "px": {
+        "x": 1228,
+        "y": 70,
+        "width": 190,
+        "height": 76
+      },
+      "cm": {
+        "x": 11.46,
+        "y": 7.84,
+        "width": 3.8,
+        "height": 1.52
+      }
+    },
+    {
       "id": "card_intro",
       "role": "card",
       "px": {

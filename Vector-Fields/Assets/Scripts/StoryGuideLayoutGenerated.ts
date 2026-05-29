@@ -109,3 +109,8 @@ export const STORY_GUIDE_NAV = {
     next: {"x":11,"y":-7.44,"width":5.2,"height":2.24},
     progress: {"x":0,"y":-7.44,"width":14.4,"height":2.24},
 };
+
+export const STORY_GUIDE_UTILITY = {
+    follow: {"x":7.06,"y":7.84,"width":3.8,"height":1.52},
+    fold: {"x":11.46,"y":7.84,"width":3.8,"height":1.52},
+};

@@ -85,26 +85,6 @@
       font-weight: 820;
     }
 
-    .status {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 18px;
-      color: var(--muted);
-      font-size: 36px;
-      line-height: 1;
-      font-weight: 760;
-    }
-
-    .status .mark {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 20px rgba(232,229,220,0.34);
-    }
-
     .slot {
       position: absolute;
       border-radius: 32px;
@@ -202,6 +182,39 @@
         var(--pressed);
       transform: scale(0.984);
     }
+
+    .utility {
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02)),
+        #3c3f3f;
+      border: 3px solid rgba(235,242,246,0.52);
+      color: var(--text);
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 650;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        0 12px 28px rgba(0,0,0,0.26);
+    }
+
+    .utility[data-state="off"],
+    .utility[data-state="closed"] {
+      color: var(--muted);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.01)),
+        #292c2c;
+      border-color: rgba(235,242,246,0.32);
+    }
+
+    .utility[data-state="pressed"] {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
+        var(--pressed);
+      transform: scale(0.984);
+    }
   </style>
 </head>
 <body>
@@ -224,13 +237,6 @@
     title.style.cssText = px(titleSlot);
     title.textContent = "Guide";
     panel.appendChild(title);
-
-    const statusSlot = spec.slots.find((s) => s.id === "status");
-    const status = document.createElement("div");
-    status.className = "status";
-    status.style.cssText = px(statusSlot);
-    status.innerHTML = `<span class="mark"></span>`;
-    panel.appendChild(status);
 
     for (const slot of spec.slots.filter((s) => s.role === "card" || s.role === "progress")) {
       const div = document.createElement("div");
@@ -264,6 +270,26 @@
         button.textContent = nav.label;
         document.body.appendChild(button);
       }
+    }
+
+    const utilities = [
+      { id: "utility_follow_on", slot: "utility_follow", label: "Follow", state: "on" },
+      { id: "utility_follow_off", slot: "utility_follow", label: "Fixed", state: "off" },
+      { id: "utility_follow_pressed", slot: "utility_follow", label: "Follow", state: "pressed" },
+      { id: "utility_fold_open", slot: "utility_fold", label: "Fold", state: "open" },
+      { id: "utility_fold_closed", slot: "utility_fold", label: "Open", state: "closed" },
+      { id: "utility_fold_pressed", slot: "utility_fold", label: "Fold", state: "pressed" },
+    ];
+
+    for (const utility of utilities) {
+      const slot = spec.slots.find((s) => s.id === utility.slot);
+      const button = document.createElement("div");
+      button.id = utility.id;
+      button.className = "capture utility";
+      button.dataset.state = utility.state;
+      button.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
+      button.textContent = utility.label;
+      document.body.appendChild(button);
     }
 
     window.storyUiReady = true;

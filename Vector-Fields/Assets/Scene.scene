@@ -17,6 +17,7 @@
     - !<own> 94339a44-3957-4d10-b720-4580f191f7e6
     - !<own> a198c9da-c135-470d-beea-4a0f196a20e0
     - !<own> 430afaca-5a35-4b44-8567-0e934e0604b0
+    - !<own> 579c3965-a9da-4295-99b6-b690c561286e
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       []
@@ -6933,7 +6934,7 @@
   Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: -50.000000}
+    Position: {x: -21.000000, y: -6.000000, z: -72.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -8784,7 +8785,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -5.500000, z: -64.000000}
+    Position: {x: 0.000000, y: -7.000000, z: -68.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -8792,6 +8793,21 @@
     []
   Components:
     - !<own> 8983634f-a68d-425c-9dec-4754a2e5d503
+- !<SceneObject/579c3965-a9da-4295-99b6-b690c561286e>
+  PrefabRemaps:
+    []
+  Name: Vector Fields Stage Layout
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> f294ea17-eebd-49f6-8a75-3200894a99de
 - !<SceneObject/4313f8b8-8074-4541-93b0-0105faf7b171>
   PrefabRemaps:
     []
@@ -17521,8 +17537,16 @@
   Enabled: true
   ScriptAsset: !<reference> b396410b-822b-464c-9f05-ca9a9a098fe8
   ScriptInputsDefault:
+    scaffoldRoot: true
     showOnStart: true
     panelOffset: true
+    cameraRoot: true
+    followUser: true
+    folded: true
+    menuDistanceCm: true
+    menuVerticalOffsetCm: true
+    menuHorizontalOffsetCm: true
+    followSmoothing: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -17530,6 +17554,57 @@
       scaffoldRoot: !<reference.SceneObject> a198c9da-c135-470d-beea-4a0f196a20e0
       showOnStart: true
       panelOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      followUser: true
+      folded: false
+      menuDistanceCm: !<float> 68.000000
+      menuVerticalOffsetCm: !<float> -7.000000
+      menuHorizontalOffsetCm: !<float> 0.000000
+      followSmoothing: !<float> 9.000000
+  ScriptTypes:
+    "":
+      {}
+- !<ScriptComponent/f294ea17-eebd-49f6-8a75-3200894a99de>
+  PrefabRemaps:
+    []
+  Name: VectorFieldsStageLayout
+  Enabled: true
+  ScriptAsset: !<reference> 6daebf24-e6bc-4d1a-87fc-b461f6d0749e
+  ScriptInputsDefault:
+    motionFieldRoot: true
+    gravityFieldRoot: true
+    windGlobeRoot: true
+    magneticFieldRoot: true
+    menuRoot: true
+    applyOnStart: true
+    settleSeconds: true
+    floorY: true
+    floorZ: true
+    handLevelY: true
+    handLevelZ: true
+    handLevelSpacing: true
+    menuZ: true
+    menuY: true
+    applyScales: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      motionFieldRoot: !<reference.SceneObject> 99b17862-d9e9-410a-8319-599c8e6ed774
+      gravityFieldRoot: !<reference.SceneObject> a0d85fd6-b271-46c7-b4cd-229a9b924811
+      windGlobeRoot: !<reference.SceneObject> 33f7d2ff-6a63-4beb-b027-12bbe1f65b9d
+      magneticFieldRoot: !<reference.SceneObject> 9e72f614-329f-4e4a-b149-7fe960315346
+      menuRoot: !<reference.SceneObject> 430afaca-5a35-4b44-8567-0e934e0604b0
+      applyOnStart: true
+      settleSeconds: !<float> 1.250000
+      floorY: !<float> -112.000000
+      floorZ: !<float> -118.000000
+      handLevelY: !<float> -6.000000
+      handLevelZ: !<float> -72.000000
+      handLevelSpacing: !<float> 42.000000
+      menuZ: !<float> -68.000000
+      menuY: !<float> -7.000000
+      applyScales: true
   ScriptTypes:
     "":
       {}
@@ -20023,7 +20098,7 @@
   Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -10.000000, z: -45.000000}
+    Position: {x: 0.000000, y: -112.000000, z: -118.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -20527,7 +20602,7 @@
   Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 10.800000, z: -48.000000}
+    Position: {x: 21.000000, y: -6.000000, z: -72.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -20845,7 +20920,7 @@
   Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -30.000000, y: -20.000000, z: -48.000000}
+    Position: {x: 0.000000, y: -112.000000, z: -118.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -24387,6 +24462,8 @@
     showAll: true
     activeChapter: true
     activeRootName: true
+    centerStagedContent: true
+    centerDepth: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -24394,6 +24471,8 @@
       showAll: true
       activeChapter: !<float> 0.000000
       activeRootName: ""
+      centerStagedContent: true
+      centerDepth: false
   ScriptTypes:
     "":
       {}
