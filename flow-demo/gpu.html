@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GPU streamline trace around a moving hull</title>
+<style>
+  html,body { margin:0; height:100%; background:#0b0e12; overflow:hidden; font-family:system-ui,sans-serif; }
+  #info { position:fixed; left:12px; top:10px; color:#9fb3c8; font-size:12px; line-height:1.5; }
+  #info b { color:#e8eef5; }
+  #fps { position:fixed; right:12px; top:10px; color:#22ddff; font-size:12px; font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div id="info"><b>GPU trace</b> · body yaws live, all streamlines re-solve on the GPU every frame<br>drag to orbit · scroll to zoom</div>
+<div id="fps"></div>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
+
+// ---- tunables (overridable via ?steps=&ny=&nz= for low-power verification) ----
+const Q = new URLSearchParams(location.search);
+const STEPS = +(Q.get('steps')) || 256;   // samples per streamline (texture width)
+const NY = +(Q.get('ny')) || 9, NZ = +(Q.get('nz')) || 13;  // seed grid
+const LINES = NY*NZ;        // streamlines (texture height)
+const PER_LINE = 9;         // animated pulses per streamline
+const MAX_FACES = 128;
+const H = +(Q.get('h')) || 0.035;   // RK4 step (arc length ≈ STEPS*H)
+const R = 1.4;              // deflection falloff
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0e12);
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100);
+camera.position.set(5.0, 2.6, 6.2);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0.2, 0.5, 0);
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const dir = new THREE.DirectionalLight(0xffffff, 0.9); dir.position.set(5,8,4); scene.add(dir);
+
+// ---- car-ish convex hull (local space; rotates as a unit) ----
+const pts = [];
+const add = (x,y,z)=>{ pts.push(new THREE.Vector3(x,y,z)); pts.push(new THREE.Vector3(x,y,-z)); };
+add(-2.2,0.05,0.05); add(-1.6,0.10,0.55); add(-0.6,0.12,0.78);
+add( 0.4,0.10,0.80); add( 1.4,0.10,0.70); add( 2.2,0.12,0.35);
+add(-2.2,0.45,0.10); add(-1.6,0.55,0.55); add(-0.4,0.60,0.74);
+add( 0.6,0.55,0.74); add( 1.5,0.45,0.55); add( 2.15,0.40,0.25);
+add(-0.4,1.05,0.42); add( 0.3,1.10,0.45); add( 0.9,0.95,0.40); add(-0.9,0.85,0.35);
+add( 1.9,0.95,0.55); add( 2.05,0.95,0.45);
+const hull = new ConvexGeometry(pts);
+const car = new THREE.Mesh(hull, new THREE.MeshStandardMaterial({
+  color:0x1878e0, metalness:0.3, roughness:0.45, transparent:true, opacity:0.92 }));
+scene.add(car);
+
+// ---- pack face planes (centroid + normal) into uniform arrays ----
+const faceC = [], faceN = [];
+{
+  const pos = hull.attributes.position;
+  const a=new THREE.Vector3(), b=new THREE.Vector3(), c=new THREE.Vector3();
+  const ab=new THREE.Vector3(), ac=new THREE.Vector3(), n=new THREE.Vector3(), ctr=new THREE.Vector3();
+  for (let i=0;i<pos.count;i+=3){
+    a.fromBufferAttribute(pos,i); b.fromBufferAttribute(pos,i+1); c.fromBufferAttribute(pos,i+2);
+    ab.subVectors(b,a); ac.subVectors(c,a); n.crossVectors(ab,ac).normalize();
+    ctr.copy(a).add(b).add(c).multiplyScalar(1/3);
+    faceC.push(ctr.clone()); faceN.push(n.clone());
+  }
+}
+const NUM_FACES = faceC.length;
+while (faceC.length < MAX_FACES){ faceC.push(new THREE.Vector3()); faceN.push(new THREE.Vector3()); }
+
+// =====================================================================
+// PASS 1 — GPU trace: each texel (col,row) integrates streamline `row`
+//          up to step `col`, writing world position in rgb, speed in a.
+// =====================================================================
+const traceRT = new THREE.WebGLRenderTarget(STEPS, LINES, {
+  type:THREE.FloatType, format:THREE.RGBAFormat,
+  minFilter:THREE.NearestFilter, magFilter:THREE.NearestFilter, depthBuffer:false });
+
+const traceUniforms = {
+  uFaceC:{ value: faceC }, uFaceN:{ value: faceN }, uNumFaces:{ value: NUM_FACES },
+  uModel:{ value: new THREE.Matrix4() }, uInvModel:{ value: new THREE.Matrix4() },
+  uU:{ value: new THREE.Vector3(1,0,0) },
+  uR:{ value: R }, uH:{ value: H }, uSteps:{ value: STEPS }, uLines:{ value: LINES },
+  uNY:{ value: NY }, uNZ:{ value: NZ },
+};
+
+const traceMat = new THREE.RawShaderMaterial({
+  glslVersion: THREE.GLSL3,
+  uniforms: traceUniforms,
+  vertexShader: `
+    in vec3 position; in vec2 uv; out vec2 vUv;
+    void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+  fragmentShader: `
+    precision highp float;
+    #define MAX_FACES ${MAX_FACES}
+    #define MAX_STEPS ${STEPS}
+    in vec2 vUv; out vec4 outColor;
+    uniform vec3 uFaceC[MAX_FACES]; uniform vec3 uFaceN[MAX_FACES]; uniform int uNumFaces;
+    uniform mat4 uModel, uInvModel; uniform vec3 uU;
+    uniform float uR, uH, uSteps, uLines, uNY, uNZ;
+
+    vec3 seed(float l){
+      float iy = floor(l/uNZ);
+      float iz = mod(l, uNZ) - floor(uNZ/2.0);
+      return vec3(-3.2, 0.10 + iy*0.165, iz*0.145);
+    }
+    // freestream deflected around the (transformed) hull, evaluated in world space
+    vec3 vel(vec3 p){
+      vec3 pl = (uInvModel * vec4(p,1.0)).xyz;            // world -> body-local
+      float best = -1e9; vec3 bn = vec3(0.0);
+      for (int i=0;i<MAX_FACES;i++){ if(i>=uNumFaces) break;
+        float d = dot(pl - uFaceC[i], uFaceN[i]);
+        if (d > best){ best = d; bn = uFaceN[i]; }
+      }
+      float w = exp(-max(best,0.0)/uR);                   // 1 at surface -> 0 far away
+      vec3 Ul = mat3(uInvModel) * uU;                     // freestream in local frame
+      vec3 vl = Ul - bn*dot(Ul,bn)*w;                     // the whole effect
+      if (best < 0.08){ vl += bn * (0.6*(0.08 - min(best,0.08))); } // anti-penetration
+      return mat3(uModel) * vl;                           // back to world
+    }
+    void main(){
+      int c = int(floor(vUv.x * uSteps));
+      float l = floor(vUv.y * uLines);
+      vec3 p = seed(l); float h = uH;
+      for (int i=0;i<MAX_STEPS;i++){ if(i>=c) break;
+        vec3 k1=vel(p), k2=vel(p+0.5*h*k1), k3=vel(p+0.5*h*k2), k4=vel(p+h*k3);
+        p += h/6.0*(k1+2.0*k2+2.0*k3+k4);
+        if (p.x > 4.6) break;
+      }
+      outColor = vec4(p, length(vel(p)));
+    }`,
+});
+const quadScene = new THREE.Scene();
+quadScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), traceMat));
+const quadCam = new THREE.Camera();
+
+// =====================================================================
+// shared color ramp (speed -> green..cyan)
+// =====================================================================
+const RAMP = `
+  vec3 ramp(float sp){
+    vec3 slow = vec3(0.169,0.824,0.290);   // green
+    vec3 fast = vec3(0.133,0.867,1.0);     // cyan
+    return mix(slow, fast, clamp((sp-0.80)/0.45, 0.0, 1.0));
+  }`;
+
+// ---- dim static streamlines: read positions from traceRT in vertex shader ----
+{
+  const N = LINES*STEPS;
+  const slot = new Float32Array(N*2);
+  for (let r=0;r<LINES;r++) for (let cc=0;cc<STEPS;cc++){
+    const i=r*STEPS+cc; slot[i*2]=(cc+0.5)/STEPS; slot[i*2+1]=(r+0.5)/LINES;
+  }
+  const idx=[];
+  for (let r=0;r<LINES;r++) for (let cc=0;cc<STEPS-1;cc++){ const b=r*STEPS+cc; idx.push(b,b+1); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N*3),3)); // unused, filled by VS
+  g.setAttribute('aSlot', new THREE.BufferAttribute(slot,2));
+  g.setIndex(idx);
+  const mat = new THREE.ShaderMaterial({
+    glslVersion: THREE.GLSL3, transparent:true, depthWrite:false,
+    uniforms:{ uTrace:{ value: traceRT.texture } },
+    vertexShader:`
+      in vec2 aSlot; uniform sampler2D uTrace; out float vSpeed;
+      void main(){ vec4 t = texture(uTrace, aSlot); vSpeed = t.a;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(t.xyz,1.0); }`,
+    fragmentShader:`precision highp float; ${RAMP}
+      in float vSpeed; out vec4 outColor;
+      void main(){ outColor = vec4(ramp(vSpeed), 0.28); }`,
+  });
+  scene.add(new THREE.LineSegments(g, mat));
+}
+
+// ---- animated pulses: sample traceRT at an advancing phase ----
+const pulseUniforms = { uTrace:{ value: traceRT.texture }, uTime:{ value:0 }, uSize:{ value: 130.0*renderer.getPixelRatio() } };
+{
+  const NP = LINES*PER_LINE;
+  const row = new Float32Array(NP), phase = new Float32Array(NP);
+  let k=0;
+  for (let r=0;r<LINES;r++) for (let j=0;j<PER_LINE;j++){ row[k]=(r+0.5)/LINES; phase[k]=j/PER_LINE; k++; }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NP*3),3));
+  g.setAttribute('aRow', new THREE.BufferAttribute(row,1));
+  g.setAttribute('aPhase', new THREE.BufferAttribute(phase,1));
+  const mat = new THREE.ShaderMaterial({
+    glslVersion: THREE.GLSL3, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+    uniforms: pulseUniforms,
+    vertexShader:`
+      in float aRow; in float aPhase; uniform sampler2D uTrace; uniform float uTime, uSize;
+      out float vSpeed;
+      void main(){
+        float u = fract(aPhase + uTime);
+        vec4 t = texture(uTrace, vec2(u, aRow)); vSpeed = t.a;
+        vec4 mv = modelViewMatrix * vec4(t.xyz,1.0);
+        gl_Position = projectionMatrix * mv;
+        gl_PointSize = uSize / -mv.z;
+      }`,
+    fragmentShader:`precision highp float; ${RAMP}
+      in float vSpeed; out vec4 outColor;
+      void main(){
+        vec2 d = gl_PointCoord - 0.5; if (dot(d,d) > 0.25) discard;   // round dot
+        vec3 col = mix(ramp(vSpeed), vec3(1.0), 0.35);
+        outColor = vec4(col, 0.95);
+      }`,
+  });
+  scene.add(new THREE.Points(g, mat));
+}
+
+// ---- loop: yaw the body, re-trace on GPU, render ----
+const clock = new THREE.Clock();
+let last = 0, frames = 0, acc = 0;
+const fpsEl = document.getElementById('fps');
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  car.rotation.y = Math.sin(t*0.35) * 0.5;          // live body motion
+  car.updateMatrixWorld();
+  traceUniforms.uModel.value.copy(car.matrixWorld);
+  traceUniforms.uInvModel.value.copy(car.matrixWorld).invert();
+
+  renderer.setRenderTarget(traceRT);                 // PASS 1: re-solve all streamlines
+  renderer.render(quadScene, quadCam);
+  renderer.setRenderTarget(null);
+
+  pulseUniforms.uTime.value = t*0.12;
+  controls.update();
+  renderer.render(scene, camera);                    // PASS 2: draw
+
+  frames++; acc += t-last; last = t;
+  if (acc > 0.5){ fpsEl.textContent = (frames/acc).toFixed(0)+' fps · '+LINES+' lines re-solved/frame'; frames=0; acc=0; }
+}
+addEventListener('resize', ()=>{
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+last = clock.getElapsedTime();
+animate();
+window.__ready = true;
+</script>
+</body>
+</html>

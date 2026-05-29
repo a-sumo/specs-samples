@@ -4,6 +4,9 @@
     - !<own> a926edd0-316f-4f43-aabc-5943bb6c581a
 - !<PassInfo/a926edd0-316f-4f43-aabc-5943bb6c581a>
   CachedProperties:
+    - ContouCount:
+        typeIdx: 1
+        value: 1.000000
     - EarthTint:
         typeIdx: 5
         value: {x: 1.000000, y: 0.280000, z: 0.220000, w: 1.000000}
@@ -31,12 +34,57 @@
           0: {x: 1.000000, y: 0.000000, z: 0.000000}
           1: {x: 0.000000, y: 1.000000, z: 0.000000}
           2: {x: 0.000000, y: 0.000000, z: 1.000000}
+    - Port_ArrowColor_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_ArrowScale_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ArrowSpacing_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ColorHigh_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_ColorLow_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_ContourColor_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_ContourCount_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_ContourThickness_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_DepthScale_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_Depth_N001:
         typeIdx: 1
         value: 1.000000
     - Port_Depth_N004:
         typeIdx: 1
         value: 1.000000
+    - Port_EarthMass_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_EarthPos_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_EarthTint_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_FieldLineColor_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_FieldLineDensity_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_FieldLineWidth_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_FinalColor1_N001:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
@@ -61,6 +109,12 @@
     - Port_FinalColor_N004:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FlowScale_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_FlowSpeed_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_GSplatPointSize_N001:
         typeIdx: 1
         value: 0.000000
@@ -88,6 +142,18 @@
     - Port_LocalAnim_N000:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_MoonMass_N000:
+        typeIdx: 1
+        value: 0.000000
+    - Port_MoonPos_N000:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_MoonTint_N000:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_OpacityScale_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_Output_N041:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
@@ -235,6 +301,9 @@
     - Port_RayOrigin_N004:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_Softening_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_TubeColorTail_N000:
         typeIdx: 5
         value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
@@ -259,6 +328,12 @@
     - Port_VectorIn_N005:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_VectorIn_N019:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WellDepth_N000:
+        typeIdx: 1
+        value: 0.000000
     - Port_WorldNormal_N001:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
@@ -280,6 +355,9 @@
     - Pt:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - RE:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - TubeColor:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
@@ -313,6 +391,9 @@
     - Tweak_N19:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Tweak_N2:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Tweak_N20:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
@@ -320,23 +401,41 @@
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
     - Tweak_N22:
-        typeIdx: 5
-        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N23:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N24:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N25:
+        typeIdx: 1
+        value: 1.000000
+    - Tweak_N3:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Tweak_N39:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Tweak_N4:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - Tweak_N5:
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Tweak_N6:
-        typeIdx: 5
-        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Tweak_N7:
-        typeIdx: 5
-        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Tweak_N8:
-        typeIdx: 5
-        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - Tweak_N9:
-        typeIdx: 5
-        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+        typeIdx: 4
+        value: {x: 1.000000, y: 1.000000, z: 1.000000}
     - alphaTestThreshold:
         typeIdx: 1
         value: 0.500000
@@ -345,7 +444,7 @@
   DepthFunction: LessEqual
   TwoSided: true
   ColorMask: {x: true, y: true, z: true, w: true}
-  CullMode: None
+  CullMode: Back
   PolygonOffset: {x: 0.000000, y: 0.000000}
   FrustumCulling: Extend
   FrustumCullPad: 100.000000
@@ -369,12 +468,6 @@
     ColorLow:
       typeIdx: 5
       value: {x: 0.120000, y: 0.360000, z: 1.000000, w: 1.000000}
-    EarthTint:
-      typeIdx: 5
-      value: {x: 1.000000, y: 0.280000, z: 0.220000, w: 1.000000}
-    MoonTint:
-      typeIdx: 5
-      value: {x: 0.220000, y: 0.600000, z: 1.000000, w: 1.000000}
     ContourColor:
       typeIdx: 5
       value: {x: 1.000000, y: 0.160000, z: 0.220000, w: 0.980000}

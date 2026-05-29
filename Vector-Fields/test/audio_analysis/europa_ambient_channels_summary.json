@@ -1,0 +1,37 @@
+{
+  "source": {
+    "audio": "Assets/Audio/europa-tecnosine-main-version-07-43-13869.mp3",
+    "recordedTimeline": "Assets/Scripts/EuropaTecnosineTimeline.ts"
+  },
+  "duration": 463.759410430839,
+  "targetSampleRate": 24,
+  "actualSampleRate": 23.99347116430903,
+  "frameCount": 11128,
+  "bandsHz": {
+    "subBass": [
+      22.0,
+      40.0
+    ]
+  },
+  "channels": {
+    "x": "baked audio full-band magnitude, also the opacity driver",
+    "y": "baked recorded channel 2 yaw from the slider timeline",
+    "z": "baked 22-40 Hz sub-bass band intensity",
+    "w": "baked opacity driver, duplicated from x for LS shader consumers"
+  },
+  "recordedYaw": {
+    "mean": 0.604945182800293,
+    "p10": 0.19499999284744263,
+    "p90": 0.8899999856948853
+  },
+  "magnitude": {
+    "mean": 0.6420857310295105,
+    "p10": 0.1766965687274933,
+    "p90": 0.9591752290725708
+  },
+  "subBassIntensity": {
+    "mean": 0.40223002433776855,
+    "p10": 0.0,
+    "p90": 0.9402926564216614
+  }
+}

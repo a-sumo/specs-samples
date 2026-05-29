@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baked 3D field · draggable slice</title>
+<style>
+  html,body { margin:0; height:100%; background:#0b0e12; overflow:hidden;
+    font-family:system-ui,sans-serif; color:#cdd9e5; }
+  canvas { display:block; cursor:ew-resize; }
+  #ui { position:fixed; left:12px; top:10px; font-size:12px; line-height:1.6;
+    background:rgba(14,18,24,.72); padding:10px 12px; border-radius:8px; width:230px; }
+  #ui b { color:#e8eef5; }
+  .row { display:flex; align-items:center; gap:8px; min-width:0; margin-top:6px; }
+  .row label { flex-shrink:0; width:54px; color:#9fb3c8; }
+  .row .val { flex-shrink:0; width:46px; text-align:right; color:#1878e0; font-variant-numeric:tabular-nums; }
+  .row input[type=range] { flex:1 1 0; min-width:0; width:0; accent-color:#1878e0; }
+  #fps { color:#1878e0; font-variant-numeric:tabular-nums; margin-top:8px; }
+  #map { position:fixed; right:12px; bottom:12px; background:rgba(14,18,24,.72); border-radius:8px; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <b>Baked 3D field · slice</b><br>
+  <span style="color:#9fb3c8">drag the view (or slider) to move the slice through the car</span>
+  <div class="row"><label>slice z</label><input id="slice" type="range" min="-105" max="105" value="0"><span class="val" id="sliceV">0</span></div>
+  <div class="row"><label>density</label><input id="dens" type="range" min="14" max="64" value="38"><span class="val" id="densV">38</span></div>
+  <div id="fps"></div>
+</div>
+<canvas id="c"></canvas>
+<canvas id="map" width="180" height="92"></canvas>
+<script>
+const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+let W,H,DPR=Math.min(devicePixelRatio||1,2), S=1, CXs=0, CYs=0;
+function fit(){ S=Math.min(W/580, H/320); CXs=W/2; CYs=H*0.52; }
+function resize(){ W=innerWidth;H=innerHeight; cv.width=W*DPR;cv.height=H*DPR; cv.style.width=W+'px';cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); fit(); }
+addEventListener('resize',resize); resize();
+const sx=wx=>CXs+wx*S, sy=wy=>CYs-wy*S;
+
+// ---- car side profile (world units, y-up) ----
+const POLY=[[-150,-4],[-120,16],[-40,26],[10,28],[34,58],[80,60],[122,30],[150,18],[156,-6],[140,-22],[-140,-22]].map(([x,y])=>({x,y}));
+const XC=3, LEN=150, WID=88;           // width taper: half-width WID at center, 0 at x=XC±LEN
+const hw = x=>{ const t=(x-XC)/LEN; return t*t>=1?0:WID*Math.sqrt(1-t*t); };
+
+function sdPoly(px,py){
+  let d=(px-POLY[0].x)**2+(py-POLY[0].y)**2,s=1;
+  for(let i=0,j=POLY.length-1;i<POLY.length;j=i,i++){
+    const ex=POLY[j].x-POLY[i].x,ey=POLY[j].y-POLY[i].y,wx=px-POLY[i].x,wy=py-POLY[i].y;
+    let t=(wx*ex+wy*ey)/(ex*ex+ey*ey);t=t<0?0:t>1?1:t;
+    const bx=wx-ex*t,by=wy-ey*t; d=Math.min(d,bx*bx+by*by);
+    const c1=py>=POLY[i].y,c2=py<POLY[j].y,c3=ex*wy>ey*wx;
+    if((c1&&c2&&c3)||(!c1&&!c2&&!c3))s=-s;
+  }
+  return s*Math.sqrt(d);
+}
+const sdf3=(x,y,z)=>Math.max(sdPoly(x,y), Math.abs(z)-hw(x));
+
+const R=46;
+function vel3(x,y,z,o){            // analytic deflected freestream U=(1,0,0)
+  const d=sdf3(x,y,z), e=1.4;
+  let gx=sdf3(x+e,y,z)-sdf3(x-e,y,z), gy=sdf3(x,y+e,z)-sdf3(x,y-e,z), gz=sdf3(x,y,z+e)-sdf3(x,y,z-e);
+  const gl=Math.hypot(gx,gy,gz)||1; gx/=gl;gy/=gl;gz/=gl;
+  const w=Math.exp(-Math.max(d,0)/R), un=gx;          // U·n = gx since U=(1,0,0)
+  let vx=1-gx*un*w, vy=-gy*un*w, vz=-gz*un*w;
+  if(d<3){const k=0.9*(3-Math.max(d,-3))/3; vx+=gx*k;vy+=gy*k;vz+=gz*k;}
+  o[0]=vx;o[1]=vy;o[2]=Math.hypot(vx,vy,vz);
+}
+
+// ---- bake the 3D volume once (this is the artifact that ports to LS) ----
+const NX=128,NY=64,NZ=72, X0=-270,X1=270, Y0=-130,Y1=130, Z0=-110,Z1=110;
+const DX=(X1-X0)/(NX-1),DY=(Y1-Y0)/(NY-1),DZ=(Z1-Z0)/(NZ-1);
+const VOL=new Float32Array(NX*NY*NZ*3);
+(function bake(){
+  const o=[0,0,0];
+  for(let k=0;k<NZ;k++){const z=Z0+k*DZ;
+    for(let j=0;j<NY;j++){const y=Y0+j*DY;
+      for(let i=0;i<NX;i++){const x=X0+i*DX; vel3(x,y,z,o);
+        const idx=((k*NY+j)*NX+i)*3; VOL[idx]=o[0];VOL[idx+1]=o[1];VOL[idx+2]=o[2];
+      }}}
+})();
+
+// trilinear-in-XY (nearest Z) sample of the baked volume
+function sample(x,y,z,o){
+  let gi=(x-X0)/DX, gj=(y-Y0)/DY, gk=Math.round((z-Z0)/DZ);
+  if(gk<0)gk=0; else if(gk>NZ-1)gk=NZ-1;
+  if(gi<0||gi>NX-1||gj<0||gj>NY-1){ o[0]=1;o[1]=0;o[2]=1; return; }
+  let i0=gi|0,j0=gj|0; const fi=gi-i0,fj=gj-j0; let i1=i0+1,j1=j0+1;
+  if(i1>NX-1)i1=NX-1; if(j1>NY-1)j1=NY-1;
+  const b=(i,j)=>((gk*NY+j)*NX+i)*3;
+  const a00=b(i0,j0),a10=b(i1,j0),a01=b(i0,j1),a11=b(i1,j1);
+  for(let c=0;c<3;c++){
+    const x0=VOL[a00+c]+(VOL[a10+c]-VOL[a00+c])*fi;
+    const x1=VOL[a01+c]+(VOL[a11+c]-VOL[a01+c])*fi;
+    o[c]=x0+(x1-x0)*fj;
+  }
+}
+
+function ramp(sp){
+  const t=Math.min(1,Math.max(0,(sp-0.80)/0.45));
+  return `rgb(${Math.round((0.169+(0.133-0.169)*t)*255)},${Math.round((0.824+(0.867-0.824)*t)*255)},${Math.round((0.290+(1.0-0.290)*t)*255)})`;
+}
+
+// trace a streamline through the sampled field at the current slice z
+const sv=[0,0,0],k1=[0,0,0],k2=[0,0,0],k3=[0,0,0],k4=[0,0,0];
+function trace(y0,z){
+  const p=[]; let x=X0+4,y=y0; const h=7;
+  for(let s=0;s<140&&x<X1;s++){ p.push(x,y);
+    sample(x,y,z,k1); sample(x+0.5*h*k1[0],y+0.5*h*k1[1],z,k2);
+    sample(x+0.5*h*k2[0],y+0.5*h*k2[1],z,k3); sample(x+h*k3[0],y+h*k3[1],z,k4);
+    x+=h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); y+=h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+  }
+  return p;
+}
+
+// clip the side profile to the width band present at depth z, then draw the cross-section
+function clipBand(poly,xlo,xhi){
+  const clip=(pts,keep,coord)=>{ const r=[];for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];
+    const ina=keep(a),inb=keep(b);
+    if(ina)r.push(a);
+    if(ina!==inb){ const t=(coord-a.x)/(b.x-a.x); r.push({x:coord,y:a.y+(b.y-a.y)*t}); }
+  } return r; };
+  let r=clip(poly,p=>p.x>=xlo,xlo); if(!r.length)return r;
+  return clip(r,p=>p.x<=xhi,xhi);
+}
+function drawCar(z){
+  const az=Math.abs(z); if(az>=WID) return;            // outside the body → empty slice
+  const xr=LEN*Math.sqrt(1-(az/WID)**2);
+  const poly=clipBand(POLY,XC-xr,XC+xr); if(poly.length<3) return;
+  ctx.beginPath(); ctx.moveTo(sx(poly[0].x),sy(poly[0].y));
+  for(let i=1;i<poly.length;i++) ctx.lineTo(sx(poly[i].x),sy(poly[i].y));
+  ctx.closePath();
+  ctx.fillStyle='#1878e0'; ctx.globalAlpha=0.92; ctx.fill();
+  ctx.globalAlpha=1; ctx.lineWidth=1.5; ctx.strokeStyle='#2b9bff'; ctx.stroke();
+}
+
+// ---- minimap: top-view footprint + slice marker ----
+const mp=document.getElementById('map'), mc=mp.getContext('2d');
+function drawMap(z){
+  mc.clearRect(0,0,180,92); const mx=x=>10+(x-X0)/(X1-X0)*160, mz=zz=>46-zz/Z1*40;
+  mc.fillStyle='rgba(24,120,224,.85)'; mc.beginPath();
+  let first=true; for(let i=0;i<NX;i++){const x=X0+i*DX,w=hw(x); if(w<=0)continue; const X=mx(x),Y=mz(w); if(first){mc.moveTo(X,Y);first=false;}else mc.lineTo(X,Y);}
+  for(let i=NX-1;i>=0;i--){const x=X0+i*DX,w=hw(x); if(w<=0)continue; mc.lineTo(mx(x),mz(-w));}
+  mc.closePath(); mc.fill();
+  mc.strokeStyle='#e8b010'; mc.lineWidth=2; mc.beginPath(); mc.moveTo(10,mz(z)); mc.lineTo(170,mz(z)); mc.stroke();
+  mc.fillStyle='#9fb3c8'; mc.font='10px system-ui'; mc.fillText('top view — slice position',10,86);
+}
+
+let SEEDS=38, sliceZ=0, lines=[];
+let t0=performance.now(),fr=0,fpsT=0; const fpsEl=document.getElementById('fps');
+function frame(now){
+  requestAnimationFrame(frame); const dt=(now-t0)/1000; t0=now;
+  lines.length=0; const m=118; for(let i=0;i<SEEDS;i++) lines.push(trace(-m+2*m*i/(SEEDS-1), sliceZ));
+
+  ctx.clearRect(0,0,W,H);
+  ctx.lineWidth=1;
+  for(const p of lines) for(let i=0;i<p.length-2;i+=2){
+    sample(p[i],p[i+1],sliceZ,sv);
+    ctx.strokeStyle=ramp(sv[2]); ctx.globalAlpha=0.30;
+    ctx.beginPath(); ctx.moveTo(sx(p[i]),sy(p[i+1])); ctx.lineTo(sx(p[i+2]),sy(p[i+3])); ctx.stroke();
+  }
+  ctx.globalAlpha=1; drawCar(sliceZ);
+
+  ctx.globalCompositeOperation='lighter'; const PH=5, tt=(now/1000)*0.18;
+  for(const p of lines){ const n=p.length/2;
+    for(let k=0;k<PH;k++){ const ph=((k/PH)+tt)%1, f=ph*(n-1), idx=f|0, fr2=f-idx, a=idx*2, b=Math.min(idx+1,n-1)*2;
+      const x=p[a]+(p[b]-p[a])*fr2, y=p[a+1]+(p[b+1]-p[a+1])*fr2;
+      sample(x,y,sliceZ,sv); ctx.fillStyle=ramp(sv[2]);
+      ctx.beginPath(); ctx.arc(sx(x),sy(y),2.6,0,7); ctx.fill();
+    }}
+  ctx.globalCompositeOperation='source-over';
+  drawMap(sliceZ);
+
+  fr++; fpsT+=dt; if(fpsT>0.5){ fpsEl.textContent=(fr/fpsT).toFixed(0)+' fps · '+SEEDS+' lines · '+NX+'×'+NY+'×'+NZ+' bake'; fr=0;fpsT=0; }
+}
+requestAnimationFrame(frame);
+
+// ---- interaction ----
+const slice=document.getElementById('slice'), sliceVE=document.getElementById('sliceV');
+function setZ(v){ sliceZ=Math.max(-105,Math.min(105,v)); slice.value=Math.round(sliceZ); sliceVE.textContent=Math.round(sliceZ); }
+slice.oninput=()=>setZ(+slice.value);
+let dragging=false, px=0;
+cv.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{ if(dragging){ setZ(sliceZ+(e.clientX-px)*0.35); px=e.clientX; }});
+cv.addEventListener('pointerup',()=>dragging=false);
+const dens=document.getElementById('dens'), densVE=document.getElementById('densV');
+dens.oninput=()=>{SEEDS=+dens.value;densVE.textContent=dens.value;};
+</script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2D flow slice — draggable section</title>
+<style>
+  html,body { margin:0; height:100%; background:#0b0e12; overflow:hidden;
+    font-family:system-ui,sans-serif; color:#cdd9e5; }
+  canvas { display:block; cursor:grab; }
+  canvas.drag { cursor:grabbing; }
+  #ui { position:fixed; left:12px; top:10px; font-size:12px; line-height:1.6;
+    background:rgba(14,18,24,.72); padding:10px 12px; border-radius:8px; width:220px; }
+  #ui b { color:#e8eef5; }
+  .row { display:flex; align-items:center; gap:8px; min-width:0; margin-top:6px; }
+  .row label { flex-shrink:0; width:66px; color:#9fb3c8; }
+  .row .val { flex-shrink:0; width:38px; text-align:right; color:#1878e0; font-variant-numeric:tabular-nums; }
+  .row input[type=range] { flex:1 1 0; min-width:0; width:0; accent-color:#1878e0; }
+  #fps { color:#1878e0; font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <b>2D flow slice</b><br>
+  <span style="color:#9fb3c8">drag the section to move it through the stream</span>
+  <div class="row"><label>angle</label><input id="angle" type="range" min="-35" max="35" value="0"><span class="val" id="angleV">0°</span></div>
+  <div class="row"><label>wind</label><input id="wind" type="range" min="40" max="240" value="130"><span class="val" id="windV">130</span></div>
+  <div class="row"><label>density</label><input id="dens" type="range" min="14" max="70" value="40"><span class="val" id="densV">40</span></div>
+  <div style="margin-top:8px" id="fps"></div>
+</div>
+<canvas id="c"></canvas>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W, H, DPR = Math.min(devicePixelRatio||1, 2);
+function resize(){ W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
+addEventListener('resize', resize); resize();
+
+// ---- car side-profile silhouette (local space, y-up convention) ----
+const POLY = [
+  [-150,  4],[-120,-16],[-40,-26],[10,-28],   // bumper, hood
+  [34,-58],[80,-60],                          // windshield + roof
+  [122,-30],[150,-18],[156, 6],               // rear glass, trunk, tail
+  [140, 22],[-140, 22]                         // underbody
+].map(([x,y])=>({x, y}));
+
+// obstacle state (movable + rotatable)
+const car = { cx: 0, cy: 0, scale: 1.0, angle: 0 };
+let U = 130;                  // freestream speed (px/sec-ish via step length)
+let SEEDS = 40;
+const R = 60;                 // deflection falloff (px)
+
+// ---- 2D signed distance to polygon (IQ), negative inside ----
+function sdPoly(px, py){
+  let d = (px-POLY[0].x)**2 + (py-POLY[0].y)**2, s = 1;
+  for (let i=0,j=POLY.length-1; i<POLY.length; j=i,i++){
+    const ex=POLY[j].x-POLY[i].x, ey=POLY[j].y-POLY[i].y;
+    const wx=px-POLY[i].x, wy=py-POLY[i].y;
+    let t=(wx*ex+wy*ey)/(ex*ex+ey*ey); t=t<0?0:t>1?1:t;
+    const bx=wx-ex*t, by=wy-ey*t;
+    d=Math.min(d, bx*bx+by*by);
+    const c1=py>=POLY[i].y, c2=py<POLY[j].y, c3=ex*wy>ey*wx;
+    if((c1&&c2&&c3)||(!c1&&!c2&&!c3)) s=-s;
+  }
+  return s*Math.sqrt(d);
+}
+
+// ---- deflected freestream, evaluated in world space ----
+let ca=1, sa=0;               // cos/sin of car angle, refreshed per frame
+function vel(px, py, out){
+  // world -> local (translate, then rotate by -angle)
+  const dx=px-car.cx, dy=py-car.cy;
+  const lx=( dx*ca + dy*sa)/car.scale;
+  const ly=(-dx*sa + dy*ca)/car.scale;
+  const d = sdPoly(lx, ly);
+  // SDF gradient via central differences (local space)
+  const e=1.2;
+  let gx=sdPoly(lx+e,ly)-sdPoly(lx-e,ly), gy=sdPoly(lx,ly+e)-sdPoly(lx,ly-e);
+  const gl=Math.hypot(gx,gy)||1; gx/=gl; gy/=gl;
+  const w=Math.exp(-Math.max(d,0)/R);
+  // freestream (1,0) rotated into local frame
+  const Ulx= ca, Uly=-sa;
+  let dot=Ulx*gx+Uly*gy;
+  let vlx=Ulx-gx*dot*w, vly=Uly-gy*dot*w;
+  if (d<3){ const k=0.9*(3-Math.max(d,-3))/3; vlx+=gx*k; vly+=gy*k; } // anti-penetration
+  // local -> world direction (rotate by +angle)
+  out[0]=vlx*ca - vly*sa;
+  out[1]=vlx*sa + vly*ca;
+}
+
+// ---- trace one streamline from the left edge ----
+const k1=[0,0],k2=[0,0],k3=[0,0],k4=[0,0];
+function trace(y0){
+  const pts=[]; let x=-20, y=y0; const h=Math.max(2, U/30);
+  for (let s=0;s<360 && x<W+20;s++){
+    pts.push(x,y);
+    vel(x,y,k1); vel(x+0.5*h*k1[0],y+0.5*h*k1[1],k2);
+    vel(x+0.5*h*k2[0],y+0.5*h*k2[1],k3); vel(x+h*k3[0],y+h*k3[1],k4);
+    x+=h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]);
+    y+=h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+  }
+  return pts;
+}
+
+// ---- speed -> green..cyan (matches the CFD reference colormap) ----
+function ramp(sp){
+  const t=Math.min(1,Math.max(0,(sp-0.80)/0.45));
+  const r=Math.round((0.169+(0.133-0.169)*t)*255);
+  const g=Math.round((0.824+(0.867-0.824)*t)*255);
+  const b=Math.round((0.290+(1.0  -0.290)*t)*255);
+  return `rgb(${r},${g},${b})`;
+}
+
+let lines=[];                 // cached polylines
+function solve(){ lines=[]; const m=80; for(let i=0;i<SEEDS;i++) lines.push(trace(m+(H-2*m)*i/(SEEDS-1))); }
+
+function drawCar(){
+  ctx.save();
+  ctx.translate(car.cx,car.cy); ctx.rotate(car.angle); ctx.scale(car.scale,car.scale);
+  ctx.beginPath(); ctx.moveTo(POLY[0].x,POLY[0].y);
+  for(let i=1;i<POLY.length;i++) ctx.lineTo(POLY[i].x,POLY[i].y);
+  ctx.closePath();
+  ctx.fillStyle='#1878e0'; ctx.globalAlpha=0.92; ctx.fill();
+  ctx.globalAlpha=1; ctx.lineWidth=1.5; ctx.strokeStyle='#2b9bff'; ctx.stroke();
+  ctx.restore();
+}
+
+const tmpv=[0,0];
+let t0=performance.now(), fr=0, fpsT=0;
+const fpsEl=document.getElementById('fps');
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=(now-t0)/1000; t0=now;
+  ca=Math.cos(car.angle); sa=Math.sin(car.angle);
+
+  solve();                                   // re-trace every frame (cheap in 2D)
+
+  ctx.clearRect(0,0,W,H);
+  // dim static streamlines, colored per-segment by speed
+  ctx.lineWidth=1;
+  for(const p of lines){
+    for(let i=0;i<p.length-2;i+=2){
+      vel(p[i],p[i+1],tmpv); const sp=Math.hypot(tmpv[0],tmpv[1]);
+      ctx.strokeStyle=ramp(sp); ctx.globalAlpha=0.30;
+      ctx.beginPath(); ctx.moveTo(p[i],p[i+1]); ctx.lineTo(p[i+2],p[i+3]); ctx.stroke();
+    }
+  }
+  ctx.globalAlpha=1;
+  drawCar();
+
+  // animated pulses riding along each line (additive glow)
+  ctx.globalCompositeOperation='lighter';
+  const PHASES=5; const tt=(now/1000)*0.18;
+  for(const p of lines){ const n=p.length/2;
+    for(let k=0;k<PHASES;k++){
+      const ph=((k/PHASES)+tt)%1; const f=ph*(n-1), idx=f|0, fr2=f-idx;
+      const a=idx*2, b=Math.min(idx+1,n-1)*2;
+      const x=p[a]+(p[b]-p[a])*fr2, y=p[a+1]+(p[b+1]-p[a+1])*fr2;
+      vel(x,y,tmpv); const sp=Math.hypot(tmpv[0],tmpv[1]);
+      ctx.fillStyle=ramp(sp); ctx.beginPath(); ctx.arc(x,y,2.6,0,7); ctx.fill();
+    }
+  }
+  ctx.globalCompositeOperation='source-over';
+
+  fr++; fpsT+=dt; if(fpsT>0.5){ fpsEl.textContent=(fr/fpsT).toFixed(0)+' fps · '+SEEDS+' lines'; fr=0; fpsT=0; }
+}
+
+// place car at center, start
+function init(){ car.cx=W*0.5; car.cy=H*0.5; }
+init(); requestAnimationFrame(frame);
+
+// ---- interaction: drag to move the section ----
+let dragging=false, ox=0, oy=0;
+cv.addEventListener('pointerdown', e=>{ dragging=true; cv.classList.add('drag'); ox=e.clientX-car.cx; oy=e.clientY-car.cy; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e=>{ if(dragging){ car.cx=e.clientX-ox; car.cy=e.clientY-oy; } });
+cv.addEventListener('pointerup',   e=>{ dragging=false; cv.classList.remove('drag'); });
+
+const angle=document.getElementById('angle'), angleV=document.getElementById('angleV');
+angle.oninput=()=>{ car.angle=(+angle.value)*Math.PI/180; angleV.textContent=angle.value+'°'; };
+const wind=document.getElementById('wind'), windV=document.getElementById('windV');
+wind.oninput=()=>{ U=+wind.value; windV.textContent=wind.value; };
+const dens=document.getElementById('dens'), densV=document.getElementById('densV');
+dens.oninput=()=>{ SEEDS=+dens.value; densV.textContent=dens.value; };
+addEventListener('resize', ()=>{ if(car.cx>W) car.cx=W*0.5; if(car.cy>H) car.cy=H*0.5; });
+</script>
+</body>
+</html>

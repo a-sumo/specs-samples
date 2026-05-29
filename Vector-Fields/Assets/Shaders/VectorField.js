@@ -261,6 +261,21 @@ vec3 fieldSurfaceWind(vec3 p) {
     return (east * jet + north * meander * 0.20) * 0.42;
 }
 
+// 9: Ambient audio plane - one shared direction with subtle per-vector noise.
+// TargetPosition encodes the audio/control channels: x=recorded yaw, y=22-40Hz bass, z=opacity/magnitude.
+vec3 fieldAmbientPlane(vec3 p) {
+    float yaw = (clamp(TargetPosition.x, 0.0, 1.0) - 0.5) * 1.62;
+    float pitch = (clamp(TargetPosition.y, 0.0, 1.0) - 0.5) * 1.05;
+    float magnitude = clamp(TargetPosition.z, 0.0, 1.0);
+    float seed = snoise(vec3(p.x * 0.82, p.z * 0.82, Time * 0.035));
+    float slow = snoise(vec3(p.x * 0.28 + 13.1, p.z * 0.28 - 7.4, Time * 0.018));
+    yaw += seed * 0.18 + slow * 0.06;
+    pitch += slow * 0.12 + seed * 0.035;
+    float c = cos(pitch);
+    vec3 direction = vec3(cos(yaw) * c, sin(pitch), sin(yaw) * c);
+    return safeNormalize(direction, vec3(1.0, 0.0, 0.0)) * (0.18 + magnitude * 0.48);
+}
+
 vec3 getField(vec3 p) {
     if (Preset == 0) return fieldExpansion(p);
     if (Preset == 1) return fieldContraction(p);
@@ -271,6 +286,7 @@ vec3 getField(vec3 p) {
     if (Preset == 6) return fieldHelix(p);
     if (Preset == 7) return fieldRiver(p);
     if (Preset == 8) return fieldSurfaceWind(p);
+    if (Preset == 9) return fieldAmbientPlane(p);
     return fieldWaves(p);
 }
 
@@ -326,7 +342,25 @@ vec3 plasmaGradient(float value) {
     else return mix(c5, c6, (value - 0.833) * 6.0);
 }
 
-vec3 getColor(vec3 vel, float t) {
+vec3 ambientGradient(float value) {
+    vec3 deepBlue = vec3(0.10, 0.26, 1.00);
+    vec3 cyan = vec3(0.02, 0.84, 1.00);
+    vec3 green = vec3(0.38, 1.00, 0.36);
+    vec3 lit = vec3(0.88, 1.00, 0.88);
+    vec3 c = mix(deepBlue, cyan, smoothstep(0.0, 0.58, value));
+    c = mix(c, green, smoothstep(0.34, 1.0, value));
+    return mix(c, lit, smoothstep(0.82, 1.0, value) * 0.22);
+}
+
+vec3 getColor(vec3 vel, float t, vec3 p) {
+    if (Preset == 9) {
+        float magnitude = clamp(TargetPosition.z, 0.0, 1.0);
+        float bass = clamp(TargetPosition.y, 0.0, 1.0);
+        float band = 0.5 + 0.5 * sin(p.x * 1.15 + p.z * 0.78 + t * 1.7 + Time * 0.12);
+        float ramp = clamp(0.14 + band * 0.48 + bass * 0.30 + length(vel) * 0.34, 0.0, 1.0);
+        return ambientGradient(ramp) * (0.52 + magnitude * 0.62);
+    }
+
     float speed = length(vel);
     float intensity = min(1.0, speed * 2.5);
 
@@ -424,11 +458,11 @@ void main() {
             finalPos = projectToDomain(startPos + tangent * (arrowLength + coneHeight), domainRadius);
         }
 
-        color = getColor(fieldVec, tClamped);
+        color = getColor(fieldVec, tClamped, startPos);
         if (isArrowCone) {
             color = mix(color, vec3(1.0), 0.2);
         }
-        alpha = 1.0;
+        alpha = (Preset == 9) ? (0.18 + clamp(TargetPosition.z, 0.0, 1.0) * 0.72) : 1.0;
 
     // ========================================
     // PARTICLE MODE: flowing billboard fans
@@ -466,8 +500,11 @@ void main() {
         float birthFade = smoothstep(0.0, 5.0, flowOffset);
         float deathFade = smoothstep(0.0, 5.0, maxPreSteps - flowOffset);
         float edgeFade = 1.0 - smoothstep(0.74, 1.0, disc);
-        color = getColor(vel, 0.5);
+        color = getColor(vel, 0.5, pos);
         alpha = edgeFade * birthFade * deathFade;
+        if (Preset == 9) {
+            alpha *= 0.18 + clamp(TargetPosition.z, 0.0, 1.0) * 0.72;
+        }
 
     // ========================================
     // TRAIL MODE: Flowing tubes with integration
@@ -537,8 +574,11 @@ void main() {
         vec3 offset = (localX * frameNormal + localY * frameBinormal) * radius;
         finalPos = pos + offset;
 
-        color = getColor(vel, tClamped);
+        color = getColor(vel, tClamped, pos);
         alpha = flowFade;
+        if (Preset == 9) {
+            alpha *= 0.18 + clamp(TargetPosition.z, 0.0, 1.0) * 0.72;
+        }
     }
 
     transformedPosition = finalPos;

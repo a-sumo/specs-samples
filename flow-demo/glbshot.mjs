@@ -1,0 +1,11 @@
+import puppeteer from 'puppeteer';
+const b=await puppeteer.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
+const p=await b.newPage(); await p.setViewport({width:1000,height:640,deviceScaleFactor:2});
+const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+await p.goto('http://localhost:4322/glbview.html?m=racecar_final.glb',{waitUntil:'domcontentloaded'});
+await p.waitForFunction('window.__ready===true',{timeout:20000}).catch(()=>{});
+await new Promise(r=>setTimeout(r,1500));
+console.log('info:', await p.evaluate(()=>window.__info));
+await p.screenshot({path:'glb_check.png'});
+console.log('errors:', errs.length?errs:'none');
+await b.close();

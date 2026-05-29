@@ -37,6 +37,8 @@
     _gridSpacing: false
     _lod: false
     _maxVertexCount: false
+    _planeDepth: false
+    _planeWidth: false
     _preset: false
     _radius: false
     _sphereRadius: false
@@ -66,6 +68,8 @@
       _gridSpacing: !<float> 1.000000
       _domainMode: !<float> 0.000000
       _sphereRadius: 4.800000
+      _planeWidth: 6.800000
+      _planeDepth: 4.050000
       _stepSize: 0.100000
       _fieldScale: !<float> 1.000000
       _flowSpeed: !<float> 2.000000
@@ -87,12 +91,14 @@
     - '// @input float _arrowScale = 2 {"hint":"Arrow length scale factor (multiplied by field magnitude)", "widget":"slider", "min":0.5, "max":5, "step":0.1}'
     - '// @input float _gridSize = 5 {"hint":"Grid size (NxNxN)", "widget":"slider", "min":1, "max":10, "step":1}'
     - '// @input float _gridSpacing = 0.6 {"hint":"Spacing between tube start positions", "widget":"slider", "min":0.1, "max":5, "step":0.1}'
-    - '// @input float _domainMode {"hint":"Where seeds are placed. Sphere Surface keeps the field on a globe-like shell.", "widget":"combobox", "values":[{"label":"Volume", "value":0}, {"label":"Sphere Surface", "value":1}]}'
+    - '// @input float _domainMode {"hint":"Where seeds are placed. Sphere Surface keeps the field on a globe-like shell.", "widget":"combobox", "values":[{"label":"Volume", "value":0}, {"label":"Sphere Surface", "value":1}, {"label":"Y-Normal Plane", "value":2}]}'
     - '// @input float _sphereRadius = 4.8 {"hint":"Radius for sphere surface fields", "widget":"slider", "min":1, "max":8, "step":0.1}'
+    - '// @input float _planeWidth = 6.8 {"hint":"Width of the Y-normal ambient plane domain", "widget":"slider", "min":2, "max":12, "step":0.1}'
+    - '// @input float _planeDepth = 4.05 {"hint":"Depth of the Y-normal ambient plane domain", "widget":"slider", "min":1, "max":8, "step":0.1}'
     - '// @input float _stepSize = 0.1 {"hint":"Step size for vector field integration", "widget":"slider", "min":0.01, "max":0.5, "step":0.01}'
     - '// @input float _fieldScale = 1 {"hint":"Field noise/frequency scale", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
     - '// @input float _flowSpeed = 50 {"hint":"Speed at which tubes flow along field lines", "widget":"slider", "min":0, "max":100, "step":0.5}'
-    - '// @input float _preset {"hint":"Vector field type", "widget":"combobox", "values":[{"label":"Burst", "value":0}, {"label":"Pull", "value":1}, {"label":"Orbit", "value":2}, {"label":"Waves", "value":3}, {"label":"Surface Wind", "value":8}]}'
+    - '// @input float _preset {"hint":"Vector field type", "widget":"combobox", "values":[{"label":"Burst", "value":0}, {"label":"Pull", "value":1}, {"label":"Orbit", "value":2}, {"label":"Waves", "value":3}, {"label":"Surface Wind", "value":8}, {"label":"Ambient Audio Plane", "value":9}]}'
     - '// @input SceneObject trackedObject {"hint":"Object that affects the field - field reacts to its position"}'
     - '// @input Component.ColliderComponent fieldCollider {"hint":"Box collider - field only animates when tracked object is inside"}'
     - '// @input Asset.Material material {"hint":"Material with VectorFieldTubesShader.js"}'

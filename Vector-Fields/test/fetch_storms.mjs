@@ -1,62 +1,90 @@
-// Fetches active global tropical cyclones from GDACS and writes a compact
-// JSON the web view loads on demand.
+// Refreshes tropical cyclone event data from GDACS, then bakes the same
+// normalized snapshot for both the web preview and Lens Studio runtime.
 //
-// Source: https://www.gdacs.org/gdacsapi/api/events/geteventlist/MAP
-// Filters to TC (tropical cyclone) events with valid point centroids.
+// Live path:    GDACS API -> web/public/storms.json -> Assets/Scripts/StormsData.ts
+// Offline path: existing storms.json or storms.backup.json -> StormsData.ts
 
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
+import {
+  gdacsUrl,
+  normalizeStormPayload,
+  renderStormsTs,
+  stormPayloadFromGdacs,
+} from "./storm_data.mjs";
 
-const since = new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString().slice(0, 10);
-const url = `https://www.gdacs.org/gdacsapi/api/events/geteventlist/MAP?fromDate=${since}&eventTypes=TC`;
-console.log("fetching", url);
+const STORM_WINDOW_DAYS = Number(process.env.STORM_WINDOW_DAYS || 14);
+const since = new Date(Date.now() - STORM_WINDOW_DAYS * 24 * 3600 * 1000).toISOString().slice(0, 10);
+const url = gdacsUrl(since);
+const stormsJsonPath = new URL("../web/public/storms.json", import.meta.url);
+const stormsBackupPath = new URL("../web/public/storms.backup.json", import.meta.url);
+const stormsTsPath = new URL("../Assets/Scripts/StormsData.ts", import.meta.url);
 
-const r = await fetch(url, { headers: { "User-Agent": "earth-winds-lab/1.0" } });
-if (!r.ok) {
-  console.error("HTTP", r.status, await r.text());
-  process.exit(1);
+async function readCachedPayload(reason) {
+  const candidates = [stormsJsonPath, stormsBackupPath];
+  for (const path of candidates) {
+    try {
+      const cached = JSON.parse(await readFile(path, "utf8"));
+      return normalizeStormPayload(cached, {
+        mode: "cached",
+        usingFallback: true,
+        fallbackReason: reason,
+        windowSince: cached.windowSince || since,
+      });
+    } catch (e) {
+      // Try the next real-data cache.
+    }
+  }
+
+  return normalizeStormPayload({
+    fetchedAt: new Date().toISOString(),
+    windowSince: since,
+    mode: "empty",
+    usingFallback: true,
+    fallbackReason: reason,
+    storms: [],
+  });
 }
-const j = await r.json();
-const features = j.features || [];
-console.log("raw features:", features.length);
 
-// Keep one record per storm — prefer the most recent Point centroid.
-const byEvent = new Map();
-for (const f of features) {
-  const p = f.properties || {};
-  if (p.eventtype !== "TC") continue;
-  const c = f.geometry?.coordinates;
-  if (!Array.isArray(c) || c.length < 2 || typeof c[0] !== "number") continue;
-  const key = `${p.eventid}-${p.episodeid}`;
-  const fromDate = p.fromdate || "";
-  const prev = byEvent.get(key);
-  if (!prev || fromDate > prev.fromDate) {
-    byEvent.set(key, {
-      key,
-      name: (p.eventname || p.name || "").replace(/^Tropical Cyclone\s+/i, ""),
-      alert: p.alertlevel || "",
-      lon: c[0],
-      lat: c[1],
-      country: p.country || "",
-      fromDate,
-      toDate: p.todate || "",
-      severity: p.severitydata?.severity ?? null,
-      severityText: p.severitydata?.severitytext || "",
-      url: p.url?.report || "",
-    });
+async function fetchLivePayload() {
+  console.log("fetching", url);
+  const response = await fetch(url, {
+    headers: { "User-Agent": "earth-winds-lab/1.0" },
+  });
+  if (!response.ok) {
+    throw new Error(`GDACS HTTP ${response.status}: ${await response.text()}`);
+  }
+  const json = await response.json();
+  return stormPayloadFromGdacs(json, {
+    fetchedAt: new Date().toISOString(),
+    windowSince: since,
+  });
+}
+
+async function writeArtifacts(payload) {
+  const normalized = normalizeStormPayload(payload);
+  await writeFile(stormsJsonPath, JSON.stringify(normalized, null, 2) + "\n");
+  await writeFile(stormsTsPath, renderStormsTs(normalized));
+
+  if (normalized.mode === "live" && normalized.storms.length > 0) {
+    await writeFile(stormsBackupPath, JSON.stringify(normalized, null, 2) + "\n");
   }
 }
-const storms = Array.from(byEvent.values()).sort((a, b) =>
-  (b.fromDate || "").localeCompare(a.fromDate || "")
-);
-console.log("unique storms:", storms.length);
-storms.forEach(s => console.log(" ", s.alert.padEnd(7), s.name, "@", s.lat.toFixed(2), s.lon.toFixed(2)));
 
-const out = {
-  source: "GDACS · Global Disaster Alert and Coordination System",
-  fetchedAt: new Date().toISOString(),
-  windowSince: since,
-  count: storms.length,
-  storms,
-};
-await writeFile(new URL("../web/public/storms.json", import.meta.url), JSON.stringify(out, null, 2));
+let payload;
+try {
+  payload = await fetchLivePayload();
+  console.log("live storms:", payload.storms.length);
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.warn("live storm fetch failed:", message);
+  payload = await readCachedPayload(message);
+  console.log("using cached real storm data:", payload.storms.length);
+}
+
+await writeArtifacts(payload);
+for (const storm of payload.storms) {
+  const speed = storm.windKmh == null ? "wind pending" : `${Math.round(storm.windKmh)} km/h`;
+  console.log(`  ${storm.alert.padEnd(7)} ${storm.name} · ${speed} · ${storm.coordinateLabel}`);
+}
 console.log("wrote web/public/storms.json");
+console.log("wrote Assets/Scripts/StormsData.ts");

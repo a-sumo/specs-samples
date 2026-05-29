@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Streamlines around a convex hull</title>
+<style>
+  html,body { margin:0; height:100%; background:#0b0e12; overflow:hidden; font-family:system-ui,sans-serif; }
+  #info { position:fixed; left:12px; top:10px; color:#9fb3c8; font-size:12px; line-height:1.5; }
+  #info b { color:#e8eef5; }
+</style>
+</head>
+<body>
+<div id="info"><b>SDF-deflection streamlines</b><br>drag to orbit · scroll to zoom · no solver, traced offline-style in JS</div>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0e12);
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100);
+camera.position.set(5.0, 2.6, 6.2);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0.2, 0.5, 0);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const dir = new THREE.DirectionalLight(0xffffff, 0.9); dir.position.set(5,8,4); scene.add(dir);
+
+// --- build a car-ish point cloud, take its convex hull -----------------------
+// flow is along +X. length=X, height=Y (up), width=Z.
+const pts = [];
+const add = (x,y,z)=>{ pts.push(new THREE.Vector3(x,y,z)); pts.push(new THREE.Vector3(x,y,-z)); };
+// lower body (long, low, tapered nose + tail)
+add(-2.2,0.05,0.05); add(-1.6,0.10,0.55); add(-0.6,0.12,0.78);
+add( 0.4,0.10,0.80); add( 1.4,0.10,0.70); add( 2.2,0.12,0.35);
+add(-2.2,0.45,0.10); add(-1.6,0.55,0.55); add(-0.4,0.60,0.74);
+add( 0.6,0.55,0.74); add( 1.5,0.45,0.55); add( 2.15,0.40,0.25);
+// canopy / cockpit bump
+add(-0.4,1.05,0.42); add( 0.3,1.10,0.45); add( 0.9,0.95,0.40); add(-0.9,0.85,0.35);
+// rear wing-ish
+add( 1.9,0.95,0.55); add( 2.05,0.95,0.45);
+const hull = new ConvexGeometry(pts);
+
+const carMat = new THREE.MeshStandardMaterial({ color:0x1878e0, metalness:0.3, roughness:0.45,
+  transparent:true, opacity:0.92, flatShading:false });
+scene.add(new THREE.Mesh(hull, carMat));
+
+// --- extract faces (centroid + normal) for the SDF --------------------------
+const faces = [];
+{
+  const pos = hull.attributes.position;
+  const a=new THREE.Vector3(), b=new THREE.Vector3(), c=new THREE.Vector3();
+  const ab=new THREE.Vector3(), ac=new THREE.Vector3(), n=new THREE.Vector3(), ctr=new THREE.Vector3();
+  for (let i=0;i<pos.count;i+=3){
+    a.fromBufferAttribute(pos,i); b.fromBufferAttribute(pos,i+1); c.fromBufferAttribute(pos,i+2);
+    ab.subVectors(b,a); ac.subVectors(c,a); n.crossVectors(ab,ac).normalize();
+    ctr.copy(a).add(b).add(c).multiplyScalar(1/3);
+    faces.push({ cx:ctr.x,cy:ctr.y,cz:ctr.z, nx:n.x,ny:n.y,nz:n.z });
+  }
+}
+// convex-hull signed distance ≈ max over faces of plane distance; grad = winning normal
+function sdf(px,py,pz){
+  let best=-1e9, bnx=0,bny=0,bnz=0;
+  for (const f of faces){
+    const d = (px-f.cx)*f.nx + (py-f.cy)*f.ny + (pz-f.cz)*f.nz;
+    if (d>best){ best=d; bnx=f.nx; bny=f.ny; bnz=f.nz; }
+  }
+  return { d:best, nx:bnx, ny:bny, nz:bnz };
+}
+
+// --- the whole "physics": deflect freestream away from the surface ----------
+const U = [1,0,0];          // freestream direction (+X)
+const R = 1.4;              // deflection falloff distance
+function vel(px,py,pz){
+  const {d,nx,ny,nz} = sdf(px,py,pz);
+  const w = Math.exp(-Math.max(d,0)/R);          // 1 at surface → 0 far away
+  const un = U[0]*nx + U[1]*ny + U[2]*nz;
+  let vx = U[0]-nx*un*w, vy = U[1]-ny*un*w, vz = U[2]-nz*un*w;
+  if (d < 0.08){ const k=0.6*(0.08-Math.min(d,0.08)); vx+=nx*k; vy+=ny*k; vz+=nz*k; } // anti-penetration
+  return [vx,vy,vz];
+}
+
+// --- trace streamlines (RK4) ------------------------------------------------
+function trace(p, h=0.02, steps=900){
+  const out=[p[0],p[1],p[2]];
+  let [x,y,z]=p;
+  for(let s=0;s<steps;s++){
+    const k1=vel(x,y,z);
+    const k2=vel(x+0.5*h*k1[0], y+0.5*h*k1[1], z+0.5*h*k1[2]);
+    const k3=vel(x+0.5*h*k2[0], y+0.5*h*k2[1], z+0.5*h*k2[2]);
+    const k4=vel(x+h*k3[0], y+h*k3[1], z+h*k3[2]);
+    x+=h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]);
+    y+=h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+    z+=h/6*(k1[2]+2*k2[2]+2*k3[2]+k4[2]);
+    out.push(x,y,z);
+    if (x>4.6) break;
+  }
+  return out;
+}
+
+// seed a grid on an upstream plane, slightly wrapping the frontal area
+const lineGroup = new THREE.Group(); scene.add(lineGroup);
+const slow = new THREE.Color(0x2bd24a);   // green = slower (near body)
+const fast = new THREE.Color(0x22ddff);   // cyan  = freestream speed
+const tmp = new THREE.Color();
+const streamlines = [];                    // keep polylines for the animation
+for (let iy=0; iy<9; iy++){
+  for (let iz=-6; iz<=6; iz++){
+    const y = 0.10 + iy*0.165;
+    const z = iz*0.145;
+    const verts = trace([-3.2, y, z]);
+    const n = verts.length/3;
+    const colors = new Float32Array(verts.length);
+    for (let i=0;i<n;i++){
+      const x=verts[i*3], yy=verts[i*3+1], zz=verts[i*3+2];
+      const v = vel(x,yy,zz); const sp = Math.hypot(v[0],v[1],v[2]);
+      const t = Math.min(1, Math.max(0, (sp-0.80)/0.45)); // stretch contrast around |U|
+      tmp.copy(slow).lerp(fast, t);
+      colors[i*3]=tmp.r; colors[i*3+1]=tmp.g; colors[i*3+2]=tmp.b;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(verts,3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(colors,3));
+    // dim static guides so the moving pulses pop
+    lineGroup.add(new THREE.Line(g, new THREE.LineBasicMaterial({ vertexColors:true, transparent:true, opacity:0.28 })));
+    streamlines.push(new Float32Array(verts));
+  }
+}
+
+// --- animated flow: bright pulses riding along every streamline -------------
+const PER_LINE = 9;
+const NP = streamlines.length * PER_LINE;
+const pPos = new Float32Array(NP*3);
+const pCol = new Float32Array(NP*3);
+const pInfo = [];                          // {line, phase} per particle
+let k=0;
+for (let s=0;s<streamlines.length;s++){
+  for (let j=0;j<PER_LINE;j++){
+    pInfo.push({ line:streamlines[s], phase:j/PER_LINE });
+    tmp.copy(fast).lerp(new THREE.Color(0xffffff), 0.35);
+    pCol[k*3]=tmp.r; pCol[k*3+1]=tmp.g; pCol[k*3+2]=tmp.b; k++;
+  }
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+pGeo.setAttribute('color', new THREE.BufferAttribute(pCol,3));
+const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({
+  size:0.10, sizeAttenuation:true, vertexColors:true,
+  transparent:true, opacity:0.95, depthWrite:false, blending:THREE.AdditiveBlending }));
+scene.add(particles);
+
+const clock = new THREE.Clock();
+function animateFlow(){
+  const t = clock.getElapsedTime()*0.12;   // flow speed (loops at 1.0)
+  for (let i=0;i<NP;i++){
+    const info = pInfo[i], V = info.line, n = V.length/3;
+    const ph = (info.phase + t) % 1;
+    const f = ph*(n-1), idx = f|0, fr = f-idx;
+    const a=idx*3, b=Math.min(idx+1,n-1)*3;
+    pPos[i*3]   = V[a]  +(V[b]  -V[a])  *fr;
+    pPos[i*3+1] = V[a+1]+(V[b+1]-V[a+1])*fr;
+    pPos[i*3+2] = V[a+2]+(V[b+2]-V[a+2])*fr;
+  }
+  pGeo.attributes.position.needsUpdate = true;
+}
+
+addEventListener('resize', ()=>{
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+(function loop(){ requestAnimationFrame(loop); animateFlow(); controls.update(); renderer.render(scene,camera); })();
+window.__ready = true;
+</script>
+</body>
+</html>

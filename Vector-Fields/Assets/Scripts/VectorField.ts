@@ -10,7 +10,8 @@ enum TubeMode {
 
 enum DomainMode {
     Volume = 0,
-    SphereSurface = 1
+    SphereSurface = 1,
+    PlaneY = 2
 }
 
 @component
@@ -112,7 +113,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
     @input
     @widget(new ComboBoxWidget([
         new ComboBoxItem("Volume", 0),
-        new ComboBoxItem("Sphere Surface", 1)
+        new ComboBoxItem("Sphere Surface", 1),
+        new ComboBoxItem("Y-Normal Plane", 2)
     ]))
     @hint("Where seeds are placed. Sphere Surface keeps the field on a globe-like shell.")
     private _domainMode: number = 0;
@@ -121,6 +123,16 @@ export class VectorFieldTubes extends BaseScriptComponent {
     @widget(new SliderWidget(1.0, 8.0, 0.1))
     @hint("Radius for sphere surface fields")
     private _sphereRadius: number = 4.8;
+
+    @input
+    @widget(new SliderWidget(2.0, 12.0, 0.1))
+    @hint("Width of the Y-normal ambient plane domain")
+    private _planeWidth: number = 6.8;
+
+    @input
+    @widget(new SliderWidget(1.0, 8.0, 0.1))
+    @hint("Depth of the Y-normal ambient plane domain")
+    private _planeDepth: number = 4.05;
 
     // ============ INTEGRATION ============
 
@@ -147,7 +159,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
         new ComboBoxItem("Pull", 1),
         new ComboBoxItem("Orbit", 2),
         new ComboBoxItem("Waves", 3),
-        new ComboBoxItem("Surface Wind", 8)
+        new ComboBoxItem("Surface Wind", 8),
+        new ComboBoxItem("Ambient Audio Plane", 9)
     ]))
     @hint("Vector field type")
     private _preset: number = 0;
@@ -190,6 +203,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
             setFieldScaleNormalized: (value: number) => self.setFieldScaleNormalized(value),
             setRadiusNormalized: (value: number) => self.setRadiusNormalized(value),
             setLengthSegmentsNormalized: (value: number) => self.setLengthSegmentsNormalized(value),
+            setArrowScaleNormalized: (value: number) => self.setArrowScaleNormalized(value),
+            setAmbientChannels: (magnitude: number, yaw: number, bass: number, opacity?: number) =>
+                self.setAmbientChannels(magnitude, yaw, bass, opacity),
             queueRefresh: (delaySeconds?: number) => self.queueRefresh(delaySeconds),
             refresh: () => self.refresh(),
             get preset(): number { return self.preset; },
@@ -208,6 +224,8 @@ export class VectorFieldTubes extends BaseScriptComponent {
             set flowSpeed(value: number) { self.flowSpeed = value; },
             get stepSize(): number { return self.stepSize; },
             set stepSize(value: number) { self.stepSize = value; },
+            get arrowScale(): number { return self.arrowScale; },
+            set arrowScale(value: number) { self.arrowScale = value; },
         };
     }
 
@@ -288,12 +306,16 @@ export class VectorFieldTubes extends BaseScriptComponent {
                     ? (VectorFieldTubes.PARTICLE_FAN_SEGMENTS + 1)
                     : (2 * radial + radial + 1 + 1);  // arrows
                 const maxTubes = Math.floor(this._maxVertexCount / vertsPerTube);
-                const maxGrid = this._domainMode === DomainMode.SphereSurface
+                const maxGrid = this._domainMode === DomainMode.SphereSurface || this._domainMode === DomainMode.PlaneY
                     ? Math.floor(Math.sqrt(maxTubes / VectorFieldTubes.SURFACE_SAMPLE_MULTIPLIER))
                     : Math.floor(Math.pow(maxTubes, 1/3));
                 const nextGrid = Math.max(1, Math.min(this._gridSize, maxGrid));
                 if (nextGrid < this._gridSize) {
-                    const suffix = this._domainMode === DomainMode.SphereSurface ? " surface grid" : "³";
+                    const suffix = this._domainMode === DomainMode.SphereSurface
+                        ? " surface grid"
+                        : this._domainMode === DomainMode.PlaneY
+                        ? " plane grid"
+                        : "³";
                     print("VectorFieldTubes: Reducing grid " + this._gridSize + suffix + " → " + nextGrid +
                           suffix + " to stay under " + this._maxVertexCount + " vertices");
                     this._gridSize = nextGrid;
@@ -429,6 +451,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
         if (this._domainMode === DomainMode.SphereSurface) {
             return Math.max(8, gridSize * gridSize * VectorFieldTubes.SURFACE_SAMPLE_MULTIPLIER);
         }
+        if (this._domainMode === DomainMode.PlaneY) {
+            return Math.max(12, Math.max(4, gridSize * 4) * Math.max(3, gridSize * 2));
+        }
         return gridSize * gridSize * gridSize;
     }
 
@@ -441,6 +466,22 @@ export class VectorFieldTubes extends BaseScriptComponent {
             Math.cos(theta) * ring * this._sphereRadius,
             y * this._sphereRadius,
             Math.sin(theta) * ring * this._sphereRadius
+        );
+    }
+
+    private computePlanePoint(index: number): vec3 {
+        const cols = Math.max(4, this._gridSize * 4);
+        const rows = Math.max(3, this._gridSize * 2);
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const u = cols <= 1 ? 0.5 : col / (cols - 1);
+        const v = rows <= 1 ? 0.5 : row / (rows - 1);
+        const jitterX = (this.hash01(index * 19.17 + 2.3) - 0.5) * this._planeWidth / Math.max(8, cols);
+        const jitterZ = (this.hash01(index * 41.11 + 7.9) - 0.5) * this._planeDepth / Math.max(8, rows);
+        return new vec3(
+            (u - 0.5) * this._planeWidth + jitterX,
+            0.0,
+            (v - 0.5) * this._planeDepth + jitterZ
         );
     }
 
@@ -480,7 +521,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
         // Only update target position if inside collider bounds
         // Convert to local space since tube positions are in local space
-        if (this.trackedObject) {
+        if (this.trackedObject && this._preset !== 9) {
             const worldPos = this.trackedObject.getTransform().getWorldPosition();
             if (this.isInsideCollider(worldPos)) {
                 // Transform world position to local space
@@ -517,6 +558,23 @@ export class VectorFieldTubes extends BaseScriptComponent {
             const seedCount = this.computeSeedCount(this._gridSize);
             for (let i = 0; i < seedCount; i++) {
                 const p = this.computeSpherePoint(i, seedCount);
+                this.startNewMeshIfNeeded(vertsPerTube);
+
+                if (this._tubeMode === TubeMode.Particles) {
+                    this.generateParticle(p.x, p.y, p.z);
+                } else if (this._tubeMode === TubeMode.Arrows) {
+                    this.generateArrow(p.x, p.y, p.z, circleSegments);
+                } else {
+                    this.generateTrail(p.x, p.y, p.z, pathLength, circleSegments);
+                }
+
+                this.currentMeshVertexCount += vertsPerTube;
+                totalTubes++;
+            }
+        } else if (this._domainMode === DomainMode.PlaneY) {
+            const seedCount = this.computeSeedCount(this._gridSize);
+            for (let i = 0; i < seedCount; i++) {
+                const p = this.computePlanePoint(i);
                 this.startNewMeshIfNeeded(vertsPerTube);
 
                 if (this._tubeMode === TubeMode.Particles) {
@@ -861,10 +919,10 @@ export class VectorFieldTubes extends BaseScriptComponent {
     }
 
     /**
-     * Set preset by index (0-8)
+     * Set preset by index (0-9)
      */
     public setPreset(index: number): void {
-        this._preset = Math.floor(Math.min(8, Math.max(0, index)));
+        this._preset = Math.floor(Math.min(9, Math.max(0, index)));
     }
 
     /**
@@ -899,6 +957,18 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this._flowSpeed = value * 100.0;
     }
 
+    public setArrowScaleNormalized(value: number): void {
+        this._arrowScale = 0.25 + Math.max(0.0, Math.min(1.0, value)) * 3.5;
+    }
+
+    public setAmbientChannels(magnitude: number, yaw: number, bass: number, opacity?: number): void {
+        this.lastValidTargetPos = new vec3(
+            Math.max(0.0, Math.min(1.0, yaw)),
+            Math.max(0.0, Math.min(1.0, bass)),
+            Math.max(0.0, Math.min(1.0, opacity === undefined ? magnitude : opacity))
+        );
+    }
+
     /**
      * Set desired length segments from normalized value (0-1)
      * Maps to range 2-64 (actual may be lower due to vertex budget)
@@ -919,10 +989,10 @@ export class VectorFieldTubes extends BaseScriptComponent {
     }
 
     /**
-     * Set domain mode: 0=Volume, 1=Sphere Surface
+     * Set domain mode: 0=Volume, 1=Sphere Surface, 2=Y-normal plane
      */
     public setDomainMode(mode: number): void {
-        const nextMode = Math.floor(Math.min(1, Math.max(0, mode)));
+        const nextMode = Math.floor(Math.min(2, Math.max(0, mode)));
         if (nextMode === this._domainMode) return;
         this._domainMode = nextMode;
         this.queueRefresh();
@@ -1044,7 +1114,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     get domainMode(): number { return this._domainMode; }
     set domainMode(value: number) {
-        const nextMode = Math.floor(Math.min(1, Math.max(0, value)));
+        const nextMode = Math.floor(Math.min(2, Math.max(0, value)));
         if (nextMode === this._domainMode) return;
         this._domainMode = nextMode;
         this.queueRefresh();
@@ -1056,6 +1126,26 @@ export class VectorFieldTubes extends BaseScriptComponent {
         if (Math.abs(nextRadius - this._sphereRadius) < 0.001) return;
         this._sphereRadius = nextRadius;
         if (this._domainMode === DomainMode.SphereSurface) {
+            this.queueRefresh();
+        }
+    }
+
+    get planeWidth(): number { return this._planeWidth; }
+    set planeWidth(value: number) {
+        const nextValue = Math.max(0.5, value);
+        if (Math.abs(nextValue - this._planeWidth) < 0.001) return;
+        this._planeWidth = nextValue;
+        if (this._domainMode === DomainMode.PlaneY) {
+            this.queueRefresh();
+        }
+    }
+
+    get planeDepth(): number { return this._planeDepth; }
+    set planeDepth(value: number) {
+        const nextValue = Math.max(0.5, value);
+        if (Math.abs(nextValue - this._planeDepth) < 0.001) return;
+        this._planeDepth = nextValue;
+        if (this._domainMode === DomainMode.PlaneY) {
             this.queueRefresh();
         }
     }
@@ -1077,6 +1167,14 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     get preset(): number { return this._preset; }
     set preset(value: number) {
-        this._preset = Math.floor(Math.min(8, Math.max(0, value)));
+        this._preset = Math.floor(Math.min(9, Math.max(0, value)));
+    }
+
+    private hash01(value: number): number {
+        return this.fract(Math.sin(value * 12.9898) * 43758.5453123);
+    }
+
+    private fract(value: number): number {
+        return value - Math.floor(value);
     }
 }

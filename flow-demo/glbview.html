@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%;background:#11151b}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script></head>
+<body><script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const sc=new THREE.Scene(); sc.background=new THREE.Color(0x11151b);
+const cam=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.01,100); cam.position.set(3,2,4);
+const rn=new THREE.WebGLRenderer({antialias:true}); rn.setSize(innerWidth,innerHeight); document.body.appendChild(rn.domElement);
+new OrbitControls(cam,rn.domElement);
+sc.add(new THREE.AmbientLight(0xffffff,0.8)); const d=new THREE.DirectionalLight(0xffffff,1.2); d.position.set(4,6,3); sc.add(d);
+const url=new URLSearchParams(location.search).get('m')||'racecar_final.glb';
+const ld=new GLTFLoader(); ld.setMeshoptDecoder(MeshoptDecoder);
+ld.load(url, g=>{
+  const box=new THREE.Box3().setFromObject(g.scene); const s=2.5/box.getSize(new THREE.Vector3()).length();
+  g.scene.scale.setScalar(s); const c=box.getCenter(new THREE.Vector3()).multiplyScalar(s);
+  g.scene.position.sub(c); sc.add(g.scene);
+  let tri=0; g.scene.traverse(o=>{ if(o.isMesh) tri+=o.geometry.index? o.geometry.index.count/3 : o.geometry.attributes.position.count/3; });
+  window.__info='loaded tris='+Math.round(tri); window.__ready=true;
+}, undefined, e=>{ window.__info='ERR '+e.message; window.__ready=true; });
+(function l(){ requestAnimationFrame(l); rn.render(sc,cam); })();
+</script></body></html>

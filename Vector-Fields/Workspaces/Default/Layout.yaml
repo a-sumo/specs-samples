@@ -6,6 +6,8 @@ dock:
           - items:
               - persistentName: Snap.Plugin.Gui.SceneHierarchyEditor
                 Uuid: 6778142c-0629-4c2a-afc3-92a65ce29e1a
+              - persistentName: Snap.Plugin.Gui.Graph.Editor
+                Uuid: 7b46e5d8-da63-4345-a011-5aa479c59573
             type: section
             current: 0
           - items:
@@ -55,14 +57,12 @@ dock:
             Uuid: 52fc2a95-41a3-427b-a138-1e00eb1c405e
           - persistentName: Snap.Plugin.AssistantAI.Panel
             Uuid: df91b2cf-37e1-401c-83fc-3d9f83343e71
-          - persistentName: Snap.Plugin.Gui.Graph.Editor
-            Uuid: 3a7ccdf1-89f5-4dbe-b14b-a8ca4fe19912
         type: section
         current: 0
     sizes:
-      - 482
-      - 42
-      - 131
-      - 747
+      - 399
+      - 90
+      - 314
+      - 651
     type: splitter
     orientation: horizontal

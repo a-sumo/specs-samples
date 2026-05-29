@@ -1,0 +1,14 @@
+import puppeteer from 'puppeteer';
+const b=await puppeteer.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
+const p=await b.newPage(); await p.setViewport({width:1300,height:680,deviceScaleFactor:2});
+const errs=[]; p.on('pageerror',e=>errs.push(String(e)));
+p.on('console',m=>{const t=m.text(); if(t.startsWith('CFD')||t.startsWith('voxelize ')) console.log(t);});
+await p.goto('http://localhost:4322/slice_car_cfd.html?nx=64&ny=30&nz=36&steps=1100&chunk=25',{waitUntil:'domcontentloaded'});
+await p.waitForFunction('window.__solved===true',{timeout:180000}).catch(()=>console.log('(timeout)'));
+await new Promise(r=>setTimeout(r,1200));
+await p.screenshot({path:'cfd_center.png'});
+await p.evaluate(()=>{ const s=document.getElementById('slice'); s.value=72; s.dispatchEvent(new Event('input')); });
+await new Promise(r=>setTimeout(r,900));
+await p.screenshot({path:'cfd_side.png'});
+console.log('errors:', errs.length?errs:'none');
+await b.close();

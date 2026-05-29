@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Artemis II — coordinated Earth / Moon / spacecraft</title>
+<style>
+  :root { color-scheme: dark; }
+  html,body { margin:0; height:100%; background:#05070d; color:#e8edf5;
+              font:13px/1.45 -apple-system,Segoe UI,Roboto,sans-serif; overflow:hidden; }
+  #c { position:fixed; inset:0; display:block; }
+  #ui { position:fixed; left:14px; top:14px; width:280px; padding:14px 16px;
+        background:rgba(10,14,22,.72); border:1px solid #1b2435; border-radius:12px;
+        backdrop-filter:blur(8px); }
+  #ui h1 { font-size:14px; margin:0 0 2px; letter-spacing:.2px; }
+  #ui .sub { color:#8a97ad; font-size:11px; margin-bottom:10px; }
+  .row { display:flex; align-items:center; gap:8px; min-width:0; margin:7px 0; }
+  .row label { flex-shrink:0; width:54px; color:#9fb0c8; }
+  .row input[type=range] { flex:1 1 0; min-width:0; width:0; accent-color:#1878e0; }
+  .row .val { flex-shrink:0; width:62px; text-align:right; color:#cfe0f5; font-variant-numeric:tabular-nums; }
+  button { background:#16243b; color:#e8edf5; border:1px solid #25527f; border-radius:8px;
+           padding:7px 12px; cursor:pointer; font-size:13px; }
+  button:hover { background:#1d3a5e; }
+  .stat { display:flex; justify-content:space-between; margin:3px 0; font-variant-numeric:tabular-nums; }
+  .stat span:first-child { color:#8a97ad; }
+  .k { color:#e08818; } .b { color:#4ea0ff; } .g { color:#cdd6e3; }
+  .note { margin-top:10px; color:#6f7d93; font-size:10.5px; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <h1>Artemis II flyby</h1>
+  <div class="sub">Earth-centered J2000 · real ephemerides on one mission clock</div>
+  <div class="row"><button id="play">⏸ Pause</button><div class="val" id="speedlbl"></div></div>
+  <div class="row"><label>speed</label><input id="speed" type="range" min="2000" max="80000" step="1000" value="25000"><div class="val"></div></div>
+  <div class="row"><label>scrub</label><input id="scrub" type="range" min="0" max="1000" step="1" value="0"><div class="val"></div></div>
+  <div style="margin:10px 0 6px;border-top:1px solid #1b2435;padding-top:9px">
+    <div class="stat"><span>UTC</span><span class="g" id="utc">—</span></div>
+    <div class="stat"><span>mission day</span><span class="g" id="day">—</span></div>
+    <div class="stat"><span><span class="dot" style="background:#e08818"></span>S/C → Moon</span><span class="k" id="dmoon">—</span></div>
+    <div class="stat"><span><span class="dot" style="background:#4ea0ff"></span>S/C → Earth</span><span class="b" id="dearth">—</span></div>
+  </div>
+  <div class="note" id="note"></div>
+</div>
+
+<script src="./data.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const D = window.ARTEMIS;
+const SCALE = 1/10000;        // scene units per km  (Moon ~38 u out)
+const BODY_EXAG = 3.5;        // bodies enlarged for visibility; paths/positions are exact
+const EARTH_KM = 6378, MOON_KM = 1737;
+
+const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'), antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+cam.position.set(20, 26, 78);
+const controls = new OrbitControls(cam, renderer.domElement);
+controls.enableDamping = true;
+
+scene.add(new THREE.AmbientLight(0x668099, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 1.1); sun.position.set(1,0.5,0.8); scene.add(sun);
+scene.add(new THREE.GridHelper(160, 32, 0x16203a, 0x0e1626));
+
+function v(p){ return new THREE.Vector3(p[0]*SCALE, p[2]*SCALE, -p[1]*SCALE); } // J2000 -> Y-up view
+
+// full paths
+function pathLine(P, color, op){
+  const g = new THREE.BufferGeometry().setFromPoints(P.map(v));
+  return new THREE.Line(g, new THREE.LineBasicMaterial({color, transparent:true, opacity:op}));
+}
+scene.add(pathLine(D.scP, 0x2b6fd0, 0.35));   // spacecraft arc
+scene.add(pathLine(D.mnP, 0x6b7689, 0.30));   // moon orbit
+
+// bodies
+const earth = new THREE.Mesh(new THREE.SphereGeometry(EARTH_KM*SCALE*BODY_EXAG,48,32),
+   new THREE.MeshStandardMaterial({color:0x1878e0, emissive:0x06203f, roughness:.8}));
+scene.add(earth);
+const moon = new THREE.Mesh(new THREE.SphereGeometry(MOON_KM*SCALE*BODY_EXAG,32,24),
+   new THREE.MeshStandardMaterial({color:0xb9c2cf, emissive:0x14181d, roughness:1}));
+scene.add(moon);
+const sc = new THREE.Mesh(new THREE.SphereGeometry(0.45,16,12),
+   new THREE.MeshStandardMaterial({color:0xe08818, emissive:0x5a3300}));
+scene.add(sc);
+
+// growing spacecraft trail
+const trailGeo = new THREE.BufferGeometry();
+const trailPos = new Float32Array(D.scP.length*3);
+trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos,3));
+const trail = new THREE.Line(trailGeo, new THREE.LineBasicMaterial({color:0xffb04a}));
+scene.add(trail);
+
+// flyby marker
+const fb = v(sampleP(D.scT, D.scP, D.flybyT));
+const flybyDot = new THREE.Mesh(new THREE.SphereGeometry(0.5,12,8), new THREE.MeshBasicMaterial({color:0xe03020}));
+flybyDot.position.copy(fb); scene.add(flybyDot);
+
+function sampleP(T,P,t){
+  const n=T.length;
+  if(t<=T[0]) return P[0];
+  if(t>=T[n-1]) return P[n-1];
+  let lo=0,hi=n-1; while(hi-lo>1){const m=(lo+hi)>>1; if(T[m]<=t)lo=m; else hi=m;}
+  const f=(t-T[lo])/(T[hi]-T[lo]);
+  return [P[lo][0]+f*(P[hi][0]-P[lo][0]),P[lo][1]+f*(P[hi][1]-P[lo][1]),P[lo][2]+f*(P[hi][2]-P[lo][2])];
+}
+function idxAt(T,t){ let lo=0,hi=T.length-1; while(hi-lo>1){const m=(lo+hi)>>1; if(T[m]<=t)lo=m; else hi=m;} return lo; }
+const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]);
+
+// UI
+const epochMs = Date.parse(D.epoch);
+let missionT = 0, playing = true, speed = 25000;
+const $=id=>document.getElementById(id);
+$('play').onclick=()=>{ playing=!playing; $('play').textContent = playing?'⏸ Pause':'▶ Play'; };
+$('speed').oninput=e=>{ speed=+e.target.value; };
+$('scrub').oninput=e=>{ missionT = (+e.target.value/1000)*D.duration; playing=false; $('play').textContent='▶ Play'; };
+$('note').innerHTML = `bodies enlarged ×${BODY_EXAG} for visibility — paths &amp; positions are exact.<br>`+
+  `<span style="color:#e03020">●</span> closest approach 8,283 km · ${D.flybyUTC} UTC`;
+
+function fmt(t){ const d=new Date(epochMs+t*1000); return d.toISOString().replace('T',' ').slice(0,19); }
+
+function update(){
+  const scp=sampleP(D.scT,D.scP,missionT), mnp=sampleP(D.mnT,D.mnP,missionT);
+  sc.position.copy(v(scp)); moon.position.copy(v(mnp));
+  const i=idxAt(D.scT,missionT);
+  for(let k=0;k<=i;k++){ const w=v(D.scP[k]); trailPos[k*3]=w.x; trailPos[k*3+1]=w.y; trailPos[k*3+2]=w.z; }
+  trailGeo.setDrawRange(0,i+1); trailGeo.attributes.position.needsUpdate=true;
+  $('utc').textContent=fmt(missionT);
+  $('day').textContent=(missionT/86400).toFixed(2);
+  $('dmoon').textContent=Math.round(dist(scp,mnp)).toLocaleString()+' km';
+  $('dearth').textContent=Math.round(Math.hypot(scp[0],scp[1],scp[2])).toLocaleString()+' km';
+  $('scrub').value=Math.round(1000*missionT/D.duration);
+  $('speedlbl').textContent=(speed/1000)+'k×';
+}
+
+let last=performance.now();
+function loop(now){
+  const dt=(now-last)/1000; last=now;
+  if(playing){ missionT+=speed*dt; if(missionT>=D.duration) missionT=0; }
+  update(); controls.update(); renderer.render(scene,cam);
+  requestAnimationFrame(loop);
+}
+function resize(){ const w=innerWidth,h=innerHeight; renderer.setSize(w,h); cam.aspect=w/h; cam.updateProjectionMatrix(); }
+addEventListener('resize',resize); resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -32997,6 +32997,59 @@
   Components:
     - !<own> c3d0678f-05f8-422d-9d6d-f8719a54c6bf
     - !<own> 7cd6a955-5ca7-4dc4-bbc4-c45e29f12398
+    - !<own> ebe15abb-81f4-4e70-afe5-ac15979404e3
+- !<ScriptComponent/ebe15abb-81f4-4e70-afe5-ac15979404e3>
+  PrefabRemaps:
+    []
+  Name: EuropaTecnosineIntroDriver
+  Enabled: true
+  ScriptAsset: !<reference> 87dbcb1a-0b4b-495f-b420-0e47ea54653b
+  ScriptInputsDefault:
+    autoStart: true
+    loop: true
+    activateVectorFieldOnStart: true
+    useSphericalVectorShell: true
+    driveVectorField: true
+    driveMotionField: true
+    driveTargetOrbit: true
+    volume: true
+    startTime: true
+    visualLeadSeconds: true
+    influence: true
+    shellRadius: true
+    vectorFieldObjectName: true
+    motionFieldObjectName: true
+    targetObjectName: true
+    fieldController: true
+    vectorFieldComponent: true
+    motionFieldComponent: true
+    targetObject: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      autoStart: true
+      loop: false
+      activateVectorFieldOnStart: true
+      useSphericalVectorShell: true
+      driveVectorField: true
+      driveMotionField: true
+      driveTargetOrbit: true
+      volume: 0.780000
+      startTime: 0.000000
+      visualLeadSeconds: 0.000000
+      influence: 0.850000
+      shellRadius: 4.800000
+      vectorFieldObjectName: VectorField
+      motionFieldObjectName: Motion Field Root
+      targetObjectName: Target
+      fieldController: !<reference.ScriptComponent> c3d0678f-05f8-422d-9d6d-f8719a54c6bf
+      vectorFieldComponent: !<reference.ScriptComponent> eaa5f500-a9c9-4052-b208-001eb4957ad4
+      motionFieldComponent: !<reference.ScriptComponent> 787c5691-3fcd-45d2-a4bb-ccd112a299a8
+      targetObject: !<reference.SceneObject> 98ef9586-1be1-4c72-b3c2-994c212b2031
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/f95f48b3-5275-42bf-9e49-39fdaf50d04e>
   PrefabRemaps:
     []

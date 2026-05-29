@@ -7,9 +7,13 @@
     "dev": "vite"
   },
   "devDependencies": {
+    "puppeteer": "^25.1.0",
     "vite": "^5.4.21"
   },
   "optionalDependencies": {
     "@rollup/rollup-darwin-arm64": "^4.60.4"
+  },
+  "dependencies": {
+    "three": "^0.184.0"
   }
 }

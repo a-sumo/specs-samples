@@ -1,0 +1,8 @@
+- !<Material/818098f8-3321-48bc-b8dc-8f15a3a80dca>
+  PackagePath: ""
+  PassesInfo:
+    - !<own> 66b0a03b-5300-40fb-bb97-9a2220e9d4a8
+- !<PassInfo/66b0a03b-5300-40fb-bb97-9a2220e9d4a8>
+  CachedProperties:
+    {}
+  Pass: !<reference> e3c09ab6-2b5e-4ebe-991c-51b62f918fd5

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Baked field from real car mesh · draggable slice</title>
+<style>
+  html,body { margin:0; height:100%; background:#0b0e12; overflow:hidden; font-family:system-ui,sans-serif; color:#cdd9e5; }
+  canvas#c { display:block; cursor:ew-resize; }
+  #ui { position:fixed; left:12px; top:10px; font-size:12px; line-height:1.6; background:rgba(14,18,24,.72); padding:10px 12px; border-radius:8px; width:240px; }
+  #ui b { color:#e8eef5; }
+  .row { display:flex; align-items:center; gap:8px; min-width:0; margin-top:6px; }
+  .row label { flex-shrink:0; width:54px; color:#9fb3c8; }
+  .row .val { flex-shrink:0; width:46px; text-align:right; color:#1878e0; font-variant-numeric:tabular-nums; }
+  .row input[type=range] { flex:1 1 0; min-width:0; width:0; accent-color:#1878e0; }
+  #fps { color:#1878e0; font-variant-numeric:tabular-nums; margin-top:8px; }
+  #map { position:fixed; right:12px; bottom:12px; background:rgba(14,18,24,.72); border-radius:8px; }
+  #bake { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; color:#9fb3c8; font-size:14px; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <b>Baked field · real F1 mesh</b><br>
+  <span style="color:#9fb3c8">drag the view (or slider) to move the slice through the car</span>
+  <div class="row"><label>slice</label><input id="slice" type="range" min="0" max="100" value="50"><span class="val" id="sliceV">0</span></div>
+  <div class="row"><label>density</label><input id="dens" type="range" min="14" max="64" value="40"><span class="val" id="densV">40</span></div>
+  <div id="fps"></div>
+</div>
+<div id="bake">loading mesh + baking field…</div>
+<canvas id="c"></canvas>
+<canvas id="map" width="180" height="96"></canvas>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.6/build/index.module.js"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { MeshBVH } from 'three-mesh-bvh';
+
+const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+let W,H,DPR=Math.min(devicePixelRatio||1,2), S=1, CXs=0, CYs=0;
+let X0,X1,Y0,Y1,Z0,Z1;                          // domain set after mesh load
+function fitView(){ const bx=X1-X0, by=Y1-Y0; S=Math.min(W/(bx*1.1), H/(by*1.25)); CXs=W/2; CYs=H*0.54; }
+function resize(){ W=innerWidth;H=innerHeight; cv.width=W*DPR;cv.height=H*DPR; cv.style.width=W+'px';cv.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); if(X1!==undefined) fitView(); }
+addEventListener('resize',resize); resize();
+const sx=wx=>CXs+wx*S, sy=wy=>CYs-wy*S;
+
+// ---------- load mesh, merge, orient (length→X, height→Y, width→Z), build BVH ----------
+const loader=new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
+const gltf=await loader.loadAsync('racecar_final.glb');
+gltf.scene.updateMatrixWorld(true);
+// expand every mesh into one flat float array (fromBufferAttribute denormalizes quantized verts)
+const verts=[]; const v3=new THREE.Vector3();
+gltf.scene.traverse(o=>{ if(o.isMesh && o.geometry?.getAttribute('position')){
+  const pa=o.geometry.getAttribute('position'), idx=o.geometry.index, cnt=idx?idx.count:pa.count;
+  for(let t=0;t<cnt;t++){ v3.fromBufferAttribute(pa, idx?idx.getX(t):t).applyMatrix4(o.matrixWorld); verts.push(v3.x,v3.y,v3.z); }
+}});
+let arr=new Float32Array(verts);
+// orient by sorting bbox dims: largest→X(len), smallest→Y(height), middle→Z(width)
+let mn=[1e30,1e30,1e30], mx=[-1e30,-1e30,-1e30];
+for(let i=0;i<arr.length;i+=3) for(let c=0;c<3;c++){ const v=arr[i+c]; if(v<mn[c])mn[c]=v; if(v>mx[c])mx[c]=v; }
+const sz=[mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2]], ctr=[(mx[0]+mn[0])/2,(mx[1]+mn[1])/2,(mx[2]+mn[2])/2];
+const order=[0,1,2].sort((a,b)=>sz[b]-sz[a]); const lenAx=order[0], midAx=order[1], minAx=order[2];
+for(let i=0;i<arr.length;i+=3){
+  const v=[arr[i]-ctr[0], arr[i+1]-ctr[1], arr[i+2]-ctr[2]];
+  arr[i]=v[lenAx]; arr[i+1]=v[minAx]; arr[i+2]=v[midAx];        // X=len, Y=height, Z=width
+}
+const geo=new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(arr,3));
+geo.computeBoundingBox();
+const CARL=sz[lenAx], CARH=sz[minAx], CARW=sz[midAx];
+const bvh=new MeshBVH(geo);
+// precompute per-face normals (non-indexed)
+const P=arr, NF=P.length/9; const FN=new Float32Array(NF*3);
+for(let f=0;f<NF;f++){ const a=f*9; const ux=P[a+3]-P[a],uy=P[a+4]-P[a+1],uz=P[a+5]-P[a+2];
+  const vx=P[a+6]-P[a],vy=P[a+7]-P[a+1],vz=P[a+8]-P[a+2];
+  let nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx; const l=Math.hypot(nx,ny,nz)||1;
+  FN[f*3]=nx/l;FN[f*3+1]=ny/l;FN[f*3+2]=nz/l; }
+
+// ---------- domain + bake the volume ----------
+X0=-CARL*0.62; X1=CARL*1.5; Y0=-CARH*1.5; Y1=CARH*1.9; Z0=-CARW*0.62; Z1=CARW*0.62;
+fitView();
+const _Q=new URLSearchParams(location.search);
+const NX=+(_Q.get('nx'))||100, NY=+(_Q.get('ny'))||48, NZ=+(_Q.get('nz'))||54;
+console.log('DIMS len/h/w', CARL.toFixed(3), CARH.toFixed(3), CARW.toFixed(3),
+  'bbox', JSON.stringify(geo.boundingBox.min), JSON.stringify(geo.boundingBox.max), 'tris', NF);
+const DX=(X1-X0)/(NX-1),DY=(Y1-Y0)/(NY-1),DZ=(Z1-Z0)/(NZ-1);
+const VOL=new Float32Array(NX*NY*NZ*3);          // vx,vy,speed (unsigned-distance deflection)
+const TOP=new Uint8Array(NX*NZ);                 // top-view shell footprint for minimap
+const R=CARH*0.85;
+const SURF=Math.max(DX,DY,DZ)*0.9;
+const WAKE_A=0.8, WAKE_L=CARL*0.7;                 // heuristic wake: deficit depth & recovery length
+function bake(){
+  const pt=new THREE.Vector3(), tgt={point:new THREE.Vector3()};
+  const rearX=new Float32Array(NY*NZ).fill(-1e9), hit=new Uint8Array(NY*NZ);
+  // pass 1: analytic deflection + record the body's rear edge per (y,z) column
+  for(let k=0;k<NZ;k++){const z=Z0+k*DZ;
+    for(let j=0;j<NY;j++){const y=Y0+j*DY;
+      for(let i=0;i<NX;i++){const x=X0+i*DX;
+        pt.set(x,y,z); bvh.closestPointToPoint(pt,tgt);
+        const d=tgt.distance;
+        let nx=x-tgt.point.x, ny=y-tgt.point.y, nz=z-tgt.point.z; let len=Math.hypot(nx,ny,nz);
+        if(len<1e-6){ const f=tgt.faceIndex; nx=FN[f*3];ny=FN[f*3+1];nz=FN[f*3+2]; len=1; } nx/=len;ny/=len;nz/=len;
+        const w=Math.exp(-d/R), un=nx;            // U=(1,0,0); deflect away from nearest surface
+        const vx=1-nx*un*w, vy=-ny*un*w, vz=-nz*un*w;
+        const idx=((k*NY+j)*NX+i)*3;
+        VOL[idx]=vx;VOL[idx+1]=vy;VOL[idx+2]=Math.hypot(vx,vy,vz);
+        if(d<SURF){ TOP[i*NZ+k]=1; const col=k*NY+j; hit[col]=1; if(x>rearX[col]) rearX[col]=x; }
+      }}}
+  // pass 2: velocity deficit downstream of each column's body shadow (a "wake" with no solver)
+  for(let k=0;k<NZ;k++) for(let j=0;j<NY;j++){ const col=k*NY+j; if(!hit[col]) continue;
+    for(let i=0;i<NX;i++){ const dx=(X0+i*DX)-rearX[col]; if(dx<=0) continue;
+      const def=1-WAKE_A*Math.exp(-dx/WAKE_L); const idx=((k*NY+j)*NX+i)*3;
+      VOL[idx]*=def; VOL[idx+1]*=def; VOL[idx+2]*=def;
+    }}
+}
+
+function sample(x,y,z,o){
+  let gi=(x-X0)/DX, gj=(y-Y0)/DY, gk=Math.round((z-Z0)/DZ);
+  if(gk<0)gk=0; else if(gk>NZ-1)gk=NZ-1;
+  if(gi<0||gi>NX-1||gj<0||gj>NY-1){ o[0]=1;o[1]=0;o[2]=1; return; }
+  let i0=gi|0,j0=gj|0; const fi=gi-i0,fj=gj-j0; let i1=i0+1,j1=j0+1; if(i1>NX-1)i1=NX-1; if(j1>NY-1)j1=NY-1;
+  const b=(i,j)=>((gk*NY+j)*NX+i)*3;
+  const a00=b(i0,j0),a10=b(i1,j0),a01=b(i0,j1),a11=b(i1,j1);
+  for(let c=0;c<3;c++){ const x0=VOL[a00+c]+(VOL[a10+c]-VOL[a00+c])*fi, x1=VOL[a01+c]+(VOL[a11+c]-VOL[a01+c])*fi; o[c]=x0+(x1-x0)*fj; }
+}
+function ramp(sp){ const t=Math.min(1,Math.max(0,(sp-0.80)/0.45));
+  return `rgb(${Math.round((0.169+(0.133-0.169)*t)*255)},${Math.round((0.824+(0.867-0.824)*t)*255)},${Math.round((0.290+(1.0-0.290)*t)*255)})`; }
+
+const sv=[0,0,0,0],k1=[0,0,0,0],k2=[0,0,0,0],k3=[0,0,0,0],k4=[0,0,0,0];
+function trace(y0,z){ const p=[]; let x=X0+DX,y=y0; const h=(X1-X0)/120;
+  for(let s=0;s<150&&x<X1;s++){ p.push(x,y);
+    sample(x,y,z,k1); sample(x+0.5*h*k1[0],y+0.5*h*k1[1],z,k2);
+    sample(x+0.5*h*k2[0],y+0.5*h*k2[1],z,k3); sample(x+h*k3[0],y+h*k3[1],z,k4);
+    x+=h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); y+=h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+  } return p; }
+
+// cross-section: intersect the real mesh triangles with the slice plane Z=z (true outline)
+function drawSection(z){
+  ctx.strokeStyle='#39a8ff'; ctx.lineWidth=1.4; ctx.globalAlpha=0.95; ctx.beginPath();
+  for(let f=0;f<NF;f++){ const a=f*9;
+    const z0=P[a+2],z1=P[a+5],z2=P[a+8];
+    if(z<Math.min(z0,z1,z2)||z>Math.max(z0,z1,z2)) continue;
+    const pts=[];
+    const edge=(ax,ay,az,bx,by,bz)=>{ if((az<=z&&bz>=z)||(bz<=z&&az>=z)){ const t=(z-az)/((bz-az)||1e-9); pts.push(ax+(bx-ax)*t, ay+(by-ay)*t); } };
+    edge(P[a],P[a+1],z0, P[a+3],P[a+4],z1);
+    edge(P[a+3],P[a+4],z1, P[a+6],P[a+7],z2);
+    edge(P[a+6],P[a+7],z2, P[a],P[a+1],z0);
+    if(pts.length>=4){ ctx.moveTo(sx(pts[0]),sy(pts[1])); ctx.lineTo(sx(pts[2]),sy(pts[3])); }
+  }
+  ctx.stroke(); ctx.globalAlpha=1;
+}
+const mp=document.getElementById('map'), mc=mp.getContext('2d');
+function drawMap(z){ mc.clearRect(0,0,180,96);
+  const mx=i=>10+i/(NX-1)*160, mz=k=>48-((Z0+k*DZ)/Z1)*40;
+  mc.fillStyle='rgba(24,120,224,.85)';
+  for(let i=0;i<NX;i++)for(let k=0;k<NZ;k++) if(TOP[i*NZ+k]){ mc.fillRect(mx(i),mz(k),2,2); }
+  mc.strokeStyle='#e8b010'; mc.lineWidth=2; const yk=48-(z/Z1)*40; mc.beginPath(); mc.moveTo(10,yk); mc.lineTo(170,yk); mc.stroke();
+  mc.fillStyle='#9fb3c8'; mc.font='10px system-ui'; mc.fillText('top view — slice position',10,90);
+}
+
+// ---------- run ----------
+let SEEDS=40, sliceZ=0, lines=[];
+function setZfromSlider(v){ sliceZ=Z0+(Z1-Z0)*v/100; document.getElementById('sliceV').textContent=sliceZ.toFixed(2); }
+let t0=performance.now(),fr=0,fpsT=0; const fpsEl=document.getElementById('fps');
+function frame(now){ requestAnimationFrame(frame); const dt=(now-t0)/1000; t0=now;
+  lines.length=0; const m=(Y1-Y0)*0.46; for(let i=0;i<SEEDS;i++) lines.push(trace(Y0+(Y1-Y0)*0.5 + (-m+2*m*i/(SEEDS-1)), sliceZ));
+  ctx.clearRect(0,0,W,H);
+  ctx.lineWidth=1;
+  for(const p of lines) for(let i=0;i<p.length-2;i+=2){ sample(p[i],p[i+1],sliceZ,sv);
+    ctx.strokeStyle=ramp(sv[2]); ctx.globalAlpha=0.30; ctx.beginPath(); ctx.moveTo(sx(p[i]),sy(p[i+1])); ctx.lineTo(sx(p[i+2]),sy(p[i+3])); ctx.stroke(); }
+  ctx.globalAlpha=1; drawSection(sliceZ);
+  ctx.globalCompositeOperation='lighter'; const PH=5, tt=(now/1000)*0.18;
+  for(const p of lines){ const n=p.length/2; for(let kk=0;kk<PH;kk++){ const ph=((kk/PH)+tt)%1, f=ph*(n-1), idx=f|0, fr2=f-idx, a=idx*2, b=Math.min(idx+1,n-1)*2;
+    const x=p[a]+(p[b]-p[a])*fr2, y=p[a+1]+(p[b+1]-p[a+1])*fr2; sample(x,y,sliceZ,sv); ctx.fillStyle=ramp(sv[2]);
+    ctx.beginPath(); ctx.arc(sx(x),sy(y),2.6,0,7); ctx.fill(); }}
+  ctx.globalCompositeOperation='source-over'; drawMap(sliceZ);
+  fr++; fpsT+=dt; if(fpsT>0.5){ fpsEl.textContent=(fr/fpsT).toFixed(0)+' fps · '+SEEDS+' lines · '+NX+'×'+NY+'×'+NZ+' · '+NF.toLocaleString()+' tris'; fr=0;fpsT=0; }
+}
+
+document.getElementById('bake').textContent='baking field from '+NF.toLocaleString()+' triangles…';
+setTimeout(()=>{ const t=performance.now(); bake(); console.log('bake ms', (performance.now()-t).toFixed(0));
+  window.__field={VOL,NX,NY,NZ,X0,X1,Y0,Y1,Z0,Z1,DX,DY,DZ,CARL,CARH,CARW,lenAx,minAx,midAx,ctr:[ctr[0],ctr[1],ctr[2]]};
+  document.getElementById('bake').style.display='none'; setZfromSlider(50); requestAnimationFrame(frame); window.__ready=true; }, 60);
+
+// interaction
+const slice=document.getElementById('slice'); slice.oninput=()=>setZfromSlider(+slice.value);
+let dragging=false, px=0;
+cv.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{ if(dragging){ let v=+slice.value+(e.clientX-px)*0.22; v=Math.max(0,Math.min(100,v)); slice.value=v; setZfromSlider(v); px=e.clientX; }});
+cv.addEventListener('pointerup',()=>dragging=false);
+const dens=document.getElementById('dens'); dens.oninput=()=>{SEEDS=+dens.value;document.getElementById('densV').textContent=dens.value;};
+</script>
+</body>
+</html>

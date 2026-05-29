@@ -1,0 +1,71 @@
+- !<AssetImportMetadata/ae706fb2-137e-4b29-9e27-0a4b42ad1ccd>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> d9034ca8-c6b4-406b-a275-5475e55c83cb
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> d9034ca8-c6b4-406b-a275-5475e55c83cb
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 685d057f-ce97-4a46-a353-b85de04cc62e
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/685d057f-ce97-4a46-a353-b85de04cc62e>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: e303208b-c24f-4606-8aa1-a24d7c2c7830
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    autoPlay: false
+    earthObject: false
+    loop: false
+    missionSecondsPerSecond: false
+    moonObject: false
+    orientToVelocity: false
+    pathMaterial: false
+    pathObject: false
+    spacecraftObject: false
+    unitsPer1000Km: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - earthObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      moonObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      spacecraftObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      pathObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      pathMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      unitsPer1000Km: 0.020000
+      missionSecondsPerSecond: !<float> 20000.000000
+      loop: true
+      autoPlay: false
+      orientToVelocity: true
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject earthObject {"hint":"Earth — frame origin. Moon/spacecraft are placed relative to its world position."}'
+    - '// @input SceneObject moonObject {"hint":"Moon — driven by the real ephemeris (its gravity well follows automatically)."}'
+    - '// @input SceneObject spacecraftObject {"hint":"Spacecraft marker (the SLS .glb instance) — driven by the Artemis trajectory."}'
+    - '// @input SceneObject pathObject {"hint":"Optional: object to render the full trajectory arc into (a RenderMeshVisual is built on it). Make it a sibling of Earth."}'
+    - '// @input Asset.Material pathMaterial {"hint":"Material for the trajectory line (an unlit/flat material reads best)."}'
+    - '// @input float unitsPer1000Km = 0.1 {"hint":"Scene cm per 1000 km. 0.1 → Moon ~38 cm out, apogee ~41 cm (fits a ~100 cm plane).", "widget":"slider", "min":0.01, "max":0.3, "step":0.005}'
+    - '// @input float missionSecondsPerSecond = 20000 {"hint":"Mission seconds played per real second. ~20000 plays the full ~8.9-day mission in ~38 s.", "widget":"slider", "min":1000, "max":100000, "step":1000}'
+    - '// @input bool loop = true {"hint":"Loop playback when the mission ends."}'
+    - '// @input bool autoPlay {"hint":"Start playing as soon as this is enabled."}'
+    - "// @input bool orientToVelocity = true {\"hint\":\"Point the marker's +Y axis along its direction of travel (prograde). This is heading, not true attitude — no attitude data exists.\"}"

@@ -1,0 +1,38 @@
+{
+  "source": "Assets/Audio/europa-tecnosine-main-version-07-43-13869.mp3",
+  "duration": 463.759410430839,
+  "targetSampleRate": 24,
+  "actualSampleRate": 23.99347116430903,
+  "frameCount": 11128,
+  "bandsHz": {
+    "subBass": [
+      22.0,
+      40.0
+    ],
+    "pads": [
+      180.0,
+      2200.0
+    ]
+  },
+  "channels": {
+    "x": "overall full-band magnitude",
+    "y": "mid/pad dominant pitch estimate, retained for diagnostics",
+    "z": "22-40 Hz sub-bass band intensity",
+    "w": "22-40 Hz sub-bass envelope"
+  },
+  "padHz": {
+    "median": 261.090087890625,
+    "p10": 193.798828125,
+    "p90": 296.08154296875
+  },
+  "subBassIntensity": {
+    "mean": 0.40223002433776855,
+    "p10": 0.0,
+    "p90": 0.9402926564216614
+  },
+  "confidence": {
+    "subBassMean": 0.40223002433776855,
+    "padsMean": 0.7210856676101685,
+    "padPeakRatioMean": 0.4674781262874603
+  }
+}

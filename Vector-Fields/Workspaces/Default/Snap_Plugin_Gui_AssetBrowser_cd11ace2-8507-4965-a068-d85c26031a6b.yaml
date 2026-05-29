@@ -1,10 +1,12 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 1386
+    size: 1585
     values:
       - ""
       - Base.png
+      - Cone.mesh
+      - Cylinder.mesh
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
@@ -25,6 +27,9 @@ CollapsedEntities:
       - FastUI.lspkg/package.native
       - FastUI.lspkg/package_dependencies.json
       - Fonts
+      - Fonts/Nunito_Sans
+      - Fonts/Nunito_Sans/NunitoSans.ttf
+      - Fonts/Nunito_Sans/OFL.txt
       - Fonts/Source_Sans_3
       - Fonts/Source_Sans_3/OFL.txt
       - Fonts/Source_Sans_3/README.txt
@@ -34,6 +39,18 @@ CollapsedEntities:
       - Fonts/latin-modern-roman/GUST-FONT-LICENSE.TXT
       - Fonts/latin-modern-roman/lm-info.pdf
       - Fonts/latin-modern-roman/lmroman9-bold.otf
+      - Hint - Swipe Right.lspkg
+      - Hint - Swipe Right.lspkg/Hint - Swipe Right__PUT_IN_ORTHO_CAM.prefab
+      - Hint - Swipe Right.lspkg/Materials
+      - Hint - Swipe Right.lspkg/Materials/SpriteGraphPreset.mat
+      - Hint - Swipe Right.lspkg/Shaders
+      - Hint - Swipe Right.lspkg/Shaders/SpriteGraphPreset.ss_graph
+      - Hint - Swipe Right.lspkg/Textures
+      - Hint - Swipe Right.lspkg/Textures/Hint_Swipe_Right.lensanim
+      - Hint - Swipe Right.lspkg/Textures/Hint_Swipe_Right.lensanim/Hint_Swipe_Right
+      - Hint - Swipe Right.lspkg/Textures/Hint_Swipe_Right.lensanim/LPD_276_L_R.png
+      - Hint - Swipe Right.lspkg/package.native
+      - Hint - Swipe Right.lspkg/package_dependencies.json
       - Image 2.mat
       - Image 3.mat
       - Image 4.mat
@@ -47,6 +64,31 @@ CollapsedEntities:
       - Images/Article/magnetic_demo.png
       - Images/Article/rendering_modes.png
       - Images/Article/tube_mesh.png
+      - Images/StoryUI
+      - Images/StoryUI/card_definition_active.png
+      - Images/StoryUI/card_definition_normal.png
+      - Images/StoryUI/card_definition_pressed.png
+      - Images/StoryUI/card_examples_active.png
+      - Images/StoryUI/card_examples_normal.png
+      - Images/StoryUI/card_examples_pressed.png
+      - Images/StoryUI/card_intro_active.png
+      - Images/StoryUI/card_intro_normal.png
+      - Images/StoryUI/card_intro_pressed.png
+      - Images/StoryUI/card_metrics_active.png
+      - Images/StoryUI/card_metrics_normal.png
+      - Images/StoryUI/card_metrics_pressed.png
+      - Images/StoryUI/card_motion_active.png
+      - Images/StoryUI/card_motion_normal.png
+      - Images/StoryUI/card_motion_pressed.png
+      - Images/StoryUI/card_patterns_active.png
+      - Images/StoryUI/card_patterns_normal.png
+      - Images/StoryUI/card_patterns_pressed.png
+      - Images/StoryUI/chapter_panel.png
+      - Images/StoryUI/nav_back_normal.png
+      - Images/StoryUI/nav_back_pressed.png
+      - Images/StoryUI/nav_next_normal.png
+      - Images/StoryUI/nav_next_pressed.png
+      - Images/StoryUI/story_ui_layout.json
       - Images/UI
       - Images/circulation_preview.png
       - Images/circulation_sprite.png
@@ -79,14 +121,14 @@ CollapsedEntities:
       - Materials/FlatMaterial 2.ss_graph
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
-      - Materials/GravityFieldPlane.mat
-      - Materials/GravityFieldPlane.ss_graph
       - Materials/IridescentMaterial.mat
       - Materials/IridescentMaterial.ss_graph
       - Materials/MagnetPole.mat
       - Materials/MagnetPole.ss_graph
       - Materials/MagneticField.mat
       - Materials/MagneticField.ss_graph
+      - Materials/MotionFieldDetail.mat
+      - Materials/MotionFieldDetail.ss_graph
       - Materials/SpriteSheetBG.mat
       - Materials/SpriteSheetBG.ss_graph
       - Materials/TestTubeDeformation.mat
@@ -526,10 +568,50 @@ CollapsedEntities:
       - Meshes/Models/moon.glb/moon
       - Normal.png
       - PBR 10.mat
+      - PBR 11.mat
+      - PBR 12.mat
+      - PBR 13.mat
+      - PBR 14.mat
+      - PBR 15.mat
+      - PBR 16.mat
+      - PBR 17.mat
+      - PBR 18.mat
+      - PBR 19.mat
       - PBR 2.mat
+      - PBR 20.mat
+      - PBR 21.mat
+      - PBR 22.mat
+      - PBR 23.mat
+      - PBR 24.mat
+      - PBR 25.mat
+      - PBR 26.mat
+      - PBR 27.mat
+      - PBR 28.mat
+      - PBR 29.mat
       - PBR 3.mat
+      - PBR 30.mat
+      - PBR 31.mat
+      - PBR 32.mat
+      - PBR 33.mat
+      - PBR 34.mat
+      - PBR 35.mat
+      - PBR 36.mat
+      - PBR 37.mat
+      - PBR 38.mat
+      - PBR 39.mat
       - PBR 4.mat
+      - PBR 40.mat
+      - PBR 41.mat
+      - PBR 42.mat
+      - PBR 43.mat
+      - PBR 44.mat
+      - PBR 45.mat
+      - PBR 46.mat
+      - PBR 47.mat
+      - PBR 48.mat
+      - PBR 49.mat
       - PBR 5.mat
+      - PBR 50.mat
       - PBR 6.mat
       - PBR 7.mat
       - PBR 8.mat
@@ -551,15 +633,20 @@ CollapsedEntities:
       - Scripts/FieldLines.ts
       - Scripts/GfsData.ts
       - Scripts/GlobeSurfaceRotator.ts
-      - Scripts/GravityFieldPlane.ts
       - Scripts/IridescentMaterial.ts
       - Scripts/MagnetPhysics.ts
       - Scripts/MagneticField.ts
+      - Scripts/MotionFieldPlane.ts
       - Scripts/NarrationPanel.ts
       - Scripts/OrbitMotion.ts
+      - Scripts/SnapToStage.ts
       - Scripts/SpatialFlexLite.ts
+      - Scripts/StageCalibration.ts
       - Scripts/StormMarkers.ts
       - Scripts/StormsData.ts
+      - Scripts/StoryGuideLayout.generated.ts
+      - Scripts/StoryGuideLayoutGenerated.ts
+      - Scripts/TexturedButton.ts
       - Scripts/TubeTest.ts
       - Scripts/Utils
       - Scripts/Utils/gradient_1_magnetic.mp4
@@ -578,17 +665,19 @@ CollapsedEntities:
       - Scripts/Utils/sprites/waves_preview.png
       - Scripts/VectorField.ts
       - Scripts/VectorFieldUIStyle.ts
+      - Scripts/VectorFieldsChapterGuide.ts
+      - Scripts/VectorFieldsScaffoldLabels.ts
+      - Scripts/VectorFieldsStoryScaffold.ts
       - Scripts/WindGlobeCalibration.ts
       - Scripts/WindStreamlines.ts
-      - Shaders
       - Shaders/AnimatedSpriteSheet.js
       - Shaders/FieldLines.js
       - Shaders/FlatMaterial.js
-      - Shaders/GravityFieldPlane.js
       - Shaders/IridescentShader.js
       - Shaders/IridescentSimple.js
       - Shaders/MagnetPole.js
       - Shaders/MagneticField.js
+      - Shaders/MotionFieldDetail.js
       - Shaders/TubeTest.js
       - Shaders/VectorField.js
       - Shaders/VectorFieldTransform.js
@@ -1367,6 +1456,115 @@ CollapsedEntities:
       - SpectaclesUIKit.lspkg/package.native
       - SpectaclesUIKit.lspkg/package_dependencies.json
       - Sphere.mesh
+      - SurfacePlacement.lspkg
+      - SurfacePlacement.lspkg/Decorators
+      - SurfacePlacement.lspkg/Decorators/Singleton.ts
+      - "SurfacePlacement.lspkg/Example Surface [DRAG ME TO SCENE].prefab"
+      - SurfacePlacement.lspkg/Example.ts
+      - SurfacePlacement.lspkg/Materials
+      - SurfacePlacement.lspkg/Materials/Arrow.mat
+      - SurfacePlacement.lspkg/Materials/CircleGrid.mat
+      - SurfacePlacement.lspkg/Materials/CircleGridHands.mat
+      - SurfacePlacement.lspkg/Materials/Dots.mat
+      - SurfacePlacement.lspkg/Materials/HandHints_Outline_Glow_Combined.mat
+      - SurfacePlacement.lspkg/Materials/Mobile_Controller.mat
+      - SurfacePlacement.lspkg/Materials/Occluder.mat
+      - SurfacePlacement.lspkg/Materials/SliderArrow.mat
+      - SurfacePlacement.lspkg/Materials/SurfaceGridMove.mat
+      - SurfacePlacement.lspkg/Materials/red_panda_pbr.mat
+      - SurfacePlacement.lspkg/Meshes
+      - SurfacePlacement.lspkg/Meshes/Animations
+      - SurfacePlacement.lspkg/Meshes/Animations/BaseLayer.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Controller_Tap.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Finger_Scroll_Micro.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Finger_Swipe_X.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Finger_Swipe_Y.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Finger_Tap_Near.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Finger_Tap_Surface.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Palm_Grab_X.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Palm_Grab_Y.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Palm_Swipe_X.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Palm_Touch_Near.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Palm_Touch_Surface.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Far.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Move_X.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Move_Y.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Move_Z.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Near.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Rotate_X.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Rotate_Y.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Rotate_Z.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Swipe_X.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Pinch_Swipe_Y.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/System_Tap_Exit.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/System_Tap_Rotate_Down.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/System_Tap_Rotate_Up.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/System_Tap_Save.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/System_Tap_Settings.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/System_Tap_Watch.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Two_Hands_Palm_Grab_X.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Two_Hands_Palm_Grab_Y.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Two_Hands_Pinch_Rotate_Y.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Two_Hands_Pinch_Rotate_Z.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Animations/Two_Hands_Pinch_Scale.animationAsset
+      - SurfacePlacement.lspkg/Meshes/Device_Mockup.mesh
+      - SurfacePlacement.lspkg/Meshes/LeftHandGeo.mesh
+      - SurfacePlacement.lspkg/Meshes/Placement.mesh
+      - SurfacePlacement.lspkg/Meshes/RedPanda
+      - SurfacePlacement.lspkg/Meshes/RedPanda/BaseLayer.animationAsset
+      - SurfacePlacement.lspkg/Meshes/RedPanda/Meshes
+      - SurfacePlacement.lspkg/Meshes/RedPanda/Meshes/innertube_lo.mesh
+      - SurfacePlacement.lspkg/Meshes/RedPanda/Meshes/red_panda_lo.mesh
+      - SurfacePlacement.lspkg/Meshes/RightHandGeo.mesh
+      - SurfacePlacement.lspkg/Meshes/Unit Plane.mesh
+      - SurfacePlacement.lspkg/Prefabs
+      - SurfacePlacement.lspkg/Prefabs/HandHints.prefab
+      - SurfacePlacement.lspkg/Prefabs/HorizontalPlacement.prefab
+      - SurfacePlacement.lspkg/Prefabs/SurfaceSlider.prefab
+      - SurfacePlacement.lspkg/Prefabs/TableTopPlacement.prefab
+      - SurfacePlacement.lspkg/Prefabs/VerticalPlacement.prefab
+      - SurfacePlacement.lspkg/README.md
+      - SurfacePlacement.lspkg/Scripts
+      - SurfacePlacement.lspkg/Scripts/CircleAnimation.ts
+      - SurfacePlacement.lspkg/Scripts/DotsLine.ts
+      - SurfacePlacement.lspkg/Scripts/ForceHover.ts
+      - SurfacePlacement.lspkg/Scripts/HandHintsController.ts
+      - SurfacePlacement.lspkg/Scripts/Horizontal.ts
+      - SurfacePlacement.lspkg/Scripts/PlacementSettings.ts
+      - SurfacePlacement.lspkg/Scripts/SingleSurface.ts
+      - SurfacePlacement.lspkg/Scripts/SurfaceDetector.ts
+      - SurfacePlacement.lspkg/Scripts/SurfacePlacementController.ts
+      - SurfacePlacement.lspkg/Scripts/SurfaceSlider.ts
+      - SurfacePlacement.lspkg/Scripts/TableTop.ts
+      - SurfacePlacement.lspkg/Scripts/Vertical.ts
+      - SurfacePlacement.lspkg/Shaders
+      - SurfacePlacement.lspkg/Shaders/CircleGrid.ss_graph
+      - SurfacePlacement.lspkg/Shaders/CircleGridHands.ss_graph
+      - SurfacePlacement.lspkg/Shaders/Dots.ss_graph
+      - SurfacePlacement.lspkg/Shaders/HandHints_Outline_Glow_Combined.ss_graph
+      - SurfacePlacement.lspkg/Shaders/Mobile_Controller_Graph.ss_graph
+      - SurfacePlacement.lspkg/Shaders/Occluder.ss_graph
+      - SurfacePlacement.lspkg/Shaders/SurfaceGrid.ss_graph
+      - SurfacePlacement.lspkg/Shaders/cutoutColorAlpha.ss_graph
+      - SurfacePlacement.lspkg/Shaders/red_panda_pbr.ss_graph
+      - SurfacePlacement.lspkg/Shaders/unlit.ss_graph
+      - SurfacePlacement.lspkg/Sounds
+      - SurfacePlacement.lspkg/Sounds/CalibrateSnap.mp3
+      - SurfacePlacement.lspkg/Textures
+      - SurfacePlacement.lspkg/Textures/Hands_Interaction_Glow_Mask.png
+      - SurfacePlacement.lspkg/Textures/Hands_Opacity_Gradient.png
+      - SurfacePlacement.lspkg/Textures/Mobile_Controller_App_Screen.png
+      - SurfacePlacement.lspkg/Textures/Mobile_Controller_App_Tap.png
+      - SurfacePlacement.lspkg/Textures/arrow.png
+      - SurfacePlacement.lspkg/Textures/arrow_transform.png
+      - SurfacePlacement.lspkg/Textures/arrows.png
+      - SurfacePlacement.lspkg/Textures/mc_arrow_dot.png
+      - SurfacePlacement.lspkg/Textures/mc_dot.png
+      - SurfacePlacement.lspkg/Textures/red_panda_base.png
+      - SurfacePlacement.lspkg/Textures/red_panda_normal.png
+      - SurfacePlacement.lspkg/Textures/red_panda_param.png
+      - SurfacePlacement.lspkg/package.native
+      - SurfacePlacement.lspkg/package_dependencies.json
       - Uber PBR.mat
       - Utilities.lspkg
       - Utilities.lspkg/README.md
@@ -1382,6 +1580,7 @@ CollapsedEntities:
       - Utilities.lspkg/Scripts/Utils/TypeConversionUtils.ts
       - Utilities.lspkg/Scripts/Utils/ValidationUtils.ts
       - Utilities.lspkg/package.native
+      - Visual Demonstration.lsc
       - WindFlowMat.mat
       - WindStreamlines_Mat.mat
       - flat.ss_graph
