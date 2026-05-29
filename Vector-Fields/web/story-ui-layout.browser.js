@@ -146,17 +146,49 @@ window.STORY_UI_LAYOUT = {
       }
     },
     {
+      "id": "utility_plane_floor",
+      "role": "utility",
+      "px": {
+        "x": 1008,
+        "y": 158,
+        "width": 190,
+        "height": 64
+      },
+      "cm": {
+        "x": 7.06,
+        "y": 6.2,
+        "width": 3.8,
+        "height": 1.28
+      }
+    },
+    {
+      "id": "utility_plane_front",
+      "role": "utility",
+      "px": {
+        "x": 1228,
+        "y": 158,
+        "width": 190,
+        "height": 64
+      },
+      "cm": {
+        "x": 11.46,
+        "y": 6.2,
+        "width": 3.8,
+        "height": 1.28
+      }
+    },
+    {
       "id": "card_intro",
       "role": "card",
       "px": {
         "x": 70,
-        "y": 238,
+        "y": 266,
         "width": 660,
         "height": 170
       },
       "cm": {
         "x": -7,
-        "y": 3.54,
+        "y": 2.98,
         "width": 13.2,
         "height": 3.4
       }
@@ -166,13 +198,13 @@ window.STORY_UI_LAYOUT = {
       "role": "card",
       "px": {
         "x": 770,
-        "y": 238,
+        "y": 266,
         "width": 660,
         "height": 170
       },
       "cm": {
         "x": 7,
-        "y": 3.54,
+        "y": 2.98,
         "width": 13.2,
         "height": 3.4
       }
@@ -182,13 +214,13 @@ window.STORY_UI_LAYOUT = {
       "role": "card",
       "px": {
         "x": 70,
-        "y": 446,
+        "y": 474,
         "width": 660,
         "height": 170
       },
       "cm": {
         "x": -7,
-        "y": -0.62,
+        "y": -1.18,
         "width": 13.2,
         "height": 3.4
       }
@@ -198,13 +230,13 @@ window.STORY_UI_LAYOUT = {
       "role": "card",
       "px": {
         "x": 770,
-        "y": 446,
+        "y": 474,
         "width": 660,
         "height": 170
       },
       "cm": {
         "x": 7,
-        "y": -0.62,
+        "y": -1.18,
         "width": 13.2,
         "height": 3.4
       }
@@ -230,13 +262,13 @@ window.STORY_UI_LAYOUT = {
       "role": "example_card",
       "px": {
         "x": 70,
-        "y": 238,
+        "y": 266,
         "width": 1360,
         "height": 154
       },
       "cm": {
         "x": 0,
-        "y": 3.7,
+        "y": 3.14,
         "width": 27.2,
         "height": 3.08
       }
@@ -246,13 +278,13 @@ window.STORY_UI_LAYOUT = {
       "role": "example_card",
       "px": {
         "x": 70,
-        "y": 430,
+        "y": 458,
         "width": 1360,
         "height": 154
       },
       "cm": {
         "x": 0,
-        "y": -0.14,
+        "y": -0.7,
         "width": 27.2,
         "height": 3.08
       }
@@ -262,13 +294,13 @@ window.STORY_UI_LAYOUT = {
       "role": "example_card",
       "px": {
         "x": 70,
-        "y": 622,
+        "y": 650,
         "width": 1360,
         "height": 154
       },
       "cm": {
         "x": 0,
-        "y": -3.98,
+        "y": -4.54,
         "width": 27.2,
         "height": 3.08
       }

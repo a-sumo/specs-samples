@@ -44,7 +44,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "root": "C00_Intro",
         "slot": {
             "x": -7,
-            "y": 3.54,
+            "y": 2.98,
             "width": 13.2,
             "height": 3.4
         }
@@ -56,7 +56,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "root": "C01_Motion_Fields",
         "slot": {
             "x": 7,
-            "y": 3.54,
+            "y": 2.98,
             "width": 13.2,
             "height": 3.4
         }
@@ -68,7 +68,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "root": "C02_Theory",
         "slot": {
             "x": -7,
-            "y": -0.62,
+            "y": -1.18,
             "width": 13.2,
             "height": 3.4
         }
@@ -80,7 +80,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "root": "C03_Real_World_Examples",
         "slot": {
             "x": 7,
-            "y": -0.62,
+            "y": -1.18,
             "width": 13.2,
             "height": 3.4
         }
@@ -96,7 +96,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "title": "Gravity",
         "slot": {
             "x": 0,
-            "y": 3.7,
+            "y": 3.14,
             "width": 27.2,
             "height": 3.08
         }
@@ -107,7 +107,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "title": "Magnetism",
         "slot": {
             "x": 0,
-            "y": -0.14,
+            "y": -0.7,
             "width": 27.2,
             "height": 3.08
         }
@@ -118,7 +118,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "title": "Wind",
         "slot": {
             "x": 0,
-            "y": -3.98,
+            "y": -4.54,
             "width": 27.2,
             "height": 3.08
         }
@@ -135,4 +135,6 @@ export const STORY_GUIDE_NAV = {
 export const STORY_GUIDE_UTILITY = {
     follow: {"x":7.06,"y":7.84,"width":3.8,"height":1.52},
     fold: {"x":11.46,"y":7.84,"width":3.8,"height":1.52},
+    planeFloor: {"x":7.06,"y":6.2,"width":3.8,"height":1.28},
+    planeFront: {"x":11.46,"y":6.2,"width":3.8,"height":1.28},
 };

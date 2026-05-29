@@ -27,7 +27,12 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     calibrateOnStart: false
+    cameraRoot: false
+    floorPlaneDropCm: false
+    floorPlaneForwardCm: false
+    frontPlaneDistanceCm: false
     placementMode: false
+    previewSizeCm: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -39,9 +44,19 @@
   DefaultScriptInputs:
     - calibrateOnStart: true
       placementMode: !<float> 0.000000
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      previewSizeCm: !<float> 36.000000
+      frontPlaneDistanceCm: !<float> 105.000000
+      floorPlaneForwardCm: !<float> 105.000000
+      floorPlaneDropCm: !<float> 105.000000
   ScriptTypes:
     -
       {}
   InputLines:
-    - '// @input bool calibrateOnStart {"hint":"Run calibration automatically at lens start. Leave OFF for menu-driven flows."}'
+    - '// @input bool calibrateOnStart = true {"hint":"Run calibration automatically at lens start, then keep that anchor until the user changes the view plane."}'
     - '// @input float placementMode {"hint":"Surface type used for calibration.", "widget":"combobox", "values":[{"label":"Horizontal (floor)", "value":0}, {"label":"Vertical (wall)", "value":1}, {"label":"Tabletop (near surface)", "value":2}]}'
+    - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor. Empty searches for Camera Object."}'
+    - '// @input float previewSizeCm = 36 {"hint":"Size of the preview reference plane in centimeters.", "widget":"slider", "min":12, "max":80, "step":1}'
+    - '// @input float frontPlaneDistanceCm = 105 {"hint":"Fallback distance for the user-facing vertical plane.", "widget":"slider", "min":40, "max":180, "step":5}'
+    - '// @input float floorPlaneForwardCm = 105 {"hint":"Fallback distance for floor mode when no tracked plane is available.", "widget":"slider", "min":50, "max":180, "step":5}'
+    - '// @input float floorPlaneDropCm = 105 {"hint":"Fallback drop below the head for floor mode when no tracked plane is available.", "widget":"slider", "min":35, "max":170, "step":5}'

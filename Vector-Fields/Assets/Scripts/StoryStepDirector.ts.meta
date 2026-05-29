@@ -26,21 +26,34 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    analyticalFrontOffset: false
+    analyticalPatternsRoot: false
     applyOnStart: false
+    calibrateReferenceOnStart: false
+    cameraRoot: false
     controlContentRoots: false
     gravityFieldRoot: false
+    gravityFrontOffset: false
+    gravityReferenceOffset: false
     hideLegacySystems: false
     initialStep: false
     legacyGuideRoot: false
     legacySlideStageRoot: false
     magneticFieldRoot: false
+    magneticFrontOffset: false
+    magneticReferenceOffset: false
     motionFieldRoot: false
+    motionFrontOffset: false
     scaffoldRoot: false
     settleSeconds: false
     showScaffold: false
     storyWidgetsRoot: false
+    useReferenceCalibrationForExamples: false
     vectorFieldRoot: false
+    viewPlaneMode: false
+    windFrontOffset: false
     windGlobeRoot: false
+    windReferenceOffset: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -52,6 +65,7 @@
   DefaultScriptInputs:
     - scaffoldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       motionFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      analyticalPatternsRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       vectorFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       magneticFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       gravityFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
@@ -61,16 +75,29 @@
       legacySlideStageRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       applyOnStart: true
       initialStep: !<float> 0.000000
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       showScaffold: true
       controlContentRoots: true
       hideLegacySystems: true
       settleSeconds: 1.250000
+      viewPlaneMode: !<float> 0.000000
+      calibrateReferenceOnStart: true
+      useReferenceCalibrationForExamples: false
+      motionFrontOffset: !<Vec3> {x: 0.000000, y: -3.000000, z: -82.000000}
+      analyticalFrontOffset: !<Vec3> {x: 0.000000, y: 8.000000, z: -78.000000}
+      gravityFrontOffset: !<Vec3> {x: 0.000000, y: -6.000000, z: -82.000000}
+      magneticFrontOffset: !<Vec3> {x: 0.000000, y: -4.000000, z: -78.000000}
+      windFrontOffset: !<Vec3> {x: 0.000000, y: -5.000000, z: -78.000000}
+      gravityReferenceOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      magneticReferenceOffset: !<Vec3> {x: 0.000000, y: 7.000000, z: 0.000000}
+      windReferenceOffset: !<Vec3> {x: 0.000000, y: 24.000000, z: 0.000000}
   ScriptTypes:
     -
       {}
   InputLines:
     - '// @input SceneObject scaffoldRoot {"hint":"Storyboard scaffold root. Falls back to VF Story Scaffold by name."}'
     - '// @input SceneObject motionFieldRoot {"hint":"Planar motion field rig."}'
+    - '// @input SceneObject analyticalPatternsRoot {"hint":"Analytical field-pattern library rig."}'
     - '// @input SceneObject vectorFieldRoot {"hint":"Legacy abstract vector field rig."}'
     - '// @input SceneObject magneticFieldRoot {"hint":"Magnetic field example rig."}'
     - '// @input SceneObject gravityFieldRoot {"hint":"Gravity field example rig."}'
@@ -80,7 +107,19 @@
     - '// @input SceneObject legacySlideStageRoot {"hint":"Older slide stage root to park while this director owns the story."}'
     - '// @input bool applyOnStart = true {"hint":"Stage a step at startup."}'
     - '// @input float initialStep {"hint":"Initial step index when applyOnStart is enabled.", "widget":"slider", "min":0, "max":3, "step":1}'
+    - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor for menu-selected front placement. Empty searches for Camera Object."}'
     - '// @input bool showScaffold = true {"hint":"Show the matching proxy/root in VF Story Scaffold."}'
     - '// @input bool controlContentRoots = true {"hint":"Enable the real content roots associated with the selected story step."}'
     - '// @input bool hideLegacySystems = true {"hint":"Hide the older narration and slide systems."}'
     - '// @input float settleSeconds = 1.25 {"hint":"Keep applying briefly after startup so other setup scripts settle first."}'
+    - '// @input float viewPlaneMode {"hint":"Reference frame used by gravity, magnetism, and wind examples.", "widget":"combobox", "values":[{"label":"Floor plane", "value":0}, {"label":"Front plane", "value":1}]}'
+    - '// @input bool calibrateReferenceOnStart = true {"hint":"Ask for the shared reference-frame calibration on first start."}'
+    - '// @input bool useReferenceCalibrationForExamples = true {"hint":"Use StageCalibration/SnapToStage for real-world examples. Off keeps menu selections immediate and camera-relative."}'
+    - '// @input vec3 motionFrontOffset = {0,-3,-82} {"hint":"Camera-relative placement for the 2D motion plane."}'
+    - '// @input vec3 analyticalFrontOffset = {0,8,-78} {"hint":"Camera-relative placement for analytical field-pattern examples."}'
+    - '// @input vec3 gravityFrontOffset = {0,-6,-82} {"hint":"Camera-relative placement for gravity when reference calibration is disabled."}'
+    - '// @input vec3 magneticFrontOffset = {0,-4,-78} {"hint":"Camera-relative placement for magnetism when reference calibration is disabled."}'
+    - '// @input vec3 windFrontOffset = {0,-5,-78} {"hint":"Camera-relative placement for wind when reference calibration is disabled."}'
+    - '// @input vec3 gravityReferenceOffset = {0,0,0} {"hint":"Gravity offset in calibrated plane-local space."}'
+    - '// @input vec3 magneticReferenceOffset = {0,7,0} {"hint":"Magnetism offset in calibrated plane-local space."}'
+    - '// @input vec3 windReferenceOffset = {0,24,0} {"hint":"Wind globe offset in calibrated plane-local space."}'

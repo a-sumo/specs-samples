@@ -119,6 +119,12 @@ const TEX_UTILITY_FOLLOW_PRESSED = requireAsset("../Images/StoryUI/utility_follo
 const TEX_UTILITY_FOLD_OPEN = requireAsset("../Images/StoryUI/utility_fold_open.png") as Texture;
 const TEX_UTILITY_FOLD_CLOSED = requireAsset("../Images/StoryUI/utility_fold_closed.png") as Texture;
 const TEX_UTILITY_FOLD_PRESSED = requireAsset("../Images/StoryUI/utility_fold_pressed.png") as Texture;
+const TEX_UTILITY_PLANE_FLOOR_ON = requireAsset("../Images/StoryUI/utility_plane_floor_on.png") as Texture;
+const TEX_UTILITY_PLANE_FLOOR_OFF = requireAsset("../Images/StoryUI/utility_plane_floor_off.png") as Texture;
+const TEX_UTILITY_PLANE_FLOOR_PRESSED = requireAsset("../Images/StoryUI/utility_plane_floor_pressed.png") as Texture;
+const TEX_UTILITY_PLANE_FRONT_ON = requireAsset("../Images/StoryUI/utility_plane_front_on.png") as Texture;
+const TEX_UTILITY_PLANE_FRONT_OFF = requireAsset("../Images/StoryUI/utility_plane_front_off.png") as Texture;
+const TEX_UTILITY_PLANE_FRONT_PRESSED = requireAsset("../Images/StoryUI/utility_plane_front_pressed.png") as Texture;
 const TEX_CARD_OVERLAY_HOVER = requireAsset("../Images/StoryUI/overlay_card_hover.png") as Texture;
 const TEX_CARD_OVERLAY_SELECTED = requireAsset("../Images/StoryUI/overlay_card_selected.png") as Texture;
 const TEX_CARD_OVERLAY_PRESSED = requireAsset("../Images/StoryUI/overlay_card_pressed.png") as Texture;
@@ -143,6 +149,7 @@ const INTERACTION_ISOLATION_ROOTS = [
     "VF Story Scaffold",
     "Field Controller",
     "Motion Field Root",
+    "Library_Analytical_Field_Patterns",
     "Vector Field Examples Root",
     "Magnetic Field Root",
     "Gravity Field Root",
@@ -151,6 +158,7 @@ const INTERACTION_ISOLATION_ROOTS = [
     "Globe Spin-Lock Button",
     "Proxy_Interactable_Handle_Test",
     "Flow Slice",
+    "Car Fluid Flow",
     "TubeTest",
 ];
 
@@ -225,8 +233,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private cards: ButtonBinding[] = [];
     private navButtons: ButtonBinding[] = [];
     private utilityButtons: ButtonBinding[] = [];
+    private viewPlaneButtons: ButtonBinding[] = [];
     private followButton: ButtonBinding | null = null;
     private foldButton: ButtonBinding | null = null;
+    private planeFloorButton: ButtonBinding | null = null;
+    private planeFrontButton: ButtonBinding | null = null;
     private examplesBackButton: ButtonBinding | null = null;
     private panelCursorImage: ImageBinding | null = null;
     private panelCursorCurrent: vec3 = new vec3(0, 0, 0.16);
@@ -246,6 +257,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private progressObject: SceneObject | null = null;
     private currentIndex: number = 0;
     private selectedExampleField: ExampleFieldId = "gravity";
+    private viewPlaneMode: number = 0;
+    private keepPlaneControlsWhileFolded: boolean = false;
     private examplesMenuOpen: boolean = false;
     private fieldSelectorButtons: ButtonBinding[] = [];
     private scaffoldApi: any = null;
@@ -413,6 +426,40 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         );
         this.foldButton = foldButton;
         this.utilityButtons.push(foldButton);
+
+        const floorButton = this.createTextureButton(
+            "__GuidePlaneFloor",
+            "plane:floor",
+            this.offsetSlot(STORY_GUIDE_UTILITY.planeFloor),
+            this.viewPlaneMode === 0 ? TEX_UTILITY_PLANE_FLOOR_ON : TEX_UTILITY_PLANE_FLOOR_OFF,
+            TEX_UTILITY_PLANE_FLOOR_ON,
+            TEX_UTILITY_PLANE_FLOOR_PRESSED,
+            248,
+            () => this.setViewPlaneMode(0),
+            true,
+            TEX_UTILITY_OVERLAY_HOVER,
+            null,
+            TEX_UTILITY_OVERLAY_PRESSED
+        );
+        this.planeFloorButton = floorButton;
+        this.viewPlaneButtons.push(floorButton);
+
+        const frontButton = this.createTextureButton(
+            "__GuidePlaneFront",
+            "plane:front",
+            this.offsetSlot(STORY_GUIDE_UTILITY.planeFront),
+            this.viewPlaneMode === 1 ? TEX_UTILITY_PLANE_FRONT_ON : TEX_UTILITY_PLANE_FRONT_OFF,
+            TEX_UTILITY_PLANE_FRONT_ON,
+            TEX_UTILITY_PLANE_FRONT_PRESSED,
+            248,
+            () => this.setViewPlaneMode(1),
+            true,
+            TEX_UTILITY_OVERLAY_HOVER,
+            null,
+            TEX_UTILITY_OVERLAY_PRESSED
+        );
+        this.planeFrontButton = frontButton;
+        this.viewPlaneButtons.push(frontButton);
     }
 
     private createTextureButton(
@@ -682,6 +729,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private syncVisualState(): void {
+        this.syncViewPlaneModeFromDirector();
         if (this.panelImage) {
             this.applyTexture(
                 this.panelImage.material,
@@ -718,8 +766,23 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.foldButton.selected = false;
             this.updateBindingVisual(this.foldButton);
         }
+        if (this.planeFloorButton) {
+            const texture = this.viewPlaneMode === 0 ? TEX_UTILITY_PLANE_FLOOR_ON : TEX_UTILITY_PLANE_FLOOR_OFF;
+            this.planeFloorButton.normal = texture;
+            this.planeFloorButton.active = texture;
+            this.planeFloorButton.selected = this.viewPlaneMode === 0;
+            this.updateBindingVisual(this.planeFloorButton);
+        }
+        if (this.planeFrontButton) {
+            const texture = this.viewPlaneMode === 1 ? TEX_UTILITY_PLANE_FRONT_ON : TEX_UTILITY_PLANE_FRONT_OFF;
+            this.planeFrontButton.normal = texture;
+            this.planeFrontButton.active = texture;
+            this.planeFrontButton.selected = this.viewPlaneMode === 1;
+            this.updateBindingVisual(this.planeFrontButton);
+        }
         this.updateBindings(this.navButtons);
         this.updateBindings(this.utilityButtons);
+        this.updateBindings(this.viewPlaneButtons);
         if (this.examplesBackButton) {
             this.updateBindingVisual(this.examplesBackButton);
         }
@@ -754,16 +817,60 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private setViewPlaneMode(mode: number): void {
+        const nextMode = this.normalizeViewPlaneMode(mode);
+        this.viewPlaneMode = nextMode;
+        this.keepPlaneControlsWhileFolded = true;
+        this.setFolded(true);
+
+        if (this.directorApi && typeof this.directorApi.setViewPlaneMode === "function") {
+            this.directorApi.setViewPlaneMode(nextMode);
+        } else {
+            const calibrationApi = this.findStageCalibrationApi();
+            if (calibrationApi) {
+                if (typeof calibrationApi.calibrateForMode === "function") {
+                    calibrationApi.calibrateForMode(nextMode);
+                } else {
+                    if (typeof calibrationApi.setViewPlaneMode === "function") calibrationApi.setViewPlaneMode(nextMode);
+                    if (typeof calibrationApi.setPlacementMode === "function") calibrationApi.setPlacementMode(nextMode);
+                    if (typeof calibrationApi.recalibrate === "function") calibrationApi.recalibrate();
+                }
+            }
+        }
+
+        this.syncVisualState();
+    }
+
+    private syncViewPlaneModeFromDirector(): void {
+        if (this.directorApi && typeof this.directorApi.getViewPlaneMode === "function") {
+            this.viewPlaneMode = this.normalizeViewPlaneMode(this.directorApi.getViewPlaneMode());
+            return;
+        }
+
+        const calibrationApi = this.findStageCalibrationApi();
+        if (calibrationApi && typeof calibrationApi.getViewPlaneMode === "function") {
+            this.viewPlaneMode = this.normalizeViewPlaneMode(calibrationApi.getViewPlaneMode());
+        } else if (calibrationApi && typeof calibrationApi.getPlacementMode === "function") {
+            this.viewPlaneMode = this.normalizeViewPlaneMode(calibrationApi.getPlacementMode());
+        }
+    }
+
+    private normalizeViewPlaneMode(mode: number): number {
+        return Math.floor(mode) === 1 ? 1 : 0;
+    }
+
     private stageFallbackContent(stepId: string): void {
         if (!this.controlContentRoots) return;
 
-        const showMotion = stepId === "motion_fields" || stepId === "theory";
+        const showMotion = stepId === "motion_fields";
+        const showAnalytical = stepId === "theory";
         const showVector = false;
         const showGravity = stepId === "examples" && this.selectedExampleField === "gravity";
         const showMagnetic = stepId === "examples" && this.selectedExampleField === "magnetism";
         const showWind = stepId === "examples" && this.selectedExampleField === "wind";
 
         this.setObjectEnabledByName("Motion Field Root", showMotion);
+        this.setObjectEnabledByName("Library_Analytical_Field_Patterns", showAnalytical);
         this.setObjectEnabledByName("Vector Field Examples Root", showVector);
         this.setObjectEnabledByName("Magnetic Field Root", showMagnetic);
         this.setObjectEnabledByName("Gravity Field Root", showGravity);
@@ -931,6 +1038,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         return this.findScriptApi(this.sceneObject, "stageStep");
     }
 
+    private findStageCalibrationApi(): any {
+        const root = this.findObjectByName("Stage Calibration");
+        return this.findScriptApi(root, "calibrateIfNeeded") || this.findScriptApi(root, "setPlacementMode");
+    }
+
     private findScriptApi(root: SceneObject | null, methodName: string): any {
         if (!root) return null;
         const scripts = root.getComponents("Component.ScriptComponent");
@@ -996,6 +1108,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (this.examplesBackButton) {
             this.examplesBackButton.object.enabled = !this.folded && this.examplesMenuOpen;
         }
+        const showPlaneControls = !this.folded || this.keepPlaneControlsWhileFolded;
+        for (let i = 0; i < this.viewPlaneButtons.length; i++) {
+            this.viewPlaneButtons[i].object.enabled = showPlaneControls;
+        }
     }
 
     private syncUtilityDockTargets(): void {
@@ -1009,6 +1125,18 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.setButtonTargetSlot(
                 this.foldButton,
                 this.offsetSlot(STORY_GUIDE_UTILITY.fold)
+            );
+        }
+        if (this.planeFloorButton) {
+            this.setButtonTargetSlot(
+                this.planeFloorButton,
+                this.offsetSlot(STORY_GUIDE_UTILITY.planeFloor)
+            );
+        }
+        if (this.planeFrontButton) {
+            this.setButtonTargetSlot(
+                this.planeFrontButton,
+                this.offsetSlot(STORY_GUIDE_UTILITY.planeFront)
             );
         }
     }
@@ -1032,6 +1160,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateBindingAnimations(this.fieldSelectorButtons);
         this.updateBindingAnimations(this.navButtons);
         this.updateBindingAnimations(this.utilityButtons);
+        this.updateBindingAnimations(this.viewPlaneButtons);
         if (this.examplesBackButton) {
             this.updateBindingAnimations([this.examplesBackButton]);
         }
@@ -1371,6 +1500,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             return;
         }
         this.folded = nextFolded;
+        if (!this.folded) {
+            this.keepPlaneControlsWhileFolded = false;
+        }
         this.syncVisualState();
     }
 
