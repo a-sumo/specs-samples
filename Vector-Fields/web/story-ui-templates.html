@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Story UI Templates</title>
+  <style>
+    :root {
+      --panel: #202221;
+      --panel-2: #2a2d2d;
+      --panel-3: #343737;
+      --accent: #d8d6cf;
+      --line: rgba(232, 229, 220, 0.54);
+      --line-soft: rgba(232, 229, 220, 0.18);
+      --text: #f4f1e9;
+      --muted: #bdb9b1;
+      --quiet: #8f8b84;
+      --active: #555757;
+      --active-ink: #fffaf0;
+      --pressed: #3f4242;
+    }
+
+    @font-face {
+      font-family: NunitoSansLocal;
+      src: url("../Assets/Fonts/Nunito_Sans/NunitoSans.ttf");
+      font-weight: 200 1000;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: transparent;
+      color: var(--text);
+      font-family: NunitoSansLocal, "Avenir Next", system-ui, sans-serif;
+    }
+
+    body {
+      display: grid;
+      gap: 34px;
+      padding: 48px;
+      align-items: start;
+      justify-items: start;
+    }
+
+    .capture {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      color: var(--text);
+    }
+
+    #panel {
+      background:
+        radial-gradient(circle at 16% 0%, rgba(244, 241, 233, 0.16), rgba(244, 241, 233, 0) 34%),
+        linear-gradient(145deg, #323534 0%, #202221 58%, #151716 100%);
+      border: 3px solid var(--line);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        inset 0 -34px 82px rgba(0,0,0,0.24);
+    }
+
+    #panel::before {
+      content: "";
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      top: 190px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), rgba(255,255,255,0.12));
+    }
+
+    .title {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      margin: 0;
+      color: var(--text);
+      font-size: 92px;
+      line-height: 1;
+      letter-spacing: 0;
+      font-weight: 820;
+    }
+
+    .status {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 36px;
+      line-height: 1;
+      font-weight: 760;
+    }
+
+    .status .mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 20px rgba(232,229,220,0.34);
+    }
+
+    .slot {
+      position: absolute;
+      border-radius: 32px;
+      border: 2px solid var(--line-soft);
+      background: rgba(255,255,255,0.035);
+    }
+
+    .slot.progress {
+      border-radius: 28px;
+      background: rgba(255,255,255,0.025);
+    }
+
+    .card {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+        var(--panel-2);
+      border: 3px solid rgba(235,242,246,0.42);
+      border-radius: 32px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.10),
+        0 18px 44px rgba(0,0,0,0.28);
+    }
+
+    .card[data-state="active"] {
+      color: var(--active-ink);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06)),
+        var(--active);
+      border-color: rgba(255,255,255,0.88);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.28),
+        0 0 0 8px rgba(232,229,220,0.16),
+        0 20px 48px rgba(0,0,0,0.34);
+    }
+
+    .card[data-state="pressed"] {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
+        var(--pressed);
+      border-color: rgba(235,242,246,0.72);
+      transform: scale(0.984);
+    }
+
+    .card .num {
+      position: absolute;
+      left: 30px;
+      top: 25px;
+      color: var(--quiet);
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 740;
+      letter-spacing: 0.08em;
+    }
+
+    .card[data-state="active"] .num {
+      color: #e4e0d4;
+    }
+
+    .card h2 {
+      position: absolute;
+      left: 112px;
+      right: 32px;
+      top: 40px;
+      margin: 0;
+      color: currentColor;
+      font-size: 48px;
+      line-height: 1;
+      font-weight: 760;
+      letter-spacing: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav {
+      display: grid;
+      place-items: center;
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.015)),
+        var(--panel-3);
+      border: 3px solid rgba(235,242,246,0.54);
+      color: var(--text);
+      font-size: 46px;
+      line-height: 1;
+      font-weight: 780;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 18px 40px rgba(0,0,0,0.28);
+    }
+
+    .nav[data-state="pressed"] {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
+        var(--pressed);
+      transform: scale(0.984);
+    }
+  </style>
+</head>
+<body>
+  <script src="./story-ui-layout.browser.js"></script>
+  <script>
+    const spec = window.STORY_UI_LAYOUT;
+    const px = (slot) => {
+      const p = slot.px;
+      return `left:${p.x}px;top:${p.y}px;width:${p.width}px;height:${p.height}px`;
+    };
+
+    const panel = document.createElement("section");
+    panel.id = "panel";
+    panel.className = "capture";
+    panel.style.cssText = `width:${spec.texture.widthPx}px;height:${spec.texture.heightPx}px;border-radius:${spec.panel.cornerRadiusPx}px`;
+
+    const titleSlot = spec.slots.find((s) => s.id === "title");
+    const title = document.createElement("h1");
+    title.className = "title";
+    title.style.cssText = px(titleSlot);
+    title.textContent = "Guide";
+    panel.appendChild(title);
+
+    const statusSlot = spec.slots.find((s) => s.id === "status");
+    const status = document.createElement("div");
+    status.className = "status";
+    status.style.cssText = px(statusSlot);
+    status.innerHTML = `<span class="mark"></span>`;
+    panel.appendChild(status);
+
+    for (const slot of spec.slots.filter((s) => s.role === "card" || s.role === "progress")) {
+      const div = document.createElement("div");
+      div.className = `slot ${slot.role}`;
+      div.style.cssText = px(slot);
+      panel.appendChild(div);
+    }
+    document.body.appendChild(panel);
+
+    for (const step of spec.steps) {
+      const slot = spec.slots.find((s) => s.id === `card_${step.id}`);
+      for (const state of ["normal", "active", "pressed"]) {
+        const card = document.createElement("article");
+        card.id = `card_${step.id}_${state}`;
+        card.className = "capture card";
+        card.dataset.state = state;
+        card.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
+        card.innerHTML = `<span class="num">${step.index}</span><h2>${step.title}</h2>`;
+        document.body.appendChild(card);
+      }
+    }
+
+    for (const nav of [{ id: "back", label: "Back" }, { id: "next", label: "Next" }]) {
+      const slot = spec.slots.find((s) => s.id === `nav_${nav.id}`);
+      for (const state of ["normal", "pressed"]) {
+        const button = document.createElement("div");
+        button.id = `nav_${nav.id}_${state}`;
+        button.className = "capture nav";
+        button.dataset.state = state;
+        button.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
+        button.textContent = nav.label;
+        document.body.appendChild(button);
+      }
+    }
+
+    window.storyUiReady = true;
+  </script>
+</body>
+</html>

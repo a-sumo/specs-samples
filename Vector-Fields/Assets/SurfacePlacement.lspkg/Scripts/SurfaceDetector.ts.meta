@@ -1,0 +1,66 @@
+- !<AssetImportMetadata/48d34039-59d5-4898-acb1-eab9d2b84275>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 80c8fa22-eaac-4513-8308-33fb37699bd7
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 80c8fa22-eaac-4513-8308-33fb37699bd7
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 9be74ec5-24e5-47a0-bc70-481d5d082011
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/9be74ec5-24e5-47a0-bc70-481d5d082011>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: |-
+    Allows do detect surface using WorldQueryModule
+    
+    API: 
+    startGroundCalibration(callback: (pos: vec3, rot: quat) => void)
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 1f991544-02b8-4982-b1c6-a42e032af7a3
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    circleAnim: false
+    confirmText: false
+    enableLogging: false
+    enableLoggingLifecycle: false
+    hintAnchor: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - circleAnim: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+      hintAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      confirmText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      enableLogging: false
+      enableLoggingLifecycle: false
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Visual Feedback</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #94A3B8; font-size: 11px;\">Circle animation and hint components</span>"}'
+    - // @input AssignableType circleAnim
+    - // @input SceneObject hintAnchor
+    - // @input Component.Text confirmText
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Logging Configuration</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #94A3B8; font-size: 11px;\">Control logging output for this script instance</span>"}'
+    - '// @input bool enableLogging {"hint":"Enable general logging (animation cycles, events, etc.)"}'
+    - '// @input bool enableLoggingLifecycle {"hint":"Enable lifecycle logging (onAwake, onStart, onUpdate, onDestroy, etc.)"}'

@@ -33,7 +33,7 @@ const MAGNETIC_VIZ_INDEX = 14;
 const GUIDE_PANEL_WIDTH_CM = 28.0;
 const GUIDE_PANEL_HEIGHT_CM = 29.0;
 const GUIDE_FONT: Font = requireAsset("../Fonts/Source_Sans_3/static/SourceSans3-SemiBold.ttf") as Font;
-const ARTICLE_IMAGE_MATERIAL: Material = requireAsset("../Materials/SpriteSheetBG.mat") as Material;
+const ARTICLE_IMAGE_MATERIAL: Material = requireAsset("../Image.mat") as Material;
 const TEX_EXPANSION: Texture = requireAsset("../Images/expansion_preview.png") as Texture;
 const TEX_CONTRACTION: Texture = requireAsset("../Images/contraction_preview.png") as Texture;
 const TEX_CIRCULATION: Texture = requireAsset("../Images/circulation_preview.png") as Texture;
@@ -582,13 +582,8 @@ export class NarrationPanel extends BaseScriptComponent {
         this.mediaImageObject.getTransform().setLocalScale(new vec3(w, h, 1.0));
         this.mediaImageObject.getTransform().setLocalPosition(new vec3(0.0, 0.55, 0.48));
         const pass = this.mediaImageMaterial.mainPass as any;
-        try { pass.spriteSheet = texture; } catch (e) {}
         try { pass.baseTex = texture; } catch (e) {}
-        try { pass.rows = 1; } catch (e) {}
-        try { pass.columns = 1; } catch (e) {}
-        try { pass.totalFrames = 1; } catch (e) {}
-        try { pass.preset = 0; } catch (e) {}
-        try { pass.blendAmount = 1.0; } catch (e) {}
+        try { pass.baseColor = new vec4(1.0, 1.0, 1.0, 1.0); } catch (e) {}
     }
 
     private layoutFieldRoots(): void {

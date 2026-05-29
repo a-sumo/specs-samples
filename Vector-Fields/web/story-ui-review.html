@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Story Guide UI Review</title>
+  <style>
+    :root {
+      --page: #090a0b;
+      --panel: #101315;
+      --panel-2: #171b1e;
+      --line: rgba(232, 229, 220, 0.18);
+      --text: #f4f1e9;
+      --muted: #bdb9b1;
+      --quiet: #8f8b84;
+      --accent: #d8d6cf;
+    }
+
+    @font-face {
+      font-family: NunitoSansLocal;
+      src: url("../Assets/Fonts/Nunito_Sans/NunitoSans.ttf");
+      font-weight: 200 1000;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--page);
+      color: var(--text);
+      font-family: NunitoSansLocal, "Avenir Next", system-ui, sans-serif;
+    }
+
+    body {
+      padding: 28px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 44px;
+      line-height: 1;
+      font-weight: 920;
+      letter-spacing: 0;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.3;
+      font-weight: 720;
+      text-align: right;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    section {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.025);
+      padding: 18px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 860;
+    }
+
+    .panel-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel-image {
+      width: min(100%, 900px);
+      height: auto;
+      display: block;
+      border-radius: 20px;
+      background: var(--panel);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .state-group {
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+    }
+
+    .state-group h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 870;
+    }
+
+    .state-group img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+
+    .nav-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .nav-row img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+
+    aside {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 0;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      color: var(--text);
+      max-width: 136px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(232,229,220,0.12);
+      color: #ebe8df;
+      font-size: 13px;
+      font-weight: 820;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 16px rgba(232,229,220,0.28);
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: static;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Story guide UI</h1>
+    <div class="meta">
+      <div>Nunito Sans</div>
+      <div id="scaleMeta"></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <section class="panel-wrap">
+        <h2>Panel Texture</h2>
+        <img class="panel-image" src="../Assets/Images/StoryUI/chapter_panel.png" alt="Chapter guide panel">
+      </section>
+
+      <section style="margin-top:24px">
+        <h2>Card States</h2>
+        <div class="cards" id="cards"></div>
+      </section>
+
+      <section style="margin-top:24px">
+        <h2>Navigation States</h2>
+        <div class="nav-row">
+          <img src="../Assets/Images/StoryUI/nav_back_normal.png" alt="Back normal">
+          <img src="../Assets/Images/StoryUI/nav_back_pressed.png" alt="Back pressed">
+          <img src="../Assets/Images/StoryUI/nav_next_normal.png" alt="Next normal">
+          <img src="../Assets/Images/StoryUI/nav_next_pressed.png" alt="Next pressed">
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <section>
+        <h2>Layout Contract</h2>
+        <div class="pill"><span class="dot"></span><span id="panelMeta"></span></div>
+        <table style="margin-top:12px">
+          <thead>
+            <tr><th>Slot</th><th>x</th><th>y</th><th>w</th><th>h</th></tr>
+          </thead>
+          <tbody id="slotRows"></tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Chapter Roots</h2>
+        <table>
+          <thead>
+            <tr><th>Card</th><th>Root</th></tr>
+          </thead>
+          <tbody id="rootRows"></tbody>
+        </table>
+      </section>
+    </aside>
+  </div>
+
+  <script src="./story-ui-layout.browser.js"></script>
+  <script>
+    const spec = window.STORY_UI_LAYOUT;
+    document.getElementById("scaleMeta").textContent =
+      `${spec.texture.widthPx} x ${spec.texture.heightPx}px, ${spec.texture.pixelsPerCm}px/cm`;
+    document.getElementById("panelMeta").textContent =
+      `${spec.texture.widthCm} x ${spec.texture.heightCm} cm`;
+
+    const cards = document.getElementById("cards");
+    for (const step of spec.steps) {
+      const group = document.createElement("article");
+      group.className = "state-group";
+      group.innerHTML = `
+        <h3>${step.index} ${step.title}</h3>
+        <img src="../Assets/Images/StoryUI/card_${step.id}_normal.png" alt="${step.title} normal">
+        <img src="../Assets/Images/StoryUI/card_${step.id}_active.png" alt="${step.title} active">
+        <img src="../Assets/Images/StoryUI/card_${step.id}_pressed.png" alt="${step.title} pressed">
+      `;
+      cards.appendChild(group);
+    }
+
+    const slotRows = document.getElementById("slotRows");
+    for (const slot of spec.slots) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${slot.id}</td><td>${slot.cm.x.toFixed(2)}</td><td>${slot.cm.y.toFixed(2)}</td><td>${slot.cm.width.toFixed(2)}</td><td>${slot.cm.height.toFixed(2)}</td>`;
+      slotRows.appendChild(tr);
+    }
+
+    const rootRows = document.getElementById("rootRows");
+    for (const step of spec.steps) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${step.title}</td><td>${step.root}</td>`;
+      rootRows.appendChild(tr);
+    }
+  </script>
+</body>
+</html>

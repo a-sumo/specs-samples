@@ -26,14 +26,22 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    autoReturnSeconds: false
     enabled: false
     fallbackDragRadiansPerCm: false
     gravityFieldObject: false
     inertiaDamping: false
     inertiaStrength: false
     interactableObject: false
+    levelOnRelease: false
+    levelSpeed: false
+    lockAxisX: false
+    lockAxisY: false
+    lockAxisZ: false
     maxStepDegrees: false
+    returnSpeed: false
     sensitivity: false
+    smoothingTime: false
     targetObject: false
   ScriptTypesHidden:
     {}
@@ -49,10 +57,18 @@
       gravityFieldObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       enabled: true
       sensitivity: !<float> 1.000000
+      smoothingTime: 0.080000
       maxStepDegrees: !<float> 16.000000
       inertiaStrength: 0.080000
       inertiaDamping: !<float> 8.000000
+      levelOnRelease: false
+      levelSpeed: 2.500000
+      autoReturnSeconds: !<float> 0.000000
+      returnSpeed: !<float> 3.000000
       fallbackDragRadiansPerCm: 0.120000
+      lockAxisX: false
+      lockAxisY: false
+      lockAxisZ: false
   ScriptTypes:
     -
       {}
@@ -62,7 +78,15 @@
     - '// @input SceneObject gravityFieldObject {"hint":"Optional object containing GravityField. If set, drag is composed with Earth tilt/spin."}'
     - '// @input bool enabled = true {"hint":"Enables touch/hand/mouse drag rotation."}'
     - '// @input float sensitivity = 1 {"hint":"Multiplier for surface-drag rotation.", "widget":"slider", "min":0.15, "max":2.5, "step":0.05}'
-    - '// @input float maxStepDegrees = 16 {"hint":"Maximum degrees of rotation accepted per frame.", "widget":"slider", "min":2, "max":35, "step":1}'
-    - '// @input float inertiaStrength = 0.08 {"hint":"How much momentum remains after release.", "widget":"slider", "min":0, "max":0.4, "step":0.01}'
-    - '// @input float inertiaDamping = 8 {"hint":"Higher values stop release momentum faster.", "widget":"slider", "min":1, "max":16, "step":0.25}'
+    - '// @input float smoothingTime = 0.08 {"hint":"Smoothing time constant (seconds). Higher = smoother / less jitter but more lag. 0 = raw.", "widget":"slider", "min":0, "max":0.3, "step":0.01}'
+    - '// @input float maxStepDegrees = 24 {"hint":"Maximum degrees of rotation accepted per frame (clamps spikes).", "widget":"slider", "min":2, "max":60, "step":1}'
+    - '// @input float inertiaStrength = 0.7 {"hint":"Fraction of spin velocity kept when you let go (momentum). 0 = stop instantly.", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - '// @input float inertiaDamping = 3.5 {"hint":"Higher values stop release momentum faster.", "widget":"slider", "min":0.5, "max":16, "step":0.25}'
+    - '// @input bool levelOnRelease {"hint":"After release, ease the polar axis back to vertical (latitude lines settle horizontal)."}'
+    - '// @input float levelSpeed = 2.5 {"hint":"How fast auto-level eases the globe upright.", "widget":"slider", "min":0.5, "max":8, "step":0.25}'
+    - '// @input float autoReturnSeconds {"hint":"Seconds of no interaction before easing back to the start orientation. 0 = never.", "widget":"slider", "min":0, "max":10, "step":0.5}'
+    - '// @input float returnSpeed = 3 {"hint":"How fast returnToRest()/auto-return eases home.", "widget":"slider", "min":0.5, "max":8, "step":0.25}'
     - '// @input float fallbackDragRadiansPerCm = 0.12 {"hint":"Fallback rotation scale when no surface hit point is available.", "widget":"slider", "min":0.01, "max":0.45, "step":0.01}'
+    - '// @input bool lockAxisX {"hint":"Block spin about the world X axis (pitch / tilt up-down)."}'
+    - '// @input bool lockAxisY {"hint":"Block spin about the world Y axis (yaw / horizontal spin)."}'
+    - '// @input bool lockAxisZ {"hint":"Block spin about the world Z axis (roll / sideways tumble)."}'

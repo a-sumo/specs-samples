@@ -1,0 +1,47 @@
+- !<AssetImportMetadata/5d2797f2-3e9b-473f-bbb4-b186307f4b1f>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> d1896672-8fb7-48ad-b2f9-eb68835c6172
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> d1896672-8fb7-48ad-b2f9-eb68835c6172
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> a26bf82f-95b1-41a2-9ba0-7b21911ecf99
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/a26bf82f-95b1-41a2-9ba0-7b21911ecf99>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 1c796658-898a-4e35-a03e-06938d2f430a
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    calibrateOnStart: false
+    placementMode: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - calibrateOnStart: true
+      placementMode: !<float> 0.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input bool calibrateOnStart {"hint":"Run calibration automatically at lens start. Leave OFF for menu-driven flows."}'
+    - '// @input float placementMode {"hint":"Surface type used for calibration.", "widget":"combobox", "values":[{"label":"Horizontal (floor)", "value":0}, {"label":"Vertical (wall)", "value":1}, {"label":"Tabletop (near surface)", "value":2}]}'

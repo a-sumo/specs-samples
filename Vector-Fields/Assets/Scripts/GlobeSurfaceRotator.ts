@@ -1,5 +1,13 @@
 // GlobeSurfaceRotator.ts
 // Trackball-style surface drag for SIK Interactable globes.
+//
+// Dynamics model: drag feeds a TARGET angular velocity (world-space rad/s).
+// The actual angular velocity eases toward it with a time-constant filter
+// (noise reduction), and the rotation is integrated from that smoothed
+// velocity every frame. On release the velocity decays exponentially
+// (gradual slowdown / inertia). Optional auto-level eases the polar axis
+// back to vertical so latitude lines settle horizontal, and returnToRest()
+// eases the whole globe back to its starting orientation.
 
 @component
 export class GlobeSurfaceRotator extends BaseScriptComponent {
@@ -28,41 +36,88 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
     sensitivity: number = 1.0;
 
     @input
-    @widget(new SliderWidget(2.0, 35.0, 1.0))
-    @hint("Maximum degrees of rotation accepted per frame.")
-    maxStepDegrees: number = 16.0;
+    @widget(new SliderWidget(0.0, 0.3, 0.01))
+    @hint("Smoothing time constant (seconds). Higher = smoother / less jitter but more lag. 0 = raw.")
+    smoothingTime: number = 0.08;
 
     @input
-    @widget(new SliderWidget(0.0, 0.4, 0.01))
-    @hint("How much momentum remains after release.")
-    inertiaStrength: number = 0.08;
+    @widget(new SliderWidget(2.0, 60.0, 1.0))
+    @hint("Maximum degrees of rotation accepted per frame (clamps spikes).")
+    maxStepDegrees: number = 24.0;
 
     @input
-    @widget(new SliderWidget(1.0, 16.0, 0.25))
+    @widget(new SliderWidget(0.0, 1.0, 0.05))
+    @hint("Fraction of spin velocity kept when you let go (momentum). 0 = stop instantly.")
+    inertiaStrength: number = 0.7;
+
+    @input
+    @widget(new SliderWidget(0.5, 16.0, 0.25))
     @hint("Higher values stop release momentum faster.")
-    inertiaDamping: number = 8.0;
+    inertiaDamping: number = 3.5;
+
+    @input
+    @hint("After release, ease the polar axis back to vertical (latitude lines settle horizontal).")
+    levelOnRelease: boolean = false;
+
+    @input
+    @widget(new SliderWidget(0.5, 8.0, 0.25))
+    @hint("How fast auto-level eases the globe upright.")
+    levelSpeed: number = 2.5;
+
+    @input
+    @widget(new SliderWidget(0.0, 10.0, 0.5))
+    @hint("Seconds of no interaction before easing back to the start orientation. 0 = never.")
+    autoReturnSeconds: number = 0.0;
+
+    @input
+    @widget(new SliderWidget(0.5, 8.0, 0.25))
+    @hint("How fast returnToRest()/auto-return eases home.")
+    returnSpeed: number = 3.0;
 
     @input
     @widget(new SliderWidget(0.01, 0.45, 0.01))
     @hint("Fallback rotation scale when no surface hit point is available.")
     fallbackDragRadiansPerCm: number = 0.12;
 
+    @input
+    @hint("Block spin about the world X axis (pitch / tilt up-down).")
+    lockAxisX: boolean = false;
+
+    @input
+    @hint("Block spin about the world Y axis (yaw / horizontal spin).")
+    lockAxisY: boolean = false;
+
+    @input
+    @hint("Block spin about the world Z axis (roll / sideways tumble).")
+    lockAxisZ: boolean = false;
+
     private targetTransform: Transform | null = null;
     private interactable: any = null;
     private gravityApi: any = null;
     private dragging: boolean = false;
+
     // Trackball math runs in WORLD space relative to the globe center. Using the
-    // object's local frame feeds the applied rotation back into the next
-    // measurement (the local frame rotates with the object), which makes the
-    // rotation cancel itself out. World-space directions depend only on the
-    // cursor and the sphere silhouette, so there is no feedback.
+    // object's local frame would feed the applied rotation back into the next
+    // measurement (the local frame rotates with the object), cancelling itself
+    // out. World-space directions depend only on the cursor and the sphere
+    // silhouette, so there is no feedback.
     private lastWorldDirection: vec3 | null = null;
-    private inertiaAxis: vec3 = vec3.up();
-    private inertiaSpeed: number = 0.0;
+
+    // World-space angular velocity (axis * rad/s), encoded as a rotation vector.
+    private angularVelocity: vec3 = vec3.zero();
+    private targetVelocity: vec3 = vec3.zero();
+    private hasFreshInput: boolean = false;
+
+    // Rest pose + idle/return state.
+    private homeRotation: quat | null = null;
+    private returning: boolean = false;
+    private idleTime: number = 0.0;
+
+    private static readonly POLE_LOCAL: vec3 = vec3.up();
 
     onAwake(): void {
         this.createEvent("OnStartEvent").bind(() => this.bindInteractable());
-        this.createEvent("UpdateEvent").bind(() => this.updateInertia());
+        this.createEvent("UpdateEvent").bind(() => this.onUpdate());
     }
 
     private bindInteractable(): void {
@@ -71,6 +126,7 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
         this.targetObject = target;
         this.interactableObject = owner;
         this.targetTransform = target.getTransform();
+        this.homeRotation = this.targetTransform.getWorldRotation();
         this.gravityApi = this.findGravityApi();
         this.interactable = this.findInteractable(owner);
 
@@ -79,7 +135,6 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
             return;
         }
 
-        print("[GlobeRotator] bound to Interactable on '" + owner.name + "', rotating '" + target.name + "'");
         this.addEventListener(this.interactable.onTriggerStart, (event: any) => this.beginDrag(event));
         this.addEventListener(this.interactable.onTriggerUpdate, (event: any) => this.updateSurfaceDrag(event));
         this.addEventListener(this.interactable.onDragUpdate, (event: any) => this.updateFallbackDrag(event));
@@ -88,97 +143,203 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
         this.addEventListener(this.interactable.onTriggerCanceled, () => this.endDrag());
     }
 
+    // ---- public UX hooks (wire to a button / gesture) --------------------
+
+    /** Ease the globe back to the orientation it had at startup. */
+    public returnToRest(): void {
+        this.returning = true;
+        this.dragging = false;
+        this.angularVelocity = vec3.zero();
+        this.targetVelocity = vec3.zero();
+    }
+
+    /** Capture the current orientation as the new rest pose. */
+    public setRestHere(): void {
+        if (this.targetTransform) this.homeRotation = this.targetTransform.getWorldRotation();
+    }
+
+    // ---- axis locks (wire to buttons) ------------------------------------
+
+    /** Block spin about each world axis. Free rotation = (false, false, false). */
+    public setAxisLock(x: boolean, y: boolean, z: boolean): void {
+        this.lockAxisX = x;
+        this.lockAxisY = y;
+        this.lockAxisZ = z;
+    }
+
+    /** Remove all locks: rotate freely in every direction. */
+    public unlockAll(): void {
+        this.setAxisLock(false, false, false);
+    }
+
+    /** Allow only horizontal spin (about world up) — like a desk globe. */
+    public lockToVerticalSpin(): void {
+        this.setAxisLock(true, false, true);
+    }
+
+    /** Toggle between vertical-spin-only and fully free. */
+    public toggleVerticalSpin(): void {
+        const spinOnly = this.lockAxisX && this.lockAxisZ && !this.lockAxisY;
+        if (spinOnly) this.unlockAll(); else this.lockToVerticalSpin();
+    }
+
+    /** Toggle the sideways roll/tumble lock, leaving yaw + pitch free. */
+    public toggleRollLock(): void {
+        this.lockAxisZ = !this.lockAxisZ;
+    }
+
+    // ---- drag input ------------------------------------------------------
+
     private beginDrag(event: any): void {
-        print("[GlobeRotator] onTriggerStart (enabled=" + this.enabled + ")");
         if (!this.enabled) return;
         this.gravityApi = this.findGravityApi();
         this.dragging = true;
-        this.inertiaSpeed = 0.0;
+        this.returning = false;
+        this.idleTime = 0.0;
+        this.angularVelocity = vec3.zero();
+        this.targetVelocity = vec3.zero();
+        this.hasFreshInput = false;
         this.lastWorldDirection = this.hitWorldDirection(event);
-        print("[GlobeRotator] beginDrag hitDir=" + (this.lastWorldDirection ? "yes" : "NULL"));
     }
 
     private updateSurfaceDrag(event: any): void {
         if (!this.enabled || !this.dragging) return;
         const nextDirection = this.hitWorldDirection(event);
-        if (!nextDirection) {
-            print("[GlobeRotator] triggerUpdate: hit dir NULL (cursor off sphere?)");
-            return;
-        }
-        print("[GlobeRotator] triggerUpdate: surface drag applied");
-        this.applySurfaceDirection(nextDirection);
+        if (!nextDirection) return;
+        this.feedSurfaceDirection(nextDirection);
     }
 
     private updateFallbackDrag(event: any): void {
         if (!this.enabled || !this.dragging) return;
-        if (this.hitWorldDirection(event)) return;
+        if (this.hitWorldDirection(event)) return; // surface path owns this frame
 
         const drag = this.eventDragVector(event);
-        print("[GlobeRotator] dragUpdate fallback drag=" + (drag ? drag.length.toFixed(2) : "NULL"));
-        if (!drag || drag.length < 0.0001 || !this.targetTransform) return;
+        if (!drag || drag.length < 0.0001) return;
 
-        // Fallback when the cursor is off the sphere: spin around world axes
-        // using the world-space drag vector. Horizontal drag yaws around world
-        // up, vertical drag pitches around world right.
+        // Off-sphere fallback: yaw around world up, pitch around world right.
         const scale = Math.max(0.0, this.fallbackDragRadiansPerCm) * Math.max(0.0, this.sensitivity);
-        const yaw = quat.angleAxis(-drag.x * scale, vec3.up());
-        const pitch = quat.angleAxis(drag.y * scale, vec3.right());
-        const delta = yaw.multiply(pitch);
-        delta.normalize();
-        this.applyRotationDelta(delta);
+        const rotationVector = vec3.up().uniformScale(-drag.x * scale)
+            .add(vec3.right().uniformScale(drag.y * scale));
+        const dt = Math.max(0.001, getDeltaTime());
+        this.targetVelocity = rotationVector.uniformScale(1.0 / dt);
+        this.hasFreshInput = true;
     }
 
     private endDrag(): void {
+        if (!this.dragging) return;
         this.dragging = false;
         this.lastWorldDirection = null;
-        this.inertiaSpeed *= Math.max(0.0, Math.min(1.0, this.inertiaStrength));
+        this.idleTime = 0.0;
+        // Keep a fraction of the smoothed velocity as release momentum.
+        this.angularVelocity = this.angularVelocity.uniformScale(this.clamp(this.inertiaStrength, 0.0, 1.0));
     }
 
-    private updateInertia(): void {
-        if (!this.enabled || this.dragging || this.inertiaSpeed <= 0.001) return;
-        const dt = Math.max(0.001, getDeltaTime());
-        const maxStep = this.degToRad(Math.max(1.0, this.maxStepDegrees));
-        const step = Math.min(maxStep, this.inertiaSpeed * dt);
-        const delta = quat.angleAxis(step, this.inertiaAxis);
-        delta.normalize();
-        this.applyRotationDelta(delta);
-        this.inertiaSpeed *= Math.exp(-Math.max(0.0, this.inertiaDamping) * dt);
-    }
-
-    private applySurfaceDirection(nextDirection: vec3): void {
-        if (!this.lastWorldDirection) {
-            this.lastWorldDirection = nextDirection;
-            return;
-        }
-
-        const fromDirection = this.lastWorldDirection;
-        const dot = this.clamp(fromDirection.dot(nextDirection), -1.0, 1.0);
-        let angle = Math.acos(dot);
-        if (angle < 0.0001) {
-            this.lastWorldDirection = nextDirection;
-            return;
-        }
-
-        let axis = fromDirection.cross(nextDirection);
-        if (axis.length < 0.0001) {
-            this.lastWorldDirection = nextDirection;
-            return;
-        }
-
-        axis = axis.normalize();
-        angle *= Math.max(0.0, this.sensitivity);
-        angle = Math.min(angle, this.degToRad(Math.max(1.0, this.maxStepDegrees)));
-
-        // Axis and angle are in world space; apply as a world-space delta.
-        const delta = quat.angleAxis(angle, axis);
-        delta.normalize();
-        this.applyRotationDelta(delta);
-
-        this.inertiaAxis = axis;
-        this.inertiaSpeed = angle / Math.max(0.001, getDeltaTime());
-        // After rotating, the grabbed point now sits at nextDirection in world
-        // space, so this is the correct reference for the next frame.
+    // Convert the latest surface hit into a target angular velocity.
+    private feedSurfaceDirection(nextDirection: vec3): void {
+        const from = this.lastWorldDirection;
         this.lastWorldDirection = nextDirection;
+        if (!from) return;
+
+        const dot = this.clamp(from.dot(nextDirection), -1.0, 1.0);
+        const angle = Math.acos(dot) * Math.max(0.0, this.sensitivity);
+        let axis = from.cross(nextDirection);
+        if (angle < 0.00001 || axis.length < 0.00001) {
+            // Cursor effectively still: target zero so the spin eases to a stop.
+            this.targetVelocity = vec3.zero();
+            this.hasFreshInput = true;
+            return;
+        }
+        axis = axis.normalize();
+        const dt = Math.max(0.001, getDeltaTime());
+        this.targetVelocity = axis.uniformScale(angle / dt);
+        this.hasFreshInput = true;
+    }
+
+    // ---- per-frame integration ------------------------------------------
+
+    private onUpdate(): void {
+        if (!this.enabled || !this.targetTransform) return;
+        const dt = Math.max(0.001, getDeltaTime());
+
+        if (this.dragging) {
+            const target = this.hasFreshInput ? this.targetVelocity : vec3.zero();
+            this.hasFreshInput = false;
+            const k = this.smoothingTime > 0.0001 ? 1.0 - Math.exp(-dt / this.smoothingTime) : 1.0;
+            this.angularVelocity = this.lerpVec(this.angularVelocity, target, k);
+            this.integrate(dt);
+            this.idleTime = 0.0;
+            return;
+        }
+
+        // Released: carry momentum, then decay it.
+        this.integrate(dt);
+        this.angularVelocity = this.angularVelocity.uniformScale(Math.exp(-Math.max(0.0, this.inertiaDamping) * dt));
+        this.idleTime += dt;
+
+        if (this.returning) {
+            this.stepReturn(dt);
+            return;
+        }
+        if (this.levelOnRelease) {
+            this.stepLevel(dt);
+        }
+        if (this.autoReturnSeconds > 0.0 && this.idleTime >= this.autoReturnSeconds) {
+            this.returning = true;
+        }
+    }
+
+    private integrate(dt: number): void {
+        // Constrain the spin to the unlocked world axes.
+        if (this.lockAxisX || this.lockAxisY || this.lockAxisZ) {
+            this.angularVelocity = new vec3(
+                this.lockAxisX ? 0.0 : this.angularVelocity.x,
+                this.lockAxisY ? 0.0 : this.angularVelocity.y,
+                this.lockAxisZ ? 0.0 : this.angularVelocity.z
+            );
+        }
+        const speed = this.angularVelocity.length;
+        if (speed < 0.00001) return;
+        let angle = speed * dt;
+        const maxStep = this.degToRad(Math.max(1.0, this.maxStepDegrees));
+        if (angle > maxStep) angle = maxStep;
+        const axis = this.angularVelocity.uniformScale(1.0 / speed);
+        this.applyRotationDelta(quat.angleAxis(angle, axis));
+    }
+
+    // Ease the polar axis toward world-up; preserves azimuth + horizontal spin.
+    private stepLevel(dt: number): void {
+        if (!this.targetTransform) return;
+        const rotation = this.targetTransform.getWorldRotation();
+        const poleLocal = GlobeSurfaceRotator.POLE_LOCAL;
+        const pole = rotation.multiplyVec3(poleLocal).normalize();
+        const up = vec3.up();
+        const dot = this.clamp(pole.dot(up), -1.0, 1.0);
+        const tilt = Math.acos(dot);
+        if (tilt < this.degToRad(0.4)) return;
+
+        let axis = pole.cross(up);
+        // Pole pointing straight down: any horizontal axis works.
+        axis = axis.length < 0.00001 ? vec3.right() : axis.normalize();
+        const k = 1.0 - Math.exp(-Math.max(0.0, this.levelSpeed) * dt);
+        this.applyRotationDelta(quat.angleAxis(tilt * k, axis));
+    }
+
+    private stepReturn(dt: number): void {
+        if (!this.targetTransform || !this.homeRotation) {
+            this.returning = false;
+            return;
+        }
+        const rotation = this.targetTransform.getWorldRotation();
+        const k = 1.0 - Math.exp(-Math.max(0.0, this.returnSpeed) * dt);
+        const next = quat.slerp(rotation, this.homeRotation, k);
+        this.targetTransform.setWorldRotation(next);
+
+        const closeness = Math.abs(this.clamp(rotation.dot(this.homeRotation), -1.0, 1.0));
+        const remaining = 2.0 * Math.acos(closeness);
+        if (remaining < this.degToRad(0.4)) {
+            this.targetTransform.setWorldRotation(this.homeRotation);
+            this.returning = false;
+        }
     }
 
     private applyRotationDelta(delta: quat): void {
@@ -261,6 +422,10 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
         } else if (typeof event === "function") {
             event(callback);
         }
+    }
+
+    private lerpVec(a: vec3, b: vec3, k: number): vec3 {
+        return a.add(b.sub(a).uniformScale(k));
     }
 
     private clamp(value: number, minValue: number, maxValue: number): number {

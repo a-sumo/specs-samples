@@ -1,0 +1,75 @@
+- !<AssetImportMetadata/c63f6d69-c36b-91f2-ddf1-da87c1b40d0d>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> a7086363-33b7-4a30-9e9c-db50e620ecc5
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> a7086363-33b7-4a30-9e9c-db50e620ecc5
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 301d705a-e02a-452c-a258-173d201c7cf2
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/301d705a-e02a-452c-a258-173d201c7cf2>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: |-
+    Allows do detect surface using WorldQueryModule
+    
+    API: 
+    startGroundCalibration(callback: (pos: vec3, rot: quat) => void)
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: c2ec78c2-3f36-48d5-bc58-2730823d0b3f
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    circleAnim: false
+    confirmText: false
+    enableLogging: false
+    enableLoggingLifecycle: false
+    hintAnchor: false
+    instructTextObj: false
+    sliderPrefab: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - circleAnim: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+      hintAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      confirmText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      enableLogging: false
+      enableLoggingLifecycle: false
+      instructTextObj: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      sliderPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Visual Feedback</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #94A3B8; font-size: 11px;\">Circle animation and hint components</span>"}'
+    - // @input AssignableType circleAnim
+    - // @input SceneObject hintAnchor
+    - // @input Component.Text confirmText
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Logging Configuration</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #94A3B8; font-size: 11px;\">Control logging output for this script instance</span>"}'
+    - '// @input bool enableLogging {"hint":"Enable general logging (animation cycles, events, etc.)"}'
+    - '// @input bool enableLoggingLifecycle {"hint":"Enable lifecycle logging (onAwake, onStart, onUpdate, onDestroy, etc.)"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">UI Configuration</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #94A3B8; font-size: 11px;\">Instruction text and height adjustment widget</span>"}'
+    - // @input SceneObject instructTextObj
+    - // @input Asset.ObjectPrefab sliderPrefab

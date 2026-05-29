@@ -1,0 +1,80 @@
+- !<AssetImportMetadata/c4e0b562-f0ca-44fa-a271-fcd5b33907a5>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 737dc505-c444-4a1b-a564-f30afdd88009
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 737dc505-c444-4a1b-a564-f30afdd88009
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 59056e58-df88-41ca-b0a6-9bfbaa5bfca0
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/59056e58-df88-41ca-b0a6-9bfbaa5bfca0>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 62462379-f5a4-42d4-b180-a5e129a46bd2
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    arrowColumns: false
+    arrowLength: false
+    arrowRows: false
+    curlStrength: false
+    flowSpeed: false
+    gustRadius: false
+    gustStrength: false
+    interactionObject: false
+    planeDepth: false
+    planeWidth: false
+    tracerCount: false
+    trailSamples: false
+    trailWidth: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - interactionObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      planeWidth: !<float> 24.000000
+      planeDepth: !<float> 14.000000
+      tracerCount: !<float> 132.000000
+      trailSamples: !<float> 10.000000
+      flowSpeed: 1.150000
+      gustStrength: 1.250000
+      gustRadius: 3.200000
+      curlStrength: 0.850000
+      arrowColumns: !<float> 11.000000
+      arrowRows: !<float> 7.000000
+      trailWidth: 0.075000
+      arrowLength: 0.420000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject interactionObject {"hint":"Optional draggable handle. Its local X/Z position creates a moving gust in the field."}'
+    - '// @input float planeWidth = 24 {"widget":"slider", "min":8, "max":34, "step":0.5}'
+    - '// @input float planeDepth = 14 {"widget":"slider", "min":5, "max":22, "step":0.5}'
+    - '// @input float tracerCount = 132 {"widget":"slider", "min":30, "max":220, "step":5}'
+    - '// @input float trailSamples = 10 {"widget":"slider", "min":4, "max":18, "step":1}'
+    - '// @input float flowSpeed = 1.15 {"widget":"slider", "min":0.2, "max":4, "step":0.05}'
+    - '// @input float gustStrength = 1.25 {"widget":"slider", "min":0, "max":3, "step":0.05}'
+    - '// @input float gustRadius = 3.2 {"widget":"slider", "min":1, "max":8, "step":0.25}'
+    - '// @input float curlStrength = 0.85 {"widget":"slider", "min":0, "max":3, "step":0.05}'
+    - '// @input float arrowColumns = 11 {"widget":"slider", "min":5, "max":17, "step":1}'
+    - '// @input float arrowRows = 7 {"widget":"slider", "min":3, "max":11, "step":1}'
+    - '// @input float trailWidth = 0.075 {"widget":"slider", "min":0.02, "max":0.18, "step":0.005}'
+    - '// @input float arrowLength = 0.42 {"widget":"slider", "min":0.15, "max":0.8, "step":0.025}'

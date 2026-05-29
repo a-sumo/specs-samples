@@ -1,0 +1,52 @@
+- !<AssetImportMetadata/ffa7f6db-af29-ff09-1fed-afa36a5bf018>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> d909b5a2-1c6a-44e1-ac44-49bef8508e2a
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> d909b5a2-1c6a-44e1-ac44-49bef8508e2a
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 8935b8c9-60f8-48ad-a2da-5bb83dabccb5
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/8935b8c9-60f8-48ad-a2da-5bb83dabccb5>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: |-
+    Allows do detect surface using WorldQueryModule
+    
+    API: 
+    startGroundCalibration(callback: (pos: vec3, rot: quat) => void)
+  VersionMajor: 1
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: bbe100f2-6e29-4791-af34-18dcd96a880d
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    handHintsPrefab: false
+    placementModePrefabs: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - handHintsPrefab: !<reference.ObjectPrefab> 00000000-0000-0000-0000-000000000000
+      placementModePrefabs: !<reference.ObjectPrefab[]>
+        []
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.ObjectPrefab handHintsPrefab
+    - "// @input Asset.ObjectPrefab[] placementModePrefabs"

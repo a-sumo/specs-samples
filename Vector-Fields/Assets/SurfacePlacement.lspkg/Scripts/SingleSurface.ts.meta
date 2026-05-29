@@ -1,0 +1,47 @@
+- !<AssetImportMetadata/2553cc6c-7066-0b85-2b60-62db04109f24>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> dee19899-eae9-4492-b028-8d21fd708f67
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> dee19899-eae9-4492-b028-8d21fd708f67
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> e0a40479-ac5c-4893-be6a-db3f6e4849eb
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/e0a40479-ac5c-4893-be6a-db3f6e4849eb>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 5c53d587-9312-45e2-96a0-c50b72676f90
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    interactable: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - interactable: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Interaction Configuration</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #94A3B8; font-size: 11px;\">Interactable component for hover and drag detection</span>"}'
+    - // @input AssignableType interactable

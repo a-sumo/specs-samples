@@ -1,0 +1,42 @@
+- !<NativePackageDescriptor/1c60ea28-64cc-42eb-9b1c-0fe13fc48b49>
+  PackagePath: ""
+  StudioVersion:
+    major: 5
+    minor: 15
+    patch: 3
+    build: 25100805
+    type: Unset
+    buildFlavor: ""
+    timestamp: 0
+    commit: ""
+  Description: "A comprehensive surface detection and object placement system for AR experiences. This package provides horizontal, vertical, and near-surface placement modes with adjustment widgets, surface detection utilities, and SIK integration for interactive object positioning."
+  SvgIcon: |
+    <svg width="393" height="338" viewBox="0 0 393 338" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M211.5 15C211.5 6.99187 205.008 0.5 197 0.5C188.992 0.5 182.5 6.99187 182.5 15L211.5 15ZM186.747 234.253C192.41 239.916 201.59 239.916 207.253 234.253L299.53 141.976C305.193 136.313 305.193 127.132 299.53 121.47C293.868 115.807 284.687 115.807 279.024 121.47L197 203.494L114.976 121.469C109.313 115.807 100.132 115.807 94.4695 121.469C88.8069 127.132 88.8069 136.313 94.4695 141.976L186.747 234.253ZM182.5 15L182.5 224L211.5 224L211.5 15L182.5 15Z" fill="white"/>
+    <path d="M102.554 190H88.3835C82.6255 190 77.3116 193.094 74.4691 198.101L16.5666 300.101C10.5117 310.767 18.216 324 30.481 324H362.519C374.784 324 382.488 310.767 376.433 300.101L318.531 198.101C315.688 193.094 310.374 190 304.617 190H290.446" stroke="#FFDA03" stroke-width="27" stroke-linecap="round"/>
+    </svg>
+
+  SetupScript:
+    code: ""
+  VersionMajor: 0
+  VersionMinor: 5
+  VersionPatch: 0
+  UpdateCheckpoint: 76
+  ExportUid: 3e491f94-610c-485f-9973-8e4412f565a1
+  ComponentUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpackedTransparent
+  ReadMe: !<reference> d87fb1ff-d4ec-4460-8ac6-87c1c9013bee
+  Tags:
+    []
+  Attachments:
+    []
+  Instantiable: !<reference> 00000000-0000-0000-0000-000000000000
+  AssetLibraryDependencyStructure: !<AssetLibraryDependencyStructure>
+    Name: SurfacePlacement
+    AssetId: 42fyXBlj0QfHNP51m6vpai
+    Hash: f8b2ffde2e105e7cac06a59481ecdb5c
+    Version:
+      major: -1
+      minor: -1
+      patch: -1
+      build: 0

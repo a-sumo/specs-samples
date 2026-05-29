@@ -1,0 +1,68 @@
+- !<AssetImportMetadata/68c2da8e-a561-46df-8b96-767853732181>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> dacdd311-dfe8-4833-a781-9ba03d453894
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> dacdd311-dfe8-4833-a781-9ba03d453894
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 2d58df9d-bd36-4b5b-beda-8fc3442b8734
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/2d58df9d-bd36-4b5b-beda-8fc3442b8734>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 6430afe6-761c-4b11-829f-2edeb7b2a76b
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    action: false
+    activeTex: false
+    globeRotator: false
+    hoverTex: false
+    image: false
+    interactableObject: false
+    isToggle: false
+    normalTex: false
+    pressedTex: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - interactableObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      image: !<reference.Image> 00000000-0000-0000-0000-000000000000
+      normalTex: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      hoverTex: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      pressedTex: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      activeTex: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      globeRotator: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      action: toggleVerticalSpin
+      isToggle: true
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject interactableObject {"hint":"Object with the SIK Interactable + Collider. Defaults to this SceneObject."}'
+    - '// @input Component.Image image {"hint":"Image to retexture for feedback. Defaults to an Image or RenderMeshVisual on this object."}'
+    - '// @input Asset.Texture normalTex {"hint":"Default button texture."}'
+    - '// @input Asset.Texture hoverTex {"hint":"Texture while hovered/targeted (optional)."}'
+    - '// @input Asset.Texture pressedTex {"hint":"Texture while pressed (optional)."}'
+    - "// @input Asset.Texture activeTex {\"hint\":\"Texture shown while toggled ON (optional, only used when 'isToggle' is set).\"}"
+    - '// @input SceneObject globeRotator {"hint":"Optional: object with a GlobeSurfaceRotator (or any script exposing the action method)."}'
+    - '// @input string action = "toggleVerticalSpin" {"hint":"Method to call on the rotator each press, e.g. toggleVerticalSpin, toggleRollLock, unlockAll, returnToRest."}'
+    - '// @input bool isToggle = true {"hint":"If on, this button latches: alternates state each press and shows activeTex while ON."}'
