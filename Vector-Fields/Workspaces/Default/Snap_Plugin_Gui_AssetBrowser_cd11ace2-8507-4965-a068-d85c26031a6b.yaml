@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 1570
+    size: 1535
     values:
       - ""
       - Base.png
@@ -15,27 +15,6 @@ CollapsedEntities:
       - Fonts/Nunito_Sans
       - Fonts/Nunito_Sans/NunitoSans.ttf
       - Fonts/Nunito_Sans/OFL.txt
-      - Fonts/Source_Sans_3
-      - Fonts/Source_Sans_3/OFL.txt
-      - Fonts/Source_Sans_3/README.txt
-      - Fonts/Source_Sans_3/static
-      - Fonts/Source_Sans_3/static/SourceSans3-SemiBold.ttf
-      - Fonts/latin-modern-roman
-      - Fonts/latin-modern-roman/GUST-FONT-LICENSE.TXT
-      - Fonts/latin-modern-roman/lm-info.pdf
-      - Fonts/latin-modern-roman/lmroman9-bold.otf
-      - Hint - Swipe Right.lspkg
-      - Hint - Swipe Right.lspkg/Hint - Swipe Right__PUT_IN_ORTHO_CAM.prefab
-      - Hint - Swipe Right.lspkg/Materials
-      - Hint - Swipe Right.lspkg/Materials/SpriteGraphPreset.mat
-      - Hint - Swipe Right.lspkg/Shaders
-      - Hint - Swipe Right.lspkg/Shaders/SpriteGraphPreset.ss_graph
-      - Hint - Swipe Right.lspkg/Textures
-      - Hint - Swipe Right.lspkg/Textures/Hint_Swipe_Right.lensanim
-      - Hint - Swipe Right.lspkg/Textures/Hint_Swipe_Right.lensanim/Hint_Swipe_Right
-      - Hint - Swipe Right.lspkg/Textures/Hint_Swipe_Right.lensanim/LPD_276_L_R.png
-      - Hint - Swipe Right.lspkg/package.native
-      - Hint - Swipe Right.lspkg/package_dependencies.json
       - Image 2.mat
       - Image 3.mat
       - Image 4.mat
@@ -43,12 +22,6 @@ CollapsedEntities:
       - Image 6.mat
       - Image.mat
       - Images
-      - Images/Article
-      - Images/Article/dipole_math.png
-      - Images/Article/line_deformation.png
-      - Images/Article/magnetic_demo.png
-      - Images/Article/rendering_modes.png
-      - Images/Article/tube_mesh.png
       - Images/StoryUI
       - Images/StoryUI/card_definition_active.png
       - Images/StoryUI/card_definition_normal.png
@@ -75,13 +48,9 @@ CollapsedEntities:
       - Images/StoryUI/nav_next_pressed.png
       - Images/StoryUI/story_ui_layout.json
       - Images/UI
-      - Images/circulation_preview.png
       - Images/circulation_sprite.png
-      - Images/contraction_preview.png
       - Images/contraction_sprite.png
-      - Images/expansion_preview.png
       - Images/expansion_sprite.png
-      - Images/magnetic_preview.png
       - Images/magnetic_sprite.png
       - Images/vf_definition.png
       - Images/vf_dipole_field.png
@@ -90,7 +59,6 @@ CollapsedEntities:
       - Images/vf_reading_key.png
       - Images/vortex_preview.png
       - Images/vortex_sprite.png
-      - Images/waves_preview.png
       - Images/waves_sprite.png
       - Images/wind_speed_legend.png
       - MaterialParams.png
@@ -622,8 +590,6 @@ CollapsedEntities:
       - Scripts/MagnetPhysics.ts
       - Scripts/MagneticField.ts
       - Scripts/MotionFieldPlane.ts
-      - Scripts/NarrationPanel.ts
-      - Scripts/OrbitMotion.ts
       - Scripts/SnapToStage.ts
       - Scripts/SpatialFlexLite.ts
       - Scripts/StageCalibration.ts
@@ -668,7 +634,6 @@ CollapsedEntities:
       - Shaders/VectorFieldTransform.js
       - Shaders/WindStreamFlow.js
       - Slides
-      - Slides/wing_streamlines.json
       - SnapDecorators.lspkg
       - SnapDecorators.lspkg/Examples.ts
       - SnapDecorators.lspkg/Examples__PLACE_IN_SCENE.prefab
