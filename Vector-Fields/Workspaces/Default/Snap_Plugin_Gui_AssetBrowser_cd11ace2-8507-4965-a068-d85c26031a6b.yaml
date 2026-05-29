@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 1585
+    size: 1570
     values:
       - ""
       - Base.png
@@ -11,21 +11,6 @@ CollapsedEntities:
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
-      - FastUI.lspkg
-      - FastUI.lspkg/Examples__PLACE_IN_SCENE.prefab
-      - FastUI.lspkg/README.md
-      - FastUI.lspkg/Scripts
-      - FastUI.lspkg/Scripts/ButtonContentLayout.ts
-      - FastUI.lspkg/Scripts/FastChat.ts
-      - FastUI.lspkg/Scripts/FastDeck.ts
-      - FastUI.lspkg/Scripts/FastGrid.ts
-      - FastUI.lspkg/Scripts/FastRoundedRectangle.ts
-      - FastUI.lspkg/Scripts/GridRearrangement.ts
-      - FastUI.lspkg/Scripts/Utils
-      - FastUI.lspkg/Scripts/Utils/TextLimiter.ts
-      - FastUI.lspkg/Scripts/Utils/TreeStructureUtils.ts
-      - FastUI.lspkg/package.native
-      - FastUI.lspkg/package_dependencies.json
       - Fonts
       - Fonts/Nunito_Sans
       - Fonts/Nunito_Sans/NunitoSans.ttf

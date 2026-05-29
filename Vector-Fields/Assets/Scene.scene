@@ -8,7 +8,6 @@
     - !<own> f95a3f9e-c3f7-48c9-885c-4459494ca20e
     - !<own> a1197dda-ad88-4710-8bf0-0d3185bf5c08
     - !<own> c1c00500-0000-4000-a000-000000000000
-    - !<own> 01401af3-bdb7-4866-9ee5-6c50029cab00
     - !<own> 3d334e99-90a0-47b6-8c72-d98b7c29a670
     - !<own> 33f7d2ff-6a63-4beb-b027-12bbe1f65b9d
     - !<own> 28ac247e-927a-4de4-84f2-d3f89f3b9bf4
@@ -358,37 +357,6 @@
     HasSegmentScaleCompensation: false
   Children:
     - !<own> 8b1597e7-0f83-4295-a17b-d12cd299f954
-  Components:
-    []
-- !<SceneObject/01401af3-bdb7-4866-9ee5-6c50029cab00>
-  PrefabRemaps:
-    - 01401af3-bdb7-4866-9ee5-6c50029cab00: b699246b-8b1e-440b-43b9-acf12aca4ddb
-    - 3775a7db-dff9-40c5-bdd9-363a621096b6: 5df99af2-5c31-4d5f-4f54-bc8d8e514e6d
-    - 52a1ca19-0493-4036-88b3-511b325ffb2e: c61c73ee-eff7-4d4f-7c82-e224a43ee822
-    - 62ebc7e6-2a7c-4019-8e94-676702586cb8: 0f350945-4936-43e7-6eab-5321fc66133c
-    - 9f0fa9d1-4931-450f-86fc-01e761610998: f51059ec-ad97-4f63-5003-542cdf0941bf
-    - a27ddd9f-5ed8-477e-aa1b-4e8582ba0628: 214528a3-bac4-4b9a-609d-e4017d41f2f9
-    - a7cd196b-2f5c-4b7d-bd87-b334988fdad3: 1bed73d3-9f5a-4add-4765-e48f0a278092
-    - c1b8b4c2-d647-4ae2-9af1-eb9fe0ba960e: c93dbd3d-b52f-4d9c-5c3a-0cdaf057b02e
-    - d0078b8c-a38c-42ed-a9ae-782c0381cb9f: 780596e1-103f-4714-7b0c-734f799b1579
-    - d7b3529f-5fd1-41f7-b772-818c6dbe6423: d69db421-22ea-4f24-5694-8a8a3766791b
-    - d8ef823c-466b-472f-8509-c4fb21c936e4: aa117c60-1fab-4abd-7dbc-25a8a453ce0a
-    - e4c071eb-0e93-4d5b-aaf5-c0c007f57ca6: 8fed8908-988b-4042-72b1-631401976b78
-    - f156e029-ad9e-4403-8d1b-8d0976866579: c51cad11-69a5-4c32-6335-2ab3a4f547e2
-  Name: Examples
-  Enabled: false
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: -100.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    - !<own> a27ddd9f-5ed8-477e-aa1b-4e8582ba0628
-    - !<own> a7cd196b-2f5c-4b7d-bd87-b334988fdad3
-    - !<own> f156e029-ad9e-4403-8d1b-8d0976866579
-    - !<own> 62ebc7e6-2a7c-4019-8e94-676702586cb8
-    - !<own> d8ef823c-466b-472f-8509-c4fb21c936e4
   Components:
     []
 - !<RenderMeshVisual/0152131e-e52b-45d2-978a-4e283a8f058d>
@@ -7242,32 +7210,6 @@
   BlendNormals: false
   BlendShapes:
     {}
-- !<ScriptComponent/3775a7db-dff9-40c5-bdd9-363a621096b6>
-  PrefabRemaps:
-    []
-  Name: FastDeck
-  Enabled: true
-  ScriptAsset: !<reference> 7ead8876-c0d3-4863-be41-81bb915aa1f0
-  ScriptInputsDefault:
-    swipeThreshold: true
-    animationSpeed: true
-    enableLogging: true
-    enableLoggingLifecycle: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      swipeThreshold: !<float> 50.000000
-      animationSpeed: 0.500000
-      swipeSpeedThreshold: !<float> 20.000000
-      leftCardRotationZ: !<float> 0.000000
-      rightCardRotationZ: !<float> 0.000000
-      testMode: true
-      enableLogging: false
-      enableLoggingLifecycle: false
-  ScriptTypes:
-    "":
-      {}
 - !<SceneObject/37a41c62-0a21-4610-92d0-739e900129a2>
   PrefabRemaps:
     []
@@ -10896,21 +10838,6 @@
     []
   Components:
     - !<own> 983d0ae1-13ca-4053-b50f-3da52f847f3b
-- !<SceneObject/52a1ca19-0493-4036-88b3-511b325ffb2e>
-  PrefabRemaps:
-    []
-  Name: FastDeck
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> 3775a7db-dff9-40c5-bdd9-363a621096b6
 - !<RenderMeshVisual/52a45d2b-9e34-4c2b-b254-6340d8813267>
   PrefabRemaps:
     []
@@ -12761,21 +12688,6 @@
     - !<own> d6a55caa-c71a-4932-b5ec-3ca0085bfbcf
     - !<own> 002aa3df-63c1-4610-a658-cd0ef4299b4b
     - !<own> 24eafb88-b3e0-4cfc-9a1a-7e2fe414bb6e
-- !<SceneObject/62ebc7e6-2a7c-4019-8e94-676702586cb8>
-  PrefabRemaps:
-    []
-  Name: FastGrid
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> 9f0fa9d1-4931-450f-86fc-01e761610998
 - !<SceneObject/63023282-4d49-4376-a93e-f1b54c279c4f>
   PrefabRemaps:
     []
@@ -20668,33 +20580,6 @@
     []
   Components:
     - !<own> 65888a11-d426-4fc5-8f5b-1c4d01ef579e
-- !<ScriptComponent/9f0fa9d1-4931-450f-86fc-01e761610998>
-  PrefabRemaps:
-    []
-  Name: FastGrid
-  Enabled: true
-  ScriptAsset: !<reference> c8be4c74-88b1-405e-afd3-ef97e392a238
-  ScriptInputsDefault:
-    rows: true
-    columns: true
-    enableLogging: true
-    enableLoggingLifecycle: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      rows: !<float> 3.000000
-      columns: !<float> 3.000000
-      buttonWidth: 12.500000
-      buttonHeight: 10.500000
-      buttonImageTexture: !<reference.Texture> 3e7a9034-d2b2-415a-bb22-355ee2b434e9
-      buttonImageMaterial: !<reference.Material> 762b21e5-2ddd-44ad-842c-9962f0ff8e17
-      draggable: true
-      enableLogging: false
-      enableLoggingLifecycle: false
-  ScriptTypes:
-    "":
-      {}
 - !<RenderMeshVisual/9f0fd7c6-db74-40b6-916e-6563c92fc4d9>
   PrefabRemaps:
     []
@@ -21097,21 +20982,6 @@
     CapitalizationOverride: None
   DepthTest: false
   TwoSided: false
-- !<SceneObject/a27ddd9f-5ed8-477e-aa1b-4e8582ba0628>
-  PrefabRemaps:
-    []
-  Name: GUIDE_ReadAndDisable
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 10.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> c1b8b4c2-d647-4ae2-9af1-eb9fe0ba960e
 - !<SceneObject/a2864553-5b6b-4810-a105-29c2d75fcd3d>
   PrefabRemaps:
     []
@@ -21652,21 +21522,6 @@
   BlendNormals: false
   BlendShapes:
     {}
-- !<SceneObject/a7cd196b-2f5c-4b7d-bd87-b334988fdad3>
-  PrefabRemaps:
-    []
-  Name: FastDeckParent
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 45.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 0.800000, y: 0.800000, z: 0.800000}
-    HasSegmentScaleCompensation: false
-  Children:
-    - !<own> 52a1ca19-0493-4036-88b3-511b325ffb2e
-  Components:
-    []
 - !<RenderMeshVisual/a83b96f8-f891-47ce-886a-0f584b818f87>
   PrefabRemaps:
     []
@@ -25205,90 +25060,6 @@
     - !<own> fa69c082-70fe-40cc-bee1-e9b8818db418
     - !<own> 0255a9fc-d481-4895-a09f-add0d99b4276
     - !<own> 2e44a827-0005-45b3-950c-82b2349398e8
-- !<Text/c1b8b4c2-d647-4ae2-9af1-eb9fe0ba960e>
-  PrefabRemaps:
-    []
-  Name: Text
-  Enabled: true
-  RenderOrder: 200
-  StretchMode: Stretch
-  VerticalAlignment: Center
-  HorizontalAlignment: Center
-  MeshShadowMode: None
-  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-  ShadowDensity: 1.000000
-  Text: |-
-    Fast UIs is a growing collection of programmatic UI multi-component compositions from UIKit.  Work with their own APIs or unpackage the FastUI package to modify the scripts further or provide a reference to your favorite AI tools and build UI fast. Often AI has an hard time understanding proportion across UI elements, this collection aims to mitigate that gap.
-    
-    Zoom out to see more compositions or explore them in the scene hierarchy.   
-  Editable: false
-  ShowEditingPreview: true
-  TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
-  SizeToFit: false
-  FontSize: 48
-  Font: !<reference> 00000000-0000-0000-0000-000000000000
-  LayoutRect:
-    left: -15.000000
-    bottom: -2.250000
-    right: 15.000000
-    top: 2.250000
-  OverflowVertical: Overflow
-  OverflowHorizontal: Wrap
-  Fill: !<TextFill>
-    Mode: Solid
-    Color: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-    Texture: !<reference> 00000000-0000-0000-0000-000000000000
-    ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-    TileCount: 5.000000
-    TileZone: Rect
-    TextureStretch: FitWidth
-  BlendMode: PremultipliedAlpha
-  Outline: !<OutlineSettings>
-    Enabled: false
-    Fill: !<TextFill>
-      Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
-      Texture: !<reference> 00000000-0000-0000-0000-000000000000
-      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-      TileCount: 5.000000
-      TileZone: Rect
-      TextureStretch: FitWidth
-    Size: 0.250000
-  Dropshadow: !<DropshadowSettings>
-    Enabled: false
-    Fill: !<TextFill>
-      Mode: Solid
-      Color: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
-      Texture: !<reference> 00000000-0000-0000-0000-000000000000
-      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-      TileCount: 5.000000
-      TileZone: Rect
-      TextureStretch: FitWidth
-    OffsetX: 0.250000
-    OffsetY: 0.250000
-  Background: !<BackgroundSettings>
-    Enabled: true
-    Fill: !<TextFill>
-      Mode: Solid
-      Color: {x: 0.016800, y: 0.198352, z: 1.000000, w: 1.000000}
-      Texture: !<reference> 00000000-0000-0000-0000-000000000000
-      ColorTint: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-      TileCount: 5.000000
-      TileZone: Rect
-      TextureStretch: FitWidth
-    Margins:
-      left: 0.500000
-      bottom: 0.500000
-      right: 0.500000
-      top: 0.500000
-    CornerRadius: 1.000000
-  AdvancedLayout: !<TextAdvancedLayout>
-    ExtentsTarget: !<reference> 00000000-0000-0000-0000-000000000000
-    LetterSpacing: 0.000000
-    LineSpacing: 1.000000
-    CapitalizationOverride: None
-  DepthTest: false
-  TwoSided: false
 - !<SceneObject/c1be3c6b-aef4-4a9e-868c-dcde81ca45b8>
   PrefabRemaps:
     []
@@ -28018,29 +27789,6 @@
   BlendNormals: false
   BlendShapes:
     {}
-- !<ScriptComponent/d0078b8c-a38c-42ed-a9ae-782c0381cb9f>
-  PrefabRemaps:
-    []
-  Name: FastRoundedRectangle
-  Enabled: true
-  ScriptAsset: !<reference> b0e74ef3-9d39-4803-adb5-1c2cc24679b0
-  ScriptInputsDefault:
-    content: true
-    style: true
-    enableLogging: true
-    enableLoggingLifecycle: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      content: Card content
-      style: bot
-      textColor: white
-      enableLogging: false
-      enableLoggingLifecycle: false
-  ScriptTypes:
-    "":
-      {}
 - !<SceneObject/d04e3a5e-ad7a-4e05-9ac4-a8655c15ef4d>
   PrefabRemaps:
     []
@@ -28763,21 +28511,6 @@
   BlendNormals: false
   BlendShapes:
     {}
-- !<SceneObject/d7b3529f-5fd1-41f7-b772-818c6dbe6423>
-  PrefabRemaps:
-    []
-  Name: FastChat
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> e4c071eb-0e93-4d5b-aaf5-c0c007f57ca6
 - !<SceneObject/d7fc4218-3f5e-47c5-8524-2dc5f31bde62>
   PrefabRemaps:
     []
@@ -28998,21 +28731,6 @@
     index-2: !<reference> eeefed81-5683-4d40-9498-fd8984e6e8f6
     thumb-3_end_end_end_end: !<reference> 1fbad860-d2cc-4f57-a307-5ac38abfa448
     wrist_to_pinky: !<reference> 4d75f471-9b48-4b6f-aa35-ecb1d7d4c0fb
-- !<SceneObject/d8ef823c-466b-472f-8509-c4fb21c936e4>
-  PrefabRemaps:
-    []
-  Name: FastRoundedRectangle
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -30.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> d0078b8c-a38c-42ed-a9ae-782c0381cb9f
 - !<RenderMeshVisual/d9790b2e-a565-4d0e-b810-8b1ac6703cb5>
   PrefabRemaps:
     []
@@ -30476,34 +30194,6 @@
   BlendNormals: false
   BlendShapes:
     {}
-- !<ScriptComponent/e4c071eb-0e93-4d5b-aaf5-c0c007f57ca6>
-  PrefabRemaps:
-    []
-  Name: FastChat
-  Enabled: true
-  ScriptAsset: !<reference> 5c2e0d37-b2e2-468f-aede-6908e1161873
-  ScriptInputsDefault:
-    textColor: true
-    colorStyle: true
-    layoutStyle: true
-    testMode: true
-    mask: true
-    enableLogging: true
-    enableLoggingLifecycle: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      textColor: white
-      colorStyle: blue_gray
-      layoutStyle: aligned
-      testMode: true
-      mask: true
-      enableLogging: false
-      enableLoggingLifecycle: false
-  ScriptTypes:
-    "":
-      {}
 - !<SceneObject/e534b522-8395-417e-83b5-da21014021d7>
   PrefabRemaps:
     []
@@ -32027,21 +31717,6 @@
     - !<own> 809c80ff-c08b-4c77-b0fb-00ad7866ae67
     - !<own> 6bf17dd4-4329-4b66-8457-b4f105a4e5f5
     - !<own> 34bab52e-30b7-4c6e-9863-c1cdf26668f3
-  Components:
-    []
-- !<SceneObject/f156e029-ad9e-4403-8d1b-8d0976866579>
-  PrefabRemaps:
-    []
-  Name: FastChatParent
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: -40.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    - !<own> d7b3529f-5fd1-41f7-b772-818c6dbe6423
   Components:
     []
 - !<SceneObject/f159ac9f-4106-46b2-a411-08c58f855bc4>
