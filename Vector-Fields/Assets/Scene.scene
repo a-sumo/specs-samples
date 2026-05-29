@@ -1401,7 +1401,7 @@
 - !<SceneObject/0cd6220e-0425-42c7-b97e-5af6cde33979>
   PrefabRemaps:
     []
-  Name: Label_C02_Title_2D_motion_field_user_drives_the_flow
+  Name: Label_C01_Title_Motion_fields_user_drives_the_flow
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -1560,7 +1560,7 @@
 - !<SceneObject/0f248159-a52b-44d5-87b6-1b32471edc58>
   PrefabRemaps:
     []
-  Name: C00_Intro_Field_Basics
+  Name: C00_Intro
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -2961,7 +2961,7 @@
 - !<SceneObject/1d41e468-4348-4b24-a94c-f530a8193d55>
   PrefabRemaps:
     []
-  Name: C02_Motion_Field_Plane
+  Name: C01_Motion_Fields
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -3182,7 +3182,7 @@
 - !<SceneObject/22b347fa-f22b-4a96-987e-e05866399e31>
   PrefabRemaps:
     []
-  Name: C01_Math_Definition
+  Name: Library_Theory_Math_Definition
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -3460,7 +3460,7 @@
 - !<SceneObject/269a69e8-e04d-4875-ae75-5e9cd07732e4>
   PrefabRemaps:
     []
-  Name: Label_C02_Drop_target_instantiates_pattern_on_plane
+  Name: Label_Library_Drop_target_instantiates_pattern_on_plane
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -3475,7 +3475,7 @@
 - !<SceneObject/269ca15f-bfbc-4397-9780-de7a733aaa96>
   PrefabRemaps:
     []
-  Name: Label_C02_Vortex_cube_rotating_flow
+  Name: Label_Library_Vortex_cube_rotating_flow
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -4723,7 +4723,7 @@
 - !<SceneObject/32955b41-7977-40ca-91fe-7296e536f4bc>
   PrefabRemaps:
     []
-  Name: Label_C01_Input_position_x_y_z
+  Name: Label_Library_Input_position_x_y_z
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -5068,7 +5068,7 @@
 - !<SceneObject/3611b282-ac4c-47ea-97ba-8ba01ceeedb1>
   PrefabRemaps:
     []
-  Name: Label_C01_Title_Math_definition_after_the_intuition
+  Name: Label_Library_Title_Math_definition_after_the_intuition
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -5630,7 +5630,7 @@
 - !<SceneObject/3c3c5740-506e-4e4a-990a-13c5de15166f>
   PrefabRemaps:
     []
-  Name: Label_C02_Saddle_cube_stretch_and_compress
+  Name: Label_Library_Saddle_cube_stretch_and_compress
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -5853,7 +5853,7 @@
 - !<SceneObject/3eb4879f-6b1c-4d6c-8c9b-70650c3cdfd7>
   PrefabRemaps:
     []
-  Name: Label_C02_Source_cube_flow_outward
+  Name: Label_Library_Source_cube_flow_outward
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -7816,7 +7816,7 @@
 - !<SceneObject/58d22800-e82e-4906-a8ea-cd858ba46cf1>
   PrefabRemaps:
     []
-  Name: Label_C03_Title_Three_fields_gravity_magnetism_wind
+  Name: Label_C03_Title_Real_world_examples_gravity_magnetism_wind
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -8997,7 +8997,7 @@
 - !<SceneObject/6784f1a9-31fa-4734-a114-0e5ccb2cf66b>
   PrefabRemaps:
     []
-  Name: C02_Metrics_Probe
+  Name: C02_Theory
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -10156,7 +10156,7 @@
 - !<SceneObject/73d37208-d26c-473d-b286-50162405a83a>
   PrefabRemaps:
     []
-  Name: Label_C02_Left_finger_future_velocity_source
+  Name: Label_C01_Left_finger_future_velocity_source
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -12132,7 +12132,7 @@
 - !<SceneObject/8a81cf23-50c0-4eef-b50c-163190f91048>
   PrefabRemaps:
     []
-  Name: Label_C02_Vortex_pattern_local_rotation
+  Name: Label_Library_Vortex_pattern_local_rotation
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -12490,7 +12490,7 @@
 - !<SceneObject/8d7f40bd-7968-4c69-9e52-ce37afa5c175>
   PrefabRemaps:
     []
-  Name: Label_C01_Scalar_field_R3_to_R
+  Name: Label_Library_Scalar_field_R3_to_R
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -12528,7 +12528,7 @@
 - !<SceneObject/8e9ac357-8a2f-4e8e-9638-e103e219dad4>
   PrefabRemaps:
     []
-  Name: Label_C02_Title_Drop_a_field_cube_to_create_a_source
+  Name: Label_Library_Title_Drop_a_field_cube_to_create_a_source
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -12953,7 +12953,7 @@
 - !<SceneObject/947d2aa6-1ebd-4db1-b7b2-307d7d51de84>
   PrefabRemaps:
     []
-  Name: Label_C02_Uniform_cube_constant_motion_everywhere
+  Name: Label_Library_Uniform_cube_constant_motion_everywhere
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -13807,7 +13807,7 @@
 - !<SceneObject/99ae9955-bcba-44d5-9879-a96deb1a803f>
   PrefabRemaps:
     []
-  Name: C03_Three_Fields_Gravity_Magnetism_Wind
+  Name: C03_Real_World_Examples
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -14116,7 +14116,7 @@
 - !<SceneObject/9ecff770-1eb1-42ae-9ae1-683b9d8c045f>
   PrefabRemaps:
     []
-  Name: Label_C02_Sink_cube_flow_inward
+  Name: Label_Library_Sink_cube_flow_inward
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -14477,7 +14477,7 @@
 - !<SceneObject/a532a6e8-44a7-4ea3-838a-3b33398a3beb>
   PrefabRemaps:
     []
-  Name: C02_Analytical_Field_Patterns
+  Name: Library_Analytical_Field_Patterns
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -15558,7 +15558,7 @@
 - !<SceneObject/b16dc847-e04e-4a1f-94b6-f00f3f1f79a7>
   PrefabRemaps:
     []
-  Name: C02_Transition_Field_Cubes
+  Name: Library_Field_Cube_Patterns
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -17096,7 +17096,7 @@
 - !<SceneObject/c24432a1-b30c-4192-85a2-794ed8c3e649>
   PrefabRemaps:
     []
-  Name: Label_C01_Vector_field_R3_to_R3
+  Name: Label_Library_Vector_field_R3_to_R3
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -19144,7 +19144,7 @@
 - !<SceneObject/d66be155-993a-4bc5-8770-9bfdcf39e3fb>
   PrefabRemaps:
     []
-  Name: Label_C02_Motion_plane_slot_vectors_live_here
+  Name: Label_C01_Motion_plane_slot_vectors_live_here
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -19225,7 +19225,7 @@
 - !<SceneObject/d8d90a4f-ed2a-4d8c-a436-eedd5953f737>
   PrefabRemaps:
     []
-  Name: Label_C02_Right_finger_future_velocity_source
+  Name: Label_C01_Right_finger_future_velocity_source
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -19396,7 +19396,7 @@
 - !<SceneObject/da0b3e6c-0e3d-41bc-955d-f0f08a8bfd96>
   PrefabRemaps:
     []
-  Name: Label_C02_Test_handle_generates_velocity
+  Name: Label_C01_Test_handle_generates_velocity
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -19505,7 +19505,7 @@
 - !<SceneObject/db9a02fd-76cb-47a3-b153-b841b99aa9e8>
   PrefabRemaps:
     []
-  Name: Label_C02_Saddle_pattern_stretching_axis
+  Name: Label_Library_Saddle_pattern_stretching_axis
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -20940,7 +20940,7 @@
 - !<SceneObject/ed822d3b-0ad1-4678-a392-698c60ab32f6>
   PrefabRemaps:
     []
-  Name: Label_C02_Source_sink_pattern_expand_or_converge
+  Name: Label_Library_Source_sink_pattern_expand_or_converge
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -20988,7 +20988,7 @@
 - !<SceneObject/ee705b5b-4777-4b59-8487-88068dabbd3b>
   PrefabRemaps:
     []
-  Name: Label_C02_Title_Analytical_field_patterns
+  Name: Label_Library_Title_Analytical_field_patterns
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
@@ -22170,7 +22170,7 @@
 - !<SceneObject/fbeb45cd-4523-4936-a09d-c76192e4d064>
   PrefabRemaps:
     []
-  Name: Label_C02_Title_Metrics_probe_curl_and_divergence
+  Name: Label_C02_Title_Theory_nabla_curl_and_divergence
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
