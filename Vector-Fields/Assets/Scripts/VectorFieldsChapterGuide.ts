@@ -423,9 +423,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
         const cameraTransform = camera.getTransform();
         const cameraPosition = cameraTransform.getWorldPosition();
-        const right = this.safeDirection(cameraTransform.right, new vec3(1.0, 0.0, 0.0));
-        const up = this.safeDirection(cameraTransform.up, new vec3(0.0, 1.0, 0.0));
-        const forward = this.safeDirection(cameraTransform.forward, new vec3(0.0, 0.0, -1.0));
+        const cameraRotation = cameraTransform.getWorldRotation();
+        const right = this.safeDirection(cameraRotation.multiplyVec3(new vec3(1.0, 0.0, 0.0)), new vec3(1.0, 0.0, 0.0));
+        const up = this.safeDirection(cameraRotation.multiplyVec3(new vec3(0.0, 1.0, 0.0)), new vec3(0.0, 1.0, 0.0));
+        const forward = this.safeDirection(cameraRotation.multiplyVec3(new vec3(0.0, 0.0, -1.0)), new vec3(0.0, 0.0, -1.0));
         const target = cameraPosition
             .add(right.uniformScale(this.menuHorizontalOffsetCm))
             .add(up.uniformScale(this.menuVerticalOffsetCm))
@@ -437,9 +438,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const next = this.mixVec3(current, target, alpha);
         transform.setWorldPosition(next);
 
-        const toCamera = cameraPosition.sub(next);
-        if (toCamera.length > 0.0001) {
-            transform.setWorldRotation(quat.lookAt(this.normalizeVec(toCamera), up));
+        const awayFromCamera = next.sub(cameraPosition);
+        if (awayFromCamera.length > 0.0001) {
+            transform.setWorldRotation(quat.lookAt(this.normalizeVec(awayFromCamera), up));
         }
     }
 
