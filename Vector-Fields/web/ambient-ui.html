@@ -387,9 +387,11 @@
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
     plane.receiveShadow = true;
+    plane.renderOrder = 0;
     fieldGroup.add(plane);
 
     const gridLines = createPlaneGrid(planeWidth, planeHeight, 18, 11);
+    gridLines.renderOrder = 1;
     fieldGroup.add(gridLines);
 
     const cols = 23;
@@ -403,16 +405,25 @@
       transparent: true,
       opacity: 0.92,
       vertexColors: true,
+      depthWrite: true,
+      toneMapped: false,
     });
     const headMaterial = vectorMaterial.clone();
     const shafts = new THREE.InstancedMesh(shaftGeometry, vectorMaterial, count);
     const heads = new THREE.InstancedMesh(headGeometry, headMaterial, count);
+    shafts.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(count * 3), 3);
+    heads.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(count * 3), 3);
     shafts.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     heads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    shafts.castShadow = true;
-    heads.castShadow = true;
+    shafts.instanceColor.setUsage(THREE.DynamicDrawUsage);
+    heads.instanceColor.setUsage(THREE.DynamicDrawUsage);
+    shafts.castShadow = false;
+    heads.castShadow = false;
+    shafts.renderOrder = 3;
+    heads.renderOrder = 4;
     fieldGroup.add(shafts);
     fieldGroup.add(heads);
+    window.__ambientDebug = { shafts, heads, vectorMaterial, headMaterial };
 
     const deepVector = new THREE.Color(0x1d46ff);
     const cyanVector = new THREE.Color(0x23d6ff);

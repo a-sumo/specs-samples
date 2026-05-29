@@ -261,6 +261,12 @@ vec3 fieldSurfaceWind(vec3 p) {
     return (east * jet + north * meander * 0.20) * 0.42;
 }
 
+vec3 safeNormalize(vec3 v, vec3 fallback) {
+    float len = length(v);
+    if (len < 0.0001) return fallback;
+    return v / len;
+}
+
 // 9: Ambient audio plane - one shared direction with subtle per-vector noise.
 // TargetPosition encodes the audio/control channels: x=recorded yaw, y=22-40Hz bass, z=opacity/magnitude.
 vec3 fieldAmbientPlane(vec3 p) {
@@ -288,12 +294,6 @@ vec3 getField(vec3 p) {
     if (Preset == 8) return fieldSurfaceWind(p);
     if (Preset == 9) return fieldAmbientPlane(p);
     return fieldWaves(p);
-}
-
-vec3 safeNormalize(vec3 v, vec3 fallback) {
-    float len = length(v);
-    if (len < 0.0001) return fallback;
-    return v / len;
 }
 
 bool usesSphereSurface() {

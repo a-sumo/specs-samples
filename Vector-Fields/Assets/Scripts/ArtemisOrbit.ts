@@ -27,6 +27,7 @@ export type ArtemisMissionInfo = {
     progress: number; // 0..1 through the mission
     metSeconds: number; // mission elapsed time (s)
     met: string; // "T+Dd HH:MM:SS"
+    utc: string; // absolute UTC clock, "YYYY-MM-DD HH:MM:SS UTC"
     missionDay: number;
     phase: string;
     spacecraftToMoonKm: number;
@@ -165,6 +166,7 @@ export class ArtemisOrbit extends BaseScriptComponent {
             progress: this.getProgress(),
             metSeconds: this.missionT,
             met: this.formatMET(this.missionT),
+            utc: this.formatUTC(this.missionT),
             missionDay: this.missionT / 86400.0,
             phase: this.phaseAt(this.missionT),
             spacecraftToMoonKm: toMoon,
@@ -372,6 +374,30 @@ export class ArtemisOrbit extends BaseScriptComponent {
         s -= m * 60;
         return "T+" + d + "d " + this.pad(h) + ":" + this.pad(m) + ":" + this.pad(s);
     }
+
+    // Absolute UTC = epoch (startUTC) + MET. The mission spans Apr 2-10 2026, so
+    // only the day rolls over (no month/year boundary handling needed here).
+    private formatUTC(met: number): string {
+        const iso = ARTEMIS_II_TRAJECTORY.startUTC; // 2026-04-02T01:57:37.084
+        const dp = iso.split("T")[0].split("-");
+        const tp = iso.split("T")[1].split(":");
+        const year = dp[0];
+        const month = dp[1];
+        const day0 = parseInt(dp[2], 10);
+        const h0 = parseInt(tp[0], 10);
+        const m0 = parseInt(tp[1], 10);
+        const s0 = parseInt(tp[2], 10);
+        let total = h0 * 3600 + m0 * 60 + s0 + Math.max(0, Math.floor(met));
+        const dayOff = Math.floor(total / 86400);
+        total -= dayOff * 86400;
+        const h = Math.floor(total / 3600);
+        total -= h * 3600;
+        const m = Math.floor(total / 60);
+        total -= m * 60;
+        return year + "-" + month + "-" + this.pad(day0 + dayOff) + " " +
+            this.pad(h) + ":" + this.pad(m) + ":" + this.pad(total) + " UTC";
+    }
+
     private pad(n: number): string {
         return (n < 10 ? "0" : "") + n;
     }
