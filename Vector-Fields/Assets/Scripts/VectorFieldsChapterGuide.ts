@@ -122,6 +122,9 @@ const TEX_UTILITY_FOLD_PRESSED = requireAsset("../Images/StoryUI/utility_fold_pr
 const TEX_CARD_OVERLAY_HOVER = requireAsset("../Images/StoryUI/overlay_card_hover.png") as Texture;
 const TEX_CARD_OVERLAY_SELECTED = requireAsset("../Images/StoryUI/overlay_card_selected.png") as Texture;
 const TEX_CARD_OVERLAY_PRESSED = requireAsset("../Images/StoryUI/overlay_card_pressed.png") as Texture;
+const TEX_EXAMPLE_OVERLAY_HOVER = requireAsset("../Images/StoryUI/overlay_example_hover.png") as Texture;
+const TEX_EXAMPLE_OVERLAY_SELECTED = requireAsset("../Images/StoryUI/overlay_example_selected.png") as Texture;
+const TEX_EXAMPLE_OVERLAY_PRESSED = requireAsset("../Images/StoryUI/overlay_example_pressed.png") as Texture;
 const TEX_NAV_OVERLAY_HOVER = requireAsset("../Images/StoryUI/overlay_nav_hover.png") as Texture;
 const TEX_NAV_OVERLAY_PRESSED = requireAsset("../Images/StoryUI/overlay_nav_pressed.png") as Texture;
 const TEX_UTILITY_OVERLAY_HOVER = requireAsset("../Images/StoryUI/overlay_utility_hover.png") as Texture;
@@ -528,9 +531,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 246,
                 () => this.selectExampleField(option.id),
                 true,
-                TEX_CARD_OVERLAY_HOVER,
-                TEX_CARD_OVERLAY_SELECTED,
-                TEX_CARD_OVERLAY_PRESSED
+                TEX_EXAMPLE_OVERLAY_HOVER,
+                TEX_EXAMPLE_OVERLAY_SELECTED,
+                TEX_EXAMPLE_OVERLAY_PRESSED
             );
             binding.object.enabled = false;
             this.fieldSelectorButtons.push(binding);

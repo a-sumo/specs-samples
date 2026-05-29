@@ -106,10 +106,9 @@
       background:
         linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
         var(--panel-2);
-      border: 3px solid rgba(235,242,246,0.42);
-      border-radius: 32px;
+      border: 2px solid rgba(235,242,246,0.42);
+      border-radius: 28px;
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.10),
         0 18px 44px rgba(0,0,0,0.28);
     }
 
@@ -120,7 +119,6 @@
         var(--active);
       border-color: rgba(255,255,255,0.88);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.28),
         0 0 0 8px rgba(232,229,220,0.16),
         0 20px 48px rgba(0,0,0,0.34);
     }
@@ -168,10 +166,9 @@
       background:
         linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.025)),
         var(--panel-2);
-      border: 3px solid rgba(235,242,246,0.46);
-      border-radius: 34px;
+      border: 2px solid rgba(235,242,246,0.46);
+      border-radius: 28px;
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.12),
         0 20px 48px rgba(0,0,0,0.30);
     }
 
@@ -182,7 +179,6 @@
         var(--active);
       border-color: rgba(255,255,255,0.9);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.30),
         0 0 0 8px rgba(232,229,220,0.17),
         0 22px 52px rgba(0,0,0,0.35);
     }
@@ -231,17 +227,16 @@
     .nav {
       display: grid;
       place-items: center;
-      border-radius: 30px;
+      border-radius: 22px;
       background:
         linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.015)),
         var(--panel-3);
-      border: 3px solid rgba(235,242,246,0.54);
+      border: 2px solid rgba(235,242,246,0.54);
       color: var(--text);
       font-size: 46px;
       line-height: 1;
       font-weight: 780;
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.12),
         0 18px 40px rgba(0,0,0,0.28);
     }
 
@@ -255,17 +250,16 @@
     .utility {
       display: grid;
       place-items: center;
-      border-radius: 24px;
+      border-radius: 20px;
       background:
         linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02)),
         #3c3f3f;
-      border: 3px solid rgba(235,242,246,0.52);
+      border: 2px solid rgba(235,242,246,0.52);
       color: var(--text);
       font-size: 34px;
       line-height: 1;
       font-weight: 650;
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.14),
         0 12px 28px rgba(0,0,0,0.26);
     }
 
@@ -298,35 +292,38 @@
       pointer-events: none;
     }
 
-    .overlay.card::before {
+    .overlay.card::before,
+    .overlay.example::before {
       inset: 4px;
-      border-radius: 30px;
-      border: 4px solid rgba(250, 248, 239, 0.82);
+      border-radius: 24px;
+      border: 3px solid rgba(250, 248, 239, 0.82);
       background:
         linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02) 34%, rgba(255,255,255,0.09)),
         radial-gradient(circle at 86% 50%, rgba(255,255,255,0.22), rgba(255,255,255,0) 38%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.34),
         inset 0 0 28px rgba(255,255,255,0.10),
         0 0 20px rgba(245,242,232,0.22);
     }
 
-    .overlay.card.selected::before {
-      inset: 1px;
-      border-width: 5px;
+    .overlay.card.selected::before,
+    .overlay.example.selected::before {
+      inset: 3px;
+      border-width: 4px;
+      border-radius: 24px;
       border-color: rgba(255, 252, 242, 0.96);
       background:
-        linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.03) 44%, rgba(255,255,255,0.12)),
+        linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02) 44%, rgba(255,255,255,0.08)),
         radial-gradient(circle at 12% 50%, rgba(255,255,255,0.18), rgba(255,255,255,0) 34%);
       box-shadow:
-        inset 0 0 0 3px rgba(255,255,255,0.13),
-        inset 0 0 34px rgba(255,255,255,0.13),
-        0 0 26px rgba(245,242,232,0.26);
+        inset 0 0 28px rgba(255,255,255,0.10),
+        0 0 22px rgba(245,242,232,0.22);
     }
 
-    .overlay.card.pressed::before {
+    .overlay.card.pressed::before,
+    .overlay.example.pressed::before {
       inset: 8px;
-      border-width: 4px;
+      border-width: 3px;
+      border-radius: 20px;
       border-color: rgba(255, 252, 242, 0.74);
       background: rgba(255,255,255,0.11);
       box-shadow:
@@ -334,26 +331,15 @@
         0 0 10px rgba(245,242,232,0.16);
     }
 
-    .overlay.card::after {
-      left: 30px;
-      right: 30px;
-      top: 12px;
-      height: 3px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.74), rgba(255,255,255,0.10));
-      opacity: 0.72;
-    }
-
     .overlay.nav::before,
     .overlay.utility::before {
       inset: 4px;
-      border-radius: 28px;
-      border: 4px solid rgba(250, 248, 239, 0.84);
+      border-radius: 18px;
+      border: 3px solid rgba(250, 248, 239, 0.84);
       background:
         linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02)),
         radial-gradient(circle at 80% 20%, rgba(255,255,255,0.24), rgba(255,255,255,0) 42%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.36),
         0 0 18px rgba(245,242,232,0.22);
     }
 
@@ -366,7 +352,7 @@
     }
 
     .overlay.utility::before {
-      border-radius: 22px;
+      border-radius: 16px;
     }
 
     .cursor {
@@ -546,6 +532,9 @@
       { id: "overlay_card_hover", slot: "card_intro", classes: "overlay card hover" },
       { id: "overlay_card_selected", slot: "card_intro", classes: "overlay card selected" },
       { id: "overlay_card_pressed", slot: "card_intro", classes: "overlay card pressed" },
+      { id: "overlay_example_hover", slot: "example_gravity", classes: "overlay example hover" },
+      { id: "overlay_example_selected", slot: "example_gravity", classes: "overlay example selected" },
+      { id: "overlay_example_pressed", slot: "example_gravity", classes: "overlay example pressed" },
       { id: "overlay_nav_hover", slot: "nav_next", classes: "overlay nav hover" },
       { id: "overlay_nav_pressed", slot: "nav_next", classes: "overlay nav pressed" },
       { id: "overlay_utility_hover", slot: "utility_follow", classes: "overlay utility hover" },
