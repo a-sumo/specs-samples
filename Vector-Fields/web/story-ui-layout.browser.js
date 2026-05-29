@@ -128,14 +128,14 @@ window.STORY_UI_LAYOUT = {
       "id": "utility_follow_folded",
       "role": "utility_folded",
       "px": {
-        "x": 1080,
-        "y": 914,
+        "x": 1020,
+        "y": 877,
         "width": 190,
         "height": 76
       },
       "cm": {
-        "x": 8.5,
-        "y": -9.04,
+        "x": 7.3,
+        "y": -8.3,
         "width": 3.8,
         "height": 1.52
       }
@@ -144,14 +144,14 @@ window.STORY_UI_LAYOUT = {
       "id": "utility_fold_folded",
       "role": "utility_folded",
       "px": {
-        "x": 1295,
-        "y": 914,
+        "x": 1232,
+        "y": 877,
         "width": 190,
         "height": 76
       },
       "cm": {
-        "x": 12.8,
-        "y": -9.04,
+        "x": 11.54,
+        "y": -8.3,
         "width": 3.8,
         "height": 1.52
       }

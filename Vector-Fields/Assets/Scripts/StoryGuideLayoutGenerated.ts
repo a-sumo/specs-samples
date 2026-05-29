@@ -116,6 +116,6 @@ export const STORY_GUIDE_UTILITY = {
 };
 
 export const STORY_GUIDE_UTILITY_FOLDED = {
-    follow: {"x":8.5,"y":-9.04,"width":3.8,"height":1.52},
-    fold: {"x":12.8,"y":-9.04,"width":3.8,"height":1.52},
+    follow: {"x":7.3,"y":-8.3,"width":3.8,"height":1.52},
+    fold: {"x":11.54,"y":-8.3,"width":3.8,"height":1.52},
 };

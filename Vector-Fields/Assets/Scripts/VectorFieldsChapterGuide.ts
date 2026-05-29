@@ -36,7 +36,10 @@ type ButtonBinding = {
     slot: StoryGuideSlot;
     homeSlot: StoryGuideSlot;
     targetSlot: StoryGuideSlot;
-    targetZ: number;
+    button: RectangleButton;
+    hitWidth: number;
+    hitHeight: number;
+    hitDepth: number;
     hovered: boolean;
     pressedState: boolean;
     selected: boolean;
@@ -117,9 +120,8 @@ const TEX_CURSOR_PRESSED = requireAsset("../Images/StoryUI/cursor_pressed.png") 
 const TEX_PANEL_CURSOR_WASH = requireAsset("../Images/StoryUI/panel_cursor_wash.png") as Texture;
 
 const BUTTON_HIT_Z = 0.34;
-const FOLDED_BUTTON_HIT_Z = 5.2;
-const BUTTON_HIT_DEPTH_CM = 24.0;
-const BUTTON_CURSOR_Z_OFFSET = 0.6;
+const BUTTON_HIT_DEPTH_CM = 1.6;
+const FOLDED_UTILITY_HIT_PAD_CM = 1.15;
 const PANEL_HIT_Z = 0.04;
 const PANEL_HIT_DEPTH_CM = 0.42;
 const FOLD_DOCK_DELAY_SEC = 0.12;
@@ -448,7 +450,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             slot: this.cloneSlot(slot),
             homeSlot: this.cloneSlot(slot),
             targetSlot: this.cloneSlot(slot),
-            targetZ: BUTTON_HIT_Z,
+            button,
+            hitWidth: slot.width,
+            hitHeight: slot.height,
+            hitDepth: BUTTON_HIT_DEPTH_CM,
             hovered: false,
             pressedState: false,
             selected: false,
@@ -907,22 +912,19 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (this.followButton) {
             this.setButtonTargetSlot(
                 this.followButton,
-                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.follow : STORY_GUIDE_UTILITY.follow),
-                docked ? FOLDED_BUTTON_HIT_Z : BUTTON_HIT_Z
+                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.follow : STORY_GUIDE_UTILITY.follow)
             );
         }
         if (this.foldButton) {
             this.setButtonTargetSlot(
                 this.foldButton,
-                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.fold : STORY_GUIDE_UTILITY.fold),
-                docked ? FOLDED_BUTTON_HIT_Z : BUTTON_HIT_Z
+                this.offsetSlot(docked ? STORY_GUIDE_UTILITY_FOLDED.fold : STORY_GUIDE_UTILITY.fold)
             );
         }
     }
 
-    private setButtonTargetSlot(binding: ButtonBinding, slot: StoryGuideSlot, z: number): void {
+    private setButtonTargetSlot(binding: ButtonBinding, slot: StoryGuideSlot): void {
         binding.targetSlot = this.cloneSlot(slot);
-        binding.targetZ = z;
     }
 
     private syncFieldSelectorState(): void {
@@ -970,7 +972,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const target = binding.targetSlot || binding.homeSlot;
         const transform = binding.object.getTransform();
         const current = transform.getLocalPosition();
-        const next = this.mixVec3(current, new vec3(target.x, target.y, binding.targetZ), alpha);
+        const next = this.mixVec3(current, new vec3(target.x, target.y, BUTTON_HIT_Z), alpha);
         transform.setLocalPosition(next);
         transform.setLocalRotation(quat.quatIdentity());
         transform.setLocalScale(new vec3(1, 1, 1));
@@ -980,6 +982,25 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             width: target.width,
             height: target.height,
         };
+        this.updateButtonHitSize(binding, target);
+    }
+
+    private updateButtonHitSize(binding: ButtonBinding, target: StoryGuideSlot): void {
+        const foldedUtility = this.folded && (binding.id === "follow" || binding.id === "fold");
+        const hitWidth = target.width + (foldedUtility ? FOLDED_UTILITY_HIT_PAD_CM : 0.0);
+        const hitHeight = target.height + (foldedUtility ? FOLDED_UTILITY_HIT_PAD_CM : 0.0);
+        const hitDepth = BUTTON_HIT_DEPTH_CM;
+        if (
+            Math.abs(binding.hitWidth - hitWidth) < 0.001 &&
+            Math.abs(binding.hitHeight - hitHeight) < 0.001 &&
+            Math.abs(binding.hitDepth - hitDepth) < 0.001
+        ) {
+            return;
+        }
+        binding.hitWidth = hitWidth;
+        binding.hitHeight = hitHeight;
+        binding.hitDepth = hitDepth;
+        binding.button.size = new vec3(hitWidth, hitHeight, hitDepth);
     }
 
     private placeImageVisual(binding: ImageBinding, scale: number, lift: number): void {
@@ -1051,8 +1072,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const fallbackY = this.cursorOwner === binding ? this.cursorTarget.y : binding.slot.y;
         const targetX = localPoint ? this.clamp(localPoint.x, minX, maxX) : fallbackX;
         const targetY = localPoint ? this.clamp(localPoint.y, minY, maxY) : fallbackY;
-        const buttonZ = binding.object.getTransform().getLocalPosition().z;
-        this.cursorTarget = new vec3(targetX, targetY, buttonZ + BUTTON_CURSOR_Z_OFFSET);
+        this.cursorTarget = new vec3(targetX, targetY, this.cursorImage.z);
         this.cursorTargetScale = pressed ? 0.84 : 1.0;
     }
 
