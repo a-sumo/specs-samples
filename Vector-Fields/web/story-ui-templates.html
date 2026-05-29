@@ -336,6 +336,37 @@
       width: 15px;
       height: 15px;
     }
+
+    .panel-cursor-wash {
+      width: 256px;
+      height: 256px;
+      background:
+        radial-gradient(circle at 50% 50%,
+          rgba(255, 252, 242, 0.44) 0%,
+          rgba(255, 252, 242, 0.26) 16%,
+          rgba(255, 252, 242, 0.12) 34%,
+          rgba(255, 252, 242, 0.04) 56%,
+          rgba(255, 252, 242, 0) 74%);
+    }
+
+    .panel-cursor-wash::before {
+      inset: 58px;
+      border-radius: 999px;
+      border: 4px solid rgba(255, 252, 242, 0.34);
+      box-shadow:
+        inset 0 0 20px rgba(255,255,255,0.14),
+        0 0 26px rgba(245,242,232,0.16);
+    }
+
+    .panel-cursor-wash::after {
+      inset: 84px;
+      border-radius: 999px;
+      background:
+        repeating-linear-gradient(135deg,
+          rgba(255,255,255,0.16) 0 4px,
+          rgba(255,255,255,0) 4px 12px);
+      opacity: 0.5;
+    }
   </style>
 </head>
 <body>
@@ -438,6 +469,11 @@
       cursor.className = `capture cursor ${state}`;
       document.body.appendChild(cursor);
     }
+
+    const panelWash = document.createElement("div");
+    panelWash.id = "panel_cursor_wash";
+    panelWash.className = "capture panel-cursor-wash";
+    document.body.appendChild(panelWash);
 
     window.storyUiReady = true;
   </script>

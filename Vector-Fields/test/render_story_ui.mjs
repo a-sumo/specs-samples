@@ -37,6 +37,7 @@ const captures = [
   ["#overlay_utility_pressed", "overlay_utility_pressed.png"],
   ["#cursor_hover", "cursor_hover.png"],
   ["#cursor_pressed", "cursor_pressed.png"],
+  ["#panel_cursor_wash", "panel_cursor_wash.png"],
 ];
 
 await fs.mkdir(outDir, { recursive: true });

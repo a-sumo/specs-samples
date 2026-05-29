@@ -97,6 +97,7 @@ const TEX_UTILITY_OVERLAY_HOVER = requireAsset("../Images/StoryUI/overlay_utilit
 const TEX_UTILITY_OVERLAY_PRESSED = requireAsset("../Images/StoryUI/overlay_utility_pressed.png") as Texture;
 const TEX_CURSOR_HOVER = requireAsset("../Images/StoryUI/cursor_hover.png") as Texture;
 const TEX_CURSOR_PRESSED = requireAsset("../Images/StoryUI/cursor_pressed.png") as Texture;
+const TEX_PANEL_CURSOR_WASH = requireAsset("../Images/StoryUI/panel_cursor_wash.png") as Texture;
 
 @component
 export class VectorFieldsChapterGuide extends BaseScriptComponent {
@@ -148,6 +149,13 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private utilityButtons: ButtonBinding[] = [];
     private followButton: ButtonBinding | null = null;
     private foldButton: ButtonBinding | null = null;
+    private panelCursorImage: ImageBinding | null = null;
+    private panelCursorCurrent: vec3 = new vec3(0, 0, 0.16);
+    private panelCursorTarget: vec3 = new vec3(0, 0, 0.16);
+    private panelCursorAlpha: number = 0.0;
+    private panelCursorTargetAlpha: number = 0.0;
+    private panelCursorScale: number = 0.88;
+    private panelCursorTargetScale: number = 0.88;
     private cursorImage: ImageBinding | null = null;
     private cursorOwner: ButtonBinding | null = null;
     private cursorCurrent: vec3 = new vec3(0, 0, 0.94);
@@ -169,6 +177,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateEventRef.bind(() => {
             this.updateMenuPose();
             this.updateButtonAnimations();
+            this.updatePanelCursorAnimation();
             this.updateCursorAnimation();
         });
     }
@@ -206,6 +215,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.panelImage = panelImage;
         this.registerFoldable(panelImage.object);
 
+        this.createPanelCursor();
+        this.createPanelHitTarget();
         this.createProgressText();
         this.createCursor();
 
@@ -366,11 +377,13 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.bindCursorEvents(button, binding);
         this.listen((button as any).onHoverEnter, () => {
             binding.hovered = true;
+            this.hidePanelCursor();
             this.showCursor(binding, false);
             this.updateBindingVisual(binding);
         });
         this.listen((button as any).onTriggerDown, () => {
             binding.pressedState = true;
+            this.hidePanelCursor();
             this.showCursor(binding, true);
             this.updateBindingVisual(binding);
         });
@@ -449,6 +462,42 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             height: 1.18,
         }, TEX_CURSOR_HOVER, 320, 0.94);
         this.cursorImage.object.enabled = false;
+    }
+
+    private createPanelCursor(): void {
+        this.panelCursorImage = this.createImage(this.sceneObject, "__GuidePanelCursorWash", {
+            x: 0,
+            y: 0,
+            width: 5.12,
+            height: 5.12,
+        }, TEX_PANEL_CURSOR_WASH, 222, 0.16);
+        this.panelCursorImage.object.enabled = false;
+        this.registerFoldable(this.panelCursorImage.object);
+    }
+
+    private createPanelHitTarget(): void {
+        const object = this.ensureChild(this.sceneObject, "__GuidePanelHitTarget");
+        this.place(object, this.panelOffset.x, this.panelOffset.y, -0.18);
+        this.registerFoldable(object);
+
+        let button = object.getComponent(RectangleButton.getTypeName()) as RectangleButton;
+        if (!button) {
+            button = object.createComponent(RectangleButton.getTypeName()) as RectangleButton;
+        }
+        (button as any)._style = "Ghost";
+        button.size = new vec3(STORY_GUIDE_PANEL.width, STORY_GUIDE_PANEL.height, 0.24);
+        button.renderOrder = 218;
+        button.initialize();
+        this.hideUIKitVisual(button);
+
+        const interactable = (button as any).interactable;
+        if (interactable) {
+            this.listen(interactable.onHoverEnter, (event: any) => this.showPanelCursorFromEvent(event));
+            this.listen(interactable.onHoverUpdate, (event: any) => this.showPanelCursorFromEvent(event));
+            this.listen(interactable.onTriggerStart, (event: any) => this.showPanelCursorFromEvent(event));
+            this.listen(interactable.onTriggerUpdate, (event: any) => this.showPanelCursorFromEvent(event));
+        }
+        this.listen((button as any).onHoverExit, () => this.hidePanelCursor());
     }
 
     private syncVisualState(): void {
@@ -539,6 +588,16 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private setImageAlpha(binding: ImageBinding, alpha: number): void {
+        const color = new vec4(1.0, 1.0, 1.0, this.clamp(alpha, 0.0, 1.0));
+        const pass = binding.material.mainPass as any;
+        try { pass.baseColor = color; } catch (e) {}
+        if (binding.component && binding.component.mainPass) {
+            const imagePass = binding.component.mainPass as any;
+            try { imagePass.baseColor = color; } catch (e) {}
+        }
+    }
+
     private offsetSlot(slot: StoryGuideSlot): StoryGuideSlot {
         return {
             x: slot.x + this.panelOffset.x,
@@ -622,6 +681,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         if (this.folded) {
             this.hideCursor();
+            this.hidePanelCursor();
         }
     }
 
@@ -648,6 +708,46 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         transform.setLocalScale(new vec3(binding.width * scale, binding.height * scale, 1.0));
     }
 
+    private showPanelCursorFromEvent(event: any): void {
+        if (!this.panelCursorImage) return;
+        const localPoint = this.cursorLocalPointFromEvent(event);
+        const halfW = STORY_GUIDE_PANEL.width * 0.5;
+        const halfH = STORY_GUIDE_PANEL.height * 0.5;
+        const margin = this.panelCursorImage.width * 0.28;
+        const targetX = localPoint ? this.clamp(localPoint.x, -halfW + margin, halfW - margin) : 0.0;
+        const targetY = localPoint ? this.clamp(localPoint.y, -halfH + margin, halfH - margin) : 0.0;
+        this.panelCursorTarget = new vec3(targetX, targetY, this.panelCursorImage.z);
+        this.panelCursorTargetAlpha = 0.88;
+        this.panelCursorTargetScale = 1.0;
+        this.panelCursorImage.object.enabled = true;
+    }
+
+    private hidePanelCursor(): void {
+        this.panelCursorTargetAlpha = 0.0;
+        this.panelCursorTargetScale = 0.88;
+    }
+
+    private updatePanelCursorAnimation(): void {
+        if (!this.panelCursorImage) return;
+        const dt = getDeltaTime();
+        const alpha = this.clamp(dt * 16.0, 0.0, 1.0);
+        this.panelCursorCurrent = this.mixVec3(this.panelCursorCurrent, this.panelCursorTarget, alpha);
+        this.panelCursorAlpha += (this.panelCursorTargetAlpha - this.panelCursorAlpha) * alpha;
+        this.panelCursorScale += (this.panelCursorTargetScale - this.panelCursorScale) * alpha;
+
+        if (this.panelCursorAlpha < 0.025 && this.panelCursorTargetAlpha <= 0.0) {
+            this.panelCursorImage.object.enabled = false;
+            return;
+        }
+
+        this.panelCursorImage.object.enabled = true;
+        const transform = this.panelCursorImage.object.getTransform();
+        transform.setLocalPosition(this.panelCursorCurrent);
+        const scale = Math.max(0.01, this.panelCursorScale);
+        transform.setLocalScale(new vec3(this.panelCursorImage.width * scale, this.panelCursorImage.height * scale, 1.0));
+        this.setImageAlpha(this.panelCursorImage, this.panelCursorAlpha);
+    }
+
     private showCursor(binding: ButtonBinding, pressed: boolean): void {
         this.showCursorAt(binding, pressed, null);
     }
@@ -667,8 +767,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const maxX = binding.slot.x + binding.slot.width * 0.5 - margin;
         const minY = binding.slot.y - binding.slot.height * 0.5 + margin;
         const maxY = binding.slot.y + binding.slot.height * 0.5 - margin;
-        const targetX = localPoint ? this.clamp(localPoint.x, minX, maxX) : binding.slot.x;
-        const targetY = localPoint ? this.clamp(localPoint.y, minY, maxY) : binding.slot.y;
+        const fallbackX = this.cursorOwner === binding ? this.cursorTarget.x : binding.slot.x;
+        const fallbackY = this.cursorOwner === binding ? this.cursorTarget.y : binding.slot.y;
+        const targetX = localPoint ? this.clamp(localPoint.x, minX, maxX) : fallbackX;
+        const targetY = localPoint ? this.clamp(localPoint.y, minY, maxY) : fallbackY;
         this.cursorTarget = new vec3(targetX, targetY, this.cursorImage.z);
         this.cursorTargetScale = pressed ? 0.84 : 1.0;
     }
