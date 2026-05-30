@@ -73,6 +73,8 @@ export class GravityField extends BaseScriptComponent {
     private static readonly ARTEMIS_TRAJECTORY_LIFT: number = 0.14;
     private static readonly ARTEMIS_DASH_LENGTH: number = 0.36;
     private static readonly ARTEMIS_DASH_GAP: number = 0.22;
+    private static readonly ARTEMIS_RESAMPLE_STEP: number = 0.24;
+    private static readonly ARTEMIS_CLEARANCE_RESAMPLE_STEP: number = 0.14;
 
     @input
     @allowUndefined
@@ -578,22 +580,29 @@ export class GravityField extends BaseScriptComponent {
         const n = d.t.length;
         if (n < 2) return mb;
         const endIdx = flownOnly ? Math.max(1, this.artemisSampleIndex(this.artemisMissionT)) : n - 1;
-        const path: vec3[] = [];
+        const rawPath: vec3[] = [];
         for (let i = 0; i <= endIdx; i++) {
-            path.push(this.artemisLocalForKm(new vec3(d.x[i], d.y[i], d.z[i]), GravityField.ARTEMIS_TRAJECTORY_LIFT));
+            rawPath.push(this.artemisRawLocalForKm(new vec3(d.x[i], d.y[i], d.z[i]), GravityField.ARTEMIS_TRAJECTORY_LIFT));
         }
         if (flownOnly) {
-            path.push(this.artemisLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT), GravityField.ARTEMIS_TRAJECTORY_LIFT));
+            rawPath.push(this.artemisRawLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT), GravityField.ARTEMIS_TRAJECTORY_LIFT));
         }
-        const smoothPath = this.clampArtemisPathToEarthClearance(this.smoothPath(path, flownOnly ? 4 : 3));
+        const path = this.compactPath(
+            this.clampArtemisPathToEarthClearance(
+                this.resamplePath(
+                    this.clampArtemisPathToEarthClearance(this.resamplePath(rawPath, GravityField.ARTEMIS_RESAMPLE_STEP)),
+                    GravityField.ARTEMIS_CLEARANCE_RESAMPLE_STEP
+                )
+            ),
+            0.025
+        );
         if (flownOnly) {
-            this.addTubePath(mb, smoothPath, GravityField.ARTEMIS_TRAIL_WIDTH, 5);
+            this.addPlanarRibbonPath(mb, path, GravityField.ARTEMIS_TRAIL_WIDTH);
         } else {
-            this.addDottedTubePath(
+            this.addDottedPlanarRibbonPath(
                 mb,
-                smoothPath,
+                path,
                 GravityField.ARTEMIS_TRAJECTORY_WIDTH,
-                4,
                 GravityField.ARTEMIS_DASH_LENGTH,
                 GravityField.ARTEMIS_DASH_GAP
             );
@@ -605,18 +614,14 @@ export class GravityField extends BaseScriptComponent {
         const mb = this.makeMeshBuilder();
         const r = GravityField.ARTEMIS_CURSOR_RADIUS;
         const w = GravityField.ARTEMIS_TRAIL_WIDTH * 0.72;
-        this.addTubePath(mb, [
+        this.addPlanarRibbonPath(mb, [
             center.add(new vec3(-r, 0.0, 0.0)),
             center.add(new vec3(r, 0.0, 0.0)),
-        ], w, 4);
-        this.addTubePath(mb, [
-            center.add(new vec3(0.0, -r, 0.0)),
-            center.add(new vec3(0.0, r, 0.0)),
-        ], w, 4);
-        this.addTubePath(mb, [
+        ], w);
+        this.addPlanarRibbonPath(mb, [
             center.add(new vec3(0.0, 0.0, -r)),
             center.add(new vec3(0.0, 0.0, r)),
-        ], w, 4);
+        ], w);
         return mb;
     }
 
@@ -627,9 +632,19 @@ export class GravityField extends BaseScriptComponent {
         return new vec3(p.x, p.y + lift, p.z);
     }
 
+    private artemisRawLocalForKm(pKm: vec3, lift: number): vec3 {
+        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
+        const offset = this.artemisRawDisplayOffset(pKm);
+        const p = origin.add(offset);
+        return new vec3(p.x, p.y + lift, p.z);
+    }
+
     private artemisDisplayOffset(pKm: vec3): vec3 {
-        const offset = this.artemisFrameRotation().multiplyVec3(pKm).uniformScale(this.artemisScaleCmPerKm());
-        return this.applyArtemisEarthClearance(offset);
+        return this.applyArtemisEarthClearance(this.artemisRawDisplayOffset(pKm));
+    }
+
+    private artemisRawDisplayOffset(pKm: vec3): vec3 {
+        return this.artemisFrameRotation().multiplyVec3(pKm).uniformScale(this.artemisScaleCmPerKm());
     }
 
     private applyArtemisEarthClearance(offset: vec3): vec3 {
@@ -642,12 +657,23 @@ export class GravityField extends BaseScriptComponent {
 
     private clampArtemisPathToEarthClearance(path: vec3[]): vec3[] {
         const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
+        const minRadius = GravityField.EARTH_RADIUS + Math.max(0.0, this.artemisEarthClearance);
         const out: vec3[] = [];
+        let lastDirX = 1.0;
+        let lastDirZ = 0.0;
         for (let i = 0; i < path.length; i++) {
             const p = path[i];
             const offset = new vec3(p.x - origin.x, p.y - origin.y, p.z - origin.z);
-            const clamped = this.applyArtemisEarthClearance(offset);
-            out.push(new vec3(origin.x + clamped.x, origin.y + clamped.y, origin.z + clamped.z));
+            const radius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
+            if (radius > 0.0001) {
+                lastDirX = offset.x / radius;
+                lastDirZ = offset.z / radius;
+            }
+            if (radius < minRadius) {
+                out.push(new vec3(origin.x + lastDirX * minRadius, p.y, origin.z + lastDirZ * minRadius));
+            } else {
+                out.push(p);
+            }
         }
         return out;
     }
@@ -1216,6 +1242,106 @@ export class GravityField extends BaseScriptComponent {
         this.addTubePath(mb, [a, b], width, GravityField.CURVE_RADIAL_SEGMENTS);
     }
 
+    private addDottedPlanarRibbonPath(mb: MeshBuilder, path: vec3[], width: number, dashLength: number, gapLength: number): void {
+        if (path.length < 2) return;
+        const dash = Math.max(0.05, dashLength);
+        const gap = Math.max(0.03, gapLength);
+        let drawing = true;
+        let remaining = dash;
+        let dashPath: vec3[] = [path[0]];
+
+        for (let i = 0; i < path.length - 1; i++) {
+            let a = path[i];
+            const b = path[i + 1];
+            let segLen = this.distanceVec(a, b);
+            if (segLen < 0.0001) continue;
+
+            while (segLen > 0.0001) {
+                const step = Math.min(remaining, segLen);
+                const next = this.lerpVec(a, b, step / segLen);
+                if (drawing) {
+                    dashPath.push(next);
+                }
+
+                remaining -= step;
+                segLen -= step;
+                a = next;
+
+                if (remaining <= 0.0001) {
+                    if (drawing && dashPath.length > 1) {
+                        this.addPlanarRibbonPath(mb, dashPath, width);
+                    }
+                    drawing = !drawing;
+                    remaining = drawing ? dash : gap;
+                    dashPath = drawing ? [a] : [];
+                }
+            }
+
+            if (drawing && dashPath.length === 0) {
+                dashPath.push(b);
+            }
+        }
+
+        if (drawing && dashPath.length > 1) {
+            this.addPlanarRibbonPath(mb, dashPath, width);
+        }
+    }
+
+    private addPlanarRibbonPath(mb: MeshBuilder, sourcePath: vec3[], width: number): void {
+        const path = this.compactPath(sourcePath, 0.001);
+        const pathLen = path.length;
+        if (pathLen < 2) return;
+        const halfWidth = Math.max(0.002, width * 0.5);
+        const base = mb.getVerticesCount();
+        const lastIndex = Math.max(1, pathLen - 1);
+        const verts: number[] = new Array(pathLen * 2 * 8);
+        const inds: number[] = new Array((pathLen - 1) * 6);
+        let vi = 0;
+        let ii = 0;
+        let sideX = 1.0;
+        let sideZ = 0.0;
+
+        for (let i = 0; i < pathLen; i++) {
+            const tangent = this.pathTangent(path, i);
+            const flatLen = Math.sqrt(tangent.x * tangent.x + tangent.z * tangent.z);
+            if (flatLen > 0.0001) {
+                let nextSideX = tangent.z / flatLen;
+                let nextSideZ = -tangent.x / flatLen;
+                if (nextSideX * sideX + nextSideZ * sideZ < 0.0) {
+                    nextSideX = -nextSideX;
+                    nextSideZ = -nextSideZ;
+                }
+                sideX = nextSideX;
+                sideZ = nextSideZ;
+            }
+
+            const p = path[i];
+            const t = i / lastIndex;
+            const lx = p.x - sideX * halfWidth;
+            const lz = p.z - sideZ * halfWidth;
+            const rx = p.x + sideX * halfWidth;
+            const rz = p.z + sideZ * halfWidth;
+            verts[vi++] = lx; verts[vi++] = p.y; verts[vi++] = lz;
+            verts[vi++] = 0.0; verts[vi++] = 1.0; verts[vi++] = 0.0;
+            verts[vi++] = t; verts[vi++] = 0.0;
+            verts[vi++] = rx; verts[vi++] = p.y; verts[vi++] = rz;
+            verts[vi++] = 0.0; verts[vi++] = 1.0; verts[vi++] = 0.0;
+            verts[vi++] = t; verts[vi++] = 1.0;
+        }
+
+        for (let i = 0; i < pathLen - 1; i++) {
+            const a = base + i * 2;
+            const b = a + 1;
+            const c = a + 2;
+            const d = a + 3;
+            inds[ii++] = a; inds[ii++] = c; inds[ii++] = b;
+            inds[ii++] = b; inds[ii++] = c; inds[ii++] = d;
+        }
+
+        mb.appendVerticesInterleaved(verts);
+        mb.appendIndices(inds);
+    }
+
     private addDottedTubePath(mb: MeshBuilder, path: vec3[], width: number, radialSegments: number, dashLength: number, gapLength: number): void {
         if (path.length < 2) return;
         const dash = Math.max(0.05, dashLength);
@@ -1326,9 +1452,56 @@ export class GravityField extends BaseScriptComponent {
     }
 
     private pathTangent(path: vec3[], index: number): vec3 {
-        const prev = path[Math.max(0, index - 1)];
-        const next = path[Math.min(path.length - 1, index + 1)];
-        return this.normalizeVec(next.sub(prev));
+        const current = path[Math.max(0, Math.min(path.length - 1, index))];
+        for (let radius = 1; radius < path.length; radius++) {
+            const prev = path[Math.max(0, index - radius)];
+            const next = path[Math.min(path.length - 1, index + radius)];
+            const tangent = next.sub(prev);
+            if (tangent.length > 0.0001) {
+                return this.normalizeVec(tangent);
+            }
+            const forward = next.sub(current);
+            if (forward.length > 0.0001) {
+                return this.normalizeVec(forward);
+            }
+            const backward = current.sub(prev);
+            if (backward.length > 0.0001) {
+                return this.normalizeVec(backward);
+            }
+        }
+        return new vec3(1.0, 0.0, 0.0);
+    }
+
+    private resamplePath(path: vec3[], maxStep: number): vec3[] {
+        if (path.length < 2) return path;
+        const step = Math.max(0.02, maxStep);
+        const out: vec3[] = [path[0]];
+        for (let i = 0; i < path.length - 1; i++) {
+            const a = path[i];
+            const b = path[i + 1];
+            const len = this.distanceVec(a, b);
+            if (len < 0.0001) continue;
+            const segments = Math.max(1, Math.ceil(len / step));
+            for (let s = 1; s <= segments; s++) {
+                out.push(this.lerpVec(a, b, s / segments));
+            }
+        }
+        return out;
+    }
+
+    private compactPath(path: vec3[], minDistance: number): vec3[] {
+        if (path.length < 2) return path;
+        const minD = Math.max(0.0, minDistance);
+        const out: vec3[] = [path[0]];
+        for (let i = 1; i < path.length; i++) {
+            if (this.distanceVec(out[out.length - 1], path[i]) >= minD) {
+                out.push(path[i]);
+            }
+        }
+        if (out.length === 1 && path.length > 1) {
+            out.push(path[path.length - 1]);
+        }
+        return out;
     }
 
     private smoothPath(path: vec3[], subdivisions: number): vec3[] {
