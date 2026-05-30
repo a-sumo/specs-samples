@@ -20,16 +20,16 @@ export const STORY_UI_LAYOUT = (() => {
   });
 
   const steps = [
-    { id: "intro", index: "01", title: "Intro", root: "C00_Intro" },
-    { id: "motion_fields", index: "02", title: "Motion Fields", root: "C01_Motion_Fields" },
-    { id: "theory", index: "03", title: "Theory", root: "C02_Theory" },
-    { id: "examples", index: "04", title: "Real World Examples", root: "C03_Real_World_Examples" },
+    { id: "intro", index: "01", title: "Intro", root: "C00_Intro", canCalibrate: false },
+    { id: "motion_fields", index: "02", title: "Motion Fields", root: "C01_Motion_Fields", canCalibrate: false },
+    { id: "theory", index: "03", title: "Theory", root: "C02_Theory", canCalibrate: false },
+    { id: "examples", index: "04", title: "Real World Examples", root: "C03_Real_World_Examples", canCalibrate: true },
   ];
 
   const examples = [
-    { id: "gravity", index: "01", title: "Gravity" },
-    { id: "magnetism", index: "02", title: "Magnetism" },
-    { id: "wind", index: "03", title: "Wind" },
+    { id: "gravity", index: "01", title: "Gravity", canCalibrate: true },
+    { id: "magnetism", index: "02", title: "Magnetism", canCalibrate: true },
+    { id: "wind", index: "03", title: "Wind", canCalibrate: true },
   ];
 
   const slots = [

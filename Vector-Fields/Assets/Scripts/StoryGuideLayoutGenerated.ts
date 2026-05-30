@@ -13,6 +13,7 @@ export type StoryGuideStep = {
     index: string;
     title: string;
     root: string;
+    canCalibrate: boolean;
     slot: StoryGuideSlot;
 };
 
@@ -20,6 +21,7 @@ export type StoryGuideExample = {
     id: string;
     index: string;
     title: string;
+    canCalibrate: boolean;
     slot: StoryGuideSlot;
 };
 
@@ -42,6 +44,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "index": "01",
         "title": "Intro",
         "root": "C00_Intro",
+        "canCalibrate": false,
         "slot": {
             "x": -7,
             "y": 2.98,
@@ -54,6 +57,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "index": "02",
         "title": "Motion Fields",
         "root": "C01_Motion_Fields",
+        "canCalibrate": false,
         "slot": {
             "x": 7,
             "y": 2.98,
@@ -66,6 +70,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "index": "03",
         "title": "Theory",
         "root": "C02_Theory",
+        "canCalibrate": false,
         "slot": {
             "x": -7,
             "y": -1.18,
@@ -78,6 +83,7 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "index": "04",
         "title": "Real World Examples",
         "root": "C03_Real_World_Examples",
+        "canCalibrate": true,
         "slot": {
             "x": 7,
             "y": -1.18,
@@ -94,6 +100,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "id": "gravity",
         "index": "01",
         "title": "Gravity",
+        "canCalibrate": true,
         "slot": {
             "x": 0,
             "y": 3.14,
@@ -105,6 +112,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "id": "magnetism",
         "index": "02",
         "title": "Magnetism",
+        "canCalibrate": true,
         "slot": {
             "x": 0,
             "y": -0.7,
@@ -116,6 +124,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "id": "wind",
         "index": "03",
         "title": "Wind",
+        "canCalibrate": true,
         "slot": {
             "x": 0,
             "y": -4.54,

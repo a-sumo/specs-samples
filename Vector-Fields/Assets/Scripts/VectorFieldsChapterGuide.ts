@@ -310,6 +310,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const nextIndex = Math.max(0, Math.min(STORY_GUIDE_STEPS.length - 1, Math.floor(index)));
         this.currentIndex = nextIndex;
         this.examplesMenuOpen = STORY_GUIDE_STEPS[this.currentIndex].id === "examples";
+        if (!this.currentStateCanCalibrate()) {
+            this.keepPlaneControlsWhileFolded = false;
+        }
         this.stageCurrentRoot();
         this.syncVisualState();
     }
@@ -818,6 +821,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private setViewPlaneMode(mode: number): void {
+        if (!this.currentStateCanCalibrate()) return;
+
         const nextMode = this.normalizeViewPlaneMode(mode);
         this.viewPlaneMode = nextMode;
         this.keepPlaneControlsWhileFolded = true;
@@ -857,6 +862,24 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private normalizeViewPlaneMode(mode: number): number {
         return Math.floor(mode) === 1 ? 1 : 0;
+    }
+
+    private currentStateCanCalibrate(): boolean {
+        const step = STORY_GUIDE_STEPS[this.currentIndex] as any;
+        if (!step) return false;
+        if (this.examplesMenuOpen) {
+            const example = this.currentExampleConfig();
+            return !!example && example.canCalibrate === true;
+        }
+        return step.canCalibrate === true;
+    }
+
+    private currentExampleConfig(): any {
+        for (let i = 0; i < STORY_GUIDE_EXAMPLES.cards.length; i++) {
+            const example = STORY_GUIDE_EXAMPLES.cards[i] as any;
+            if (example.id === this.selectedExampleField) return example;
+        }
+        return null;
     }
 
     private stageFallbackContent(stepId: string): void {
@@ -1108,9 +1131,20 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (this.examplesBackButton) {
             this.examplesBackButton.object.enabled = !this.folded && this.examplesMenuOpen;
         }
-        const showPlaneControls = !this.folded || this.keepPlaneControlsWhileFolded;
+        const canCalibrate = this.currentStateCanCalibrate();
+        if (!canCalibrate) {
+            this.keepPlaneControlsWhileFolded = false;
+        }
+        const showPlaneControls = canCalibrate && (!this.folded || this.keepPlaneControlsWhileFolded);
         for (let i = 0; i < this.viewPlaneButtons.length; i++) {
             this.viewPlaneButtons[i].object.enabled = showPlaneControls;
+            if (!showPlaneControls) {
+                this.viewPlaneButtons[i].hovered = false;
+                this.viewPlaneButtons[i].pressedState = false;
+            }
+        }
+        if (!showPlaneControls && this.cursorOwner && this.isViewPlaneBinding(this.cursorOwner)) {
+            this.hideCursor();
         }
     }
 
@@ -1143,6 +1177,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private setButtonTargetSlot(binding: ButtonBinding, slot: StoryGuideSlot): void {
         binding.targetSlot = this.cloneSlot(slot);
+    }
+
+    private isViewPlaneBinding(binding: ButtonBinding): boolean {
+        return binding.id === "plane:floor" || binding.id === "plane:front";
     }
 
     private syncFieldSelectorState(): void {

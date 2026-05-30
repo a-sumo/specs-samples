@@ -26,42 +26,49 @@ window.STORY_UI_LAYOUT = {
       "id": "intro",
       "index": "01",
       "title": "Intro",
-      "root": "C00_Intro"
+      "root": "C00_Intro",
+      "canCalibrate": false
     },
     {
       "id": "motion_fields",
       "index": "02",
       "title": "Motion Fields",
-      "root": "C01_Motion_Fields"
+      "root": "C01_Motion_Fields",
+      "canCalibrate": false
     },
     {
       "id": "theory",
       "index": "03",
       "title": "Theory",
-      "root": "C02_Theory"
+      "root": "C02_Theory",
+      "canCalibrate": false
     },
     {
       "id": "examples",
       "index": "04",
       "title": "Real World Examples",
-      "root": "C03_Real_World_Examples"
+      "root": "C03_Real_World_Examples",
+      "canCalibrate": true
     }
   ],
   "examples": [
     {
       "id": "gravity",
       "index": "01",
-      "title": "Gravity"
+      "title": "Gravity",
+      "canCalibrate": true
     },
     {
       "id": "magnetism",
       "index": "02",
-      "title": "Magnetism"
+      "title": "Magnetism",
+      "canCalibrate": true
     },
     {
       "id": "wind",
       "index": "03",
-      "title": "Wind"
+      "title": "Wind",
+      "canCalibrate": true
     }
   ],
   "slots": [
