@@ -30,7 +30,7 @@ export class VectorFieldsStageLayout extends BaseScriptComponent {
 
     @input
     @hint("Apply the authored layout at startup.")
-    applyOnStart: boolean = true;
+    applyOnStart: boolean = false;
 
     @input
     @hint("Keep applying for a brief startup window so older setup scripts settle first.")
@@ -43,6 +43,14 @@ export class VectorFieldsStageLayout extends BaseScriptComponent {
     @input
     @hint("Default forward distance for floor fields, in centimeters.")
     floorZ: number = -118.0;
+
+    @input
+    @hint("Head-relative height for the 2D motion plane. This is a front display, not a floor plane.")
+    motionFrontY: number = -3.0;
+
+    @input
+    @hint("Head-relative forward distance for the 2D motion plane.")
+    motionFrontZ: number = -82.0;
 
     @input
     @hint("Chest/head height for hand-rotated examples, in centimeters.")
@@ -62,7 +70,7 @@ export class VectorFieldsStageLayout extends BaseScriptComponent {
 
     @input
     @hint("Fallback menu height when Follow is off.")
-    menuY: number = -7.0;
+    menuY: number = -16.0;
 
     @input
     @hint("Apply scale presets with the positions.")
@@ -92,7 +100,7 @@ export class VectorFieldsStageLayout extends BaseScriptComponent {
         const wind = this.windGlobeRoot || this.findObjectByName("Globe Calibration");
         const magnetic = this.magneticFieldRoot || this.findObjectByName("Magnetic Field Root");
 
-        this.place(motion, new vec3(0.0, this.floorY, this.floorZ), quat.quatIdentity(), new vec3(1.0, 1.0, 1.0));
+        this.place(motion, new vec3(0.0, this.motionFrontY, this.motionFrontZ), this.motionPlaneRotation(), new vec3(1.0, 1.0, 1.0));
         this.place(gravity, new vec3(0.0, this.floorY, this.floorZ), quat.quatIdentity(), new vec3(1.0, 1.0, 1.0));
         this.place(wind, new vec3(-this.handLevelSpacing * 0.5, this.handLevelY, this.handLevelZ), quat.quatIdentity(), new vec3(1.0, 1.0, 1.0));
         this.place(magnetic, new vec3(this.handLevelSpacing * 0.5, this.handLevelY, this.handLevelZ), quat.quatIdentity(), new vec3(1.0, 1.0, 1.0));
@@ -117,6 +125,10 @@ export class VectorFieldsStageLayout extends BaseScriptComponent {
         if (this.applyScales) {
             tr.setLocalScale(scale);
         }
+    }
+
+    private motionPlaneRotation(): quat {
+        return quat.angleAxis(Math.PI * 0.5, new vec3(1.0, 0.0, 0.0));
     }
 
     private findObjectByName(name: string): SceneObject | null {

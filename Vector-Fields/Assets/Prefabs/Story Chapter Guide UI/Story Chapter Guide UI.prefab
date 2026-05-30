@@ -13,6 +13,7 @@
   ScriptInputsDefault:
     directorRoot: true
     showOnStart: true
+    initialIndex: true
     controlContentRoots: true
     hideLegacySystems: true
     isolateSceneInteractors: true
@@ -31,6 +32,7 @@
       scaffoldRoot: !<reference.SceneObject> a198c9da-c135-470d-beea-4a0f196a20e0
       directorRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       showOnStart: true
+      initialIndex: !<float> 0.000000
       controlContentRoots: true
       hideLegacySystems: true
       isolateSceneInteractors: true
@@ -40,6 +42,7 @@
       folded: false
       menuDistanceCm: !<float> 68.000000
       menuVerticalOffsetCm: !<float> -7.000000
+      menuLowerOffsetCm: !<float> -9.000000
       menuHorizontalOffsetCm: !<float> 0.000000
       followSmoothing: !<float> 9.000000
   ScriptTypes:
