@@ -25,9 +25,9 @@ export class GravityFieldPlane extends BaseScriptComponent {
     planeMaterial: Material = null as any;
 
     @input
-    @widget(new SliderWidget(6.0, 42.0, 0.5))
+    @widget(new SliderWidget(6.0, 72.0, 0.5))
     @hint("Plane width/depth in cm.")
-    planeSize: number = 30.0;
+    planeSize: number = 56.0;
 
     @input
     @widget(new SliderWidget(24, 192, 4))
@@ -117,7 +117,7 @@ export class GravityFieldPlane extends BaseScriptComponent {
     @input
     @hint("Arrow overlay color.")
     @widget(new ColorWidget())
-    arrowColor: vec4 = new vec4(1.0, 0.90, 0.96, 0.98);
+    arrowColor: vec4 = new vec4(1.0, 0.90, 0.96, 0.70);
 
     @input
     @widget(new SliderWidget(0.1, 2.5, 0.05))
@@ -130,14 +130,14 @@ export class GravityFieldPlane extends BaseScriptComponent {
     fieldLineWidth: number = 0.065;
 
     @input
-    @widget(new SliderWidget(1.2, 5.0, 0.1))
+    @widget(new SliderWidget(1.2, 9.0, 0.1))
     @hint("Spacing between shader-drawn arrows.")
-    arrowSpacing: number = 2.8;
+    arrowSpacing: number = 6.4;
 
     @input
-    @widget(new SliderWidget(0.25, 1.1, 0.05))
+    @widget(new SliderWidget(0.08, 1.1, 0.05))
     @hint("Size of each shader-drawn arrow within its grid cell.")
-    arrowScale: number = 0.72;
+    arrowScale: number = 0.34;
 
     private visual: RenderMeshVisual | null = null;
     private materialInstance: Material | null = null;
