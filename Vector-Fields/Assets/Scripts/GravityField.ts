@@ -73,8 +73,8 @@ export class GravityField extends BaseScriptComponent {
     private static readonly ARTEMIS_TRAJECTORY_LIFT: number = 0.14;
     private static readonly ARTEMIS_DASH_LENGTH: number = 0.36;
     private static readonly ARTEMIS_DASH_GAP: number = 0.22;
-    private static readonly ARTEMIS_RESAMPLE_STEP: number = 0.24;
-    private static readonly ARTEMIS_CLEARANCE_RESAMPLE_STEP: number = 0.14;
+    private static readonly ARTEMIS_RESAMPLE_STEP: number = 0.22;
+    private static readonly ARTEMIS_OUTER_PATH_RADIUS: number = 5.15;
 
     @input
     @allowUndefined
@@ -550,9 +550,9 @@ export class GravityField extends BaseScriptComponent {
 
         if (this.satelliteBase) {
             const satelliteTransform = this.satelliteBase.object.getTransform();
-            satelliteTransform.setLocalPosition(this.artemisLocalForKm(spacecraftKm, 0.0));
-            const ahead = this.sampleArtemis(ARTEMIS_II_TRAJECTORY, Math.min(duration, this.artemisMissionT + 2000.0));
-            let dir = this.artemisFrameRotation().multiplyVec3(ahead.sub(spacecraftKm));
+            satelliteTransform.setLocalPosition(this.artemisDisplayLocalForTime(this.artemisMissionT, 0.0));
+            const ahead = this.artemisDisplayLocalForTime(Math.min(duration, this.artemisMissionT + 2000.0), 0.0);
+            let dir = ahead.sub(satelliteTransform.getLocalPosition());
             if (dir.length > 0.0001) {
                 dir = this.normalizeVec(dir);
                 satelliteTransform.setLocalRotation(quat.lookAt(dir, new vec3(0.0, 1.0, 0.0)));
@@ -570,32 +570,13 @@ export class GravityField extends BaseScriptComponent {
         const trail = this.buildArtemisTrajectoryMesh(true);
         this.assignVisual("artemisTrail", trail, new vec4(1.0, 0.98, 0.90, 0.96), GravityField.FIELD_RENDER_ORDER + 7);
 
-        const cursor = this.buildArtemisCursorMesh(this.artemisLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT), GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.03));
+        const cursor = this.buildArtemisCursorMesh(this.artemisDisplayLocalForTime(this.artemisMissionT, GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.03));
         this.assignVisual("artemisCursor", cursor, new vec4(1.0, 0.99, 0.94, 1.0), GravityField.BODY_RENDER_ORDER + 4);
     }
 
     private buildArtemisTrajectoryMesh(flownOnly: boolean): MeshBuilder {
         const mb = this.makeMeshBuilder();
-        const d: any = ARTEMIS_II_TRAJECTORY;
-        const n = d.t.length;
-        if (n < 2) return mb;
-        const endIdx = flownOnly ? Math.max(1, this.artemisSampleIndex(this.artemisMissionT)) : n - 1;
-        const rawPath: vec3[] = [];
-        for (let i = 0; i <= endIdx; i++) {
-            rawPath.push(this.artemisRawLocalForKm(new vec3(d.x[i], d.y[i], d.z[i]), GravityField.ARTEMIS_TRAJECTORY_LIFT));
-        }
-        if (flownOnly) {
-            rawPath.push(this.artemisRawLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT), GravityField.ARTEMIS_TRAJECTORY_LIFT));
-        }
-        const path = this.compactPath(
-            this.clampArtemisPathToEarthClearance(
-                this.resamplePath(
-                    this.clampArtemisPathToEarthClearance(this.resamplePath(rawPath, GravityField.ARTEMIS_RESAMPLE_STEP)),
-                    GravityField.ARTEMIS_CLEARANCE_RESAMPLE_STEP
-                )
-            ),
-            0.025
-        );
+        const path = this.buildArtemisDisplayPath(flownOnly, GravityField.ARTEMIS_TRAJECTORY_LIFT);
         if (flownOnly) {
             this.addPlanarRibbonPath(mb, path, GravityField.ARTEMIS_TRAIL_WIDTH);
         } else {
@@ -608,6 +589,33 @@ export class GravityField extends BaseScriptComponent {
             );
         }
         return mb;
+    }
+
+    private buildArtemisDisplayPath(flownOnly: boolean, lift: number): vec3[] {
+        const d: any = ARTEMIS_II_TRAJECTORY;
+        const n = d.t.length;
+        if (n < 2) return [];
+        const startIdx = this.artemisOuterStartIndex();
+        const endIdx = this.artemisOuterEndIndex(startIdx);
+        const sampleIdx = this.artemisSampleIndex(this.artemisMissionT);
+        if (flownOnly && sampleIdx < startIdx) return [];
+
+        const lastIdx = flownOnly ? Math.min(sampleIdx, endIdx) : endIdx;
+        const path: vec3[] = [
+            this.artemisEarthRimLocalForKm(new vec3(d.x[startIdx], d.y[startIdx], d.z[startIdx]), lift),
+        ];
+        for (let i = startIdx; i <= lastIdx; i++) {
+            path.push(this.artemisPlanarLocalForKm(new vec3(d.x[i], d.y[i], d.z[i]), lift));
+        }
+
+        if (flownOnly && this.artemisMissionT < d.t[endIdx]) {
+            if (this.artemisMissionT >= d.t[startIdx]) {
+                path.push(this.artemisPlanarLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT), lift));
+            }
+        } else {
+            path.push(this.artemisEarthRimLocalForKm(new vec3(d.x[endIdx], d.y[endIdx], d.z[endIdx]), lift));
+        }
+        return this.compactPath(this.resamplePath(path, GravityField.ARTEMIS_RESAMPLE_STEP), 0.025);
     }
 
     private buildArtemisCursorMesh(center: vec3): MeshBuilder {
@@ -639,12 +647,98 @@ export class GravityField extends BaseScriptComponent {
         return new vec3(p.x, p.y + lift, p.z);
     }
 
+    private artemisPlanarLocalForKm(pKm: vec3, lift: number): vec3 {
+        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
+        const offset = this.artemisRawDisplayOffset(pKm);
+        return new vec3(origin.x + offset.x, origin.y + lift, origin.z + offset.z);
+    }
+
+    private artemisEarthRimLocalForKm(pKm: vec3, lift: number): vec3 {
+        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
+        const offset = this.artemisRawDisplayOffset(pKm);
+        const radius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
+        const minRadius = GravityField.EARTH_RADIUS + Math.max(0.0, this.artemisEarthClearance);
+        if (radius < 0.0001) return new vec3(origin.x + minRadius, origin.y + lift, origin.z);
+        return new vec3(origin.x + (offset.x / radius) * minRadius, origin.y + lift, origin.z + (offset.z / radius) * minRadius);
+    }
+
+    private artemisDisplayLocalForTime(t: number, lift: number): vec3 {
+        const d: any = ARTEMIS_II_TRAJECTORY;
+        const startIdx = this.artemisOuterStartIndex();
+        const endIdx = this.artemisOuterEndIndex(startIdx);
+        if (t <= d.t[startIdx]) {
+            return this.artemisEarthRimLocalForKm(new vec3(d.x[startIdx], d.y[startIdx], d.z[startIdx]), lift);
+        }
+        if (t >= d.t[endIdx]) {
+            return this.artemisEarthRimLocalForKm(new vec3(d.x[endIdx], d.y[endIdx], d.z[endIdx]), lift);
+        }
+        return this.artemisPlanarLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, t), lift);
+    }
+
     private artemisDisplayOffset(pKm: vec3): vec3 {
         return this.applyArtemisEarthClearance(this.artemisRawDisplayOffset(pKm));
     }
 
     private artemisRawDisplayOffset(pKm: vec3): vec3 {
         return this.artemisFrameRotation().multiplyVec3(pKm).uniformScale(this.artemisScaleCmPerKm());
+    }
+
+    private artemisDisplayRadiusForIndex(index: number): number {
+        const d: any = ARTEMIS_II_TRAJECTORY;
+        const offset = this.artemisRawDisplayOffset(new vec3(d.x[index], d.y[index], d.z[index]));
+        return Math.sqrt(offset.x * offset.x + offset.z * offset.z);
+    }
+
+    private artemisOuterStartIndex(): number {
+        const d: any = ARTEMIS_II_TRAJECTORY;
+        const n = d.t.length;
+        if (n < 2) return 0;
+        const threshold = this.artemisOuterPathRadius();
+        const maxIdx = this.artemisMaxRadiusIndex();
+        let start = 0;
+        for (let i = maxIdx; i >= 0; i--) {
+            if (this.artemisDisplayRadiusForIndex(i) < threshold) {
+                start = Math.min(maxIdx, i + 1);
+                break;
+            }
+        }
+        return start;
+    }
+
+    private artemisOuterEndIndex(startIdx: number): number {
+        const d: any = ARTEMIS_II_TRAJECTORY;
+        const n = d.t.length;
+        if (n < 2) return 0;
+        const threshold = this.artemisOuterPathRadius();
+        const maxIdx = Math.max(startIdx, this.artemisMaxRadiusIndex());
+        let end = n - 1;
+        for (let i = maxIdx; i < n; i++) {
+            if (this.artemisDisplayRadiusForIndex(i) < threshold) {
+                end = Math.max(maxIdx, i - 1);
+                break;
+            }
+        }
+        return end;
+    }
+
+    private artemisMaxRadiusIndex(): number {
+        const d: any = ARTEMIS_II_TRAJECTORY;
+        const n = d.t.length;
+        let maxIdx = 0;
+        let maxRadius = -1.0;
+        for (let i = 0; i < n; i++) {
+            const radius = this.artemisDisplayRadiusForIndex(i);
+            if (radius > maxRadius) {
+                maxRadius = radius;
+                maxIdx = i;
+            }
+        }
+        return maxIdx;
+    }
+
+    private artemisOuterPathRadius(): number {
+        const minRadius = GravityField.EARTH_RADIUS + Math.max(0.0, this.artemisEarthClearance);
+        return Math.max(GravityField.ARTEMIS_OUTER_PATH_RADIUS, minRadius + 3.0);
     }
 
     private applyArtemisEarthClearance(offset: vec3): vec3 {
