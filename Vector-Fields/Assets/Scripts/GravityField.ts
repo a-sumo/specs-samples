@@ -8,9 +8,6 @@
 // The "well" is not a spatial axis. Bodies stay on the reference plane while
 // the curves dip along local Y to show scalar intensity.
 
-import { ARTEMIS_II_TRAJECTORY } from "./ArtemisTrajectory";
-import { MOON_EPHEMERIS } from "./MoonEphemeris";
-
 type GravitySample = {
     field: vec3;
     intensity: number;
@@ -70,12 +67,10 @@ export class GravityField extends BaseScriptComponent {
     private static readonly ARTEMIS_TRAJECTORY_WIDTH: number = 0.05;
     private static readonly ARTEMIS_TRAIL_WIDTH: number = 0.08;
     private static readonly ARTEMIS_CURSOR_RADIUS: number = 0.34;
-    private static readonly ARTEMIS_TRAJECTORY_LIFT: number = 0.14;
-    private static readonly ARTEMIS_DASH_LENGTH: number = 0.36;
-    private static readonly ARTEMIS_DASH_GAP: number = 0.22;
-    private static readonly ARTEMIS_RESAMPLE_STEP: number = 0.22;
-    private static readonly ARTEMIS_OUTER_PATH_RADIUS: number = 5.15;
-
+    private static readonly ARTEMIS_TRAJECTORY_LIFT: number = 0.16;
+    private static readonly ARTEMIS_DASH_LENGTH: number = 0.42;
+    private static readonly ARTEMIS_DASH_GAP: number = 0.24;
+    private static readonly ARTEMIS_DISPLAY_DURATION_HOURS: number = 214.0;
     @input
     @allowUndefined
     @hint("Optional Earth object. If unset, a generated flat shaded Earth is used.")
@@ -186,16 +181,6 @@ export class GravityField extends BaseScriptComponent {
     lineWidth: number = 0.08;
 
     @input
-    @widget(new SliderWidget(0.75, 6.0, 0.05))
-    @hint("Display-only scale multiplier for the Artemis II trajectory and Moon distance. Body model sizes stay constant.")
-    artemisTrajectoryScale: number = 2.65;
-
-    @input
-    @widget(new SliderWidget(0.0, 1.5, 0.05))
-    @hint("Minimum visual gap between the Artemis II path and the visible Earth model.")
-    artemisEarthClearance: number = 0.65;
-
-    @input
     @widget(new SliderWidget(0.15, 6.0, 0.05))
     @hint("How far the scalar gravity well falls along local Y. Depth scales with body mass so Earth dominates the Moon.")
     wellDepth: number = 2.4;
@@ -229,9 +214,7 @@ export class GravityField extends BaseScriptComponent {
     private wasMoonRotationDriven: boolean = false;
     private wasSatelliteDriven: boolean = false;
     private artemisMissionEnabled: boolean = false;
-    private artemisMissionT: number = 0.0;
-    private artemisFrameRot: quat = quat.fromEulerAngles(0, 0, 0);
-    private artemisFrameReady: boolean = false;
+    private artemisMissionHours: number = 0.0;
 
     onAwake(): void {
         this.captureBaseTransforms();
@@ -328,7 +311,7 @@ export class GravityField extends BaseScriptComponent {
     private rebuildIfModelInputsChanged(throttleForMotion: boolean): void {
         const signature = this.modelSignature();
         if (signature === this.lastModelSignature) return;
-        if (throttleForMotion && !this.artemisMissionEnabled) {
+        if (throttleForMotion) {
             const now = getTime();
             if (now - this.lastMotionRebuildTime < Math.max(0.02, this.motionRebuildInterval)) return;
             this.lastMotionRebuildTime = now;
@@ -343,11 +326,8 @@ export class GravityField extends BaseScriptComponent {
             ? this.objectSignature(this.earthObject) + "|" + this.objectSignature(this.moonObject)
             : this.objectIdentitySignature(this.earthObject) + "|" + this.objectIdentitySignature(this.moonObject);
         const orbitCurveSignature = this.showSatelliteOrbitCurve ? "orbit:" + this.issOrbitRadius.toFixed(3) : "orbit:off";
-        const artemisSignature = this.artemisMissionEnabled
-            ? "artemis:" + this.artemisSampleIndex(this.artemisMissionT)
-            : "artemis:off";
-        const artemisDisplaySignature = "artemisDisplay:" + this.artemisTrajectoryScale.toFixed(3) + ":" + this.artemisEarthClearance.toFixed(3);
-        return bodySignature + "|" + mode + "|" + orbitCurveSignature + "|" + artemisSignature + "|" + artemisDisplaySignature;
+        const artemisSignature = this.artemisMissionEnabled ? "artemis:" + this.artemisDisplaySampleIndex() : "artemis:off";
+        return bodySignature + "|" + mode + "|" + orbitCurveSignature + "|" + artemisSignature;
     }
 
     private objectIdentitySignature(object: SceneObject | null): string {
@@ -443,7 +423,7 @@ export class GravityField extends BaseScriptComponent {
         this.motionElapsedHours += dt * Math.max(0.0, this.simulatedHoursPerSecond);
 
         if (this.artemisMissionEnabled) {
-            return this.updateArtemisMotion(dt);
+            return this.updateArtemisDisplayMotion(dt);
         }
 
         const hadMoonPositionDriven = this.wasMoonPositionDriven;
@@ -524,38 +504,19 @@ export class GravityField extends BaseScriptComponent {
         this.wasSatelliteDriven = true;
     }
 
-    private updateArtemisMotion(dt: number): boolean {
-        this.artemisMissionT += dt * Math.max(0.0, this.simulatedHoursPerSecond) * 3600.0;
-        const duration = Math.max(1.0, ARTEMIS_II_TRAJECTORY.durationSec);
-        if (this.artemisMissionT >= duration) {
-            this.artemisMissionT = this.artemisMissionT % duration;
-        }
-
+    private updateArtemisDisplayMotion(dt: number): boolean {
+        this.artemisMissionHours += dt * Math.max(0.0, this.simulatedHoursPerSecond);
         this.updateEarthMotion();
-
-        const moonKm = this.sampleArtemis(MOON_EPHEMERIS, this.artemisMissionT);
-        const spacecraftKm = this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT);
-        if (this.moonBase) {
-            const moonTransform = this.moonBase.object.getTransform();
-            moonTransform.setLocalPosition(this.artemisLocalForKm(moonKm, 0.0));
-            if (this.moonSynchronousRotationEnabled && this.earthBase) {
-                const toEarth = this.earthBase.position.sub(moonTransform.getLocalPosition());
-                if (toEarth.length > 0.0001) {
-                    moonTransform.setLocalRotation(quat.lookAt(this.normalizeVec(toEarth), new vec3(0.0, 1.0, 0.0)));
-                    this.wasMoonRotationDriven = true;
-                }
-            }
-            this.wasMoonPositionDriven = true;
-        }
+        this.updateMoonMotion();
 
         if (this.satelliteBase) {
-            const satelliteTransform = this.satelliteBase.object.getTransform();
-            satelliteTransform.setLocalPosition(this.artemisDisplayLocalForTime(this.artemisMissionT, 0.0));
-            const ahead = this.artemisDisplayLocalForTime(Math.min(duration, this.artemisMissionT + 2000.0), 0.0);
-            let dir = ahead.sub(satelliteTransform.getLocalPosition());
+            const tr = this.satelliteBase.object.getTransform();
+            const p = this.sampleArtemisDisplayPath(this.artemisDisplayProgress(), GravityField.ARTEMIS_TRAJECTORY_LIFT);
+            const ahead = this.sampleArtemisDisplayPath(this.artemisDisplayProgress(0.01), GravityField.ARTEMIS_TRAJECTORY_LIFT);
+            const dir = ahead.sub(p);
+            tr.setLocalPosition(new vec3(p.x, p.y - GravityField.ARTEMIS_TRAJECTORY_LIFT, p.z));
             if (dir.length > 0.0001) {
-                dir = this.normalizeVec(dir);
-                satelliteTransform.setLocalRotation(quat.lookAt(dir, new vec3(0.0, 1.0, 0.0)));
+                tr.setLocalRotation(quat.lookAt(this.normalizeVec(dir), new vec3(0.0, 1.0, 0.0)));
             }
             this.wasSatelliteDriven = true;
         }
@@ -564,58 +525,77 @@ export class GravityField extends BaseScriptComponent {
     }
 
     private buildArtemisMissionVisuals(): void {
-        const trajectory = this.buildArtemisTrajectoryMesh(false);
-        this.assignVisual("artemisTrajectory", trajectory, new vec4(0.94, 0.93, 0.88, 0.72), GravityField.FIELD_RENDER_ORDER + 6);
+        const fullPath = this.buildArtemisDisplayPath(1.0, GravityField.ARTEMIS_TRAJECTORY_LIFT);
+        const trajectory = this.makeMeshBuilder();
+        this.addDottedPlanarRibbonPath(
+            trajectory,
+            fullPath,
+            GravityField.ARTEMIS_TRAJECTORY_WIDTH,
+            GravityField.ARTEMIS_DASH_LENGTH,
+            GravityField.ARTEMIS_DASH_GAP
+        );
+        this.assignVisual("artemisTrajectory", trajectory, new vec4(0.96, 0.95, 0.90, 0.82), GravityField.FIELD_RENDER_ORDER + 6);
 
-        const trail = this.buildArtemisTrajectoryMesh(true);
-        this.assignVisual("artemisTrail", trail, new vec4(1.0, 0.98, 0.90, 0.96), GravityField.FIELD_RENDER_ORDER + 7);
+        const trail = this.makeMeshBuilder();
+        this.addPlanarRibbonPath(trail, this.buildArtemisDisplayPath(this.artemisDisplayProgress(), GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.01), GravityField.ARTEMIS_TRAIL_WIDTH);
+        this.assignVisual("artemisTrail", trail, new vec4(1.0, 0.98, 0.88, 0.96), GravityField.FIELD_RENDER_ORDER + 7);
 
-        const cursor = this.buildArtemisCursorMesh(this.artemisDisplayLocalForTime(this.artemisMissionT, GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.03));
-        this.assignVisual("artemisCursor", cursor, new vec4(1.0, 0.99, 0.94, 1.0), GravityField.BODY_RENDER_ORDER + 4);
+        const cursor = this.buildArtemisCursorMesh(this.sampleArtemisDisplayPath(this.artemisDisplayProgress(), GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.03));
+        this.assignVisual("artemisCursor", cursor, new vec4(1.0, 0.99, 0.92, 1.0), GravityField.BODY_RENDER_ORDER + 4);
     }
 
-    private buildArtemisTrajectoryMesh(flownOnly: boolean): MeshBuilder {
-        const mb = this.makeMeshBuilder();
-        const path = this.buildArtemisDisplayPath(flownOnly, GravityField.ARTEMIS_TRAJECTORY_LIFT);
-        if (flownOnly) {
-            this.addPlanarRibbonPath(mb, path, GravityField.ARTEMIS_TRAIL_WIDTH);
-        } else {
-            this.addDottedPlanarRibbonPath(
-                mb,
-                path,
-                GravityField.ARTEMIS_TRAJECTORY_WIDTH,
-                GravityField.ARTEMIS_DASH_LENGTH,
-                GravityField.ARTEMIS_DASH_GAP
-            );
-        }
-        return mb;
+    private buildArtemisDisplayPath(progress: number, lift: number): vec3[] {
+        const full = this.buildArtemisSchematicPath(lift);
+        if (progress >= 0.999) return full;
+        if (progress <= 0.001) return [full[0]];
+        const targetDistance = this.pathLength(full) * Math.max(0.0, Math.min(1.0, progress));
+        return this.slicePathByDistance(full, targetDistance);
     }
 
-    private buildArtemisDisplayPath(flownOnly: boolean, lift: number): vec3[] {
-        const d: any = ARTEMIS_II_TRAJECTORY;
-        const n = d.t.length;
-        if (n < 2) return [];
-        const startIdx = this.artemisOuterStartIndex();
-        const endIdx = this.artemisOuterEndIndex(startIdx);
-        const sampleIdx = this.artemisSampleIndex(this.artemisMissionT);
-        if (flownOnly && sampleIdx < startIdx) return [];
+    private buildArtemisSchematicPath(lift: number): vec3[] {
+        const earth = this.earthBase ? this.earthBase.position : this.earthFallback();
+        const moon = this.moonBase ? this.moonBase.position : this.moonFallback();
+        let axis = new vec3(moon.x - earth.x, 0.0, moon.z - earth.z);
+        if (axis.length < 0.001) axis = new vec3(1.0, 0.0, 0.0);
+        axis = this.normalizeVec(axis);
+        const side = new vec3(-axis.z, 0.0, axis.x);
+        const distance = Math.max(8.0, Math.sqrt((moon.x - earth.x) * (moon.x - earth.x) + (moon.z - earth.z) * (moon.z - earth.z)));
+        const earthR = GravityField.EARTH_RADIUS + 0.72;
+        const moonR = Math.max(GravityField.MOON_RADIUS + 1.15, distance * 0.22);
+        const y = earth.y + lift;
 
-        const lastIdx = flownOnly ? Math.min(sampleIdx, endIdx) : endIdx;
-        const path: vec3[] = [
-            this.artemisEarthRimLocalForKm(new vec3(d.x[startIdx], d.y[startIdx], d.z[startIdx]), lift),
-        ];
-        for (let i = startIdx; i <= lastIdx; i++) {
-            path.push(this.artemisPlanarLocalForKm(new vec3(d.x[i], d.y[i], d.z[i]), lift));
-        }
+        const start = new vec3(earth.x - side.x * earthR, y, earth.z - side.z * earthR);
+        const outbound = new vec3(moon.x - axis.x * moonR - side.x * moonR * 0.48, y, moon.z - axis.z * moonR - side.z * moonR * 0.48);
+        const farMoon = new vec3(moon.x + axis.x * moonR * 0.98, y, moon.z + axis.z * moonR * 0.98);
+        const inbound = new vec3(moon.x - axis.x * moonR - side.x * -moonR * 0.50, y, moon.z - axis.z * moonR - side.z * -moonR * 0.50);
+        const end = new vec3(earth.x + side.x * earthR, y, earth.z + side.z * earthR);
 
-        if (flownOnly && this.artemisMissionT < d.t[endIdx]) {
-            if (this.artemisMissionT >= d.t[startIdx]) {
-                path.push(this.artemisPlanarLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT), lift));
-            }
-        } else {
-            path.push(this.artemisEarthRimLocalForKm(new vec3(d.x[endIdx], d.y[endIdx], d.z[endIdx]), lift));
-        }
-        return this.compactPath(this.resamplePath(path, GravityField.ARTEMIS_RESAMPLE_STEP), 0.025);
+        const path: vec3[] = [];
+        this.appendCubic(path, start,
+            earth.add(axis.uniformScale(distance * 0.26)).sub(side.uniformScale(distance * 0.74)).add(new vec3(0.0, lift, 0.0)),
+            moon.sub(axis.uniformScale(distance * 0.38)).sub(side.uniformScale(distance * 0.58)).add(new vec3(0.0, lift, 0.0)),
+            outbound,
+            44
+        );
+        this.appendCubic(path, outbound,
+            moon.sub(side.uniformScale(moonR * 1.45)).add(new vec3(0.0, lift, 0.0)),
+            moon.add(axis.uniformScale(moonR * 1.55)).sub(side.uniformScale(moonR * 0.25)).add(new vec3(0.0, lift, 0.0)),
+            farMoon,
+            26
+        );
+        this.appendCubic(path, farMoon,
+            moon.add(axis.uniformScale(moonR * 1.55)).add(side.uniformScale(moonR * 0.30)).add(new vec3(0.0, lift, 0.0)),
+            moon.add(side.uniformScale(moonR * 1.45)).add(new vec3(0.0, lift, 0.0)),
+            inbound,
+            26
+        );
+        this.appendCubic(path, inbound,
+            moon.sub(axis.uniformScale(distance * 0.38)).add(side.uniformScale(distance * 0.58)).add(new vec3(0.0, lift, 0.0)),
+            earth.add(axis.uniformScale(distance * 0.26)).add(side.uniformScale(distance * 0.74)).add(new vec3(0.0, lift, 0.0)),
+            end,
+            44
+        );
+        return this.compactPath(path, 0.03);
     }
 
     private buildArtemisCursorMesh(center: vec3): MeshBuilder {
@@ -633,213 +613,71 @@ export class GravityField extends BaseScriptComponent {
         return mb;
     }
 
-    private artemisLocalForKm(pKm: vec3, lift: number): vec3 {
-        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
-        const offset = this.artemisDisplayOffset(pKm);
-        const p = origin.add(offset);
-        return new vec3(p.x, p.y + lift, p.z);
+    private sampleArtemisDisplayPath(progress: number, lift: number): vec3 {
+        const path = this.buildArtemisSchematicPath(lift);
+        if (path.length === 0) return this.earthBase ? this.earthBase.position : this.earthFallback();
+        const sliced = this.slicePathByDistance(path, this.pathLength(path) * Math.max(0.0, Math.min(1.0, progress)));
+        return sliced[sliced.length - 1];
     }
 
-    private artemisRawLocalForKm(pKm: vec3, lift: number): vec3 {
-        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
-        const offset = this.artemisRawDisplayOffset(pKm);
-        const p = origin.add(offset);
-        return new vec3(p.x, p.y + lift, p.z);
+    private artemisDisplayProgress(offset: number = 0.0): number {
+        const duration = Math.max(1.0, GravityField.ARTEMIS_DISPLAY_DURATION_HOURS);
+        let p = (this.artemisMissionHours / duration) + offset;
+        p = p - Math.floor(p);
+        return p;
     }
 
-    private artemisPlanarLocalForKm(pKm: vec3, lift: number): vec3 {
-        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
-        const offset = this.artemisRawDisplayOffset(pKm);
-        return new vec3(origin.x + offset.x, origin.y + lift, origin.z + offset.z);
+    private artemisDisplaySampleIndex(): number {
+        return Math.floor(this.artemisDisplayProgress() * 180.0);
     }
 
-    private artemisEarthRimLocalForKm(pKm: vec3, lift: number): vec3 {
-        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
-        const offset = this.artemisRawDisplayOffset(pKm);
-        const radius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
-        const minRadius = GravityField.EARTH_RADIUS + Math.max(0.0, this.artemisEarthClearance);
-        if (radius < 0.0001) return new vec3(origin.x + minRadius, origin.y + lift, origin.z);
-        return new vec3(origin.x + (offset.x / radius) * minRadius, origin.y + lift, origin.z + (offset.z / radius) * minRadius);
-    }
-
-    private artemisDisplayLocalForTime(t: number, lift: number): vec3 {
-        const d: any = ARTEMIS_II_TRAJECTORY;
-        const startIdx = this.artemisOuterStartIndex();
-        const endIdx = this.artemisOuterEndIndex(startIdx);
-        if (t <= d.t[startIdx]) {
-            return this.artemisEarthRimLocalForKm(new vec3(d.x[startIdx], d.y[startIdx], d.z[startIdx]), lift);
+    private appendCubic(path: vec3[], p0: vec3, p1: vec3, p2: vec3, p3: vec3, steps: number): void {
+        const start = path.length === 0 ? 0 : 1;
+        for (let i = start; i <= steps; i++) {
+            path.push(this.cubicPoint(p0, p1, p2, p3, i / steps));
         }
-        if (t >= d.t[endIdx]) {
-            return this.artemisEarthRimLocalForKm(new vec3(d.x[endIdx], d.y[endIdx], d.z[endIdx]), lift);
-        }
-        return this.artemisPlanarLocalForKm(this.sampleArtemis(ARTEMIS_II_TRAJECTORY, t), lift);
     }
 
-    private artemisDisplayOffset(pKm: vec3): vec3 {
-        return this.applyArtemisEarthClearance(this.artemisRawDisplayOffset(pKm));
-    }
-
-    private artemisRawDisplayOffset(pKm: vec3): vec3 {
-        return this.artemisFrameRotation().multiplyVec3(pKm).uniformScale(this.artemisScaleCmPerKm());
-    }
-
-    private artemisDisplayRadiusForIndex(index: number): number {
-        const d: any = ARTEMIS_II_TRAJECTORY;
-        const offset = this.artemisRawDisplayOffset(new vec3(d.x[index], d.y[index], d.z[index]));
-        return Math.sqrt(offset.x * offset.x + offset.z * offset.z);
-    }
-
-    private artemisOuterStartIndex(): number {
-        const d: any = ARTEMIS_II_TRAJECTORY;
-        const n = d.t.length;
-        if (n < 2) return 0;
-        const threshold = this.artemisOuterPathRadius();
-        const maxIdx = this.artemisMaxRadiusIndex();
-        let start = 0;
-        for (let i = maxIdx; i >= 0; i--) {
-            if (this.artemisDisplayRadiusForIndex(i) < threshold) {
-                start = Math.min(maxIdx, i + 1);
-                break;
-            }
-        }
-        return start;
-    }
-
-    private artemisOuterEndIndex(startIdx: number): number {
-        const d: any = ARTEMIS_II_TRAJECTORY;
-        const n = d.t.length;
-        if (n < 2) return 0;
-        const threshold = this.artemisOuterPathRadius();
-        const maxIdx = Math.max(startIdx, this.artemisMaxRadiusIndex());
-        let end = n - 1;
-        for (let i = maxIdx; i < n; i++) {
-            if (this.artemisDisplayRadiusForIndex(i) < threshold) {
-                end = Math.max(maxIdx, i - 1);
-                break;
-            }
-        }
-        return end;
-    }
-
-    private artemisMaxRadiusIndex(): number {
-        const d: any = ARTEMIS_II_TRAJECTORY;
-        const n = d.t.length;
-        let maxIdx = 0;
-        let maxRadius = -1.0;
-        for (let i = 0; i < n; i++) {
-            const radius = this.artemisDisplayRadiusForIndex(i);
-            if (radius > maxRadius) {
-                maxRadius = radius;
-                maxIdx = i;
-            }
-        }
-        return maxIdx;
-    }
-
-    private artemisOuterPathRadius(): number {
-        const minRadius = GravityField.EARTH_RADIUS + Math.max(0.0, this.artemisEarthClearance);
-        return Math.max(GravityField.ARTEMIS_OUTER_PATH_RADIUS, minRadius + 3.0);
-    }
-
-    private applyArtemisEarthClearance(offset: vec3): vec3 {
-        const radius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
-        const minRadius = GravityField.EARTH_RADIUS + Math.max(0.0, this.artemisEarthClearance);
-        if (radius < 0.0001 || radius >= minRadius) return offset;
-        const k = minRadius / radius;
-        return new vec3(offset.x * k, offset.y, offset.z * k);
-    }
-
-    private clampArtemisPathToEarthClearance(path: vec3[]): vec3[] {
-        const origin = this.earthBase ? this.earthBase.position : this.earthFallback();
-        const minRadius = GravityField.EARTH_RADIUS + Math.max(0.0, this.artemisEarthClearance);
-        const out: vec3[] = [];
-        let lastDirX = 1.0;
-        let lastDirZ = 0.0;
-        for (let i = 0; i < path.length; i++) {
-            const p = path[i];
-            const offset = new vec3(p.x - origin.x, p.y - origin.y, p.z - origin.z);
-            const radius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
-            if (radius > 0.0001) {
-                lastDirX = offset.x / radius;
-                lastDirZ = offset.z / radius;
-            }
-            if (radius < minRadius) {
-                out.push(new vec3(origin.x + lastDirX * minRadius, p.y, origin.z + lastDirZ * minRadius));
-            } else {
-                out.push(p);
-            }
-        }
-        return out;
-    }
-
-    private artemisScaleCmPerKm(): number {
-        const earth = this.earthBase ? this.earthBase.position : this.earthFallback();
-        const moon = this.moonBase ? this.moonBase.position : this.moonFallback();
-        const visualMoonDistance = Math.max(0.5, moon.sub(earth).length);
-        const moonStartDistanceKm = Math.max(1.0, this.sampleArtemis(MOON_EPHEMERIS, 0.0).length);
-        return (visualMoonDistance / moonStartDistanceKm) * Math.max(0.1, this.artemisTrajectoryScale);
-    }
-
-    private artemisFrameRotation(): quat {
-        if (this.artemisFrameReady) return this.artemisFrameRot;
-        this.artemisFrameReady = true;
-        const m: any = MOON_EPHEMERIS;
-        const n = m.t.length;
-        if (n < 3) return this.artemisFrameRot;
-        const a = new vec3(m.x[0], m.y[0], m.z[0]);
-        let b = new vec3(m.x[(n / 4) | 0], m.y[(n / 4) | 0], m.z[(n / 4) | 0]);
-        let nrm = a.cross(b);
-        if (nrm.length < 1.0) {
-            b = new vec3(m.x[(n / 2) | 0], m.y[(n / 2) | 0], m.z[(n / 2) | 0]);
-            nrm = a.cross(b);
-        }
-        if (nrm.length < 1e-6) return this.artemisFrameRot;
-        nrm = nrm.normalize();
-        const up = vec3.up();
-        const d = Math.max(-1.0, Math.min(1.0, nrm.dot(up)));
-        const axis = nrm.cross(up);
-        if (axis.length < 1e-6) {
-            this.artemisFrameRot = d > 0 ? quat.fromEulerAngles(0, 0, 0) : quat.angleAxis(Math.PI, vec3.right());
-        } else {
-            this.artemisFrameRot = quat.angleAxis(Math.acos(d), axis.normalize());
-        }
-        return this.artemisFrameRot;
-    }
-
-    private sampleArtemis(data: any, t: number): vec3 {
-        const ts: number[] = data.t;
-        const n = ts.length;
-        if (n === 0) return vec3.zero();
-        if (t <= ts[0]) return new vec3(data.x[0], data.y[0], data.z[0]);
-        if (t >= ts[n - 1]) return new vec3(data.x[n - 1], data.y[n - 1], data.z[n - 1]);
-        let lo = 0;
-        let hi = n - 1;
-        while (hi - lo > 1) {
-            const mid = (lo + hi) >> 1;
-            if (ts[mid] <= t) lo = mid;
-            else hi = mid;
-        }
-        const f = (t - ts[lo]) / (ts[hi] - ts[lo]);
+    private cubicPoint(p0: vec3, p1: vec3, p2: vec3, p3: vec3, t: number): vec3 {
+        const u = 1.0 - t;
+        const a = u * u * u;
+        const b = 3.0 * u * u * t;
+        const c = 3.0 * u * t * t;
+        const d = t * t * t;
         return new vec3(
-            data.x[lo] + f * (data.x[hi] - data.x[lo]),
-            data.y[lo] + f * (data.y[hi] - data.y[lo]),
-            data.z[lo] + f * (data.z[hi] - data.z[lo])
+            p0.x * a + p1.x * b + p2.x * c + p3.x * d,
+            p0.y * a + p1.y * b + p2.y * c + p3.y * d,
+            p0.z * a + p1.z * b + p2.z * c + p3.z * d
         );
     }
 
-    private artemisSampleIndex(t: number): number {
-        const ts: number[] = ARTEMIS_II_TRAJECTORY.t;
-        const n = ts.length;
-        if (t <= ts[0]) return 0;
-        if (t >= ts[n - 1]) return n - 1;
-        let lo = 0;
-        let hi = n - 1;
-        while (hi - lo > 1) {
-            const m = (lo + hi) >> 1;
-            if (ts[m] <= t) lo = m;
-            else hi = m;
+    private pathLength(path: vec3[]): number {
+        let total = 0.0;
+        for (let i = 1; i < path.length; i++) {
+            total += this.distanceVec(path[i - 1], path[i]);
         }
-        return lo;
+        return total;
+    }
+
+    private slicePathByDistance(path: vec3[], distance: number): vec3[] {
+        if (path.length < 2) return path;
+        const out: vec3[] = [path[0]];
+        let remaining = Math.max(0.0, distance);
+        for (let i = 1; i < path.length; i++) {
+            const a = path[i - 1];
+            const b = path[i];
+            const seg = this.distanceVec(a, b);
+            if (seg <= remaining) {
+                out.push(b);
+                remaining -= seg;
+                continue;
+            }
+            if (seg > 0.0001) {
+                out.push(this.lerpVec(a, b, remaining / seg));
+            }
+            break;
+        }
+        return out.length > 1 ? out : [path[0], path[1]];
     }
 
     private orbitAngle(elapsedHours: number, periodHours: number, phase: number): number {
