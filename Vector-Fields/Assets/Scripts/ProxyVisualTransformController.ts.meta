@@ -1,0 +1,74 @@
+- !<AssetImportMetadata/96910fab-09a1-46bf-9ba0-e9907db803f1>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 75bd3985-9cac-47b1-944a-1135dad96d09
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 75bd3985-9cac-47b1-944a-1135dad96d09
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> c381b540-927c-42fc-bdd0-130207f0cb12
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/c381b540-927c-42fc-bdd0-130207f0cb12>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 9acc02b9-7892-450a-815d-253960dacb5e
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cameraRoot: false
+    directorRoot: false
+    dockScale: false
+    dockSmoothing: false
+    dockTweenSeconds: false
+    driveRotation: false
+    driveScale: false
+    foldedDockOffset: false
+    hideWhenNoActiveVisual: false
+    menuRoot: false
+    unfoldedDockOffset: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - menuRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      directorRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      unfoldedDockOffset: !<Vec3> {x: 22.000000, y: 0.000000, z: 0.600000}
+      foldedDockOffset: !<Vec3> {x: 9.250000, y: 1.000000, z: 0.600000}
+      dockScale: !<Vec3> {x: 8.000000, y: 8.000000, z: 8.000000}
+      dockSmoothing: !<float> 12.000000
+      dockTweenSeconds: 0.380000
+      hideWhenNoActiveVisual: true
+      driveScale: true
+      driveRotation: true
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject menuRoot {"hint":"Menu root used as the docking reference. Empty searches for Story Chapter Guide UI."}'
+    - '// @input SceneObject directorRoot {"hint":"Story Step Director root that reports the active visual root."}'
+    - '// @input SceneObject cameraRoot {"hint":"Optional camera fallback when no menu root is available."}'
+    - '// @input vec3 unfoldedDockOffset = {0,14,0.6} {"hint":"Menu-local dock offset while the guide is unfolded."}'
+    - '// @input vec3 foldedDockOffset = {17.1,12.2,0.6} {"hint":"Menu-local dock offset while the guide is folded."}'
+    - '// @input vec3 dockScale = {4.8,4.8,4.8} {"hint":"Local scale used when the proxy returns to its dock."}'
+    - '// @input float dockSmoothing = 12 {"hint":"How quickly the proxy plane lands back on the dock.", "widget":"slider", "min":1, "max":30, "step":0.5}'
+    - '// @input float dockTweenSeconds = 0.38 {"hint":"Seconds used when toggling the proxy inactive and returning it to dock.", "widget":"slider", "min":0.12, "max":1.2, "step":0.02}'
+    - '// @input bool hideWhenNoActiveVisual {"hint":"Hide the proxy plane when no transformable visual is active."}'
+    - '// @input bool driveScale = true {"hint":"Apply proxy scale changes to the active visual root."}'
+    - '// @input bool driveRotation = true {"hint":"Apply proxy rotation changes to the active visual root."}'

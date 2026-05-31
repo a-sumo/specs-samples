@@ -1,0 +1,47 @@
+- !<AssetImportMetadata/24ad6a4e-21a8-4e9a-b9d3-664fb0c7bc2b>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 0dd18e3a-b221-4331-9e25-256f86b127dd
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 0dd18e3a-b221-4331-9e25-256f86b127dd
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> daf5176e-f479-4ab5-9f08-b020a760110b
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/daf5176e-f479-4ab5-9f08-b020a760110b>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 645a6be0-14db-4ee7-94ad-cd06984c969d
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cursorRenderOrder: false
+    disableCursorDepthTest: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - cursorRenderOrder: !<float> 20000.000000
+      disableCursorDepthTest: true
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - "// @input float cursorRenderOrder = 20000 {\"hint\":\"Render order assigned to SIK's runtime InteractorCursor visuals.\"}"
+    - '// @input bool disableCursorDepthTest = true {"hint":"When enabled, cursor materials ignore scene depth so they remain visible over UI cards."}'

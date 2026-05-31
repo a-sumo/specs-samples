@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .capture {
+      width: 1024px;
+      height: 1024px;
+      background:
+        radial-gradient(circle, rgba(240, 236, 222, 0.34) 0 2px, transparent 2.6px) 0 0 / 48px 48px,
+        radial-gradient(circle at 50% 50%, rgba(240, 236, 222, 0.055), transparent 68%);
+      border: 2px solid rgba(240, 236, 222, 0.15);
+      opacity: 0.88;
+      mask-image: radial-gradient(circle at 50% 50%, black 0 70%, rgba(0, 0, 0, 0.62) 84%, transparent 100%);
+    }
+  </style>
+</head>
+<body>
+  <div id="proxy_interaction_plane" class="capture"></div>
+  <script>
+    window.proxyInteractionPlaneReady = true;
+  </script>
+</body>
+</html>

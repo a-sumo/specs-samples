@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Panel Previewer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: #111318;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #fff;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 28px;
+      height: 48px;
+      background: #1c1e28;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .toolbar .logo {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .toolbar .divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .file-tabs {
+      display: flex;
+      gap: 0;
+      height: 100%;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.42);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      color: #fff;
+      border-bottom-color: #1878e0;
+    }
+
+    .tab:hover:not(.active) {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .toolbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bg-toggle {
+      display: flex;
+      gap: 0;
+    }
+
+    .bg-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+    }
+
+    .bg-btn.active {
+      background: rgba(255, 255, 255, 0.10);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.36);
+    }
+
+    .bg-btn + .bg-btn { border-left: none; }
+
+    /* ── Stage ── */
+    .stage {
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .frame-wrap {
+      position: relative;
+    }
+
+    /* Checkered transparency indicator */
+    .stage.checker .frame-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+        linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
+        linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      background-color: #222;
+      z-index: 0;
+    }
+
+    iframe {
+      display: block;
+      border: none;
+      background: transparent;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Panel labels ── */
+    .panel-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.28);
+      margin-bottom: 10px;
+      margin-top: 36px;
+      font-family: ui-monospace, "Menlo", monospace;
+    }
+
+    .panel-label:first-child { margin-top: 0; }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="logo">Previewer</span>
+  <div class="divider"></div>
+  <div class="file-tabs" id="tabs"></div>
+  <div class="toolbar-right">
+    <div class="bg-toggle">
+      <button class="bg-btn active" data-bg="dark">Dark</button>
+      <button class="bg-btn" data-bg="checker">Checker</button>
+      <button class="bg-btn" data-bg="light">Light</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="frame-wrap">
+    <iframe id="main-frame" allowtransparency="true"></iframe>
+  </div>
+</div>
+
+<script>
+  const FILES = [
+    { label: "math-explainer.html",   src: "math-explainer.html"   },
+    { label: "vf-definition.html",    src: "vf-definition.html"    },
+    { label: "theory-field-menu.html", src: "theory-field-menu.html" },
+    { label: "story-ui-templates.html", src: "story-ui-templates.html" },
+    { label: "proxy-interaction-plane.html", src: "proxy-interaction-plane.html" },
+    { label: "ambient-ui.html",        src: "ambient-ui.html"       },
+  ];
+
+  const BG = {
+    dark:    "#111318",
+    checker: "#111318",
+    light:   "#e8eaf0",
+  };
+
+  let activeFile = 0;
+  let activeBg   = "dark";
+
+  // ── Tabs ──
+  const tabBar = document.getElementById("tabs");
+  FILES.forEach((f, i) => {
+    const t = document.createElement("div");
+    t.className = "tab" + (i === 0 ? " active" : "");
+    t.textContent = f.label;
+    t.onclick = () => selectFile(i);
+    tabBar.appendChild(t);
+  });
+
+  // ── BG toggle ──
+  document.querySelectorAll(".bg-btn").forEach(btn => {
+    btn.onclick = () => {
+      activeBg = btn.dataset.bg;
+      document.querySelectorAll(".bg-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      applyBg();
+    };
+  });
+
+  function applyBg() {
+    document.body.style.background = BG[activeBg];
+    const stage = document.getElementById("stage");
+    if (activeBg === "checker") {
+      stage.classList.add("checker");
+    } else {
+      stage.classList.remove("checker");
+    }
+  }
+
+  // ── Frame ──
+  const frame = document.getElementById("main-frame");
+
+  function selectFile(i) {
+    activeFile = i;
+    tabBar.querySelectorAll(".tab").forEach((t, j) => {
+      t.classList.toggle("active", j === i);
+    });
+    loadFile(FILES[i].src);
+  }
+
+  function loadFile(src) {
+    frame.style.height = "600px"; // temporary while loading
+    frame.src = src;
+  }
+
+  frame.addEventListener("load", () => {
+    try {
+      const doc = frame.contentDocument;
+      const h   = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
+      const w   = Math.max(doc.body.scrollWidth,  doc.documentElement.scrollWidth);
+      frame.style.height = h + "px";
+      frame.style.width  = w + "px";
+    } catch(e) {
+      frame.style.height = "5000px";
+      frame.style.width  = "1200px";
+    }
+  });
+
+  // Init
+  loadFile(FILES[0].src);
+  applyBg();
+</script>
+</body>
+</html>
