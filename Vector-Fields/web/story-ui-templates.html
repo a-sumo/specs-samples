@@ -148,6 +148,38 @@
         inset 0 -34px 82px rgba(0,0,0,0.38);
     }
 
+    .motion-instructions {
+      position: absolute;
+      left: 260px;
+      right: 260px;
+      top: 384px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: rgba(242, 248, 255, 0.96);
+    }
+
+    .motion-instructions .motion-kicker {
+      font-size: 24px;
+      line-height: 1.1;
+      font-weight: 840;
+      letter-spacing: 7px;
+      text-transform: uppercase;
+      color: rgba(154, 202, 255, 0.78);
+      margin-bottom: 22px;
+    }
+
+    .motion-instructions .motion-copy {
+      font-size: 42px;
+      line-height: 1.18;
+      font-weight: 760;
+      max-width: 880px;
+      margin: 0;
+    }
+
     .title {
       position: absolute;
       display: flex;
@@ -1130,6 +1162,7 @@
         panel.appendChild(div);
       }
       document.body.appendChild(panel);
+      return panel;
     };
 
     const detailPanels = [
@@ -1236,6 +1269,8 @@
       let visibleSlotIds = detail.controls === false ? [] : ["example_mode_a", "example_mode_b", "example_mode_c"];
       if (detail.id === "gravity") {
         visibleSlotIds = ["variant_artemis"];
+      } else if (detail.id === "magnetism") {
+        visibleSlotIds = ["example_mode_magnetic_a", "example_mode_magnetic_b"];
       } else if (detail.showModes === false) {
         visibleSlotIds = ["variant_primary", "variant_secondary"];
       }
@@ -1275,7 +1310,14 @@
     };
 
     const createTheoryMotionPanel = () => {
-      createPanel("theory_panel_motion", "Theory", "theory_title", [], "examples");
+      const panel = createPanel("theory_panel_motion", "Theory", "theory_title", [], "examples");
+      const text = document.createElement("div");
+      text.className = "motion-instructions";
+      text.innerHTML = `
+        <div class="motion-kicker">Motion Field</div>
+        <p class="motion-copy">Move the handle through the plane. Faster motion lengthens the arrows and bends the local field.</p>
+      `;
+      panel.appendChild(text);
     };
 
     createTheoryPanel();

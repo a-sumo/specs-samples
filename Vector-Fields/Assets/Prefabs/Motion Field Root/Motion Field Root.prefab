@@ -189,16 +189,13 @@
   ScriptInputsDefault:
     metricCursorObject: true
     initialPreset: true
-    trailSamples: true
+    tracerCount: true
     flowSpeed: true
-    gustStrength: true
-    gustRadius: true
-    curlStrength: true
+    arrowColumns: true
+    arrowRows: true
     trailWidth: true
-    arrowLength: true
     metricSampleStep: true
     flowMemorySeconds: true
-    flowAccumulation: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -208,19 +205,19 @@
       initialPreset: !<float> 3.000000
       planeWidth: !<float> 48.000000
       planeDepth: !<float> 28.000000
-      tracerCount: !<float> 264.000000
-      trailSamples: !<float> 10.000000
+      tracerCount: !<float> 132.000000
+      trailSamples: !<float> 8.000000
       flowSpeed: 1.150000
-      gustStrength: 1.250000
-      gustRadius: 3.200000
-      curlStrength: 0.850000
-      arrowColumns: !<float> 15.000000
-      arrowRows: !<float> 9.000000
+      gustStrength: 2.100000
+      gustRadius: 3.900000
+      curlStrength: 1.450000
+      arrowColumns: !<float> 11.000000
+      arrowRows: !<float> 7.000000
       trailWidth: 0.075000
-      arrowLength: 0.420000
+      arrowLength: 0.950000
       metricSampleStep: 0.550000
       flowMemorySeconds: !<float> 2.000000
-      flowAccumulation: !<float> 1.000000
+      flowAccumulation: 1.650000
   ScriptTypes:
     "":
       {}

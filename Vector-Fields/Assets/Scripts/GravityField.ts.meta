@@ -37,8 +37,6 @@
     fieldLineCount: false
     fieldLineSteps: false
     initialStage: false
-    issOrbitMotionEnabled: false
-    issOrbitRadius: false
     lineWidth: false
     material: false
     moonMass: false
@@ -47,8 +45,6 @@
     moonSynchronousRotationEnabled: false
     motionRebuildInterval: false
     planeSize: false
-    satelliteObject: false
-    showSatelliteOrbitCurve: false
     simulatedHoursPerSecond: false
     softening: false
     useModelPositions: false
@@ -65,15 +61,11 @@
   DefaultScriptInputs:
     - earthObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       moonObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      satelliteObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       useModelPositions: false
-      showSatelliteOrbitCurve: false
       earthAxialMotionEnabled: false
-      issOrbitMotionEnabled: false
       moonOrbitMotionEnabled: false
       moonSynchronousRotationEnabled: false
       simulatedHoursPerSecond: 0.500000
-      issOrbitRadius: 1.550000
       motionRebuildInterval: 0.180000
       earthMass: !<float> 18.000000
       moonMass: !<float> 2.000000
@@ -97,15 +89,11 @@
   InputLines:
     - '// @input SceneObject earthObject {"hint":"Optional Earth object. If unset, a generated flat shaded Earth is used."}'
     - '// @input SceneObject moonObject {"hint":"Optional Moon object. If unset, a generated flat shaded Moon is used."}'
-    - '// @input SceneObject satelliteObject {"hint":"Optional ISS/satellite object. If unset, a generated flat shaded satellite is used."}'
     - '// @input bool useModelPositions = true {"hint":"When on, the field samples the live Earth/Moon transforms so orbital motion deforms the visualization."}'
-    - '// @input bool showSatelliteOrbitCurve {"hint":"Optional debug orbit guide. Off by default so the ISS orbit curve stays hidden."}'
     - '// @input bool earthAxialMotionEnabled = true {"hint":"When on, the Earth spins on its tilted axis. The 23.4 degree tilt itself is always applied."}'
-    - '// @input bool issOrbitMotionEnabled = true {"hint":"When on, moves the ISS/satellite model around Earth on a 51.6 degree inclined orbit."}'
     - '// @input bool moonOrbitMotionEnabled = true {"hint":"When on, moves the Moon model around Earth."}'
     - '// @input bool moonSynchronousRotationEnabled = true {"hint":"When on, the Moon is tidally locked: the same face always points toward Earth."}'
     - '// @input float simulatedHoursPerSecond = 8 {"hint":"Simulated hours per real second for celestial motion toggles. 8.0 makes a Moon orbit complete in ~80 s.", "widget":"slider", "min":0.05, "max":48, "step":0.05}'
-    - '// @input float issOrbitRadius = 1.55 {"hint":"Display radius in cm for ISS orbit. Real ISS altitude is close to Earth, so this remains adjustable for AR readability.", "widget":"slider", "min":1.45, "max":4, "step":0.05}'
     - '// @input float motionRebuildInterval = 0.33 {"hint":"Minimum seconds between field rebuilds while the Moon orbit is animated.", "widget":"slider", "min":0.05, "max":1, "step":0.05}'
     - '// @input float earthMass = 18 {"hint":"Relative Earth mass", "widget":"slider", "min":1, "max":30, "step":0.5}'
     - '// @input float moonMass = 2 {"hint":"Moon mass multiplier. 1 means the real Earth/Moon mass ratio.", "widget":"slider", "min":0.25, "max":8, "step":0.25}'

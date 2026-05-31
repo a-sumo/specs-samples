@@ -180,7 +180,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     @input
     @hint("Camera-relative placement for the 2D motion plane.")
-    motionFrontOffset: vec3 = new vec3(0.0, 0.0, -50.0);
+    motionFrontOffset: vec3 = new vec3(0.0, 0.0, -30.0);
 
     @input
     @hint("Camera-relative placement for the real VectorField in the theory chapter.")
@@ -215,6 +215,14 @@ export class StoryStepDirector extends BaseScriptComponent {
     @hint("Wind globe offset in calibrated plane-local space.")
     windReferenceOffset: vec3 = new vec3(0.0, 24.0, 0.0);
 
+    @input('float')
+    @hint("Push the car-flow slice down (cm) so you look at it from above and the depth-drag handles are easy to reach.")
+    carFlowDropDistance: number = 14.0;
+
+    @input('float')
+    @hint("Tilt the car-flow slice back (degrees) so the front/back drag axis has on-screen height. Flip the sign if it tilts the wrong way.")
+    carFlowTiltDegrees: number = 16.0;
+
     private currentStep: StoryStepConfig = STORY_STEP_CONFIGS[0];
     private selectedExampleField: ExampleFieldId = "gravity";
     private exampleFieldSelected: boolean = false;
@@ -239,7 +247,6 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     onAwake(): void {
         this.enableStageCalibrationObject();
-        this.parkContentRoots();
         this.createEvent("OnStartEvent").bind(() => {
             this.bindStageCalibration();
             this.elapsed = 0.0;
@@ -352,7 +359,7 @@ export class StoryStepDirector extends BaseScriptComponent {
     }
 
     public selectMagneticTubeMode(mode: number): void {
-        this.selectedMagneticTubeMode = this.normalizeStage(mode, 0, 2);
+        this.selectedMagneticTubeMode = this.normalizeMagneticTubeMode(mode);
         if (this.currentStep.id === "examples") {
             this.appliedKey = "";
             this.applyCurrent(true);
@@ -647,7 +654,7 @@ export class StoryStepDirector extends BaseScriptComponent {
         }
         if (showMagnetic) {
             this.placeExampleRoot(magneticRoot, this.magneticFrontOffset, this.magneticReferenceOffset, "Proxy_Magnetic_Field_Example_Slot");
-            this.applyTubeMode(magneticRoot, this.selectedMagneticTubeMode);
+            this.applyTubeMode(magneticRoot, this.normalizeMagneticTubeMode(this.selectedMagneticTubeMode));
             this.callLifecycle(magneticRoot, "refresh");
         }
         if (showWindGlobe) {
@@ -659,6 +666,7 @@ export class StoryStepDirector extends BaseScriptComponent {
         }
         if (showCarFlow) {
             this.placeExampleRoot(carFlowRoot, this.windFrontOffset, this.windReferenceOffset, "Proxy_Wind_Field_Example_Slot");
+            this.adjustCarFlowViewingAngle(carFlowRoot);
             this.callLifecycle(carFlowRoot, "refresh");
         }
 
@@ -836,8 +844,6 @@ export class StoryStepDirector extends BaseScriptComponent {
     private setArtemisContentEnabled(root: SceneObject | null, enabled: boolean): void {
         if (!root) return;
         this.setChildEnabledByName(root, "Artemis Trajectory Path", enabled);
-        this.setChildEnabledByName(root, "Gravity ISS Model", enabled);
-        this.setChildEnabledByName(root, "ISS", enabled);
         this.setChildEnabledByName(root, "Mission Info", enabled);
         this.setChildEnabledByName(root, "MissionInfoPanel", enabled);
     }
@@ -877,6 +883,10 @@ export class StoryStepDirector extends BaseScriptComponent {
         }
         if (typeof api.refresh === "function") api.refresh();
         else if (typeof api.queueRefresh === "function") api.queueRefresh(0.01);
+    }
+
+    private normalizeMagneticTubeMode(mode: number): number {
+        return Math.floor(mode) === 2 ? 2 : 0;
     }
 
     private restoreVectorFieldTarget(root: SceneObject | null): void {
@@ -930,6 +940,27 @@ export class StoryStepDirector extends BaseScriptComponent {
             return;
         }
         this.placeFrontFacing(root, frontOffset, false);
+    }
+
+    // The car-flow slice billboards to face the camera and lands at head height,
+    // which leaves it edge-on to its own front/back drag axis — hard to grab.
+    // Drop it below eye line (so you look down at it) and tilt it back a touch,
+    // giving the depth handles real on-screen height to pinch and slide.
+    private adjustCarFlowViewingAngle(root: SceneObject | null): void {
+        if (!root) return;
+        const transform = root.getTransform();
+
+        if (Math.abs(this.carFlowDropDistance) > 0.001) {
+            const pos = transform.getWorldPosition();
+            transform.setWorldPosition(new vec3(pos.x, pos.y - this.carFlowDropDistance, pos.z));
+        }
+
+        if (Math.abs(this.carFlowTiltDegrees) > 0.001) {
+            const rotation = transform.getWorldRotation();
+            const right = rotation.multiplyVec3(new vec3(1.0, 0.0, 0.0));
+            const pitch = quat.angleAxis(this.carFlowTiltDegrees * Math.PI / 180.0, right);
+            transform.setWorldRotation(pitch.multiply(rotation));
+        }
     }
 
     private callLifecycle(root: SceneObject | null, methodName: string): void {

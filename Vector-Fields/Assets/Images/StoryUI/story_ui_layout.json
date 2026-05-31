@@ -361,6 +361,38 @@
       }
     },
     {
+      "id": "example_mode_magnetic_a",
+      "role": "example_mode",
+      "px": {
+        "x": 320,
+        "y": 680,
+        "width": 400,
+        "height": 82
+      },
+      "cm": {
+        "x": -4.6,
+        "y": -4.42,
+        "width": 8,
+        "height": 1.64
+      }
+    },
+    {
+      "id": "example_mode_magnetic_b",
+      "role": "example_mode",
+      "px": {
+        "x": 780,
+        "y": 680,
+        "width": 400,
+        "height": 82
+      },
+      "cm": {
+        "x": 4.6,
+        "y": -4.42,
+        "width": 8,
+        "height": 1.64
+      }
+    },
+    {
       "id": "card_theory",
       "role": "card",
       "px": {

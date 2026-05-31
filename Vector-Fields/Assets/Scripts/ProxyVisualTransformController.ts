@@ -255,7 +255,9 @@ export class ProxyVisualTransformController extends BaseScriptComponent {
         if (menu) {
             const transform = menu.getTransform();
             const rotation = transform.getWorldRotation();
-            const position = transform.getWorldPosition().add(rotation.multiplyVec3(offset));
+            const scale = transform.getLocalScale();
+            const scaledOffset = new vec3(offset.x * scale.x, offset.y * scale.y, offset.z * scale.z);
+            const position = transform.getWorldPosition().add(rotation.multiplyVec3(scaledOffset));
             return {
                 position,
                 rotation,

@@ -72,6 +72,8 @@ export const STORY_UI_LAYOUT = (() => {
     rect("example_mode_a", 90, 680, 400, 82, "example_mode"),
     rect("example_mode_b", 550, 680, 400, 82, "example_mode"),
     rect("example_mode_c", 1010, 680, 400, 82, "example_mode"),
+    rect("example_mode_magnetic_a", 320, 680, 400, 82, "example_mode"),
+    rect("example_mode_magnetic_b", 780, 680, 400, 82, "example_mode"),
     rect("card_theory", 90, 270, 640, 650, "card"),
     rect("card_examples", 770, 270, 640, 650, "card"),
     rect("card_definition", 70, 282, 400, 600, "card"),

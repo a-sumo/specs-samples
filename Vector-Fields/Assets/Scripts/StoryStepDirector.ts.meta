@@ -29,6 +29,8 @@
     applyOnStart: false
     calibrateReferenceOnStart: false
     cameraRoot: false
+    carFlowDropDistance: false
+    carFlowTiltDegrees: false
     controlContentRoots: false
     gravityFieldRoot: false
     gravityFrontOffset: false
@@ -97,6 +99,8 @@
       gravityReferenceOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
       magneticReferenceOffset: !<Vec3> {x: 0.000000, y: 7.000000, z: 0.000000}
       windReferenceOffset: !<Vec3> {x: 0.000000, y: 24.000000, z: 0.000000}
+      carFlowDropDistance: !<float> 14.000000
+      carFlowTiltDegrees: !<float> 16.000000
   ScriptTypes:
     -
       {}
@@ -123,7 +127,7 @@
     - '// @input float initialVectorColorMap = 17 {"hint":"Initial cube VectorField color map for theory modes.", "widget":"combobox", "values":[{"label":"jet", "value":13}, {"label":"viridis", "value":17}, {"label":"plasma", "value":18}]}'
     - '// @input float vectorColorMapScale = 1 {"hint":"Color-gradient scale for cube VectorField theory modes.", "widget":"slider", "min":0.05, "max":4, "step":0.01}'
     - '// @input float vectorColorMapOffset {"hint":"Color-gradient offset for cube VectorField theory modes.", "widget":"slider", "min":-1, "max":1, "step":0.01}'
-    - '// @input vec3 motionFrontOffset = {0,0,-50} {"hint":"Camera-relative placement for the 2D motion plane."}'
+    - '// @input vec3 motionFrontOffset = {0,0,-30} {"hint":"Camera-relative placement for the 2D motion plane."}'
     - '// @input vec3 theoryVectorFrontOffset = {0,0,-50} {"hint":"Camera-relative placement for the real VectorField in the theory chapter."}'
     - '// @input float theoryVectorScale = 0.85 {"hint":"Local scale for the real VectorField when staged in theory.", "widget":"slider", "min":0.35, "max":2, "step":0.05}'
     - '// @input vec3 gravityFrontOffset = {0,-28,-82} {"hint":"Camera-relative placement for gravity when reference calibration is disabled."}'
@@ -132,3 +136,5 @@
     - '// @input vec3 gravityReferenceOffset = {0,0,0} {"hint":"Gravity offset in calibrated plane-local space."}'
     - '// @input vec3 magneticReferenceOffset = {0,7,0} {"hint":"Magnetism offset in calibrated plane-local space."}'
     - '// @input vec3 windReferenceOffset = {0,24,0} {"hint":"Wind globe offset in calibrated plane-local space."}'
+    - '// @input float carFlowDropDistance = 14 {"hint":"Push the car-flow slice down (cm) so you look at it from above and the depth-drag handles are easy to reach."}'
+    - '// @input float carFlowTiltDegrees = 16 {"hint":"Tilt the car-flow slice back (degrees) so the front/back drag axis has on-screen height. Flip the sign if it tilts the wrong way."}'

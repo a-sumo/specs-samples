@@ -35,7 +35,7 @@ type ExampleFieldId = "gravity" | "magnetism" | "wind" | "aerodynamics";
 type GravityExampleVariant = "field" | "artemis";
 type WindExampleVariant = "globe" | "car_flow";
 type ExampleVariantId = "gravity:field" | "gravity:artemis";
-type ExampleModeId = "gravity:bodies" | "gravity:arrows" | "gravity:lines" | "magnetism:trails" | "magnetism:points" | "magnetism:arrows" | "wind:trails" | "wind:points" | "wind:arrows";
+type ExampleModeId = "gravity:bodies" | "gravity:arrows" | "gravity:lines" | "magnetism:trails" | "magnetism:arrows" | "wind:trails" | "wind:points" | "wind:arrows";
 type TheoryFieldModeId = "expansion" | "contraction" | "curl" | "motion";
 type GradientPaletteId = "jet" | "viridis" | "plasma";
 
@@ -375,6 +375,7 @@ const WIND_EVENT_SLOTS: StoryGuideSlot[] = [
     { x: 0.0, y: -4.42, width: 8.0, height: 1.64 },
     { x: 9.2, y: -4.42, width: 8.0, height: 1.64 },
 ];
+const MAGNETIC_MODE_SLOTS: StoryGuideSlot[] = STORY_GUIDE_EXAMPLE_DETAIL.magneticModes;
 
 const EXAMPLE_FIELD_OPTIONS: ExampleFieldOption[] = [
     { id: "gravity", label: "Gravitational Fields", slot: STORY_GUIDE_EXAMPLES.cards[0].slot },
@@ -388,9 +389,8 @@ const EXAMPLE_VARIANT_OPTIONS: ExampleVariantOption[] = [
 ];
 
 const EXAMPLE_MODE_OPTIONS: ExampleModeOption[] = [
-    { id: "magnetism:trails", field: "magnetism", label: "Trails", mode: 0, slot: STORY_GUIDE_EXAMPLE_DETAIL.modes[0] },
-    { id: "magnetism:points", field: "magnetism", label: "Points", mode: 1, slot: STORY_GUIDE_EXAMPLE_DETAIL.modes[1] },
-    { id: "magnetism:arrows", field: "magnetism", label: "Arrows", mode: 2, slot: STORY_GUIDE_EXAMPLE_DETAIL.modes[2] },
+    { id: "magnetism:trails", field: "magnetism", label: "Trails", mode: 0, slot: MAGNETIC_MODE_SLOTS[0] },
+    { id: "magnetism:arrows", field: "magnetism", label: "Arrows", mode: 2, slot: MAGNETIC_MODE_SLOTS[1] },
     { id: "wind:trails", field: "wind", label: "Trails", mode: 0, slot: STORY_GUIDE_EXAMPLE_DETAIL.modes[0] },
     { id: "wind:points", field: "wind", label: "Points", mode: 1, slot: STORY_GUIDE_EXAMPLE_DETAIL.modes[1] },
     { id: "wind:arrows", field: "wind", label: "Arrows", mode: 2, slot: STORY_GUIDE_EXAMPLE_DETAIL.modes[2] },
@@ -467,7 +467,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     @input
     @hint("Keep the menu in front of the user.")
-    followUser: boolean = true;
+    followUser: boolean = false;
 
     @input
     @hint("Start with only Fold/Open and Follow/Fixed controls visible.")
@@ -475,7 +475,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     @input
     @hint("Distance from head anchor in centimeters when Follow is active.")
-    menuDistanceCm: number = 68.0;
+    menuDistanceCm: number = 52.0;
+
+    @input
+    @widget(new SliderWidget(0.75, 2.5, 0.05))
+    @hint("Uniform visual scale for the entire menu plane and its hit targets.")
+    menuVisualScale: number = 1.55;
 
     @input
     @hint("Vertical offset from head anchor in centimeters when Follow is active.")
@@ -2004,6 +2009,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (this.selectedExampleField === "gravity" && typeof this.directorApi.selectGravityStage === "function") {
             this.directorApi.selectGravityStage(this.selectedGravityStage);
         } else if (this.selectedExampleField === "magnetism" && typeof this.directorApi.selectMagneticTubeMode === "function") {
+            this.selectedMagnetismTubeMode = this.selectedMagnetismTubeMode === 2 ? 2 : 0;
             this.directorApi.selectMagneticTubeMode(this.selectedMagnetismTubeMode);
         } else if (this.selectedExampleField === "wind" && typeof this.directorApi.selectWindTubeMode === "function") {
             this.directorApi.selectWindTubeMode(this.selectedWindTubeMode);
@@ -2328,8 +2334,6 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.setObjectEnabledByName("Magnetic Field Root", showMagnetic);
         this.setObjectEnabledByName("Gravity Field Root", showGravity);
         this.setObjectEnabledByName("Artemis Trajectory Path", showArtemis);
-        this.setObjectEnabledByName("Gravity ISS Model", showArtemis);
-        this.setObjectEnabledByName("ISS", showArtemis);
         this.setObjectEnabledByName("Mission Info", showArtemis);
         this.setObjectEnabledByName("MissionInfoPanel", showArtemis);
         this.setObjectEnabledByName("Globe Calibration", showWindGlobe);
@@ -2796,6 +2800,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private updateMenuPose(): void {
+        this.applyMenuVisualScale();
         if (!this.followUser) return;
         const camera = this.cameraRoot || this.findObjectByName("Camera Object") || this.findObjectByName("Camera");
         if (!camera) return;
@@ -2828,6 +2833,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (faceDirection.length > 0.0001) {
             transform.setWorldRotation(quat.lookAt(faceDirection, worldUp));
         }
+    }
+
+    private applyMenuVisualScale(): void {
+        const s = Math.max(0.1, this.menuVisualScale);
+        this.sceneObject.getTransform().setLocalScale(new vec3(s, s, s));
     }
 
     private syncFoldState(): void {
@@ -3912,7 +3922,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (option.field === "gravity") {
             this.selectedGravityStage = option.mode;
         } else if (option.field === "magnetism") {
-            this.selectedMagnetismTubeMode = option.mode;
+            this.selectedMagnetismTubeMode = option.mode === 2 ? 2 : 0;
         } else if (option.field === "wind") {
             this.selectedWindTubeMode = option.mode;
         }
@@ -4155,7 +4165,6 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             return "gravity:lines";
         }
         if (this.selectedExampleField === "magnetism") {
-            if (this.selectedMagnetismTubeMode === 1) return "magnetism:points";
             if (this.selectedMagnetismTubeMode === 2) return "magnetism:arrows";
             return "magnetism:trails";
         }

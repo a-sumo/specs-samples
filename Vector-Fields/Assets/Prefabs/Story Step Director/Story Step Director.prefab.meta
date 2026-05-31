@@ -54,6 +54,8 @@
     gravityReferenceOffset: true
     magneticReferenceOffset: true
     windReferenceOffset: true
+    carFlowDropDistance: true
+    carFlowTiltDegrees: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -89,6 +91,8 @@
       gravityReferenceOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
       magneticReferenceOffset: !<Vec3> {x: 0.000000, y: 7.000000, z: 0.000000}
       windReferenceOffset: !<Vec3> {x: 0.000000, y: 24.000000, z: 0.000000}
+      carFlowDropDistance: !<float> 14.000000
+      carFlowTiltDegrees: !<float> 16.000000
   ScriptTypes:
     "":
       {}

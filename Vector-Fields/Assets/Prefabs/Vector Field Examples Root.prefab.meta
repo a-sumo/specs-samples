@@ -112,7 +112,6 @@
     _preset: true
     _colorMapScale: true
     _colorMapOffset: true
-    fieldCollider: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -139,7 +138,7 @@
       _colorMapScale: !<float> 1.000000
       _colorMapOffset: !<float> 0.000000
       trackedObject: !<reference.SceneObject> 993a5b8b-d62f-4329-5f51-f5c9950706b4
-      fieldCollider: !<reference.ColliderComponent> 00000000-0000-0000-0000-000000000000
+      fieldCollider: !<reference.ColliderComponent> 8f392357-c171-4e52-60db-128822f94c36
       material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42
   ScriptTypes:
     "":
@@ -154,9 +153,9 @@
     []
   Name: Physics Collider
   Enabled: true
-  Shape: !<Sphere>
+  Shape: !<Box>
     FitVisual: true
-    Radius: 3.000000
+    Size: {x: 15.000000, y: 15.000000, z: 15.000000}
   Matter: !<reference> 00000000-0000-0000-0000-000000000000
   Filter: !<reference> 00000000-0000-0000-0000-000000000000
   OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
@@ -379,7 +378,7 @@
   PrefabRemaps:
     []
   Name: Vector Field Examples Root
-  Enabled: false
+  Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: 0.000000}

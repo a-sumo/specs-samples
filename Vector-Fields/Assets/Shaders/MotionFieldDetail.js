@@ -26,18 +26,17 @@ void main() {
     vec2 aspect = vec2(1.7142857, 1.0);
     vec2 d = (p - hp) * aspect;
     float r = length(d);
-    float nearHandle = 1.0 - smoothstep(0.02, 0.24, r);
-    float wakeFalloff = exp(-r * 5.2) * wakeStrength;
+    float nearHandle = 1.0 - smoothstep(0.02, 0.28, r);
+    float wakeFalloff = exp(-r * 3.7) * wakeStrength;
 
     vec2 swirlDir = vec2(-d.y, d.x) / max(0.045, r);
     vec2 baseDir = normalize(vec2(1.0, 0.10 * sin(uv.x * 8.0 + time * 0.72)));
-    vec2 fieldDir = normalize(baseDir + swirlDir * wakeFalloff * 0.72 + vec2(0.0, sin((uv.x + uv.y) * 7.0 + time) * 0.045));
     float speed = clamp(length(baseDir + swirlDir * wakeFalloff * 1.25), 0.0, 2.0) * 0.5;
 
     vec2 warped = uv;
-    warped.y += sin(uv.x * 10.0 + time * 0.74) * 0.018;
-    warped.y += sin(uv.x * 21.0 - time * 0.52 + uv.y * 6.0) * 0.007;
-    warped += swirlDir * wakeFalloff * 0.035;
+    warped.y += sin(uv.x * 10.0 + time * 0.74) * (0.020 + wakeFalloff * 0.020);
+    warped.y += sin(uv.x * 21.0 - time * 0.52 + uv.y * 6.0) * (0.008 + wakeFalloff * 0.012);
+    warped += swirlDir * wakeFalloff * 0.082;
 
     float linePhase = fract(warped.y * 24.0 + warped.x * 1.15 + time * 0.18);
     float lineDist = abs(linePhase - 0.5);
@@ -51,21 +50,9 @@ void main() {
     float pulseDist = abs(pulsePhase - 0.5);
     float pulse = 1.0 - smoothstep(0.035, 0.18, pulseDist);
 
-    float ringPhase = fract(r * 13.0 - time * 0.82);
+    float ringPhase = fract(r * 12.0 - time * 1.05);
     float ring = (1.0 - smoothstep(0.036, 0.118, abs(ringPhase - 0.5))) * wakeFalloff;
 
-    vec2 gridUv = uv * vec2(12.0, 7.0);
-    vec2 cell = fract(gridUv) - 0.5;
-    vec2 dir = normalize(fieldDir + vec2(0.0001, 0.0));
-    vec2 side = vec2(-dir.y, dir.x);
-    vec2 local = vec2(dot(cell, dir), dot(cell, side));
-    float shaft = (1.0 - smoothstep(0.018, 0.046, abs(local.y))) *
-                  smoothstep(-0.34, -0.18, local.x) *
-                  (1.0 - smoothstep(0.02, 0.20, local.x));
-    float headWidth = mix(0.13, 0.02, smoothstep(0.06, 0.34, local.x));
-    float head = (1.0 - smoothstep(headWidth, headWidth + 0.035, abs(local.y))) *
-                 smoothstep(0.02, 0.09, local.x) *
-                 (1.0 - smoothstep(0.28, 0.38, local.x));
     // CPU geometry arrows sample the real multi-finger field. Keep this shader
     // to streamlines and wake only so the plane has a single arrow language.
     float arrows = 0.0;

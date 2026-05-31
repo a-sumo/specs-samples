@@ -40,10 +40,9 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     @input
     @widget(new ComboBoxWidget([
         new ComboBoxItem("Trails", 0),
-        new ComboBoxItem("Particles", 1),
         new ComboBoxItem("Arrows", 2)
     ]))
-    @hint("Trails: flowing tubes, Particles: short flowing trails, Arrows: static oriented")
+    @hint("Trails: flowing tubes, Arrows: static oriented")
     private _tubeMode: number = 0;
 
     // ============ GEOMETRY ============
@@ -199,8 +198,13 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         }
     }
 
+    private normalizeTubeMode(mode: number): number {
+        return Math.floor(mode) === MagneticTubeMode.Arrows ? MagneticTubeMode.Arrows : MagneticTubeMode.Trails;
+    }
+
     onAwake(): void {
         this.setupMaterial();
+        this._tubeMode = this.normalizeTubeMode(this._tubeMode);
         this.applyLOD();
         this.adaptGeometryToBudget();
         this.generateMesh();
@@ -635,7 +639,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
     }
 
     public setTubeMode(mode: number): void {
-        this._tubeMode = Math.floor(Math.min(2, Math.max(0, mode)));
+        this._tubeMode = this.normalizeTubeMode(mode);
         this.refresh();
     }
 
@@ -672,7 +676,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     get tubeMode(): number { return this._tubeMode; }
     set tubeMode(value: number) {
-        this._tubeMode = Math.floor(Math.min(2, Math.max(0, value)));
+        this._tubeMode = this.normalizeTubeMode(value);
         this.refresh();
     }
 

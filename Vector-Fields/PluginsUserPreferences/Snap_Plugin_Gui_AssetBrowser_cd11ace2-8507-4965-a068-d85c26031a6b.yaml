@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 1122
+    size: 1124
     values:
       - ""
       - Audio_TODO
@@ -194,6 +194,7 @@ CollapsedEntities:
       - Images/waves_sprite.png
       - Images/wind_speed_legend.png
       - MaterialParams.png
+      - Materials
       - Materials/Article
       - Materials/Article/VfDefinitionMat.mat
       - Materials/Article/VfDipoleMat.mat
@@ -338,6 +339,7 @@ CollapsedEntities:
       - Prefabs/Wind Globe Root/Globe Calibration.prefab
       - Render Target.renderTarget
       - Scene.scene
+      - Scripts
       - Scripts/AnalyticalFieldPatterns.ts
       - Scripts/ArtemisOrbit.ts
       - Scripts/ArtemisTrajectory.ts

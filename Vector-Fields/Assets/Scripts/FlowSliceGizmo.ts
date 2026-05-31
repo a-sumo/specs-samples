@@ -18,8 +18,8 @@ export class FlowSliceGizmo extends BaseScriptComponent {
 
   // In-theme blue for the slice outline + wind cue.
   private static OUTLINE_COLOR = new vec4(0.094, 0.471, 0.878, 1.0);
-  // Vivid amber for the grab handles so they clearly stand apart from the outline.
-  private static HANDLE_COLOR = new vec4(0.878, 0.533, 0.094, 1.0);
+  // Lighter, brighter blue for the grab handles so they pop against the outline.
+  private static HANDLE_COLOR = new vec4(0.42, 0.71, 1.0, 1.0);
 
   private handleObject!: SceneObject;
 

@@ -200,6 +200,20 @@ export const STORY_GUIDE_EXAMPLE_DETAIL = {
         "height": 1.64
     }
 ] as StoryGuideSlot[],
+    magneticModes: [
+    {
+        "x": -4.6,
+        "y": -4.42,
+        "width": 8,
+        "height": 1.64
+    },
+    {
+        "x": 4.6,
+        "y": -4.42,
+        "width": 8,
+        "height": 1.64
+    }
+] as StoryGuideSlot[],
 };
 
 export const STORY_GUIDE_THEORY = {

@@ -31,6 +31,9 @@ const GUIDE_FONT: Font = requireAsset("../Fonts/Nunito_Sans/NunitoSans.ttf") as 
 const LINE_WIDTH_SCALE: number = 1.62;
 const METRIC_READOUT_SIZE: number = 78;
 const METRIC_READOUT_ORDER: number = 96;
+const DYNAMIC_MESH_FPS: number = 24.0;
+const METRIC_READOUT_FPS: number = 10.0;
+const INTERACTION_REFRESH_SECONDS: number = 0.25;
 
 @component
 export class MotionFieldPlane extends BaseScriptComponent {
@@ -64,11 +67,11 @@ export class MotionFieldPlane extends BaseScriptComponent {
 
     @input
     @widget(new SliderWidget(30, 420, 5))
-    tracerCount: number = 264;
+    tracerCount: number = 132;
 
     @input
     @widget(new SliderWidget(4, 18, 1))
-    trailSamples: number = 10;
+    trailSamples: number = 8;
 
     @input
     @widget(new SliderWidget(0.2, 4.0, 0.05))
@@ -76,31 +79,31 @@ export class MotionFieldPlane extends BaseScriptComponent {
 
     @input
     @widget(new SliderWidget(0.0, 3.0, 0.05))
-    gustStrength: number = 1.25;
+    gustStrength: number = 2.1;
 
     @input
     @widget(new SliderWidget(1.0, 8.0, 0.25))
-    gustRadius: number = 3.2;
+    gustRadius: number = 3.9;
 
     @input
     @widget(new SliderWidget(0.0, 3.0, 0.05))
-    curlStrength: number = 0.85;
+    curlStrength: number = 1.45;
 
     @input
     @widget(new SliderWidget(5, 27, 1))
-    arrowColumns: number = 15;
+    arrowColumns: number = 11;
 
     @input
     @widget(new SliderWidget(3, 17, 1))
-    arrowRows: number = 9;
+    arrowRows: number = 7;
 
     @input
     @widget(new SliderWidget(0.02, 0.18, 0.005))
     trailWidth: number = 0.075;
 
     @input
-    @widget(new SliderWidget(0.15, 0.8, 0.025))
-    arrowLength: number = 0.42;
+    @widget(new SliderWidget(0.25, 1.8, 0.025))
+    arrowLength: number = 0.95;
 
     @input
     @widget(new SliderWidget(0.18, 1.2, 0.02))
@@ -114,7 +117,7 @@ export class MotionFieldPlane extends BaseScriptComponent {
     @input
     @widget(new SliderWidget(0.0, 3.0, 0.05))
     @hint("How strongly continued stirring builds up momentum in the field (cumulative energy).")
-    flowAccumulation: number = 1.0;
+    flowAccumulation: number = 1.65;
 
     private backdropVisual: RenderMeshVisual | null = null;
     private gridVisual: RenderMeshVisual | null = null;
@@ -147,12 +150,16 @@ export class MotionFieldPlane extends BaseScriptComponent {
     private momentumX: number = 0.0;
     private momentumZ: number = 0.0;
     private driveEnergy: number = 0.35;
+    private handleSpeedScalar: number = 0.0;
     private handleActive: boolean = false;
     private metricX: number = 0.0;
     private metricZ: number = 0.0;
     private divergenceText: Text | null = null;
     private curlText: Text | null = null;
     private initialized: boolean = false;
+    private dynamicMeshAccumulator: number = 0.0;
+    private metricReadoutAccumulator: number = 0.0;
+    private interactionRefreshAccumulator: number = 0.0;
 
     onAwake(): void {
         this.preset = this.presetFromIndex(this.initialPreset);
@@ -167,6 +174,7 @@ export class MotionFieldPlane extends BaseScriptComponent {
     public stage(): void {
         this.sceneObject.enabled = true;
         this.initialize();
+        this.bindInteractionTargets();
         this.resetField();
     }
 
@@ -180,7 +188,10 @@ export class MotionFieldPlane extends BaseScriptComponent {
 
     public resetField(): void {
         this.seedTracers();
+        this.dynamicMeshAccumulator = 0.0;
+        this.metricReadoutAccumulator = 0.0;
         this.buildDynamicMeshes();
+        this.updateMetricReadouts();
     }
 
     public setFlowSpeedNormalized(value: number): void {
@@ -315,7 +326,7 @@ export class MotionFieldPlane extends BaseScriptComponent {
                 try { script.enabled = true; } catch (e) {}
                 try { script.targetingMode = TargetingMode.All; } catch (e) {}
                 try { script.targetingVisual = 1; } catch (e) {}
-                try { script.ignoreInteractionPlane = true; } catch (e) {}
+                try { script.ignoreInteractionPlane = false; } catch (e) {}
                 try { script.keepHoverOnTrigger = true; } catch (e) {}
                 try { script.enableInstantDrag = true; } catch (e) {}
                 try { script.allowMultipleInteractors = true; } catch (e) {}
@@ -365,12 +376,24 @@ export class MotionFieldPlane extends BaseScriptComponent {
     private tick(): void {
         if (!this.initialized) return;
         const dt = Math.min(0.04, Math.max(0.001, getDeltaTime()));
-        this.bindInteractionTargets();
+        this.interactionRefreshAccumulator += dt;
+        if (this.interactionRefreshAccumulator >= INTERACTION_REFRESH_SECONDS) {
+            this.interactionRefreshAccumulator = 0.0;
+            this.bindInteractionTargets();
+        }
         this.updateHandle(dt);
         this.updateMetricCursor();
         this.updateDetailMaterial();
-        this.buildDynamicMeshes();
-        this.updateMetricReadouts();
+        this.dynamicMeshAccumulator += dt;
+        if (this.dynamicMeshAccumulator >= 1.0 / DYNAMIC_MESH_FPS) {
+            this.dynamicMeshAccumulator = 0.0;
+            this.buildDynamicMeshes();
+        }
+        this.metricReadoutAccumulator += dt;
+        if (this.metricReadoutAccumulator >= 1.0 / METRIC_READOUT_FPS) {
+            this.metricReadoutAccumulator = 0.0;
+            this.updateMetricReadouts();
+        }
     }
 
     private updateHandle(dt: number): void {
@@ -394,26 +417,30 @@ export class MotionFieldPlane extends BaseScriptComponent {
 
         const halfW = Math.max(0.001, this.planeWidth * 0.5);
         const halfD = Math.max(0.001, this.planeDepth * 0.5);
-        const positionDriveX = this.clamp(this.handleX / halfW, -1.0, 1.0) * 1.28;
-        const positionDriveZ = this.clamp(this.handleZ / halfD, -1.0, 1.0) * 1.28;
-        const motionDriveX = this.clamp(this.handleVX * 0.11, -2.2, 2.2);
-        const motionDriveZ = this.clamp(this.handleVZ * 0.11, -2.2, 2.2);
+        const handleSpeed = Math.sqrt(this.handleVX * this.handleVX + this.handleVZ * this.handleVZ);
+        const velocityFollow = this.clamp(dt * 10.0, 0.0, 1.0);
+        this.handleSpeedScalar += (this.clamp(handleSpeed * 0.035, 0.0, 2.2) - this.handleSpeedScalar) * velocityFollow;
+
+        const positionDriveX = this.clamp(this.handleX / halfW, -1.0, 1.0) * 1.55;
+        const positionDriveZ = this.clamp(this.handleZ / halfD, -1.0, 1.0) * 1.55;
+        const motionDriveX = this.clamp(this.handleVX * 0.16, -3.4, 3.4);
+        const motionDriveZ = this.clamp(this.handleVZ * 0.16, -3.4, 3.4);
         // Leaky integrator gives the field memory: stirring accumulates
         // momentum (cumulative energy) that eases back to rest over
         // flowMemorySeconds instead of snapping the instant you stop.
         const memTau = Math.max(0.05, this.flowMemorySeconds);
         const memDecay = Math.exp(-dt / memTau);
-        const momCap = 2.6;
+        const momCap = 3.8;
         this.momentumX = this.clamp(this.momentumX * memDecay + motionDriveX * this.flowAccumulation * dt, -momCap, momCap);
         this.momentumZ = this.clamp(this.momentumZ * memDecay + motionDriveZ * this.flowAccumulation * dt, -momCap, momCap);
-        const targetDriveX = this.clamp(positionDriveX + this.momentumX, -2.8, 2.8);
-        const targetDriveZ = this.clamp(positionDriveZ + this.momentumZ, -2.8, 2.8);
+        const targetDriveX = this.clamp(positionDriveX + this.momentumX, -4.2, 4.2);
+        const targetDriveZ = this.clamp(positionDriveZ + this.momentumZ, -4.2, 4.2);
         const follow = this.clamp(dt * 12.0, 0.0, 1.0);
         this.driveX += (targetDriveX - this.driveX) * follow;
         this.driveZ += (targetDriveZ - this.driveZ) * follow;
         const targetEnergy = this.clamp(
-            0.38 + Math.sqrt(this.driveX * this.driveX + this.driveZ * this.driveZ) * 0.22,
-            0.28,
+            0.45 + Math.sqrt(this.driveX * this.driveX + this.driveZ * this.driveZ) * 0.30 + this.handleSpeedScalar * 0.16,
+            0.34,
             1.0
         );
         this.driveEnergy += (targetEnergy - this.driveEnergy) * follow;
@@ -512,17 +539,19 @@ export class MotionFieldPlane extends BaseScriptComponent {
         if (this.handleActive) {
             const dx = x - this.handleX;
             const dz = z - this.handleZ;
-            const radius = Math.max(0.001, this.gustRadius);
+            const radius = Math.max(0.001, this.gustRadius * (1.0 + this.handleSpeedScalar * 0.08));
             const d2 = dx * dx + dz * dz;
-            const falloff = Math.exp(-d2 / (radius * radius));
+            const falloff = Math.exp(-d2 / (radius * radius * 1.25));
             const len = Math.max(0.001, Math.sqrt(d2));
-            const dragX = this.driveX;
-            const dragZ = this.driveZ;
+            const deformation = 1.25 + this.handleSpeedScalar * 0.32;
+            const dragX = this.driveX * deformation;
+            const dragZ = this.driveZ * deformation;
             vx += dragX * this.gustStrength * falloff;
             vz += dragZ * this.gustStrength * falloff;
             const swirlSign = this.driveZ >= 0.0 ? 1.0 : -1.0;
-            vx += (-dz / len) * this.curlStrength * falloff * (0.55 + this.driveEnergy * 0.65) * swirlSign;
-            vz += (dx / len) * this.curlStrength * falloff * (0.55 + this.driveEnergy * 0.65) * swirlSign;
+            const swirl = this.curlStrength * falloff * (0.75 + this.driveEnergy * 1.05 + this.handleSpeedScalar * 0.25) * swirlSign;
+            vx += (-dz / len) * swirl;
+            vz += (dx / len) * swirl;
         }
         return { x: vx, z: vz, speed: Math.sqrt(vx * vx + vz * vz) };
     }
@@ -531,8 +560,7 @@ export class MotionFieldPlane extends BaseScriptComponent {
         if (!this.backdropMaterial) return;
         const u = this.clamp((this.handleX / Math.max(0.001, this.planeWidth)) + 0.5, 0.0, 1.0);
         const v = this.clamp((this.handleZ / Math.max(0.001, this.planeDepth)) + 0.5, 0.0, 1.0);
-        const handleSpeed = Math.sqrt(this.handleVX * this.handleVX + this.handleVZ * this.handleVZ);
-        const wake = this.clamp(this.driveEnergy + handleSpeed * 0.018, 0.28, 1.0);
+        const wake = this.clamp(this.driveEnergy + this.handleSpeedScalar * 0.35, 0.42, 1.0);
         const data = new vec4(u, v, wake, 0.88);
         const pass = this.backdropMaterial.mainPass as any;
         try { pass.FlatColor = data; } catch (e) {}
@@ -611,8 +639,10 @@ export class MotionFieldPlane extends BaseScriptComponent {
             for (let ix = 0; ix < cols; ix++) {
                 const x = -hw + this.planeWidth * ((ix + 0.5) / cols);
                 const f = this.sampleField(x, z, t);
-                const len = this.arrowLength * this.clamp(0.65 + f.speed * 0.22, 0.65, 1.45);
-                this.addArrow(mb, x, z, f.x, f.z, len, 0.075, 0.055);
+                const velocityStretch = this.handleActive ? this.handleSpeedScalar : 0.0;
+                const len = this.arrowLength * this.clamp(1.05 + f.speed * 0.20 + velocityStretch * 0.72, 1.05, 3.25);
+                const width = 0.12 * this.clamp(1.0 + velocityStretch * 0.16, 1.0, 1.32);
+                this.addArrow(mb, x, z, f.x, f.z, len, width, 0.055);
             }
         }
         this.arrowVisual.mesh = mb.getMesh();

@@ -816,10 +816,7 @@
   Enabled: true
   ScriptAsset: !<reference> 80c05993-b909-4c91-94d9-9e48d8344b9e
   ScriptInputsDefault:
-    showSatelliteOrbitCurve: true
-    issOrbitMotionEnabled: true
     moonOrbitMotionEnabled: true
-    issOrbitRadius: true
     earthMass: true
     moonMass: true
     planeSize: true
@@ -834,15 +831,11 @@
     "":
       earthObject: !<reference.SceneObject> 257f33c4-56b6-46cf-bfd3-8f183064abc8
       moonObject: !<reference.SceneObject> 22a53735-61f6-40db-9d36-dfa4511b3755
-      satelliteObject: !<reference.SceneObject> 2f229d75-bd2e-4213-b6a5-55d8b66b68f0
       useModelPositions: true
-      showSatelliteOrbitCurve: false
       earthAxialMotionEnabled: true
-      issOrbitMotionEnabled: false
       moonOrbitMotionEnabled: false
       moonSynchronousRotationEnabled: true
       simulatedHoursPerSecond: !<float> 8.000000
-      issOrbitRadius: 1.550000
       motionRebuildInterval: 0.330000
       earthMass: !<float> 18.000000
       moonMass: !<float> 2.000000

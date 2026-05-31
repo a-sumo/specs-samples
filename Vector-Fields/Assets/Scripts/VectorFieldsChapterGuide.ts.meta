@@ -39,6 +39,7 @@
     menuHorizontalOffsetCm: false
     menuLowerOffsetCm: false
     menuVerticalOffsetCm: false
+    menuVisualScale: false
     panelOffset: false
     showOnStart: false
   ScriptTypesHidden:
@@ -60,6 +61,7 @@
       followUser: false
       folded: false
       menuDistanceCm: !<float> 68.000000
+      menuVisualScale: 1.550000
       menuVerticalOffsetCm: !<float> -7.000000
       menuLowerOffsetCm: !<float> -9.000000
       menuHorizontalOffsetCm: !<float> 0.000000
@@ -76,9 +78,10 @@
     - '// @input bool isolateSceneInteractors = true {"hint":"While open, pause nearby scene colliders so content cannot steal menu touches."}'
     - '// @input vec3 panelOffset = {0,0,0} {"hint":"Offset from this root in centimeters."}'
     - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor for Follow mode. Empty searches for Camera Object."}'
-    - '// @input bool followUser = true {"hint":"Keep the menu in front of the user."}'
+    - '// @input bool followUser {"hint":"Keep the menu in front of the user."}'
     - '// @input bool folded {"hint":"Start with only Fold/Open and Follow/Fixed controls visible."}'
-    - '// @input float menuDistanceCm = 68 {"hint":"Distance from head anchor in centimeters when Follow is active."}'
+    - '// @input float menuDistanceCm = 52 {"hint":"Distance from head anchor in centimeters when Follow is active."}'
+    - '// @input float menuVisualScale = 1.55 {"hint":"Uniform visual scale for the entire menu plane and its hit targets.", "widget":"slider", "min":0.75, "max":2.5, "step":0.05}'
     - '// @input float menuVerticalOffsetCm = -7 {"hint":"Vertical offset from head anchor in centimeters when Follow is active."}'
     - '// @input float menuLowerOffsetCm = -14 {"hint":"Extra vertical drop so staged visuals can sit above the menu without calibration."}'
     - '// @input float menuHorizontalOffsetCm {"hint":"Horizontal offset from head anchor in centimeters when Follow is active."}'

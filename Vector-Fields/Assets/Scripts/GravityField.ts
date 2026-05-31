@@ -60,12 +60,9 @@ export class GravityField extends BaseScriptComponent {
 
     private static readonly EARTH_RADIUS: number = 1.45;
     private static readonly MOON_RADIUS: number = 0.64;
-    private static readonly SATELLITE_RADIUS: number = 0.26;
     private static readonly CURVE_RADIAL_SEGMENTS: number = 3;
     private static readonly EARTH_AXIAL_TILT_DEG: number = 23.4;
     private static readonly EARTH_SIDEREAL_DAY_HOURS: number = 23.9;
-    private static readonly ISS_ORBIT_INCLINATION_DEG: number = 51.6;
-    private static readonly ISS_ORBIT_PERIOD_HOURS: number = 91.5 / 60.0;
     private static readonly MOON_ORBIT_PERIOD_HOURS: number = 27.3 * 24.0;
     private static readonly MOON_ORBIT_INCLINATION_DEG: number = 5.1;
     private static readonly ARTEMIS_TRAJECTORY_WIDTH: number = 0.05;
@@ -76,6 +73,7 @@ export class GravityField extends BaseScriptComponent {
     private static readonly ARTEMIS_DASH_GAP: number = 0.22;
     private static readonly ARTEMIS_RESAMPLE_STEP: number = 0.22;
     private static readonly ARTEMIS_OUTER_PATH_RADIUS: number = 5.15;
+    private static readonly ARTEMIS_DYNAMIC_INTERVAL: number = 0.2;
 
     @input
     @allowUndefined
@@ -88,25 +86,12 @@ export class GravityField extends BaseScriptComponent {
     moonObject: SceneObject = null as any;
 
     @input
-    @allowUndefined
-    @hint("Optional ISS/satellite object. If unset, a generated flat shaded satellite is used.")
-    satelliteObject: SceneObject = null as any;
-
-    @input
     @hint("When on, the field samples the live Earth/Moon transforms so orbital motion deforms the visualization.")
     useModelPositions: boolean = true;
 
     @input
-    @hint("Optional debug orbit guide. Off by default so the ISS orbit curve stays hidden.")
-    showSatelliteOrbitCurve: boolean = false;
-
-    @input
     @hint("When on, the Earth spins on its tilted axis. The 23.4 degree tilt itself is always applied.")
     earthAxialMotionEnabled: boolean = true;
-
-    @input
-    @hint("When on, moves the ISS/satellite model around Earth on a 51.6 degree inclined orbit.")
-    issOrbitMotionEnabled: boolean = true;
 
     @input
     @hint("When on, moves the Moon model around Earth.")
@@ -120,11 +105,6 @@ export class GravityField extends BaseScriptComponent {
     @widget(new SliderWidget(0.05, 48.0, 0.05))
     @hint("Simulated hours per real second for celestial motion toggles. 8.0 makes a Moon orbit complete in ~80 s.")
     simulatedHoursPerSecond: number = 8.0;
-
-    @input
-    @widget(new SliderWidget(1.45, 4.0, 0.05))
-    @hint("Display radius in cm for ISS orbit. Real ISS altitude is close to Earth, so this remains adjustable for AR readability.")
-    issOrbitRadius: number = 1.55;
 
     @input
     @widget(new SliderWidget(0.05, 1.0, 0.05))
@@ -222,15 +202,23 @@ export class GravityField extends BaseScriptComponent {
     private activeBodies: GravityBody[] | null = null;
     private earthBase: StoredTransform | null = null;
     private moonBase: StoredTransform | null = null;
-    private satelliteBase: StoredTransform | null = null;
     private motionElapsedHours: number = 0.0;
     private lastMotionRebuildTime: number = -999.0;
     private wasEarthDriven: boolean = false;
     private wasMoonPositionDriven: boolean = false;
     private wasMoonRotationDriven: boolean = false;
-    private wasSatelliteDriven: boolean = false;
     private artemisMissionEnabled: boolean = false;
     private artemisMissionT: number = 0.0;
+    // Artemis is rebuilt incrementally: the full dotted path and the event
+    // markers are static for the whole mission and built once; only the trail
+    // and the position cursor update, on a coarse throttle.
+    private artemisStaticBuilt: boolean = false;
+    private artemisStaticSignature: string = "";
+    private lastArtemisDynamicTime: number = -999.0;
+    private artemisEventLabelPositions: vec3[] = [];
+    // Render order is walked over the (deep) body model trees only when it
+    // actually changes, not on every rebuild.
+    private renderOrderedModels: { [key: string]: number } = {};
     private artemisFrameRot: quat = quat.fromEulerAngles(0, 0, 0);
     private artemisFrameReady: boolean = false;
     private artemisEventLabels: SurfaceLabel[] = [];
@@ -252,7 +240,6 @@ export class GravityField extends BaseScriptComponent {
         (this as any).gravityApi = {
             setStage: (stage: number) => self.setStage(stage),
             setEarthAxialMotionEnabled: (enabled: boolean) => self.setEarthAxialMotionEnabled(enabled),
-            setIssOrbitMotionEnabled: (enabled: boolean) => self.setIssOrbitMotionEnabled(enabled),
             setMoonOrbitMotionEnabled: (enabled: boolean) => self.setMoonOrbitMotionEnabled(enabled),
             setMoonSynchronousRotationEnabled: (enabled: boolean) => self.setMoonSynchronousRotationEnabled(enabled),
             setCelestialMotionEnabled: (enabled: boolean) => self.setCelestialMotionEnabled(enabled),
@@ -271,10 +258,6 @@ export class GravityField extends BaseScriptComponent {
         this.earthAxialMotionEnabled = enabled;
     }
 
-    public setIssOrbitMotionEnabled(enabled: boolean): void {
-        this.issOrbitMotionEnabled = enabled;
-    }
-
     public setMoonOrbitMotionEnabled(enabled: boolean): void {
         this.moonOrbitMotionEnabled = enabled;
     }
@@ -286,9 +269,10 @@ export class GravityField extends BaseScriptComponent {
     public setCelestialMotionEnabled(enabled: boolean): void {
         this.artemisMissionEnabled = enabled;
         this.setEarthAxialMotionEnabled(enabled);
-        this.setIssOrbitMotionEnabled(false);
         this.setMoonOrbitMotionEnabled(false);
         this.setMoonSynchronousRotationEnabled(enabled);
+        // Force the static Artemis geometry to rebuild on the next pass.
+        this.artemisStaticBuilt = false;
         if (!enabled) this.destroyArtemisEventLabels();
         this.rebuild();
     }
@@ -328,8 +312,24 @@ export class GravityField extends BaseScriptComponent {
 
     private tick(): void {
         const fieldBodyMoved = this.updateCelestialMotion();
-        this.rebuildIfModelInputsChanged(fieldBodyMoved);
+        if (this.artemisMissionEnabled) {
+            // During the mission the bodies move via their transforms and the
+            // GPU well plane tracks them through its own uniforms, so no full
+            // rebuild is needed. Only refresh the growing trail + cursor.
+            this.updateArtemisDynamic();
+        } else {
+            this.rebuildIfModelInputsChanged(fieldBodyMoved);
+        }
         this.updateArtemisEventLabels();
+    }
+
+    private updateArtemisDynamic(): void {
+        const now = getTime();
+        if (now - this.lastArtemisDynamicTime < GravityField.ARTEMIS_DYNAMIC_INTERVAL) return;
+        this.lastArtemisDynamicTime = now;
+        // Rebuilds the static path/markers only if the display scale changed;
+        // otherwise just swaps the trail and cursor meshes on existing visuals.
+        this.buildArtemisMissionVisuals();
     }
 
     // Floating timestamp labels at each Artemis waypoint. Created once when the
@@ -342,14 +342,12 @@ export class GravityField extends BaseScriptComponent {
             return;
         }
         this.ensureArtemisEventLabels();
+        // Label positions are fixed for the mission (set once in ensure...).
+        // Per frame we only re-billboard them toward the camera.
         const camera = this.cameraWorldPosition();
+        if (!camera) return;
         for (let i = 0; i < this.artemisEventLabels.length; i++) {
-            const at = this.artemisPlanarLocalForKm(
-                this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisEventLabelTimes[i]),
-                GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.04
-            );
-            this.artemisEventLabels[i].setLocalPosition(at);
-            if (camera) this.artemisEventLabels[i].face(camera);
+            this.artemisEventLabels[i].face(camera);
         }
     }
 
@@ -371,8 +369,14 @@ export class GravityField extends BaseScriptComponent {
             const side = (slot % 2 === 0) ? 1.0 : -1.0;
             const lift = Math.floor(slot / 2) * 1.6;
             label.setCallout(num + (ev.label || "") + (when ? "\n" + when : ""), new vec4(0.15, 0.55, 1.0, 1.0), side, lift);
+            const at = this.artemisPlanarLocalForKm(
+                this.sampleArtemis(ARTEMIS_II_TRAJECTORY, ev.t),
+                GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.04
+            );
+            label.setLocalPosition(at);
             this.artemisEventLabels.push(label);
             this.artemisEventLabelTimes.push(ev.t);
+            this.artemisEventLabelPositions.push(at);
             slot++;
         }
         this.artemisEventLabelsBuilt = true;
@@ -383,6 +387,7 @@ export class GravityField extends BaseScriptComponent {
         for (let i = 0; i < this.artemisEventLabels.length; i++) this.artemisEventLabels[i].destroy();
         this.artemisEventLabels = [];
         this.artemisEventLabelTimes = [];
+        this.artemisEventLabelPositions = [];
         this.artemisEventLabelsBuilt = false;
     }
 
@@ -432,12 +437,11 @@ export class GravityField extends BaseScriptComponent {
         const bodySignature = this.useModelPositions
             ? this.objectSignature(this.earthObject) + "|" + this.objectSignature(this.moonObject)
             : this.objectIdentitySignature(this.earthObject) + "|" + this.objectIdentitySignature(this.moonObject);
-        const orbitCurveSignature = this.showSatelliteOrbitCurve ? "orbit:" + this.issOrbitRadius.toFixed(3) : "orbit:off";
         const artemisSignature = this.artemisMissionEnabled
             ? "artemis:" + this.artemisSampleIndex(this.artemisMissionT)
             : "artemis:off";
         const artemisDisplaySignature = "artemisDisplay:" + this.artemisTrajectoryScale.toFixed(3) + ":" + this.artemisEarthClearance.toFixed(3);
-        return bodySignature + "|" + mode + "|" + orbitCurveSignature + "|" + artemisSignature + "|" + artemisDisplaySignature;
+        return bodySignature + "|" + mode + "|" + artemisSignature + "|" + artemisDisplaySignature;
     }
 
     private objectIdentitySignature(object: SceneObject | null): string {
@@ -494,7 +498,6 @@ export class GravityField extends BaseScriptComponent {
         const bodies = this.bodies();
         const earth = bodies[0].center;
         const moon = bodies[1].center;
-        const satellite = new vec3(earth.x + 1.85, 0.95, earth.z - 2.45);
 
         if (!this.useAssignedModel(this.earthObject, GravityField.BODY_RENDER_ORDER)) {
             this.assignVisual("earthSphere", this.buildSphereMesh(earth, GravityField.EARTH_RADIUS, 9, 6), new vec4(0.58, 0.66, 0.68, 1.0), GravityField.BODY_RENDER_ORDER);
@@ -502,18 +505,11 @@ export class GravityField extends BaseScriptComponent {
         if (!this.useAssignedModel(this.moonObject, GravityField.BODY_RENDER_ORDER + 1)) {
             this.assignVisual("moonSphere", this.buildSphereMesh(moon, GravityField.MOON_RADIUS, 8, 5), new vec4(0.88, 0.88, 0.82, 1.0), GravityField.BODY_RENDER_ORDER + 1);
         }
-        if (!this.useAssignedModel(this.satelliteObject, GravityField.BODY_RENDER_ORDER + 2)) {
-            this.assignVisual("satelliteSphere", this.buildSphereMesh(satellite, GravityField.SATELLITE_RADIUS, 7, 4), new vec4(0.96, 0.94, 0.86, 1.0), GravityField.BODY_RENDER_ORDER + 2);
-        }
-        if (this.showSatelliteOrbitCurve) {
-            this.assignVisual("orbitRing", this.buildOrbitRingMesh(earth, Math.max(0.1, this.issOrbitRadius), 0.06), new vec4(0.58, 0.58, 0.56, 0.38), GravityField.BODY_RENDER_ORDER - 1);
-        }
     }
 
     private captureBaseTransforms(): void {
         this.earthBase = this.captureTransform(this.earthObject);
         this.moonBase = this.captureTransform(this.moonObject);
-        this.satelliteBase = this.captureTransform(this.satelliteObject);
     }
 
     private captureTransform(object: SceneObject | null): StoredTransform | null {
@@ -539,7 +535,6 @@ export class GravityField extends BaseScriptComponent {
         const hadMoonPositionDriven = this.wasMoonPositionDriven;
         const moonMoved = this.updateMoonMotion();
         this.updateEarthMotion();
-        this.updateSatelliteMotion();
         return this.useModelPositions && (moonMoved || hadMoonPositionDriven);
     }
 
@@ -591,29 +586,6 @@ export class GravityField extends BaseScriptComponent {
         return positionDriven;
     }
 
-    private updateSatelliteMotion(): void {
-        if (!this.satelliteBase || !this.earthBase) return;
-        const tr = this.satelliteBase.object.getTransform();
-        if (!this.issOrbitMotionEnabled) {
-            if (this.wasSatelliteDriven) {
-                tr.setLocalPosition(this.copyVec3(this.satelliteBase.position));
-                tr.setLocalRotation(this.copyQuat(this.satelliteBase.rotation));
-                this.wasSatelliteDriven = false;
-            }
-            return;
-        }
-
-        const baseOffset = this.satelliteBase.position.sub(this.earthBase.position);
-        const phase = Math.atan2(baseOffset.z, baseOffset.x);
-        const radius = Math.max(GravityField.EARTH_RADIUS * 1.02, this.issOrbitRadius);
-        const angle = this.orbitAngle(this.motionElapsedHours, GravityField.ISS_ORBIT_PERIOD_HOURS, phase);
-        const rel = this.inclinedOrbitOffset(radius, angle, GravityField.ISS_ORBIT_INCLINATION_DEG);
-        const tangent = this.inclinedOrbitTangent(angle, GravityField.ISS_ORBIT_INCLINATION_DEG);
-        tr.setLocalPosition(this.earthBase.position.add(rel));
-        tr.setLocalRotation(quat.lookAt(tangent, new vec3(0.0, 1.0, 0.0)));
-        this.wasSatelliteDriven = true;
-    }
-
     private updateArtemisMotion(dt: number): boolean {
         this.artemisMissionT += dt * Math.max(0.0, this.simulatedHoursPerSecond) * 3600.0;
         const duration = Math.max(1.0, ARTEMIS_II_TRAJECTORY.durationSec);
@@ -624,7 +596,6 @@ export class GravityField extends BaseScriptComponent {
         this.updateEarthMotion();
 
         const moonKm = this.sampleArtemis(MOON_EPHEMERIS, this.artemisMissionT);
-        const spacecraftKm = this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisMissionT);
         if (this.moonBase) {
             const moonTransform = this.moonBase.object.getTransform();
             moonTransform.setLocalPosition(this.artemisLocalForKm(moonKm, 0.0));
@@ -638,32 +609,34 @@ export class GravityField extends BaseScriptComponent {
             this.wasMoonPositionDriven = true;
         }
 
-        if (this.satelliteBase) {
-            const satelliteTransform = this.satelliteBase.object.getTransform();
-            satelliteTransform.setLocalPosition(this.artemisDisplayLocalForTime(this.artemisMissionT, 0.0));
-            const ahead = this.artemisDisplayLocalForTime(Math.min(duration, this.artemisMissionT + 2000.0), 0.0);
-            let dir = ahead.sub(satelliteTransform.getLocalPosition());
-            if (dir.length > 0.0001) {
-                dir = this.normalizeVec(dir);
-                satelliteTransform.setLocalRotation(quat.lookAt(dir, new vec3(0.0, 1.0, 0.0)));
-            }
-            this.wasSatelliteDriven = true;
-        }
-
         return true;
     }
 
     private buildArtemisMissionVisuals(): void {
-        const trajectory = this.buildArtemisTrajectoryMesh(false);
-        this.assignVisual("artemisTrajectory", trajectory, new vec4(0.22, 0.55, 1.0, 0.70), GravityField.FIELD_RENDER_ORDER + 6);
+        // The full dotted path and the event markers do not change shape during
+        // the mission, so build them once (and again only if the display scale
+        // changes). This is what used to be rebuilt ~10x/sec and tanked perf.
+        const signature = this.artemisDisplaySignatureValue();
+        if (!this.artemisStaticBuilt || signature !== this.artemisStaticSignature) {
+            const trajectory = this.buildArtemisTrajectoryMesh(false);
+            this.assignVisual("artemisTrajectory", trajectory, new vec4(0.22, 0.55, 1.0, 0.70), GravityField.FIELD_RENDER_ORDER + 6);
+            this.buildArtemisEventMarkers();
+            this.destroyArtemisEventLabels();
+            this.artemisStaticBuilt = true;
+            this.artemisStaticSignature = signature;
+        }
 
+        // The trail grows with mission time and the cursor tracks the current
+        // position; these are the only meshes refreshed per update tick.
         const trail = this.buildArtemisTrajectoryMesh(true);
         this.assignVisual("artemisTrail", trail, new vec4(0.42, 0.72, 1.0, 0.96), GravityField.FIELD_RENDER_ORDER + 7);
 
         const cursor = this.buildArtemisCursorMesh(this.artemisDisplayLocalForTime(this.artemisMissionT, GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.03));
         this.assignVisual("artemisCursor", cursor, new vec4(0.70, 0.86, 1.0, 1.0), GravityField.BODY_RENDER_ORDER + 4);
+    }
 
-        this.buildArtemisEventMarkers();
+    private artemisDisplaySignatureValue(): string {
+        return this.artemisTrajectoryScale.toFixed(3) + ":" + this.artemisEarthClearance.toFixed(3);
     }
 
     // Place a ring marker at each mission waypoint (ARTEMIS_II_TRAJECTORY.events),
@@ -961,13 +934,6 @@ export class GravityField extends BaseScriptComponent {
         const x = Math.cos(angle) * radius;
         const zFlat = Math.sin(angle) * radius;
         return new vec3(x, zFlat * Math.sin(tilt), zFlat * Math.cos(tilt));
-    }
-
-    private inclinedOrbitTangent(angle: number, inclinationDeg: number): vec3 {
-        const tilt = this.degToRad(inclinationDeg);
-        const x = -Math.sin(angle);
-        const zFlat = Math.cos(angle);
-        return this.normalizeVec(new vec3(x, zFlat * Math.sin(tilt), zFlat * Math.cos(tilt)));
     }
 
     private buildArrowPlane(): void {
@@ -1774,19 +1740,6 @@ export class GravityField extends BaseScriptComponent {
         return mb;
     }
 
-    private buildOrbitRingMesh(center: vec3, radius: number, width: number): MeshBuilder {
-        const mb = this.makeMeshBuilder();
-        const steps = 64;
-        for (let i = 0; i < steps; i++) {
-            const a0 = (i / steps) * Math.PI * 2.0;
-            const a1 = ((i + 1) / steps) * Math.PI * 2.0;
-            const p0 = new vec3(center.x + Math.cos(a0) * radius, center.y + 0.06, center.z + Math.sin(a0) * radius);
-            const p1 = new vec3(center.x + Math.cos(a1) * radius, center.y + 0.06, center.z + Math.sin(a1) * radius);
-            this.addRibbonSegment(mb, p0, p1, width);
-        }
-        return mb;
-    }
-
     private addFlatTri(mb: MeshBuilder, a: vec3, b: vec3, c: vec3): void {
         const ab = b.sub(a);
         const ac = c.sub(a);
@@ -1810,7 +1763,13 @@ export class GravityField extends BaseScriptComponent {
         if (!model) return false;
 
         try { model.enabled = true; } catch (e) {}
-        this.setObjectRenderOrderRecursive(model, renderOrder);
+        // Body models are deep Sketchfab trees; only walk them for render order
+        // when it actually changes, not on every rebuild.
+        const key = model.uniqueIdentifier;
+        if (this.renderOrderedModels[key] !== renderOrder) {
+            this.setObjectRenderOrderRecursive(model, renderOrder);
+            this.renderOrderedModels[key] = renderOrder;
+        }
         return true;
     }
 
