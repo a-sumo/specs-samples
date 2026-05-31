@@ -26,10 +26,12 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    flowDirection: false
     lineWidth: false
     material: false
     planeHeight: false
     planeWidth: false
+    radialSegments: false
     travel: false
   ScriptTypesHidden:
     {}
@@ -45,6 +47,8 @@
       planeHeight: 14.120000
       travel: !<float> 9.000000
       lineWidth: 0.300000
+      flowDirection: !<float> -1.000000
+      radialSegments: 10
   ScriptTypes:
     -
       {}
@@ -53,4 +57,6 @@
     - // @input float planeWidth = 36.6
     - // @input float planeHeight = 14.12
     - // @input float travel = 9
-    - // @input float lineWidth = 0.3
+    - // @input float lineWidth = 0.18
+    - // @input float flowDirection = -1
+    - // @input int radialSegments = 10

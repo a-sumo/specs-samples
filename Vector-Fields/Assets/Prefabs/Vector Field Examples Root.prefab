@@ -4,44 +4,6 @@
     - !<own> fd9cd3ca-49f8-4cc9-9350-f3867dc4443f
   LazyLoading: false
   RetainAssets: true
-- !<ScriptComponent/3b8fe396-9172-4303-b599-ff915795f898>
-  PrefabRemaps:
-    []
-  Name: Interactable
-  Enabled: true
-  ScriptAsset: !<reference> 652e631a-22d0-4941-9f74-2943df59f34c
-  ScriptInputsDefault:
-    targetingMode: true
-    targetingVisual: true
-    ignoreInteractionPlane: true
-    keepHoverOnTrigger: true
-    enableInstantDrag: true
-    isScrollable: true
-    allowMultipleInteractors: true
-    enablePokeDirectionality: true
-    acceptableXDirections: true
-    acceptableYDirections: true
-    acceptableZDirections: true
-    useFilteredPinch: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      targetingMode: !<float> 3.000000
-      targetingVisual: !<float> 1.000000
-      ignoreInteractionPlane: false
-      keepHoverOnTrigger: false
-      enableInstantDrag: false
-      isScrollable: false
-      allowMultipleInteractors: true
-      enablePokeDirectionality: false
-      acceptableXDirections: !<float> 0.000000
-      acceptableYDirections: !<float> 0.000000
-      acceptableZDirections: !<float> 1.000000
-      useFilteredPinch: false
-  ScriptTypes:
-    "":
-      {}
 - !<SceneObject/5c4b659d-1fec-4582-84ac-22d403284e8e>
   PrefabRemaps:
     []
@@ -105,31 +67,29 @@
   Enabled: true
   ScriptAsset: !<reference> e70ea878-ce68-42de-809a-df95318d9571
   ScriptInputsDefault:
-    _lod: true
-    _maxVertexCount: true
-    _tubeMode: true
+    _gridSize: true
     _domainMode: true
     _sphereRadius: true
     _planeWidth: true
     _planeDepth: true
     _stepSize: true
     _preset: true
-    _colorMap: true
     _colorMapScale: true
     _colorMapOffset: true
+    fieldCollider: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
-      _lod: !<float> 2.000000
-      _maxVertexCount: !<float> 40000.000000
-      _tubeMode: !<float> 0.000000
-      _desiredLengthSegments: !<float> 20.000000
-      _radius: 0.030000
+      _lod: !<float> 0.000000
+      _maxVertexCount: !<float> 12000.000000
+      _tubeMode: !<float> 2.000000
+      _desiredLengthSegments: !<float> 4.000000
+      _radius: 0.040000
       _coneLength: !<float> 4.000000
       _coneRadius: 1.700000
       _arrowScale: 1.300000
-      _gridSize: !<float> 8.000000
+      _gridSize: !<float> 5.000000
       _gridSpacing: 0.600000
       _domainMode: !<float> 0.000000
       _sphereRadius: 4.800000
@@ -139,33 +99,15 @@
       _fieldScale: 1.100000
       _flowSpeed: !<float> 48.000000
       _preset: !<float> 0.000000
-      _colorMap: !<float> 9.000000
+      _colorMap: !<float> 17.000000
       _colorMapScale: !<float> 1.000000
       _colorMapOffset: !<float> 0.000000
       trackedObject: !<reference.SceneObject> 993a5b8b-d62f-4329-a0ae-0a366af8f94b
-      fieldCollider: !<reference.ColliderComponent> 6d180f37-2b4d-4aac-976f-470670f916a3
+      fieldCollider: !<reference.ColliderComponent> 00000000-0000-0000-0000-000000000000
       material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42
   ScriptTypes:
     "":
       {}
-- !<ColliderComponent/6d180f37-2b4d-4aac-976f-470670f916a3>
-  PrefabRemaps:
-    []
-  Name: Physics Collider
-  Enabled: true
-  Shape: !<Box>
-    FitVisual: true
-    Size: {x: 15.000000, y: 15.000000, z: 15.000000}
-  Matter: !<reference> 00000000-0000-0000-0000-000000000000
-  Filter: !<reference> 00000000-0000-0000-0000-000000000000
-  OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
-  WorldSettings: !<reference> 00000000-0000-0000-0000-000000000000
-  EnableSmoothing: false
-  PositionTension: 30.000000
-  RotationTension: 30.000000
-  ForceCompound: false
-  Intangible: false
-  ShowCollider: false
 - !<ColliderComponent/8f392357-c171-4e52-9f24-ed77dd06b3c9>
   PrefabRemaps:
     []
@@ -173,7 +115,7 @@
   Enabled: true
   Shape: !<Sphere>
     FitVisual: true
-    Radius: 6.000000
+    Radius: 3.000000
   Matter: !<reference> 00000000-0000-0000-0000-000000000000
   Filter: !<reference> 00000000-0000-0000-0000-000000000000
   OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
@@ -193,7 +135,7 @@
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 2.000000, y: 2.000000, z: 2.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -345,64 +287,6 @@
   ScriptTypes:
     "":
       {}
-- !<ScriptComponent/cf497590-2697-4f38-95ac-990428a225e4>
-  PrefabRemaps:
-    []
-  Name: InteractableManipulation
-  Enabled: true
-  ScriptAsset: !<reference> 664b556b-1946-4c2c-866a-e675b4e86006
-  ScriptInputsDefault:
-    manipulateRootSceneObject: true
-    minimumScaleFactor: true
-    maximumScaleFactor: true
-    enableTranslation: true
-    enableRotation: true
-    enableScale: true
-    enableStretchZ: true
-    showStretchZProperties: true
-    zStretchFactorMin: true
-    zStretchFactorMax: true
-    useFilter: true
-    showFilterProperties: true
-    minCutoff: true
-    beta: true
-    dcutoff: true
-    showTranslationProperties: true
-    _enableXTranslation: true
-    _enableYTranslation: true
-    _enableZTranslation: true
-    showRotationProperties: true
-    _rotationAxis: true
-    isSynced: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      manipulateRootSceneObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      minimumScaleFactor: 0.250000
-      maximumScaleFactor: !<float> 20.000000
-      enableTranslation: true
-      enableRotation: true
-      enableScale: true
-      enableStretchZ: true
-      showStretchZProperties: false
-      zStretchFactorMin: !<float> 1.000000
-      zStretchFactorMax: !<float> 12.000000
-      useFilter: true
-      showFilterProperties: false
-      minCutoff: !<float> 2.000000
-      beta: 0.015000
-      dcutoff: !<float> 1.000000
-      showTranslationProperties: false
-      _enableXTranslation: true
-      _enableYTranslation: true
-      _enableZTranslation: true
-      showRotationProperties: false
-      _rotationAxis: All
-      isSynced: false
-  ScriptTypes:
-    "":
-      {}
 - !<ScriptComponent/e380bfaf-3fde-4bc2-8772-694fcd64e90c>
   PrefabRemaps:
     []
@@ -411,12 +295,9 @@
   ScriptAsset: !<reference> 664b556b-1946-4c2c-866a-e675b4e86006
   ScriptInputsDefault:
     manipulateRootSceneObject: true
-    minimumScaleFactor: true
-    maximumScaleFactor: true
     enableTranslation: true
     enableRotation: true
     enableScale: true
-    enableStretchZ: true
     showStretchZProperties: true
     zStretchFactorMin: true
     zStretchFactorMax: true
@@ -437,12 +318,12 @@
   ScriptInputs:
     "":
       manipulateRootSceneObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      minimumScaleFactor: 0.250000
-      maximumScaleFactor: !<float> 20.000000
+      minimumScaleFactor: 0.350000
+      maximumScaleFactor: !<float> 3.000000
       enableTranslation: true
       enableRotation: true
       enableScale: true
-      enableStretchZ: true
+      enableStretchZ: false
       showStretchZProperties: false
       zStretchFactorMin: !<float> 1.000000
       zStretchFactorMax: !<float> 12.000000
@@ -468,7 +349,7 @@
   Enabled: true
   Shape: !<Sphere>
     FitVisual: true
-    Radius: 6.000000
+    Radius: 1.500000
   Matter: !<reference> 00000000-0000-0000-0000-000000000000
   Filter: !<reference> 00000000-0000-0000-0000-000000000000
   OverlapFilter: !<reference> 00000000-0000-0000-0000-000000000000
@@ -481,23 +362,20 @@
   ShowCollider: false
 - !<SceneObject/fd9cd3ca-49f8-4cc9-9350-f3867dc4443f>
   PrefabRemaps:
-    - 3b8fe396-9172-4303-b599-ff915795f898: a6da0529-5cc3-453f-b69d-1183d1bc46c3
     - 5c4b659d-1fec-4582-84ac-22d403284e8e: 5c4b659d-1fec-4582-7b53-dd2bfcd7b171
     - 663d3834-b731-48c8-b5c4-a085f52d67c9: 663d3834-b731-48c8-4a3b-5f7a0ad29836
     - 68a56ace-6401-4200-a536-d7dd73708538: 68a56ace-6401-4200-5ac9-28228c8f7ac7
-    - 6d180f37-2b4d-4aac-976f-470670f916a3: 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9
     - 8f392357-c171-4e52-9f24-ed77dd06b3c9: 8f392357-c171-4e52-60db-128822f94c36
     - 993a5b8b-d62f-4329-a0ae-0a366af8f94b: 993a5b8b-d62f-4329-5f51-f5c9950706b4
     - b8a520bc-21a4-44d6-a332-2b3f73649569: b8a520bc-21a4-44d6-5ccd-d4c08c9b6a96
     - ba89eaa7-52fc-4491-829f-708d0fe8a498: 59eef357-cdd7-4eb0-b404-56e9ab9debc4
     - bf13c035-9f02-4be6-82e0-f52cd13a4731: bf13c035-9f02-4be6-7d1f-0ad32ec5b8ce
     - c53a443e-d0fc-4d2e-a3a6-5680677bdd4c: c53a443e-d0fc-4d2e-5c59-a97f988422b3
-    - cf497590-2697-4f38-95ac-990428a225e4: 4bbbff2f-0888-4975-9fde-cfbc0803a26b
     - e380bfaf-3fde-4bc2-8772-694fcd64e90c: e380bfaf-3fde-4bc2-788d-96b0329b16f3
     - eb50fb70-d076-44a2-bb22-560c65ea7be6: eb50fb70-d076-44a2-44dd-a9f39a158419
     - fd9cd3ca-49f8-4cc9-9350-f3867dc4443f: fd9cd3ca-49f8-4cc9-6caf-0c79823bbbc0
   Name: Vector Field Examples Root
-  Enabled: true
+  Enabled: false
   Layers: 1
   LocalTransform: !<TransformEntity>
     Position: {x: 0.000000, y: 0.000000, z: 0.000000}
@@ -508,6 +386,4 @@
     - !<own> 5c4b659d-1fec-4582-84ac-22d403284e8e
     - !<own> 993a5b8b-d62f-4329-a0ae-0a366af8f94b
   Components:
-    - !<own> 3b8fe396-9172-4303-b599-ff915795f898
-    - !<own> cf497590-2697-4f38-95ac-990428a225e4
-    - !<own> 6d180f37-2b4d-4aac-976f-470670f916a3
+    []

@@ -4,42 +4,42 @@
     - !<own> f3cc860b-dce0-4ad7-8aca-2b410e9bd0d2
 - !<PassInfo/f3cc860b-dce0-4ad7-8aca-2b410e9bd0d2>
   CachedProperties:
-    - Port_Depth_N004:
+    - Port_Depth_N001:
         typeIdx: 1
         value: 1.000000
-    - Port_FinalColor1_N004:
+    - Port_FinalColor1_N001:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-    - Port_FinalColor2_N004:
+    - Port_FinalColor2_N001:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-    - Port_FinalColor3_N004:
+    - Port_FinalColor3_N001:
         typeIdx: 5
         value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
-    - Port_GSplatPointSize_N004:
+    - Port_GSplatPointSize_N001:
         typeIdx: 1
         value: 0.000000
-    - Port_GSplatRotation_N004:
+    - Port_GSplatRotation_N001:
         typeIdx: 5
-        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
-    - Port_GSplatScale_N004:
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+    - Port_GSplatScale_N001:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
-    - Port_PrevWorldPosition_N004:
+    - Port_PrevWorldPosition_N001:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
-    - Port_RayDirection_N004:
-        typeIdx: 4
-        value: {x: 0.000000, y: 1.000000, z: 0.000000}
-    - Port_RayOrigin_N004:
+    - Port_RayDirection_N001:
         typeIdx: 4
         value: {x: 0.000000, y: 0.000000, z: 0.000000}
-    - Port_WorldNormal_N004:
+    - Port_RayOrigin_N001:
         typeIdx: 4
-        value: {x: 0.000000, y: 1.000000, z: 0.000000}
-    - Port_WorldTangent_N004:
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldNormal_N001:
         typeIdx: 4
-        value: {x: 0.000000, y: 0.000000, z: 1.000000}
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldTangent_N001:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
   DepthWrite: false
   DepthTest: true
   DepthFunction: LessEqual
@@ -63,4 +63,4 @@
     Time:
       typeIdx: 1
       value: 1.000000
-  Pass: !<reference> 15d21274-5f2e-4632-8b3f-76f9ac4c85ca
+  Pass: !<reference> 25827d84-a82b-4330-a296-59f1fdd99149

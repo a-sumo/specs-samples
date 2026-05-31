@@ -1,8 +1,7 @@
 // CarFlowStream.js — animated streamline ribbons for ONE baked car-flow slice.
 // CarFlowStreamlines.ts builds the geometry for the current slice only and
-// rebuilds it when the draggable slice changes; this shader just animates a
-// flowing dash along each ribbon and colours it on the vivid Earth-wind-map
-// speed ramp.
+// rebuilds it when the draggable slice changes. This shader animates a smooth
+// green wind-tunnel pulse from the car's nose toward its rear.
 //
 // Packed UVs (from CarFlowStreamlines.ts):
 //   texture0 = (pathT, templatePhase)
@@ -26,29 +25,30 @@ void main() {
     float speedColor = clamp(uv1.x, 0.0, 1.0);
     float crossSection = clamp(uv2.x, -1.0, 1.0);
 
-    // ribbon cross-section shading (soft tube)
+    // Soft tube shading: two smoothsteps, no lighting branch.
     float radial = abs(crossSection);
-    float edge = 1.0 - smoothstep(0.64, 1.0, radial);
-    float shoulder = 1.0 - smoothstep(0.18, 0.92, radial);
+    float edge = 1.0 - smoothstep(0.70, 1.0, radial);
     float core = 1.0 - smoothstep(0.0, 0.42, radial);
 
-    // flowing dash travelling head-to-tail (flow direction inverted: pf = 1-pathT)
+    // Path data runs left-to-right in the image. Use 1-pathT so the visible
+    // wave travels right-to-left. Avoid trig/pow here; this runs per fragment.
     float pf = 1.0 - pathT;
     float phase = fract(Time * PhaseSpeed + templatePhase);
-    float behind = fract(phase - pf + 1.0);
-    float wrapped = abs(fract(pf - phase + 0.5) - 0.5);
-    float head = 1.0 - smoothstep(0.0, 0.06, wrapped);
-    float wake = 1.0 - smoothstep(0.035, 0.58, behind);
-    float flowOpacity = 0.30 + wake * 0.44 + head * 0.44;
-    float tubeShade = edge * (0.72 + shoulder * 0.20 + core * 0.40);
-    float alpha = clamp(tubeShade * flowOpacity, 0.0, 1.0);
+    float band = fract(pf * 3.15 - phase + 1.0);
+    float bandDist = abs(band - 0.5) * 2.0;
+    float pulse = 1.0 - smoothstep(0.10, 0.92, bandDist);
+    float glint = 1.0 - smoothstep(0.00, 0.20, bandDist);
+    float flowOpacity = 0.22 + pulse * 0.40 + glint * 0.12;
+    float tubeShade = edge * (0.82 + core * 0.32);
+    float alpha = clamp(tubeShade * flowOpacity * (0.82 + speedColor * 0.18), 0.0, 0.76);
 
-    // colour: bright blue (slow) -> bright cyan (fast)
-    float t = clamp((speedColor - 0.40) / 0.35, 0.0, 1.0);
-    vec3 slow = vec3(0.10, 0.45, 1.00);   // bright blue
-    vec3 fast = vec3(0.10, 0.95, 1.00);   // bright cyan
+    // Smooth single-family green ramp. The value change is continuous so the
+    // streamlines read as airflow, not chopped bars.
+    float t = smoothstep(0.16, 0.96, speedColor);
+    vec3 slow = vec3(0.18, 0.76, 0.12);
+    vec3 fast = vec3(0.72, 1.00, 0.24);
     vec3 color = mix(slow, fast, t);
-    color += vec3(0.10, 0.12, 0.14) * core * head;   // bright comet core
+    color += vec3(0.14, 0.18, 0.05) * core * (0.28 + glint * 0.72);
     color = clamp(color, 0.0, 1.0);
 
     transformedPosition = pos;
