@@ -25,6 +25,13 @@ export type StoryGuideExample = {
     slot: StoryGuideSlot;
 };
 
+export type StoryGuideTheoryCard = {
+    id: string;
+    index: string;
+    title: string;
+    slot: StoryGuideSlot;
+};
+
 export type StoryGuideTheoryMode = {
     id: string;
     index: string;
@@ -54,45 +61,68 @@ export const STORY_GUIDE_PANEL = {
 
 export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
     {
-        "id": "intro",
-        "index": "01",
-        "title": "Intro",
-        "root": "C00_Intro",
-        "canCalibrate": false,
-        "slot": {
-            "x": -9.6,
-            "y": 1.5,
-            "width": 8,
-            "height": 5
-        }
-    },
-    {
         "id": "theory",
-        "index": "02",
+        "index": "01",
         "title": "Theory",
         "root": "C02_Theory",
         "canCalibrate": false,
         "slot": {
-            "x": 0,
-            "y": 1.5,
-            "width": 8,
-            "height": 5
+            "x": -6.8,
+            "y": -1.9,
+            "width": 12.8,
+            "height": 13
         }
     },
     {
         "id": "examples",
-        "index": "03",
-        "title": "Examples",
+        "index": "02",
+        "title": "Real World",
         "root": "C03_Real_World_Examples",
         "canCalibrate": true,
         "slot": {
-            "x": 9.6,
-            "y": 1.5,
-            "width": 8,
-            "height": 5
+            "x": 6.8,
+            "y": -1.9,
+            "width": 12.8,
+            "height": 13
         }
     }
 ];
+
+export const STORY_GUIDE_THEORY_CARDS = [
+    {
+        "id": "definition",
+        "index": "01",
+        "title": "Definition",
+        "slot": {
+            "x": -9.6,
+            "y": -1.64,
+            "width": 8,
+            "height": 12
+        }
+    },
+    {
+        "id": "metrics",
+        "index": "02",
+        "title": "Field Metrics",
+        "slot": {
+            "x": 0,
+            "y": -1.64,
+            "width": 8,
+            "height": 12
+        }
+    },
+    {
+        "id": "patterns",
+        "index": "03",
+        "title": "Analytical Examples",
+        "slot": {
+            "x": 9.6,
+            "y": -1.64,
+            "width": 8,
+            "height": 12
+        }
+    }
+] as StoryGuideTheoryCard[];
 
 export const STORY_GUIDE_EXAMPLES = {
     back: {"x":-11.2,"y":7.76,"width":4.8,"height":1.68},
@@ -104,7 +134,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "canCalibrate": true,
         "slot": {
             "x": 0,
-            "y": 2.8,
+            "y": 3.12,
             "width": 27.2,
             "height": 2.8
         }
@@ -116,7 +146,7 @@ export const STORY_GUIDE_EXAMPLES = {
         "canCalibrate": true,
         "slot": {
             "x": 0,
-            "y": -0.88,
+            "y": -0.08,
             "width": 27.2,
             "height": 2.8
         }
@@ -124,11 +154,23 @@ export const STORY_GUIDE_EXAMPLES = {
     {
         "id": "wind",
         "index": "03",
-        "title": "Wind",
+        "title": "Earth Winds",
         "canCalibrate": true,
         "slot": {
             "x": 0,
-            "y": -4.56,
+            "y": -3.28,
+            "width": 27.2,
+            "height": 2.8
+        }
+    },
+    {
+        "id": "aerodynamics",
+        "index": "04",
+        "title": "Aerodynamics",
+        "canCalibrate": true,
+        "slot": {
+            "x": 0,
+            "y": -6.48,
             "width": 27.2,
             "height": 2.8
         }
@@ -255,10 +297,10 @@ export const STORY_GUIDE_NAV = {
 };
 
 export const STORY_GUIDE_UTILITY = {
-    follow: {"x":7.06,"y":7.84,"width":3.8,"height":1.52},
-    fold: {"x":11.46,"y":7.84,"width":3.8,"height":1.52},
-    planeFloor: {"x":7.06,"y":6.2,"width":3.8,"height":1.28},
-    planeFront: {"x":11.46,"y":6.2,"width":3.8,"height":1.28},
+    follow: {"x":5.6,"y":8.46,"width":5.2,"height":1.72},
+    fold: {"x":11.6,"y":8.46,"width":5.2,"height":1.72},
+    planeFloor: {"x":5.6,"y":6.38,"width":5.2,"height":1.72},
+    planeFront: {"x":11.6,"y":6.38,"width":5.2,"height":1.72},
 };
 
 export const STORY_GUIDE_VARIANTS = {

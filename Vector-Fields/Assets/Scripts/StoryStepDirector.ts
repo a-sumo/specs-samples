@@ -5,17 +5,14 @@ import { StageCalibration } from "./StageCalibration";
 
 type StoryStepConfig = {
     id: string;
-    scaffoldRoot: string;
     motion: boolean;
-    analytical: boolean;
     vector: boolean;
     magnetic: boolean;
     gravity: boolean;
     wind: boolean;
-    storyWidgets: boolean;
 };
 
-type ExampleFieldId = "gravity" | "magnetism" | "wind";
+type ExampleFieldId = "gravity" | "magnetism" | "wind" | "aerodynamics";
 type GravityExampleVariant = "field" | "artemis";
 type WindExampleVariant = "globe" | "car_flow";
 type TheoryFieldModeId = "expansion" | "contraction" | "curl" | "motion";
@@ -39,40 +36,24 @@ const GRADIENT_PALETTE_DEFAULT = 17;
 
 const DEFAULT_MAIN_EXPERIENCE_RENDER_ORDER = 520;
 const MAIN_EXPERIENCE_RENDER_ORDER_SPAN = 90;
+const GRAVITY_EXAMPLE_DROP_CM = 15.0;
 
 const STORY_STEP_CONFIGS: StoryStepConfig[] = [
     {
-        id: "intro",
-        scaffoldRoot: "C00_Intro",
-        motion: false,
-        analytical: false,
-        vector: false,
-        magnetic: false,
-        gravity: false,
-        wind: false,
-        storyWidgets: false,
-    },
-    {
         id: "theory",
-        scaffoldRoot: "C02_Theory",
         motion: true,
-        analytical: false,
         vector: false,
         magnetic: false,
         gravity: false,
         wind: false,
-        storyWidgets: false,
     },
     {
         id: "examples",
-        scaffoldRoot: "C03_Real_World_Examples",
         motion: false,
-        analytical: false,
         vector: false,
         magnetic: true,
         gravity: true,
         wind: true,
-        storyWidgets: false,
     },
 ];
 
@@ -80,28 +61,13 @@ const STORY_STEP_CONFIGS: StoryStepConfig[] = [
 export class StoryStepDirector extends BaseScriptComponent {
     @input
     @allowUndefined
-    @hint("Storyboard scaffold root. Falls back to VF Story Scaffold by name.")
-    scaffoldRoot: SceneObject = null as any;
-
-    @input
-    @allowUndefined
     @hint("Planar motion field rig.")
     motionFieldRoot: SceneObject = null as any;
 
     @input
     @allowUndefined
-    @hint("Analytical field-pattern library rig.")
-    analyticalPatternsRoot: SceneObject = null as any;
-
-    @input
-    @allowUndefined
-    @hint("Legacy abstract vector field rig.")
+    @hint("Theory vector field rig.")
     vectorFieldRoot: SceneObject = null as any;
-
-    @input
-    @allowUndefined
-    @hint("Legacy standalone theory menu. Kept hidden when the main guide owns theory controls.")
-    theoryFieldMenuRoot: SceneObject = null as any;
 
     @input
     @allowUndefined
@@ -119,21 +85,6 @@ export class StoryStepDirector extends BaseScriptComponent {
     windGlobeRoot: SceneObject = null as any;
 
     @input
-    @allowUndefined
-    @hint("Older image widget group. Usually hidden while the new scaffold is active.")
-    storyWidgetsRoot: SceneObject = null as any;
-
-    @input
-    @allowUndefined
-    @hint("Older narration panel root to park while this director owns the story.")
-    legacyGuideRoot: SceneObject = null as any;
-
-    @input
-    @allowUndefined
-    @hint("Older slide stage root to park while this director owns the story.")
-    legacySlideStageRoot: SceneObject = null as any;
-
-    @input
     @hint("Stage a step at startup when the director runs without the main guide.")
     applyOnStart: boolean = false;
 
@@ -148,16 +99,8 @@ export class StoryStepDirector extends BaseScriptComponent {
     cameraRoot: SceneObject = null as any;
 
     @input
-    @hint("Show the matching proxy/root in VF Story Scaffold.")
-    showScaffold: boolean = true;
-
-    @input
     @hint("Enable the real content roots associated with the selected story step.")
     controlContentRoots: boolean = true;
-
-    @input
-    @hint("Hide the older narration and slide systems.")
-    hideLegacySystems: boolean = true;
 
     @input
     @widget(new SliderWidget(0, 900, 1))
@@ -201,6 +144,7 @@ export class StoryStepDirector extends BaseScriptComponent {
         new ComboBoxItem("Gravity", 0),
         new ComboBoxItem("Magnetism", 1),
         new ComboBoxItem("Wind", 2),
+        new ComboBoxItem("Aerodynamics", 3),
     ]))
     @hint("Initial real-world example when the examples step is opened at startup.")
     initialExampleField: number = 0;
@@ -239,26 +183,13 @@ export class StoryStepDirector extends BaseScriptComponent {
     motionFrontOffset: vec3 = new vec3(0.0, 0.0, -50.0);
 
     @input
-    @hint("Camera-relative placement for analytical field-pattern examples.")
-    analyticalFrontOffset: vec3 = new vec3(0.0, 0.0, -78.0);
-
-    @input
     @hint("Camera-relative placement for the real VectorField in the theory chapter.")
     theoryVectorFrontOffset: vec3 = new vec3(0.0, 0.0, -50.0);
-
-    @input
-    @hint("Camera-relative placement for the theory mode menu.")
-    theoryMenuFrontOffset: vec3 = new vec3(16.0, -12.0, -78.0);
 
     @input
     @widget(new SliderWidget(0.35, 2.0, 0.05))
     @hint("Local scale for the real VectorField when staged in theory.")
     theoryVectorScale: number = 0.85;
-
-    @input
-    @widget(new SliderWidget(0.55, 1.8, 0.05))
-    @hint("Local scale for the theory field menu.")
-    theoryMenuScale: number = 1.0;
 
     @input
     @hint("Camera-relative placement for gravity when reference calibration is disabled.")
@@ -285,8 +216,9 @@ export class StoryStepDirector extends BaseScriptComponent {
     windReferenceOffset: vec3 = new vec3(0.0, 24.0, 0.0);
 
     private currentStep: StoryStepConfig = STORY_STEP_CONFIGS[0];
-    private currentRootName: string = STORY_STEP_CONFIGS[0].scaffoldRoot;
     private selectedExampleField: ExampleFieldId = "gravity";
+    private exampleFieldSelected: boolean = false;
+    private theoryFieldSelected: boolean = false;
     private selectedGravityVariant: GravityExampleVariant = "field";
     private selectedWindVariant: WindExampleVariant = "globe";
     private selectedTheoryFieldMode: number = 0;
@@ -307,12 +239,14 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     onAwake(): void {
         this.enableStageCalibrationObject();
+        this.parkContentRoots();
         this.createEvent("OnStartEvent").bind(() => {
             this.bindStageCalibration();
             this.elapsed = 0.0;
             this.selectedExampleField = this.exampleFieldFromIndex(this.initialExampleField);
             this.selectedTheoryFieldMode = this.normalizeTheoryFieldMode(this.initialTheoryFieldMode);
             this.selectedGradientPalette = this.normalizeGradientPalette(this.initialVectorColorMap);
+            this.parkContentRoots();
             if (this.applyOnStart) {
                 this.showStepByIndex(this.initialStep);
             }
@@ -333,7 +267,6 @@ export class StoryStepDirector extends BaseScriptComponent {
     public stageStep(stepId: string, rootName: string, index: number): void {
         const resolved = this.findStep(stepId, rootName, index);
         this.currentStep = resolved;
-        this.currentRootName = rootName && rootName.length > 0 ? rootName : resolved.scaffoldRoot;
         this.appliedKey = "";
         this.applyCurrent(true);
     }
@@ -352,6 +285,21 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     public selectExampleField(fieldName: string): void {
         this.selectedExampleField = this.normalizeExampleField(fieldName);
+        if (this.selectedExampleField === "wind") {
+            this.selectedWindVariant = "globe";
+        } else if (this.selectedExampleField === "aerodynamics") {
+            this.selectedWindVariant = "car_flow";
+        }
+        this.exampleFieldSelected = true;
+        if (this.currentStep.id === "examples") {
+            this.appliedKey = "";
+            this.applyCurrent(true);
+        }
+    }
+
+    // Return to the bare example-selector (no field staged).
+    public clearExampleSelection(): void {
+        this.exampleFieldSelected = false;
         if (this.currentStep.id === "examples") {
             this.appliedKey = "";
             this.applyCurrent(true);
@@ -360,18 +308,26 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     public selectExampleVariant(variantName: string): void {
         const key = (variantName || "").toLowerCase();
+        let matched = false;
         if (key === "gravity:artemis" || key === "artemis" || key === "trajectory" || key === "mission") {
             this.selectedExampleField = "gravity";
             this.selectedGravityVariant = "artemis";
+            matched = true;
         } else if (key === "gravity:field" || key === "gravity_field" || key === "field") {
             this.selectedExampleField = "gravity";
             this.selectedGravityVariant = "field";
-        } else if (key === "wind:car_flow" || key === "car_flow" || key === "car" || key === "flow") {
-            this.selectedExampleField = "wind";
+            matched = true;
+        } else if (key === "aerodynamics" || key === "aero" || key === "wind:car_flow" || key === "car_flow" || key === "car" || key === "flow") {
+            this.selectedExampleField = "aerodynamics";
             this.selectedWindVariant = "car_flow";
+            matched = true;
         } else if (key === "wind:globe" || key === "globe" || key === "earth") {
             this.selectedExampleField = "wind";
             this.selectedWindVariant = "globe";
+            matched = true;
+        }
+        if (matched) {
+            this.exampleFieldSelected = true;
         }
         if (this.currentStep.id === "examples") {
             this.appliedKey = "";
@@ -382,7 +338,8 @@ export class StoryStepDirector extends BaseScriptComponent {
     public getSelectedExampleVariant(fieldName: string): string {
         const field = this.normalizeExampleField(fieldName || this.selectedExampleField);
         if (field === "gravity") return this.selectedGravityVariant;
-        if (field === "wind") return this.selectedWindVariant;
+        if (field === "wind") return "globe";
+        if (field === "aerodynamics") return "car_flow";
         return "";
     }
 
@@ -410,8 +367,17 @@ export class StoryStepDirector extends BaseScriptComponent {
         }
     }
 
+    public clearTheorySelection(): void {
+        this.theoryFieldSelected = false;
+        if (this.currentStep.id === "theory") {
+            this.appliedKey = "";
+            this.applyCurrent(true);
+        }
+    }
+
     public selectTheoryFieldMode(mode: number | string): void {
         this.selectedTheoryFieldMode = this.normalizeTheoryFieldMode(mode);
+        this.theoryFieldSelected = true;
         if (this.currentStep.id === "theory") {
             this.appliedKey = "";
             this.applyCurrent(true);
@@ -600,77 +566,57 @@ export class StoryStepDirector extends BaseScriptComponent {
     }
 
     private applyCurrent(force: boolean): void {
-        const key = this.currentStep.id + ":" + this.currentRootName + ":" + this.selectedExampleField + ":" + this.selectedGravityVariant + ":" + this.selectedWindVariant + ":" + this.selectedGravityStage + ":" + this.selectedMagneticTubeMode + ":" + this.selectedWindTubeMode + ":" + this.selectedTheoryFieldMode + ":" + this.selectedGradientPalette + ":" + this.vectorColorMapScale + ":" + this.vectorColorMapOffset + ":" + this.getViewPlaneMode() + ":" + this.useFrontPlacementForAllVisuals + ":" + this.useReferenceCalibrationForExamples + ":" + this.useExampleProxySlots;
+        const key = this.currentStep.id + ":" + this.selectedExampleField + ":" + this.selectedGravityVariant + ":" + this.selectedWindVariant + ":" + this.selectedGravityStage + ":" + this.selectedMagneticTubeMode + ":" + this.selectedWindTubeMode + ":" + this.selectedTheoryFieldMode + ":" + this.selectedGradientPalette + ":" + this.vectorColorMapScale + ":" + this.vectorColorMapOffset + ":" + this.getViewPlaneMode() + ":" + this.useFrontPlacementForAllVisuals + ":" + this.useReferenceCalibrationForExamples + ":" + this.useExampleProxySlots;
         if (!force && key === this.appliedKey) return;
         this.appliedKey = key;
 
-        if (this.showScaffold) {
-            this.applyScaffoldRoot(this.currentRootName);
-        }
         if (this.controlContentRoots) {
             this.applyContentRoots(this.currentStep);
-        }
-        if (this.hideLegacySystems) {
-            this.setEnabled(this.legacyGuideRoot || this.findObjectByName("Guide"), false);
-            this.setEnabled(this.legacySlideStageRoot || this.findObjectByName("SlideStage"), false);
         }
 
         let fieldSuffix = "";
         if (this.currentStep.id === "examples") {
             const variant = this.selectedExampleField === "gravity"
                 ? this.selectedGravityVariant
-                : (this.selectedExampleField === "wind" ? this.selectedWindVariant : "");
+                : (this.selectedExampleField === "wind" ? "globe" : (this.selectedExampleField === "aerodynamics" ? "car_flow" : ""));
             fieldSuffix = " [" + this.selectedExampleField + (variant.length > 0 ? ":" + variant : "") + "]";
         }
-        print("StoryStepDirector: " + this.currentStep.id + " -> " + this.currentRootName + fieldSuffix);
-    }
-
-    private applyScaffoldRoot(rootName: string): void {
-        const scaffold = this.scaffoldRoot || this.findObjectByName("VF Story Scaffold");
-        if (!scaffold) return;
-
-        const libraryRootName = this.currentStep.analytical ? "Library_Analytical_Field_Patterns" : "";
-        const api = this.findScriptApi(scaffold, libraryRootName.length > 0 ? "showRootWithLibrary" : "showRoot");
-        if (libraryRootName.length > 0 && api && typeof api.showRootWithLibrary === "function") {
-            api.showRootWithLibrary(rootName, libraryRootName);
-        } else if (api && typeof api.showRoot === "function") {
-            api.showRoot(rootName);
-        }
+        print("StoryStepDirector: " + this.currentStep.id + fieldSuffix);
     }
 
     private applyContentRoots(step: StoryStepConfig): void {
         const selectingExample = step.id === "examples";
-        const showMagnetic = step.magnetic && (!selectingExample || this.selectedExampleField === "magnetism");
-        const showGravity = step.gravity && (!selectingExample || this.selectedExampleField === "gravity");
+        // On the examples screen nothing stages until the user actually picks a
+        // card — opening the screen just shows the selector, not a default field.
+        const hasSelection = !selectingExample || this.exampleFieldSelected;
+        const showMagnetic = step.magnetic && hasSelection && (!selectingExample || this.selectedExampleField === "magnetism");
+        const showGravity = step.gravity && hasSelection && (!selectingExample || this.selectedExampleField === "gravity");
         const showArtemis = showGravity && (!selectingExample || this.selectedGravityVariant === "artemis");
-        const showWindSelection = step.wind && (!selectingExample || this.selectedExampleField === "wind");
+        const showWindSelection = step.wind && hasSelection && (!selectingExample || this.selectedExampleField === "wind");
         const showWindGlobe = showWindSelection && (!selectingExample || this.selectedWindVariant === "globe");
-        const showCarFlow = showWindSelection && selectingExample && this.selectedWindVariant === "car_flow";
+        const showCarFlow = step.wind && hasSelection && selectingExample && this.selectedExampleField === "aerodynamics";
+        const showWindContent = showWindGlobe || showCarFlow;
         const motionRoot = this.motionFieldRoot || this.findObjectByName("Motion Field Root");
-        const analyticalRoot = this.analyticalPatternsRoot || this.findObjectByName("Library_Analytical_Field_Patterns");
         const vectorRoot = this.vectorFieldRoot || this.findObjectByName("Vector Field Examples Root");
-        const theoryMenuRoot = this.theoryFieldMenuRoot || this.findObjectByName("Theory Field Menu");
         const magneticRoot = this.magneticFieldRoot || this.findObjectByName("Magnetic Field Root");
         const gravityRoot = this.gravityFieldRoot || this.findObjectByName("Gravity Field Root");
-        const windRoot = this.windGlobeRoot || this.findObjectByName("Globe Calibration") || this.findObjectByName("Globe Wind");
+        const windRoot = this.windGlobeRoot || this.findObjectByName("Globe Calibration");
         const carFlowRoot = this.findObjectByName("Car Fluid Flow");
-        const fieldControllerRoot = this.findObjectByName("Field Controller");
         const theoryMode = THEORY_FIELD_MODES[this.normalizeTheoryFieldMode(this.selectedTheoryFieldMode)];
-        const showTheoryPlane = step.id === "theory" && theoryMode.id === "motion";
-        const showTheoryField = step.id === "theory" && theoryMode.id !== "motion";
+        const showTheorySelection = step.id !== "theory" || this.theoryFieldSelected;
+        const showTheoryPlane = step.id === "theory" && showTheorySelection && theoryMode.id === "motion";
+        const showTheoryField = step.id === "theory" && showTheorySelection && theoryMode.id !== "motion";
 
         this.setEnabled(motionRoot, showTheoryPlane);
-        this.setEnabled(analyticalRoot, step.analytical);
         this.setEnabled(vectorRoot, showTheoryField);
         this.setEnabled(magneticRoot, showMagnetic);
         this.setEnabled(gravityRoot, showGravity);
-        this.setEnabled(windRoot, showWindGlobe);
+        // Wind is enabled after placement below, avoiding a visible frame at its authored transform.
+        this.setEnabled(windRoot, false);
         this.setEnabled(carFlowRoot, showCarFlow);
-        this.setEnabled(fieldControllerRoot, false);
-        this.setEnabled(this.storyWidgetsRoot || this.findObjectByName("Story Widgets"), step.storyWidgets);
         this.setProxyVisualEnabled("Proxy_Gravity_Field_Example_Slot", !showGravity);
         this.setProxyVisualEnabled("Proxy_Magnetic_Field_Example_Slot", !showMagnetic);
-        this.setProxyVisualEnabled("Proxy_Wind_Field_Example_Slot", !showWindSelection);
+        this.setProxyVisualEnabled("Proxy_Wind_Field_Example_Slot", !showWindContent);
         this.setProxyVisualEnabled("Proxy_Metric_Cursor", !showTheoryPlane && !showTheoryField);
         this.setProxyVisualEnabled("Proxy_Local_Finite_Difference_Stencil", !showTheoryPlane && !showTheoryField);
         this.setProxyVisualEnabled("Proxy_Curl_Readout_Slot", !showTheoryPlane && !showTheoryField);
@@ -681,29 +627,19 @@ export class StoryStepDirector extends BaseScriptComponent {
             this.callLifecycle(motionRoot, "stage");
             this.applyTheoryMotionFieldMode(motionRoot);
         }
-        if (step.analytical) {
-            this.restoreRootBaseScale(analyticalRoot);
-            this.placeFrontFacing(analyticalRoot, this.analyticalFrontOffset, false);
-            this.callLifecycle(analyticalRoot, "stage");
-        }
         if (showTheoryField) {
             this.placeTheoryVectorField(vectorRoot);
             this.applyTheoryVectorFieldMode(vectorRoot);
         }
-        this.callLifecycle(theoryMenuRoot, "hide");
-        this.setEnabled(theoryMenuRoot, false);
         if (!showTheoryPlane) {
             this.callLifecycle(motionRoot, "hide");
-        }
-        if (!step.analytical) {
-            this.callLifecycle(analyticalRoot, "hide");
         }
 
         if (!this.useFrontPlacementForAllVisuals && this.useReferenceCalibrationForExamples && (showGravity || showMagnetic || showWindGlobe || showCarFlow)) {
             this.calibrateReferenceIfNeeded();
         }
         if (showGravity) {
-            this.placeExampleRoot(gravityRoot, this.gravityFrontOffset, this.gravityReferenceOffset, "Proxy_Gravity_Field_Example_Slot");
+            this.placeExampleRoot(gravityRoot, this.gravityFrontPlacementOffset(), this.gravityReferencePlacementOffset(), "Proxy_Gravity_Field_Example_Slot");
             this.disableScriptByName(gravityRoot, "SnapToStage");
             this.setArtemisContentEnabled(gravityRoot, showArtemis);
             this.applyGravityStage(gravityRoot);
@@ -716,6 +652,8 @@ export class StoryStepDirector extends BaseScriptComponent {
         }
         if (showWindGlobe) {
             this.placeExampleRoot(windRoot, this.windFrontOffset, this.windReferenceOffset, "Proxy_Wind_Field_Example_Slot");
+            this.callLifecycle(windRoot, "prepare");
+            this.setEnabled(windRoot, true);
             this.applyTubeMode(windRoot, this.selectedWindTubeMode);
             this.callLifecycle(windRoot, "refresh");
         }
@@ -735,7 +673,6 @@ export class StoryStepDirector extends BaseScriptComponent {
 
         this.promoteMainExperienceVisuals([
             motionRoot,
-            analyticalRoot,
             vectorRoot,
             magneticRoot,
             gravityRoot,
@@ -748,11 +685,10 @@ export class StoryStepDirector extends BaseScriptComponent {
     private promoteCurrentMainExperienceVisuals(): void {
         this.promoteMainExperienceVisuals([
             this.motionFieldRoot || this.findObjectByName("Motion Field Root"),
-            this.analyticalPatternsRoot || this.findObjectByName("Library_Analytical_Field_Patterns"),
             this.vectorFieldRoot || this.findObjectByName("Vector Field Examples Root"),
             this.magneticFieldRoot || this.findObjectByName("Magnetic Field Root"),
             this.gravityFieldRoot || this.findObjectByName("Gravity Field Root"),
-            this.windGlobeRoot || this.findObjectByName("Globe Calibration") || this.findObjectByName("Globe Wind"),
+            this.windGlobeRoot || this.findObjectByName("Globe Calibration"),
             this.findObjectByName("Car Fluid Flow"),
         ]);
     }
@@ -913,6 +849,22 @@ export class StoryStepDirector extends BaseScriptComponent {
         if (typeof api.setCelestialMotionEnabled === "function") {
             api.setCelestialMotionEnabled(this.selectedGravityVariant === "artemis");
         }
+    }
+
+    private gravityFrontPlacementOffset(): vec3 {
+        return new vec3(
+            this.gravityFrontOffset.x,
+            this.gravityFrontOffset.y - GRAVITY_EXAMPLE_DROP_CM,
+            this.gravityFrontOffset.z
+        );
+    }
+
+    private gravityReferencePlacementOffset(): vec3 {
+        return new vec3(
+            this.gravityReferenceOffset.x,
+            this.gravityReferenceOffset.y - GRAVITY_EXAMPLE_DROP_CM,
+            this.gravityReferenceOffset.z
+        );
     }
 
     private applyTubeMode(root: SceneObject | null, mode: number): void {
@@ -1087,10 +1039,61 @@ export class StoryStepDirector extends BaseScriptComponent {
         this.resetToDefaultStance();
     }
 
+    public getActiveVisualRoot(): SceneObject | null {
+        return this.resolveActiveVisualRoot();
+    }
+
+    public hasActiveVisual(): boolean {
+        return this.resolveActiveVisualRoot() !== null;
+    }
+
+    public getActiveVisualKey(): string {
+        const root = this.resolveActiveVisualRoot();
+        if (!root) return "";
+        return this.currentStep.id + ":" + root.name + ":" + this.selectedExampleField + ":" +
+            this.selectedGravityVariant + ":" + this.selectedWindVariant + ":" +
+            this.selectedTheoryFieldMode + ":" + this.selectedGravityStage + ":" +
+            this.selectedMagneticTubeMode + ":" + this.selectedWindTubeMode;
+    }
+
+    private resolveActiveVisualRoot(): SceneObject | null {
+        const motionRoot = this.motionFieldRoot || this.findObjectByName("Motion Field Root");
+        const vectorRoot = this.vectorFieldRoot || this.findObjectByName("Vector Field Examples Root");
+        const magneticRoot = this.magneticFieldRoot || this.findObjectByName("Magnetic Field Root");
+        const gravityRoot = this.gravityFieldRoot || this.findObjectByName("Gravity Field Root");
+        const windRoot = this.windGlobeRoot || this.findObjectByName("Globe Calibration");
+        const carFlowRoot = this.findObjectByName("Car Fluid Flow");
+
+        if (this.currentStep.id === "theory") {
+            const theoryMode = THEORY_FIELD_MODES[this.normalizeTheoryFieldMode(this.selectedTheoryFieldMode)];
+            return this.enabledRoot(theoryMode.id === "motion" ? motionRoot : vectorRoot);
+        }
+
+        if (this.currentStep.id === "examples") {
+            if (!this.exampleFieldSelected) return null;
+            if (this.selectedExampleField === "gravity") return this.enabledRoot(gravityRoot);
+            if (this.selectedExampleField === "magnetism") return this.enabledRoot(magneticRoot);
+            if (this.selectedExampleField === "wind") {
+                return this.enabledRoot(windRoot);
+            }
+            if (this.selectedExampleField === "aerodynamics") {
+                return this.enabledRoot(carFlowRoot);
+            }
+        }
+
+        return null;
+    }
+
+    private enabledRoot(root: SceneObject | null): SceneObject | null {
+        if (!root || !root.enabled) return null;
+        return root;
+    }
+
     private normalizeExampleField(fieldName: string): ExampleFieldId {
         const key = (fieldName || "").toLowerCase();
         if (key === "magnetic" || key === "magnetism") return "magnetism";
-        if (key === "wind" || key === "globe") return "wind";
+        if (key === "wind" || key === "globe" || key === "earth" || key === "earth_winds" || key === "earth winds") return "wind";
+        if (key === "aerodynamics" || key === "aero" || key === "car_flow" || key === "car" || key === "flow") return "aerodynamics";
         return "gravity";
     }
 
@@ -1098,6 +1101,7 @@ export class StoryStepDirector extends BaseScriptComponent {
         const safeIndex = Math.floor(index);
         if (safeIndex === 1) return "magnetism";
         if (safeIndex === 2) return "wind";
+        if (safeIndex === 3) return "aerodynamics";
         return "gravity";
     }
 
@@ -1212,9 +1216,9 @@ export class StoryStepDirector extends BaseScriptComponent {
             }
         }
         if (rootName && rootName.length > 0) {
-            for (let i = 0; i < STORY_STEP_CONFIGS.length; i++) {
-                if (STORY_STEP_CONFIGS[i].scaffoldRoot === rootName) return STORY_STEP_CONFIGS[i];
-            }
+            const key = rootName.toLowerCase();
+            if (key.indexOf("theory") >= 0) return STORY_STEP_CONFIGS[0];
+            if (key.indexOf("example") >= 0 || key.indexOf("real_world") >= 0) return STORY_STEP_CONFIGS[1];
         }
         const safeIndex = Math.max(0, Math.min(STORY_STEP_CONFIGS.length - 1, Math.floor(index)));
         return STORY_STEP_CONFIGS[safeIndex];
@@ -1223,6 +1227,16 @@ export class StoryStepDirector extends BaseScriptComponent {
     private setEnabled(object: SceneObject | null, enabled: boolean): void {
         if (!object) return;
         object.enabled = enabled;
+    }
+
+    private parkContentRoots(): void {
+        if (!this.controlContentRoots) return;
+        this.setEnabled(this.motionFieldRoot || this.findObjectByName("Motion Field Root"), false);
+        this.setEnabled(this.vectorFieldRoot || this.findObjectByName("Vector Field Examples Root"), false);
+        this.setEnabled(this.magneticFieldRoot || this.findObjectByName("Magnetic Field Root"), false);
+        this.setEnabled(this.gravityFieldRoot || this.findObjectByName("Gravity Field Root"), false);
+        this.setEnabled(this.windGlobeRoot || this.findObjectByName("Globe Calibration"), false);
+        this.setEnabled(this.findObjectByName("Car Fluid Flow"), false);
     }
 
     private findScriptApi(root: SceneObject | null, methodName: string): any {
@@ -1240,7 +1254,7 @@ export class StoryStepDirector extends BaseScriptComponent {
         const scripts = root.getComponents("Component.ScriptComponent");
         for (let i = 0; i < scripts.length; i++) {
             const script = scripts[i] as any;
-            const api = (script && (script.motionFieldApi || script.analyticalFieldApi || script.fieldApi || script.gravityApi || script.windApi || script.theoryFieldMenuApi || script.panelApi)) || script;
+            const api = (script && (script.motionFieldApi || script.fieldApi || script.gravityApi || script.windApi || script.panelApi)) || script;
             if (api && typeof api[methodName] === "function") return api;
         }
         for (let i = 0; i < root.getChildrenCount(); i++) {

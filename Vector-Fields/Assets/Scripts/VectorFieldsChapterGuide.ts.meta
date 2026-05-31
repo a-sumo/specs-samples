@@ -1,20 +1,20 @@
-- !<AssetImportMetadata/09d4c514-7677-496c-9a8d-24b19e0bf9eb>
+- !<AssetImportMetadata/c4f152b7-4ff5-4658-9264-d3c9f33cc9ef>
   ImportedAssetIds:
-    TypeScriptAsset: !<reference> b396410b-822b-464c-9f05-ca9a9a098fe8
+    TypeScriptAsset: !<reference> a3c791fa-c9cd-4c7b-96e1-43768c5a7e1c
   ImporterName: TypeScriptAssetImporter
-  PrimaryAsset: !<reference> b396410b-822b-464c-9f05-ca9a9a098fe8
+  PrimaryAsset: !<reference> a3c791fa-c9cd-4c7b-96e1-43768c5a7e1c
   PackageType: NotAPackage
   LegacyPackagePolicy: ~
   ExtraData:
     {}
   AssetDataMap:
-    TypeScriptAsset: !<own> 3548f3a9-4e81-4ffa-810a-37ed5d0c5568
+    TypeScriptAsset: !<own> 793df5fd-7e52-49ba-9711-c7966edb9bd0
   DependentFiles:
     []
   ImporterSettings: !<AssetImporterSettings>
     {}
   CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
-- !<TypeScriptAssetData/3548f3a9-4e81-4ffa-810a-37ed5d0c5568>
+- !<TypeScriptAssetData/793df5fd-7e52-49ba-9711-c7966edb9bd0>
   SvgIcon: ""
   SetupScript:
     code: ""
@@ -22,7 +22,7 @@
   VersionMajor: 0
   VersionMinor: 0
   VersionPatch: 0
-  ComponentUid: 51196117-a65d-45d8-9ae6-f27df82743ca
+  ComponentUid: 14164b2d-42c2-4f80-95fc-e60f5b61ad71
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
@@ -32,15 +32,14 @@
     folded: false
     followSmoothing: false
     followUser: false
-    hideLegacySystems: false
     initialIndex: false
     isolateSceneInteractors: false
+    menuBillboardPitchBlend: false
     menuDistanceCm: false
     menuHorizontalOffsetCm: false
     menuLowerOffsetCm: false
     menuVerticalOffsetCm: false
     panelOffset: false
-    scaffoldRoot: false
     showOnStart: false
   ScriptTypesHidden:
     {}
@@ -51,32 +50,29 @@
   Attachments:
     []
   DefaultScriptInputs:
-    - scaffoldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      directorRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+    - directorRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       showOnStart: true
       initialIndex: !<float> 0.000000
       controlContentRoots: true
-      hideLegacySystems: true
       isolateSceneInteractors: true
       panelOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
       cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      followUser: true
+      followUser: false
       folded: false
       menuDistanceCm: !<float> 68.000000
       menuVerticalOffsetCm: !<float> -7.000000
-      menuLowerOffsetCm: !<float> -20.000000
+      menuLowerOffsetCm: !<float> -9.000000
       menuHorizontalOffsetCm: !<float> 0.000000
+      menuBillboardPitchBlend: 0.350000
       followSmoothing: !<float> 9.000000
   ScriptTypes:
     -
       {}
   InputLines:
-    - '// @input SceneObject scaffoldRoot {"hint":"VF Story Scaffold root. If empty, the script searches for it by name."}'
     - '// @input SceneObject directorRoot {"hint":"Optional Story Step Director root. If empty, the script searches for it by name."}'
     - '// @input bool showOnStart = true {"hint":"Start visible and immediately stage the first chapter."}'
     - '// @input float initialIndex {"hint":"Initial chapter index for the main menu.", "widget":"slider", "min":0, "max":2, "step":1}'
     - '// @input bool controlContentRoots = true {"hint":"When no Story Step Director is present, enable the real content roots for each guide step."}'
-    - '// @input bool hideLegacySystems = true {"hint":"When this guide owns staging, park the older narration panel and slide stage."}'
     - '// @input bool isolateSceneInteractors = true {"hint":"While open, pause nearby scene colliders so content cannot steal menu touches."}'
     - '// @input vec3 panelOffset = {0,0,0} {"hint":"Offset from this root in centimeters."}'
     - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor for Follow mode. Empty searches for Camera Object."}'
@@ -84,6 +80,7 @@
     - '// @input bool folded {"hint":"Start with only Fold/Open and Follow/Fixed controls visible."}'
     - '// @input float menuDistanceCm = 68 {"hint":"Distance from head anchor in centimeters when Follow is active."}'
     - '// @input float menuVerticalOffsetCm = -7 {"hint":"Vertical offset from head anchor in centimeters when Follow is active."}'
-    - '// @input float menuLowerOffsetCm = -9 {"hint":"Extra vertical drop so staged visuals can sit above the menu without calibration."}'
+    - '// @input float menuLowerOffsetCm = -14 {"hint":"Extra vertical drop so staged visuals can sit above the menu without calibration."}'
     - '// @input float menuHorizontalOffsetCm {"hint":"Horizontal offset from head anchor in centimeters when Follow is active."}'
+    - "// @input float menuBillboardPitchBlend = 0.35 {\"hint\":\"How much Follow mode pitches the menu toward the user's head instead of yaw-only billboarding.\", \"widget\":\"slider\", \"min\":0, \"max\":1, \"step\":0.05}"
     - '// @input float followSmoothing = 9 {"hint":"Higher values make the menu catch up faster."}'

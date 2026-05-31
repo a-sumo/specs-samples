@@ -2,7 +2,10 @@
 // Texture-backed chapter guide with UIKit hit targets.
 
 import { RectangleButton } from "SpectaclesUIKit.lspkg/Scripts/Components/Button/RectangleButton";
-import { STORY_GUIDE_EXAMPLE_DETAIL, STORY_GUIDE_EXAMPLES, STORY_GUIDE_GRADIENTS, STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_STEPS, STORY_GUIDE_THEORY, STORY_GUIDE_UTILITY, STORY_GUIDE_VARIANTS } from "./StoryGuideLayoutGenerated";
+import { TargetingMode } from "SpectaclesInteractionKit.lspkg/Core/Interactor/Interactor";
+import { GFS_META } from "./GfsData";
+import { STORY_GUIDE_EXAMPLE_DETAIL, STORY_GUIDE_EXAMPLES, STORY_GUIDE_GRADIENTS, STORY_GUIDE_NAV, STORY_GUIDE_PANEL, STORY_GUIDE_THEORY, STORY_GUIDE_THEORY_CARDS, STORY_GUIDE_UTILITY, STORY_GUIDE_VARIANTS } from "./StoryGuideLayoutGenerated";
+import { STORMS, STORMS_DATA_MODE, STORMS_FETCHED_AT, STORMS_SOURCE, STORMS_USING_FALLBACK, Storm } from "./StormsData";
 
 type StoryGuideSlot = {
     x: number;
@@ -11,10 +14,27 @@ type StoryGuideSlot = {
     height: number;
 };
 
-type ExampleFieldId = "gravity" | "magnetism" | "wind";
+const GUIDE_STEPS: { id: string; index: string; title: string; canCalibrate: boolean; slot: StoryGuideSlot }[] = [
+    {
+        id: "theory",
+        index: "01",
+        title: "Theory",
+        canCalibrate: false,
+        slot: { x: -6.8, y: -1.9, width: 12.8, height: 13.0 },
+    },
+    {
+        id: "examples",
+        index: "02",
+        title: "Real World",
+        canCalibrate: true,
+        slot: { x: 6.8, y: -1.9, width: 12.8, height: 13.0 },
+    },
+];
+
+type ExampleFieldId = "gravity" | "magnetism" | "wind" | "aerodynamics";
 type GravityExampleVariant = "field" | "artemis";
 type WindExampleVariant = "globe" | "car_flow";
-type ExampleVariantId = "gravity:field" | "gravity:artemis" | "wind:globe" | "wind:car_flow";
+type ExampleVariantId = "gravity:field" | "gravity:artemis";
 type ExampleModeId = "gravity:bodies" | "gravity:arrows" | "gravity:lines" | "magnetism:trails" | "magnetism:points" | "magnetism:arrows" | "wind:trails" | "wind:points" | "wind:arrows";
 type TheoryFieldModeId = "expansion" | "contraction" | "curl" | "motion";
 type GradientPaletteId = "jet" | "viridis" | "plasma";
@@ -54,12 +74,19 @@ type ButtonBinding = {
     visualLift: number;
     targetLift: number;
     label: Text | null;
+    cursorEventsBound?: boolean;
+    actionButtonEventBound?: boolean;
+    actionInteractableEventBound?: boolean;
+    lastActionTime?: number;
+    moveEventsBound?: boolean;
 };
 
 type GradientSliderId = "scale" | "offset";
+type MagneticSliderId = "mag_power" | "mag_pull" | "mag_length" | "mag_speed";
+type ControlSliderId = GradientSliderId | MagneticSliderId;
 
 type GradientSliderBinding = {
-    id: GradientSliderId;
+    id: ControlSliderId;
     object: SceneObject;
     button: RectangleButton;
     slot: StoryGuideSlot;
@@ -75,6 +102,13 @@ type GradientSliderBinding = {
     value: number;
     hovered: boolean;
     pressed: boolean;
+};
+
+type WindEventCardBinding = {
+    stormIndex: number;
+    button: ButtonBinding;
+    title: Text;
+    detail: Text;
 };
 
 type ColliderBinding = {
@@ -122,7 +156,7 @@ type GradientPaletteOption = {
 
 const IMAGE_MATERIAL = requireAsset("../Image.mat") as Material;
 const GUIDE_FONT = requireAsset("../Fonts/Nunito_Sans/NunitoSans.ttf") as Font;
-const TEX_PANEL_MAIN = requireAsset("../Images/StoryUI/chapter_panel.png") as Texture;
+const TEX_PANEL_MAIN = requireAsset("../Images/StoryUI/chapter_panel_main_v3.png") as Texture;
 const TEX_PANEL_EXAMPLES = requireAsset("../Images/StoryUI/examples_panel.png") as Texture;
 const TEX_PANEL_THEORY = requireAsset("../Images/StoryUI/theory_panel.png") as Texture;
 const TEX_PANEL_THEORY_MOTION = requireAsset("../Images/StoryUI/theory_panel_motion.png") as Texture;
@@ -130,6 +164,7 @@ const EXAMPLE_DETAIL_PANEL_TEXTURES: { [key: string]: Texture } = {
     gravity: requireAsset("../Images/StoryUI/example_detail_gravity_panel.png") as Texture,
     magnetism: requireAsset("../Images/StoryUI/example_detail_magnetism_panel.png") as Texture,
     wind: requireAsset("../Images/StoryUI/example_detail_wind_panel.png") as Texture,
+    aerodynamics: requireAsset("../Images/StoryUI/example_detail_aerodynamics_panel.png") as Texture,
 };
 const TEX_PANEL_GRAVITY_ARTEMIS = requireAsset("../Images/StoryUI/example_detail_gravity_artemis_panel.png") as Texture;
 
@@ -140,16 +175,55 @@ const CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture; presse
         pressed: requireAsset("../Images/StoryUI/card_intro_pressed.png") as Texture,
     },
     theory: {
-        normal: requireAsset("../Images/StoryUI/card_theory_normal.png") as Texture,
-        active: requireAsset("../Images/StoryUI/card_theory_active.png") as Texture,
-        pressed: requireAsset("../Images/StoryUI/card_theory_pressed.png") as Texture,
+        normal: requireAsset("../Images/StoryUI/card_theory_main_v3_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/card_theory_main_v3_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/card_theory_main_v3_pressed.png") as Texture,
     },
     examples: {
-        normal: requireAsset("../Images/StoryUI/card_examples_normal.png") as Texture,
-        active: requireAsset("../Images/StoryUI/card_examples_active.png") as Texture,
-        pressed: requireAsset("../Images/StoryUI/card_examples_pressed.png") as Texture,
+        normal: requireAsset("../Images/StoryUI/card_examples_main_v3_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/card_examples_main_v3_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/card_examples_main_v3_pressed.png") as Texture,
     },
 };
+
+const THEORY_CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture; pressed: Texture } } = {
+    definition: {
+        normal: requireAsset("../Images/StoryUI/card_definition_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/card_definition_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/card_definition_pressed.png") as Texture,
+    },
+    metrics: {
+        normal: requireAsset("../Images/StoryUI/card_metrics_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/card_metrics_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/card_metrics_pressed.png") as Texture,
+    },
+    patterns: {
+        normal: requireAsset("../Images/StoryUI/card_patterns_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/card_patterns_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/card_patterns_pressed.png") as Texture,
+    },
+};
+
+const MATH_EXPLAINER_TEXTURES: Texture[] = [
+    requireAsset("../Images/StoryUI/math_explainer_del_intro.png") as Texture,
+    requireAsset("../Images/StoryUI/math_explainer_operator.png") as Texture,
+    requireAsset("../Images/StoryUI/math_explainer_del_coordinates.png") as Texture,
+    requireAsset("../Images/StoryUI/math_explainer_divergence.png") as Texture,
+    requireAsset("../Images/StoryUI/math_explainer_divergence_example.png") as Texture,
+    requireAsset("../Images/StoryUI/math_explainer_curl.png") as Texture,
+    requireAsset("../Images/StoryUI/math_explainer_curl_example.png") as Texture,
+];
+
+const VF_DEFINITION_TEXTURES: Texture[] = [
+    requireAsset("../Images/StoryUI/vf_def_scalar_to_vector.png") as Texture,
+    requireAsset("../Images/StoryUI/vf_def_vf_informal.png") as Texture,
+    requireAsset("../Images/StoryUI/vf_def_vf_formal.png") as Texture,
+    requireAsset("../Images/StoryUI/vf_def_vf_examples.png") as Texture,
+    requireAsset("../Images/StoryUI/vf_def_vf_gradient.png") as Texture,
+];
+
+// Full-width slot covering the entire lower content area of the theory panel.
+const THEORY_FULL_PANEL_SLOT: StoryGuideSlot = { x: 0, y: -2.04, width: 26.4, height: 8.56 };
 
 const EXAMPLE_CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture; pressed: Texture } } = {
     gravity: {
@@ -166,6 +240,11 @@ const EXAMPLE_CARD_TEXTURES: { [key: string]: { normal: Texture; active: Texture
         normal: requireAsset("../Images/StoryUI/example_wind_normal.png") as Texture,
         active: requireAsset("../Images/StoryUI/example_wind_active.png") as Texture,
         pressed: requireAsset("../Images/StoryUI/example_wind_pressed.png") as Texture,
+    },
+    aerodynamics: {
+        normal: requireAsset("../Images/StoryUI/example_aerodynamics_normal.png") as Texture,
+        active: requireAsset("../Images/StoryUI/example_aerodynamics_active.png") as Texture,
+        pressed: requireAsset("../Images/StoryUI/example_aerodynamics_pressed.png") as Texture,
     },
 };
 
@@ -186,6 +265,9 @@ const TEX_UTILITY_RESET_PRESSED = requireAsset("../Images/StoryUI/utility_plane_
 const TEX_UTILITY_PLANE_FRONT_ON = requireAsset("../Images/StoryUI/utility_plane_front_on.png") as Texture;
 const TEX_UTILITY_PLANE_FRONT_OFF = requireAsset("../Images/StoryUI/utility_plane_front_off.png") as Texture;
 const TEX_UTILITY_PLANE_FRONT_PRESSED = requireAsset("../Images/StoryUI/utility_plane_front_pressed.png") as Texture;
+const TEX_UTILITY_MOVE_NORMAL = requireAsset("../Images/StoryUI/utility_move_normal.png") as Texture;
+const TEX_UTILITY_MOVE_ACTIVE = requireAsset("../Images/StoryUI/utility_move_active.png") as Texture;
+const TEX_UTILITY_MOVE_PRESSED = requireAsset("../Images/StoryUI/utility_move_pressed.png") as Texture;
 const TEX_VARIANT_NORMAL = requireAsset("../Images/StoryUI/variant_normal.png") as Texture;
 const TEX_VARIANT_ACTIVE = requireAsset("../Images/StoryUI/variant_active.png") as Texture;
 const TEX_VARIANT_PRESSED = requireAsset("../Images/StoryUI/variant_pressed.png") as Texture;
@@ -259,23 +341,26 @@ const TEX_SLIDER_TRACK = requireAsset("../Images/StoryUI/slider_track.png") as T
 const TEX_SLIDER_FILL = requireAsset("../Images/StoryUI/slider_fill.png") as Texture;
 const TEX_SLIDER_KNOB = requireAsset("../Images/StoryUI/slider_knob.png") as Texture;
 const BUTTON_HIT_Z = 0.34;
-const BUTTON_HIT_DEPTH_CM = 1.6;
+const BUTTON_HIT_DEPTH_CM = 2.4;
+const UTILITY_HIT_PAD_CM = 0.3;
 const FOLDED_UTILITY_HIT_PAD_CM = 1.15;
 const PANEL_HIT_Z = 0.04;
 const PANEL_HIT_DEPTH_CM = 0.42;
 const MAIN_EXPERIENCE_RENDER_ORDER = 520;
 const MAIN_EXPERIENCE_RENDER_ORDER_SPAN = 90;
+const MENU_MOVE_HANDLE_SLOT: StoryGuideSlot = { x: 17.15, y: 7.32, width: 4.0, height: 4.0 };
+// When folded the panel border is hidden and the utility controls collapse into a
+// single row aligned with Follow/Fold (Reset hides): Follow, Fold, Proxy, then the
+// move handle. The proxy and handle tween up from the 2x2 grid into that row.
+const MENU_MOVE_HANDLE_SLOT_FOLDED: StoryGuideSlot = { x: 22.75, y: 8.46, width: 4.0, height: 4.0 };
+const PROXY_SLOT_FOLDED: StoryGuideSlot = { x: 17.1, y: 8.46, width: 5.2, height: 1.72 };
 
 const INTERACTION_ISOLATION_ROOTS = [
-    "VF Story Scaffold",
-    "Field Controller",
     "Motion Field Root",
-    "Library_Analytical_Field_Patterns",
     "Vector Field Examples Root",
     "Magnetic Field Root",
     "Gravity Field Root",
     "Globe Calibration",
-    "Globe Wind",
     "Globe Spin-Lock Button",
     "Proxy_Interactable_Handle_Test",
     "Flow Slice",
@@ -284,17 +369,22 @@ const INTERACTION_ISOLATION_ROOTS = [
 ];
 
 const ARTEMIS_VARIANT_SLOT: StoryGuideSlot = { x: 0, y: -3.16, width: 26.4, height: 5.36 };
+const WIND_SOURCE_SLOT: StoryGuideSlot = { x: 0.0, y: 1.96, width: 25.6, height: 4.1 };
+const WIND_EVENT_SLOTS: StoryGuideSlot[] = [
+    { x: -9.2, y: -4.42, width: 8.0, height: 1.64 },
+    { x: 0.0, y: -4.42, width: 8.0, height: 1.64 },
+    { x: 9.2, y: -4.42, width: 8.0, height: 1.64 },
+];
 
 const EXAMPLE_FIELD_OPTIONS: ExampleFieldOption[] = [
     { id: "gravity", label: "Gravitational Fields", slot: STORY_GUIDE_EXAMPLES.cards[0].slot },
     { id: "magnetism", label: "Magnetism", slot: STORY_GUIDE_EXAMPLES.cards[1].slot },
-    { id: "wind", label: "Wind", slot: STORY_GUIDE_EXAMPLES.cards[2].slot },
+    { id: "wind", label: "Earth Winds", slot: STORY_GUIDE_EXAMPLES.cards[2].slot },
+    { id: "aerodynamics", label: "Aerodynamics", slot: STORY_GUIDE_EXAMPLES.cards[3].slot },
 ];
 
 const EXAMPLE_VARIANT_OPTIONS: ExampleVariantOption[] = [
     { id: "gravity:artemis", field: "gravity", label: "Artemis II", slot: ARTEMIS_VARIANT_SLOT },
-    { id: "wind:globe", field: "wind", label: "Earth Winds", slot: STORY_GUIDE_VARIANTS.primary },
-    { id: "wind:car_flow", field: "wind", label: "Car Wind Tunnel", slot: STORY_GUIDE_VARIANTS.secondary },
 ];
 
 const EXAMPLE_MODE_OPTIONS: ExampleModeOption[] = [
@@ -320,8 +410,13 @@ const GRADIENT_PALETTE_OPTIONS: GradientPaletteOption[] = [
 ];
 
 const THEORY_INFO_SLOT: StoryGuideSlot = STORY_GUIDE_THEORY.info;
-const GRADIENT_SCALE_SLOT: StoryGuideSlot = { x: 6.16, y: -5.18, width: 12.4, height: 1.42 };
-const GRADIENT_OFFSET_SLOT: StoryGuideSlot = { x: 6.16, y: -7.08, width: 12.4, height: 1.42 };
+const GRADIENT_SCALE_SLOT: StoryGuideSlot = { x: 3.28, y: -5.18, width: 12.4, height: 1.42 };
+const GRADIENT_OFFSET_SLOT: StoryGuideSlot = { x: 3.28, y: -7.08, width: 12.4, height: 1.42 };
+const MAGNETIC_ADVANCED_SLOT: StoryGuideSlot = { x: 0.0, y: -7.84, width: 8.0, height: 1.64 };
+const MAGNETIC_POWER_SLOT: StoryGuideSlot = { x: -6.8, y: -4.48, width: 12.4, height: 1.36 };
+const MAGNETIC_PULL_SLOT: StoryGuideSlot = { x: 6.8, y: -4.48, width: 12.4, height: 1.36 };
+const MAGNETIC_LENGTH_SLOT: StoryGuideSlot = { x: -6.8, y: -6.28, width: 12.4, height: 1.36 };
+const MAGNETIC_SPEED_SLOT: StoryGuideSlot = { x: 6.8, y: -6.28, width: 12.4, height: 1.36 };
 const GRADIENT_SLIDER_TRACK_Y = -0.28;
 const GRADIENT_SLIDER_TRACK_HEIGHT = 0.36;
 const GRADIENT_SLIDER_KNOB_WIDTH = 0.68;
@@ -341,11 +436,6 @@ const GRADIENT_SLIDER_KNOB_HOVER_Z = 0.0;
 export class VectorFieldsChapterGuide extends BaseScriptComponent {
     @input
     @allowUndefined
-    @hint("VF Story Scaffold root. If empty, the script searches for it by name.")
-    scaffoldRoot: SceneObject = null as any;
-
-    @input
-    @allowUndefined
     @hint("Optional Story Step Director root. If empty, the script searches for it by name.")
     directorRoot: SceneObject = null as any;
 
@@ -361,10 +451,6 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     @input
     @hint("When no Story Step Director is present, enable the real content roots for each guide step.")
     controlContentRoots: boolean = true;
-
-    @input
-    @hint("When this guide owns staging, park the older narration panel and slide stage.")
-    hideLegacySystems: boolean = true;
 
     @input
     @hint("While open, pause nearby scene colliders so content cannot steal menu touches.")
@@ -397,11 +483,16 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     @input
     @hint("Extra vertical drop so staged visuals can sit above the menu without calibration.")
-    menuLowerOffsetCm: number = -9.0;
+    menuLowerOffsetCm: number = -14.0;
 
     @input
     @hint("Horizontal offset from head anchor in centimeters when Follow is active.")
     menuHorizontalOffsetCm: number = 0.0;
+
+    @input
+    @widget(new SliderWidget(0, 1, 0.05))
+    @hint("How much Follow mode pitches the menu toward the user's head instead of yaw-only billboarding.")
+    menuBillboardPitchBlend: number = 0.35;
 
     @input
     @hint("Higher values make the menu catch up faster.")
@@ -415,6 +506,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private followButton: ButtonBinding | null = null;
     private foldButton: ButtonBinding | null = null;
     private resetButton: ButtonBinding | null = null;
+    private proxyButton: ButtonBinding | null = null;
+    private moveHandleButton: ButtonBinding | null = null;
     private examplesBackButton: ButtonBinding | null = null;
     private theoryInfoImage: ImageBinding | null = null;
     private panelCursorImage: ImageBinding | null = null;
@@ -436,6 +529,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private progressObject: SceneObject | null = null;
     private currentIndex: number = 0;
     private selectedExampleField: ExampleFieldId = "gravity";
+    private hasSelectedExampleField: boolean = false;
     private viewPlaneMode: number = 0;
     private keepPlaneControlsWhileFolded: boolean = false;
     private examplesMenuOpen: boolean = false;
@@ -445,25 +539,46 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private variantButtons: ButtonBinding[] = [];
     private exampleModeButtons: ButtonBinding[] = [];
     private theoryModeButtons: ButtonBinding[] = [];
+    private theoryCardButtons: ButtonBinding[] = [];
+    private theoryPanelImage: ImageBinding | null = null;
+    private selectedTheoryCard: string = "";
+    private metricsPage: number = 0;
+    private definitionPage: number = 0;
     private paletteButtons: ButtonBinding[] = [];
     private gradientSliders: GradientSliderBinding[] = [];
+    private magneticAdvancedButton: ButtonBinding | null = null;
+    private magneticSliders: GradientSliderBinding[] = [];
+    private magneticAdvancedOpen: boolean = false;
     private selectedGravityVariant: GravityExampleVariant = "field";
     private selectedWindVariant: WindExampleVariant = "globe";
     private selectedGravityStage: number = 2;
     private selectedMagnetismTubeMode: number = 0;
     private selectedWindTubeMode: number = 0;
+    private selectedWindEventIndex: number = -1;
+    private windSourceObject: SceneObject | null = null;
+    private windSourceText: Text | null = null;
+    private windEventCards: WindEventCardBinding[] = [];
     private selectedTheoryMode: TheoryFieldModeId = "expansion";
     private selectedGradientPalette: GradientPaletteId = "viridis";
     private gradientScaleValue: number = 1.0;
     private gradientOffsetValue: number = 0.0;
-    private scaffoldApi: any = null;
+    private magneticPowerValue: number = 0.09;
+    private magneticPullValue: number = 0.47;
+    private magneticLengthValue: number = 0.58;
+    private magneticSpeedValue: number = 0.71;
+    private magneticControlsDirty: boolean = false;
     private directorApi: any = null;
+    private proxyApi: any = null;
+    private menuDragActive: boolean = false;
+    private menuDragStartCursorWorld: vec3 | null = null;
+    private menuDragStartMenuWorld: vec3 | null = null;
     private isolatedColliders: ColliderBinding[] = [];
     private hiddenUIKitButtons: RectangleButton[] = [];
     private built: boolean = false;
     private startEventRef: any = null;
     private updateEventRef: any = null;
     private renderPrioritySettleRemaining: number = 0.0;
+    private theoryPatternUiSettleRemaining: number = 0.0;
 
     onAwake(): void {
         this.startEventRef = this.createEvent("OnStartEvent");
@@ -474,7 +589,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.syncContextualPanelState();
             this.updateMenuPose();
             this.updateMainExperiencePriority();
+            this.updateTheoryPatternUiSettle();
             this.hideRegisteredUIKitVisuals();
+            this.syncProxyButtonState();
             this.updateButtonAnimations();
             this.updatePanelCursorAnimation();
             this.updateCursorAnimation();
@@ -487,21 +604,48 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             return;
         }
         if (this.theoryMenuOpen) {
-            this.cycleTheoryFieldMode(1);
+            if (this.selectedTheoryCard === "metrics") {
+                if (this.metricsPage < MATH_EXPLAINER_TEXTURES.length - 1) {
+                    this.metricsPage++;
+                    this.updateTheoryPanelTexture();
+                }
+                return;
+            }
+            if (this.selectedTheoryCard === "definition") {
+                if (this.definitionPage < VF_DEFINITION_TEXTURES.length - 1) {
+                    this.definitionPage++;
+                    this.updateTheoryPanelTexture();
+                }
+                return;
+            }
+            if (this.selectedTheoryCard === "patterns") {
+                this.cycleTheoryFieldMode(1);
+                return;
+            }
             return;
         }
-        if (STORY_GUIDE_STEPS[this.currentIndex].id === "intro") {
-            this.goTo(this.stepIndexForId("theory"));
-            return;
-        }
-        if (STORY_GUIDE_STEPS[this.currentIndex].id === "examples") {
+        if (GUIDE_STEPS[this.currentIndex].id === "examples") {
             this.cycleExampleField(1);
             return;
         }
-        this.goTo(Math.min(STORY_GUIDE_STEPS.length - 1, this.currentIndex + 1));
+        this.goTo(Math.min(GUIDE_STEPS.length - 1, this.currentIndex + 1));
     }
 
     public prev(): void {
+        if (this.theoryMenuOpen) {
+            if (this.selectedTheoryCard === "metrics" && this.metricsPage > 0) {
+                this.metricsPage--;
+                this.updateTheoryPanelTexture();
+                this.syncVisualState();
+                return;
+            }
+            if (this.selectedTheoryCard === "definition" && this.definitionPage > 0) {
+                this.definitionPage--;
+                this.updateTheoryPanelTexture();
+                this.syncVisualState();
+                return;
+            }
+        }
         if (this.examplesMenuOpen || this.theoryMenuOpen) {
             this.returnToChapterList();
             return;
@@ -510,11 +654,17 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     public goTo(index: number): void {
-        const nextIndex = Math.max(0, Math.min(STORY_GUIDE_STEPS.length - 1, Math.floor(index)));
+        const nextIndex = Math.max(0, Math.min(GUIDE_STEPS.length - 1, Math.floor(index)));
         this.currentIndex = nextIndex;
-        const stepId = STORY_GUIDE_STEPS[this.currentIndex].id;
+        const stepId = GUIDE_STEPS[this.currentIndex].id;
         this.examplesMenuOpen = stepId === "examples";
         this.examplesDetailOpen = false;
+        this.magneticAdvancedOpen = false;
+        if (stepId !== "theory") {
+            this.selectedTheoryCard = "";
+            this.metricsPage = 0;
+            this.definitionPage = 0;
+        }
         this.theoryMenuOpen = stepId === "theory";
         if (!this.currentStateCanCalibrate()) {
             this.keepPlaneControlsWhileFolded = false;
@@ -523,14 +673,35 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.syncVisualState();
     }
 
+    private showChapterList(): void {
+        this.examplesMenuOpen = false;
+        this.examplesDetailOpen = false;
+        this.magneticAdvancedOpen = false;
+        this.theoryMenuOpen = false;
+        this.selectedTheoryCard = "";
+        this.metricsPage = 0;
+        this.definitionPage = 0;
+        this.keepPlaneControlsWhileFolded = false;
+        this.hideStaleChapterCards();
+        this.syncVisualState();
+    }
+
+    public isFolded(): boolean {
+        return this.folded;
+    }
+
+    public isMenuFolded(): boolean {
+        return this.folded;
+    }
+
     private build(): void {
         if (this.built) {
             this.syncVisualState();
             return;
         }
         this.built = true;
-        this.scaffoldApi = this.findScaffoldApi();
         this.directorApi = this.findDirectorApi();
+        this.proxyApi = this.findProxyApi();
         this.syncGradientValuesFromDirector();
         this.sceneObject.enabled = this.showOnStart;
 
@@ -545,11 +716,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.setPanelHoverUniform();
 
         this.createPanelCursor();
-        this.createPanelHitTarget();
+        this.disablePanelHitTarget();
         this.createProgressText();
 
-        for (let i = 0; i < STORY_GUIDE_STEPS.length; i++) {
-            const step = STORY_GUIDE_STEPS[i];
+        for (let i = 0; i < GUIDE_STEPS.length; i++) {
+            const step = GUIDE_STEPS[i];
             const tex = CARD_TEXTURES[step.id];
             if (!tex) continue;
             const slot = this.offsetSlot(step.slot);
@@ -570,9 +741,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.cards.push(card);
         }
 
+        this.createTheoryCardButtons();
         this.createExampleFieldSelectors();
         this.createVariantSelectors();
         this.createExampleModeSelectors();
+        this.createMagneticAdvancedControls();
+        this.createWindWeatherPanel();
         this.createTheoryFieldSelectors();
         this.createGradientPaletteSelectors();
         this.createGradientSliders();
@@ -582,9 +756,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.createNavButton("__GuideNext", "next", this.offsetSlot(STORY_GUIDE_NAV.next), TEX_NAV_NEXT_NORMAL, TEX_NAV_NEXT_PRESSED, 244, () => this.next());
         this.createUtilityButtons();
 
-        this.currentIndex = Math.max(0, Math.min(STORY_GUIDE_STEPS.length - 1, Math.floor(this.initialIndex)));
-        this.goTo(this.currentIndex);
-        print("VectorFieldsChapterGuide: built " + STORY_GUIDE_STEPS.length + " slots at 50 px/cm");
+        this.currentIndex = Math.max(0, Math.min(GUIDE_STEPS.length - 1, Math.floor(this.initialIndex)));
+        this.showChapterList();
+        print("VectorFieldsChapterGuide: built " + GUIDE_STEPS.length + " slots at 50 px/cm");
     }
 
     private createNavButton(name: string, id: string, slot: StoryGuideSlot, normal: Texture, pressed: Texture, renderOrder: number, action: () => void): void {
@@ -605,6 +779,24 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private createUtilityButtons(): void {
+        const moveHandleButton = this.createTextureButton(
+            "__GuideMoveHandle",
+            "move",
+            this.offsetSlot(MENU_MOVE_HANDLE_SLOT),
+            TEX_UTILITY_MOVE_NORMAL,
+            TEX_UTILITY_MOVE_ACTIVE,
+            TEX_UTILITY_MOVE_PRESSED,
+            252,
+            () => {},
+            false,
+            TEX_UTILITY_OVERLAY_HOVER,
+            null,
+            TEX_UTILITY_OVERLAY_PRESSED
+        );
+        this.moveHandleButton = moveHandleButton;
+        this.utilityButtons.push(moveHandleButton);
+        this.bindMenuMoveHandle(moveHandleButton);
+
         const followButton = this.createTextureButton(
             "__GuideFollow",
             "follow",
@@ -662,6 +854,25 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         );
         this.resetButton = resetButton;
         this.utilityButtons.push(resetButton);
+
+        const proxyButton = this.createTextureButton(
+            "__GuideProxyTransform",
+            "proxy",
+            this.offsetSlot(STORY_GUIDE_UTILITY.planeFront),
+            TEX_UTILITY_PLANE_FRONT_OFF,
+            TEX_UTILITY_PLANE_FRONT_ON,
+            TEX_UTILITY_PLANE_FRONT_PRESSED,
+            248,
+            () => {
+                this.toggleProxyPlane();
+            },
+            false,
+            TEX_UTILITY_OVERLAY_HOVER,
+            TEX_UTILITY_OVERLAY_HOVER,
+            TEX_UTILITY_OVERLAY_PRESSED
+        );
+        this.proxyButton = proxyButton;
+        this.utilityButtons.push(proxyButton);
     }
 
     private createTextureButton(
@@ -735,11 +946,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         };
 
         this.bindCursorEvents(button, binding);
+        this.bindButtonActionEvents(button, binding, action);
         this.listen((button as any).onHoverEnter, () => {
-            binding.hovered = true;
-            this.hidePanelCursor();
-            this.showCursor(binding, false);
-            this.updateBindingVisual(binding);
+            this.setTextureButtonHover(binding, true);
         });
         this.listen((button as any).onTriggerDown, () => {
             binding.pressedState = true;
@@ -747,21 +956,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.showCursor(binding, true);
             this.updateBindingVisual(binding);
         });
-        this.listen((button as any).onTriggerUp, () => {
-            action();
-            binding.pressedState = false;
-            if (binding.hovered) {
-                this.showCursor(binding, false);
-            }
-            this.syncVisualState();
-        });
         this.listen((button as any).onHoverExit, () => {
-            binding.hovered = false;
-            binding.pressedState = false;
-            if (this.cursorOwner === binding) {
-                this.hideCursor();
-            }
-            this.syncVisualState();
+            this.setTextureButtonHover(binding, false);
         });
         return binding;
     }
@@ -842,13 +1038,83 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private createWindWeatherPanel(): void {
+        if (!this.windSourceText) {
+            const sourceSlot = this.offsetSlot(WIND_SOURCE_SLOT);
+            this.windSourceObject = this.ensureChild(this.sceneObject, "__GuideWindSourceInfo");
+            this.place(this.windSourceObject, sourceSlot.x, sourceSlot.y, 0.64);
+            this.registerFoldable(this.windSourceObject);
+            this.windSourceText = this.configureGuideText(
+                this.windSourceObject,
+                this.windSourceText,
+                this.windSourceTextValue(),
+                sourceSlot.width,
+                sourceSlot.height,
+                24,
+                HorizontalAlignment.Left,
+                VerticalAlignment.Center,
+                256,
+                new vec4(0.94, 0.94, 0.94, 1.0)
+            );
+            this.windSourceObject.enabled = false;
+        }
+
+        const maxCards = Math.min(STORMS.length, WIND_EVENT_SLOTS.length);
+        for (let i = this.windEventCards.length; i < maxCards; i++) {
+            const storm = STORMS[i];
+            const slot = this.offsetSlot(WIND_EVENT_SLOTS[i]);
+            const binding = this.createTextureButton(
+                "__GuideWindEvent_" + i,
+                "wind_event:" + i,
+                slot,
+                TEX_VARIANT_NORMAL,
+                TEX_VARIANT_ACTIVE,
+                TEX_VARIANT_PRESSED,
+                252,
+                () => this.selectWindEvent(i),
+                true,
+                TEX_UTILITY_OVERLAY_HOVER,
+                TEX_UTILITY_OVERLAY_HOVER,
+                TEX_UTILITY_OVERLAY_PRESSED
+            );
+            const title = this.createWindEventText(binding.object, "__Title", this.windEventTitle(storm), -0.08, 0.34, slot.width - 0.8, 0.62, 25, HorizontalAlignment.Left, 258);
+            const detail = this.createWindEventText(binding.object, "__Detail", this.windEventDetail(storm), -0.08, -0.32, slot.width - 0.8, 0.58, 19, HorizontalAlignment.Left, 258);
+            binding.object.enabled = false;
+            this.windEventCards.push({ stormIndex: i, button: binding, title, detail });
+        }
+    }
+
+    private createWindEventText(parent: SceneObject, name: string, value: string, x: number, y: number, width: number, height: number, size: number, alignment: HorizontalAlignment, renderOrder: number): Text {
+        const object = this.ensureChild(parent, name);
+        this.place(object, x, y, 0.64);
+        return this.configureGuideText(
+            object,
+            object.getComponent("Component.Text") as Text,
+            value,
+            width,
+            height,
+            size,
+            alignment,
+            VerticalAlignment.Center,
+            renderOrder,
+            new vec4(0.88, 0.88, 0.88, 1.0)
+        );
+    }
+
     private createTheoryFieldSelectors(): void {
         for (let i = 0; i < THEORY_FIELD_OPTIONS.length; i++) {
             const option = THEORY_FIELD_OPTIONS[i];
+            const newId = "theory_mode:" + option.id;
+            const existing = this.findCardBinding(this.theoryModeButtons, newId) ||
+                this.findCardBinding(this.theoryModeButtons, "theory:" + option.id);
+            if (existing) {
+                existing.id = newId;
+                continue;
+            }
             const tex = THEORY_MODE_TEXTURES[option.id];
             const binding = this.createTextureButton(
                 "__GuideTheoryMode_" + option.id,
-                "theory:" + option.id,
+                newId,
                 this.offsetSlot(option.slot),
                 tex.normal,
                 tex.active,
@@ -906,8 +1172,16 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private ensureRuntimeAdditions(): void {
         if (!this.built) return;
         let added = false;
+        if (this.theoryModeButtons.length < THEORY_FIELD_OPTIONS.length) {
+            this.createTheoryFieldSelectors();
+            added = true;
+        }
         if (this.exampleModeButtons.length < EXAMPLE_MODE_OPTIONS.length) {
             this.createExampleModeSelectors();
+            added = true;
+        }
+        if (!this.windSourceText || this.windEventCards.length < Math.min(STORMS.length, WIND_EVENT_SLOTS.length)) {
+            this.createWindWeatherPanel();
             added = true;
         }
         if (!this.theoryInfoImage) {
@@ -920,6 +1194,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         if (this.gradientSliders.length < 2) {
             this.createGradientSliders();
+            added = true;
+        }
+        if (!this.magneticAdvancedButton || this.magneticSliders.length < 4) {
+            this.createMagneticAdvancedControls();
             added = true;
         }
         if (added) {
@@ -955,7 +1233,75 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
-    private createGradientSlider(name: string, id: GradientSliderId, slot: StoryGuideSlot, labelText: string, min: number, max: number, step: number, value: number): GradientSliderBinding {
+    private createMagneticAdvancedControls(): void {
+        if (!this.magneticAdvancedButton) {
+            const slot = this.offsetSlot(MAGNETIC_ADVANCED_SLOT);
+            const binding = this.createTextureButton(
+                "__GuideMagneticAdvanced",
+                "magnetic_advanced",
+                slot,
+                TEX_VARIANT_NORMAL,
+                TEX_VARIANT_ACTIVE,
+                TEX_VARIANT_PRESSED,
+                249,
+                () => this.toggleMagneticAdvanced(),
+                true,
+                TEX_UTILITY_OVERLAY_HOVER,
+                TEX_UTILITY_OVERLAY_HOVER,
+                TEX_UTILITY_OVERLAY_PRESSED
+            );
+            binding.label = this.createButtonLabel(binding.object, "__Label", "Advanced", slot.width, slot.height, 254);
+            binding.object.enabled = false;
+            this.magneticAdvancedButton = binding;
+        }
+        if (this.magneticSliders.length > 0) return;
+        this.magneticSliders.push(this.createGradientSlider(
+            "__GuideMagneticPower",
+            "mag_power",
+            this.offsetSlot(MAGNETIC_POWER_SLOT),
+            "Power",
+            0.0,
+            1.0,
+            0.01,
+            this.magneticPowerValue
+        ));
+        this.magneticSliders.push(this.createGradientSlider(
+            "__GuideMagneticPull",
+            "mag_pull",
+            this.offsetSlot(MAGNETIC_PULL_SLOT),
+            "Pull",
+            0.0,
+            1.0,
+            0.01,
+            this.magneticPullValue
+        ));
+        this.magneticSliders.push(this.createGradientSlider(
+            "__GuideMagneticLength",
+            "mag_length",
+            this.offsetSlot(MAGNETIC_LENGTH_SLOT),
+            "Length",
+            0.0,
+            1.0,
+            0.01,
+            this.magneticLengthValue
+        ));
+        this.magneticSliders.push(this.createGradientSlider(
+            "__GuideMagneticSpeed",
+            "mag_speed",
+            this.offsetSlot(MAGNETIC_SPEED_SLOT),
+            "Speed",
+            0.0,
+            1.0,
+            0.01,
+            this.magneticSpeedValue
+        ));
+        for (let i = 0; i < this.magneticSliders.length; i++) {
+            this.magneticSliders[i].object.enabled = false;
+            this.updateGradientSliderVisual(this.magneticSliders[i]);
+        }
+    }
+
+    private createGradientSlider(name: string, id: ControlSliderId, slot: StoryGuideSlot, labelText: string, min: number, max: number, step: number, value: number): GradientSliderBinding {
         const object = this.ensureChild(this.sceneObject, name);
         this.place(object, slot.x, slot.y, BUTTON_HIT_Z);
         this.registerFoldable(object);
@@ -1027,6 +1373,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 this.updateGradientSliderVisual(binding);
             });
             this.listen(interactable.onHoverUpdate, (event: any) => this.showGradientSliderCursor(binding, event));
+            this.listen(interactable.onHoverExit, () => {
+                binding.hovered = false;
+                binding.pressed = false;
+                this.hidePanelCursor();
+                this.updateGradientSliderVisual(binding);
+            });
             this.listen(interactable.onTriggerStart, (event: any) => {
                 binding.pressed = true;
                 this.updateGradientSliderFromEvent(binding, event);
@@ -1119,6 +1471,40 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         return label;
     }
 
+    private configureGuideText(
+        object: SceneObject,
+        existing: Text | null,
+        value: string,
+        width: number,
+        height: number,
+        size: number,
+        horizontalAlignment: HorizontalAlignment,
+        verticalAlignment: VerticalAlignment,
+        renderOrder: number,
+        color: vec4
+    ): Text {
+        let text = existing || object.getComponent("Component.Text") as Text;
+        if (!text) {
+            text = object.createComponent("Component.Text") as Text;
+        }
+        text.text = value;
+        text.size = size;
+        text.font = GUIDE_FONT;
+        text.horizontalAlignment = horizontalAlignment;
+        text.verticalAlignment = verticalAlignment;
+        text.horizontalOverflow = HorizontalOverflow.Wrap;
+        text.verticalOverflow = VerticalOverflow.Truncate;
+        text.worldSpaceRect = Rect.create(-width * 0.5, width * 0.5, -height * 0.5, height * 0.5);
+        text.depthTest = true;
+        try { text.blendMode = BlendMode.PremultipliedAlphaAuto; } catch (e) {}
+        text.twoSided = true;
+        text.renderOrder = renderOrder;
+        try {
+            text.textFill.color = color;
+        } catch (e) {}
+        return text;
+    }
+
     private createImage(
         parent: SceneObject,
         name: string,
@@ -1183,6 +1569,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.panelCursorImage = null;
     }
 
+    private disablePanelHitTarget(): void {
+        const object = this.ensureChild(this.sceneObject, "__GuidePanelHitTarget");
+        object.enabled = false;
+        this.panelHitObject = null;
+    }
+
     private createPanelHitTarget(): void {
         const object = this.ensureChild(this.sceneObject, "__GuidePanelHitTarget");
         this.place(object, this.panelOffset.x, this.panelOffset.y, PANEL_HIT_Z);
@@ -1233,14 +1625,15 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             );
             this.setPanelHoverUniform();
         }
+        this.syncMainMenuCardGeometry();
         for (let i = 0; i < this.cards.length; i++) {
             const binding = this.cards[i];
-            binding.selected = i === this.currentIndex;
+            binding.selected = false;
             this.updateBindingVisual(binding);
         }
         if (this.progressText) {
-            const step = STORY_GUIDE_STEPS[this.currentIndex];
-            this.progressText.text = step.index + " / " + this.twoDigit(STORY_GUIDE_STEPS.length);
+            const step = GUIDE_STEPS[this.currentIndex];
+            this.progressText.text = step.index + " / " + this.twoDigit(GUIDE_STEPS.length);
         }
         if (this.followButton) {
             const texture = this.followUser ? TEX_UTILITY_FOLLOW_ON : TEX_UTILITY_FOLLOW_OFF;
@@ -1264,15 +1657,19 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         this.updateBindings(this.navButtons);
         this.updateBindings(this.utilityButtons);
+        this.syncProxyButtonState();
         this.updateBindings(this.viewPlaneButtons);
         if (this.examplesBackButton) {
             this.updateBindingVisual(this.examplesBackButton);
         }
         this.syncFoldState();
+        this.hideStaleChapterCards();
         this.syncMenuModeVisibility();
+        this.syncTheoryCardState();
         this.syncFieldSelectorState();
         this.syncVariantState();
         this.syncExampleModeState();
+        this.syncMagneticAdvancedState();
         this.syncTheoryFieldModeState();
         this.syncGradientPaletteState();
         this.syncGradientSliderState();
@@ -1281,16 +1678,200 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.refreshSceneInteractionIsolation();
     }
 
+    private syncMainMenuCardGeometry(): void {
+        const existingCards = this.cards;
+        const syncedCards: ButtonBinding[] = [];
+        for (let i = 0; i < GUIDE_STEPS.length; i++) {
+            const step = GUIDE_STEPS[i];
+            const textures = CARD_TEXTURES[step.id];
+            if (!textures) continue;
+
+            const binding = this.findCardBinding(existingCards, step.id);
+            if (!binding) continue;
+            const slot = this.offsetSlot(step.slot);
+            binding.normal = textures.normal;
+            binding.active = textures.active;
+            binding.pressed = textures.pressed;
+            binding.homeSlot = this.cloneSlot(slot);
+            binding.targetSlot = this.cloneSlot(slot);
+            binding.slot = this.cloneSlot(slot);
+            this.place(binding.object, slot.x, slot.y, BUTTON_HIT_Z);
+            this.placeImage(binding.image, 0.0, 0.0, binding.image.z, slot.width, slot.height);
+            this.placeImage(binding.overlay, 0.0, 0.0, binding.overlay.z, slot.width, slot.height);
+            this.updateButtonHitSize(binding, slot);
+            syncedCards.push(binding);
+        }
+        for (let i = 0; i < existingCards.length; i++) {
+            const binding = existingCards[i];
+            if (syncedCards.indexOf(binding) >= 0) continue;
+            binding.object.enabled = false;
+            binding.hovered = false;
+            binding.pressedState = false;
+        }
+        if (syncedCards.length > 0) {
+            this.cards = syncedCards;
+        }
+    }
+
+    private findCardBinding(cards: ButtonBinding[], id: string): ButtonBinding | null {
+        for (let i = 0; i < cards.length; i++) {
+            if (cards[i].id === id) return cards[i];
+        }
+        return null;
+    }
+
     private syncContextualPanelState(): void {
-        if (!this.theoryInfoImage) return;
-        const mode = this.currentTheoryFieldOption();
-        const texture = THEORY_INFO_TEXTURES[mode.id] || THEORY_INFO_TEXTURES.expansion;
-        this.applyTexture(this.theoryInfoImage.material, texture, this.theoryInfoImage.component);
-        this.theoryInfoImage.object.enabled = !this.folded && this.theoryMenuOpen;
+        this.updateTheoryPanelTexture();
+        this.syncWindWeatherState();
+    }
+
+    private syncWindWeatherState(): void {
+        const show = !this.folded && this.examplesMenuOpen && this.examplesDetailOpen && this.selectedExampleField === "wind";
+        if (this.windSourceObject) {
+            this.windSourceObject.enabled = show;
+        }
+        if (this.windSourceText) {
+            this.windSourceText.text = this.windSourceTextValue();
+        }
+        for (let i = 0; i < this.windEventCards.length; i++) {
+            const card = this.windEventCards[i];
+            const visible = show && card.stormIndex < STORMS.length;
+            card.button.object.enabled = visible;
+            if (!visible) {
+                card.button.hovered = false;
+                card.button.pressedState = false;
+            }
+            card.button.selected = visible && card.stormIndex === this.selectedWindEventIndex;
+            this.updateBindingVisual(card.button);
+            const storm = STORMS[card.stormIndex];
+            if (storm) {
+                card.title.text = this.windEventTitle(storm);
+                card.detail.text = this.windEventDetail(storm);
+                const color = card.button.selected
+                    ? new vec4(1.0, 1.0, 1.0, 1.0)
+                    : (card.button.hovered ? new vec4(0.96, 0.96, 0.96, 1.0) : new vec4(0.84, 0.84, 0.84, 1.0));
+                try { card.title.textFill.color = color; } catch (e) {}
+                try { card.detail.textFill.color = color; } catch (e) {}
+            }
+        }
+        if (this.cursorOwner && this.cursorOwner.id.indexOf("wind_event:") === 0 && !this.cursorOwner.object.enabled) {
+            this.hideCursor();
+        }
+    }
+
+    private windSourceTextValue(): string {
+        const gfs: any = GFS_META as any;
+        const timestep = this.shortUtc(gfs.refTime || (gfs.times && gfs.times.length > 0 ? gfs.times[0] : ""));
+        const cadence = gfs.stepHours ? gfs.stepHours + " h" : "3 h";
+        const grid = gfs.lonRes && gfs.latRes ? gfs.lonRes + "° x " + gfs.latRes + "°" : "2° x 2°";
+        const gfsMode = gfs.usingFallback ? "cached fallback" : (gfs.dataMode || "live");
+        const gfsFetchedAt = gfs.fetchedAt ? this.shortUtc(gfs.fetchedAt) : this.shortUtc(gfs.lastAttemptAt || "");
+        const eventState = STORMS.length > 0
+            ? STORMS.length + " active tracked event" + (STORMS.length === 1 ? "" : "s")
+            : "no active tracked tropical cyclones";
+        const mode = STORMS_USING_FALLBACK ? "cached fallback" : STORMS_DATA_MODE;
+        return "Source: " + gfs.source + " · " + gfsMode + "\n" +
+            "Layer: 10 m wind · " + grid + " grid · " + cadence + " forecast cadence\n" +
+            "Baked timestep: " + timestep + " · fetched " + gfsFetchedAt + "\n" +
+            "Events: " + STORMS_SOURCE + " · " + mode + " · fetched " + this.shortUtc(STORMS_FETCHED_AT) + "\n" +
+            "Current cards: " + eventState;
+    }
+
+    private windEventTitle(storm: Storm): string {
+        return (storm.name || "Tracked weather") + " · " + (storm.alert || "tracked");
+    }
+
+    private windEventDetail(storm: Storm): string {
+        const speed = this.windSpeedDetail(storm);
+        const location = storm.coordinateLabel || this.coordinateLabel(storm.lat, storm.lon);
+        const update = storm.updatedLabel || this.shortUtc(storm.toDate || storm.fromDate);
+        return speed + " · " + location + " · " + update;
+    }
+
+    private selectWindEvent(index: number): void {
+        if (index < 0 || index >= STORMS.length) return;
+        this.selectedWindEventIndex = index;
+        const storm = STORMS[index];
+        const root = this.findObjectByName("Globe Calibration");
+        const api = this.findAnyScriptApi(root, "focusWeatherEvent");
+        if (api && typeof api.focusWeatherEvent === "function" && storm.lat !== null && storm.lon !== null) {
+            api.focusWeatherEvent(
+                storm.lat,
+                storm.lon,
+                storm.name || "Weather event",
+                this.windEventCalloutDetail(storm)
+            );
+        }
+        this.syncVisualState();
+    }
+
+    private windEventCalloutDetail(storm: Storm): string {
+        const speed = this.windSpeedDetail(storm);
+        const loc = storm.coordinateLabel || this.coordinateLabel(storm.lat, storm.lon);
+        return speed + " · " + loc;
+    }
+
+    private windSpeedDetail(storm: Storm): string {
+        if (storm.windKmh === null || storm.windKmh === undefined || isNaN(storm.windKmh)) {
+            return storm.windBand || "wind pending";
+        }
+        const kmh = Math.round(storm.windKmh);
+        const mps = storm.windMps !== null && storm.windMps !== undefined && !isNaN(storm.windMps)
+            ? storm.windMps
+            : storm.windKmh / 3.6;
+        const mph = storm.windKmh * 0.621371;
+        return kmh + " km/h · " + mps.toFixed(1) + " m/s · " + Math.round(mph) + " mph";
+    }
+
+    private coordinateLabel(lat: number | null, lon: number | null): string {
+        if (lat === null || lon === null || isNaN(lat) || isNaN(lon)) return "location pending";
+        return Math.abs(lat).toFixed(1) + "°" + (lat >= 0 ? "N" : "S") + ", " +
+            Math.abs(lon).toFixed(1) + "°" + (lon >= 0 ? "E" : "W");
+    }
+
+    private shortUtc(iso: string): string {
+        const t = Date.parse(iso || "");
+        if (isNaN(t)) return "pending";
+        const d = new Date(t);
+        const yy = d.getUTCFullYear();
+        const mo = this.twoDigit(d.getUTCMonth() + 1);
+        const da = this.twoDigit(d.getUTCDate());
+        const hh = this.twoDigit(d.getUTCHours());
+        const mi = this.twoDigit(d.getUTCMinutes());
+        return yy + "-" + mo + "-" + da + " " + hh + ":" + mi + " UTC";
+    }
+
+    private updateTheoryPanelTexture(): void {
+        // patterns mode: show theory field info panel in the small theory_info slot
+        if (this.theoryInfoImage) {
+            const showInfo = !this.folded && this.theoryMenuOpen && this.selectedTheoryCard === "patterns";
+            if (showInfo) {
+                const mode = this.currentTheoryFieldOption();
+                const tex = THEORY_INFO_TEXTURES[mode.id] || THEORY_INFO_TEXTURES.expansion;
+                this.applyTexture(this.theoryInfoImage.material, tex, this.theoryInfoImage.component);
+            }
+            this.theoryInfoImage.object.enabled = showInfo;
+        }
+        // definition/metrics: show full-panel image
+        if (this.theoryPanelImage) {
+            const showPanel = !this.folded && this.theoryMenuOpen && (this.selectedTheoryCard === "metrics" || this.selectedTheoryCard === "definition");
+            if (showPanel) {
+                let tex: Texture | null = null;
+                if (this.selectedTheoryCard === "metrics") {
+                    const idx = Math.max(0, Math.min(this.metricsPage, MATH_EXPLAINER_TEXTURES.length - 1));
+                    tex = MATH_EXPLAINER_TEXTURES[idx];
+                } else {
+                    const idx = Math.max(0, Math.min(this.definitionPage, VF_DEFINITION_TEXTURES.length - 1));
+                    tex = VF_DEFINITION_TEXTURES[idx];
+                }
+                if (tex) this.applyTexture(this.theoryPanelImage.material, tex, this.theoryPanelImage.component);
+            }
+            this.theoryPanelImage.object.enabled = showPanel;
+        }
     }
 
     private stageCurrentRoot(): void {
-        const step = STORY_GUIDE_STEPS[this.currentIndex];
+        const step = GUIDE_STEPS[this.currentIndex];
         if (this.directorApi && typeof this.directorApi.stageStep === "function") {
             this.syncDirectorExampleField(step.id);
             this.syncDirectorExampleVariant(step.id);
@@ -1298,19 +1879,17 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.syncDirectorTheoryFieldMode(step.id);
             this.syncDirectorGradientPalette(step.id);
             this.syncDirectorGradientControls(step.id);
-            this.directorApi.stageStep(step.id, step.root, this.currentIndex);
+            this.directorApi.stageStep(step.id, "", this.currentIndex);
+            if (this.isMagneticDetailActive()) {
+                this.applyMagneticAdvancedControls();
+            }
             this.beginMainExperiencePrioritySettle();
             return;
-        }
-        if (this.directorApi && typeof this.directorApi.showRoot === "function") {
-            this.directorApi.showRoot(step.root);
-            this.beginMainExperiencePrioritySettle();
-            return;
-        }
-        if (this.scaffoldApi && typeof this.scaffoldApi.showRoot === "function") {
-            this.scaffoldApi.showRoot(step.root);
         }
         this.stageFallbackContent(step.id);
+        if (this.isMagneticDetailActive()) {
+            this.applyMagneticAdvancedControls();
+        }
         this.beginMainExperiencePrioritySettle();
     }
 
@@ -1328,11 +1907,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private promoteCurrentMainExperienceVisuals(): void {
         this.promoteMainExperienceVisuals([
             this.findObjectByName("Motion Field Root"),
-            this.findObjectByName("Library_Analytical_Field_Patterns"),
             this.findObjectByName("Vector Field Examples Root"),
             this.findObjectByName("Magnetic Field Root"),
             this.findObjectByName("Gravity Field Root"),
-            this.findObjectByName("Globe Calibration") || this.findObjectByName("Globe Wind"),
+            this.findObjectByName("Globe Calibration"),
             this.findObjectByName("Car Fluid Flow"),
         ]);
     }
@@ -1397,17 +1975,22 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private syncDirectorExampleField(stepId: string): void {
-        if (stepId !== "examples") return;
-        if (this.directorApi && typeof this.directorApi.selectExampleField === "function") {
-            this.directorApi.selectExampleField(this.selectedExampleField);
+        if (stepId !== "examples" || !this.directorApi) return;
+        // Browsing back to the selector is menu navigation, not a visual unload.
+        // The director still starts with no selection, so first entry does not
+        // stage the default gravity field.
+        if (this.examplesDetailOpen) {
+            if (typeof this.directorApi.selectExampleField === "function") {
+                this.directorApi.selectExampleField(this.selectedExampleField);
+            }
         }
     }
 
     private syncDirectorExampleVariant(stepId: string): void {
-        if (stepId !== "examples") return;
+        if (stepId !== "examples" || !this.examplesDetailOpen) return;
         const variant = this.selectedExampleField === "gravity"
             ? (this.selectedGravityVariant === "artemis" ? "gravity:artemis" : "gravity:field")
-            : this.currentVariantId();
+            : null;
         if (!variant) return;
         if (this.directorApi && typeof this.directorApi.selectExampleVariant === "function") {
             this.directorApi.selectExampleVariant(variant);
@@ -1415,7 +1998,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private syncDirectorExampleMode(stepId: string): void {
-        if (stepId !== "examples" || !this.directorApi) return;
+        if (stepId !== "examples" || !this.directorApi || !this.examplesDetailOpen) return;
         if (this.selectedExampleField === "gravity" && typeof this.directorApi.selectGravityStage === "function") {
             this.directorApi.selectGravityStage(this.selectedGravityStage);
         } else if (this.selectedExampleField === "magnetism" && typeof this.directorApi.selectMagneticTubeMode === "function") {
@@ -1427,12 +2010,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private syncDirectorTheoryFieldMode(stepId: string): void {
         if (stepId !== "theory") return;
+        if (this.selectedTheoryCard !== "patterns") {
+            return;
+        }
         const option = this.currentTheoryFieldOption();
         if (this.directorApi && typeof this.directorApi.selectTheoryFieldMode === "function") {
-            if (typeof this.directorApi.getTheoryFieldMode === "function") {
-                const currentMode = Math.floor(this.directorApi.getTheoryFieldMode());
-                if (currentMode === option.index) return;
-            }
             this.directorApi.selectTheoryFieldMode(option.id);
         }
     }
@@ -1469,7 +2051,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private applyGradientControlsToActiveVectorField(): void {
-        const stepId = STORY_GUIDE_STEPS[this.currentIndex].id;
+        const stepId = GUIDE_STEPS[this.currentIndex].id;
         if (stepId !== "theory" || this.selectedTheoryMode === "motion") return;
 
         const root = this.findObjectByName("Vector Field Examples Root");
@@ -1545,6 +2127,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private resetActiveVisual(): void {
+        this.setProxyPlaneActive(false);
         const director = this.directorApi as any;
         if (director) {
             if (typeof director.resetActiveVisual === "function") {
@@ -1557,6 +2140,139 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         this.keepPlaneControlsWhileFolded = false;
         this.syncVisualState();
+    }
+
+    private bindMenuMoveHandle(binding: ButtonBinding, retries: number = 2): void {
+        if (binding.moveEventsBound) return;
+
+        const interactable = (binding.button as any).interactable;
+        if (!interactable) {
+            if (retries > 0) {
+                try {
+                    const delayed = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
+                    delayed.bind(() => this.bindMenuMoveHandle(binding, retries - 1));
+                    delayed.reset(0.0);
+                } catch (e) {}
+            }
+            return;
+        }
+
+        binding.moveEventsBound = true;
+        this.listen(interactable.onTriggerStart, (event: any) => this.beginMenuDrag(event));
+        this.listen(interactable.onTriggerUpdate, (event: any) => this.updateMenuDrag(event));
+        this.listen(interactable.onTriggerEnd, () => this.endMenuDrag());
+        this.listen(interactable.onTriggerCancel, () => this.endMenuDrag());
+        this.listen(interactable.onTriggerCanceled, () => this.endMenuDrag());
+        this.listen(interactable.onHoverExit, () => this.endMenuDrag());
+        this.listen((binding.button as any).onTriggerUp, () => this.endMenuDrag());
+    }
+
+    private beginMenuDrag(event: any): void {
+        const worldPoint = this.cursorWorldPointFromEvent(event);
+        if (!worldPoint) return;
+
+        this.menuDragActive = true;
+        this.menuDragStartCursorWorld = worldPoint;
+        this.menuDragStartMenuWorld = this.sceneObject.getTransform().getWorldPosition();
+        if (this.followUser) {
+            this.followUser = false;
+            this.syncVisualState();
+        }
+    }
+
+    private updateMenuDrag(event: any): void {
+        if (!this.menuDragActive || !this.menuDragStartCursorWorld || !this.menuDragStartMenuWorld) return;
+        const worldPoint = this.cursorWorldPointFromEvent(event);
+        if (!worldPoint) return;
+
+        const delta = worldPoint.sub(this.menuDragStartCursorWorld);
+        this.sceneObject.getTransform().setWorldPosition(this.menuDragStartMenuWorld.add(delta));
+        this.dockProxyPlaneSoftly();
+    }
+
+    private endMenuDrag(): void {
+        if (!this.menuDragActive) return;
+        this.menuDragActive = false;
+        this.menuDragStartCursorWorld = null;
+        this.menuDragStartMenuWorld = null;
+        this.dockProxyPlaneSoftly();
+    }
+
+    private toggleProxyPlane(): void {
+        const api = this.proxyApi || this.findProxyApi();
+        this.proxyApi = api;
+        if (!api || !this.proxyCanActivate(api)) {
+            this.setProxyPlaneActive(false);
+            this.syncProxyButtonState();
+            return;
+        }
+
+        if (typeof api.toggleActive === "function") {
+            api.toggleActive();
+        } else {
+            this.setProxyPlaneActive(!this.proxyIsActive(api));
+        }
+        this.syncProxyButtonState();
+    }
+
+    private setProxyPlaneActive(active: boolean): void {
+        const api = this.proxyApi || this.findProxyApi();
+        this.proxyApi = api;
+        if (!api) return;
+        if (typeof api.setActive === "function") {
+            api.setActive(active);
+        } else if (active && typeof api.activate === "function") {
+            api.activate();
+        } else if (!active && typeof api.deactivate === "function") {
+            api.deactivate();
+        } else if (!active && typeof api.cancelAndDock === "function") {
+            api.cancelAndDock();
+        }
+    }
+
+    private dockProxyPlaneSoftly(): void {
+        const api = this.proxyApi || this.findProxyApi();
+        this.proxyApi = api;
+        if (api && typeof api.dockSoftly === "function") {
+            api.dockSoftly();
+        }
+    }
+
+    private syncProxyButtonState(): void {
+        if (!this.proxyButton) return;
+        const api = this.proxyApi || this.findProxyApi();
+        this.proxyApi = api;
+        const available = !!api && this.proxyCanActivate(api);
+        const active = !!api && this.proxyIsActive(api);
+
+        this.proxyButton.normal = available ? TEX_UTILITY_PLANE_FRONT_OFF : TEX_UTILITY_PLANE_FRONT_OFF;
+        this.proxyButton.active = TEX_UTILITY_PLANE_FRONT_ON;
+        this.proxyButton.pressed = TEX_UTILITY_PLANE_FRONT_PRESSED;
+        this.proxyButton.selected = active;
+        if (!available) {
+            this.proxyButton.hovered = false;
+            this.proxyButton.pressedState = false;
+        }
+        this.updateBindingVisual(this.proxyButton);
+        this.setButtonInteractionEnabled(this.proxyButton, available);
+        this.setButtonImageAlpha(this.proxyButton, available ? 1.0 : 0.72);
+    }
+
+    private proxyCanActivate(api: any): boolean {
+        if (!api) return false;
+        try {
+            if (typeof api.canActivate === "function") return api.canActivate();
+            if (typeof api.hasActiveVisual === "function") return api.hasActiveVisual();
+        } catch (e) {}
+        return true;
+    }
+
+    private proxyIsActive(api: any): boolean {
+        if (!api) return false;
+        try {
+            if (typeof api.isActive === "function") return api.isActive();
+        } catch (e) {}
+        return false;
     }
 
     private syncViewPlaneModeFromDirector(): void {
@@ -1592,21 +2308,21 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private stageFallbackContent(stepId: string): void {
         if (!this.controlContentRoots) return;
 
-        const showMotion = stepId === "theory" && this.selectedTheoryMode === "motion";
-        const showAnalytical = false;
-        const showVector = stepId === "theory" && this.selectedTheoryMode !== "motion";
-        const showGravity = stepId === "examples" && this.selectedExampleField === "gravity";
-        const showMagnetic = stepId === "examples" && this.selectedExampleField === "magnetism";
-        const showWind = stepId === "examples" && this.selectedExampleField === "wind";
-        const showWindGlobe = showWind && this.selectedWindVariant === "globe";
-        const showCarFlow = showWind && this.selectedWindVariant === "car_flow";
+        const showTheoryContent = stepId === "theory" && this.selectedTheoryCard === "patterns";
+        const showMotion = showTheoryContent && this.selectedTheoryMode === "motion";
+        const showVector = showTheoryContent && this.selectedTheoryMode !== "motion";
+        const showExampleContent = stepId === "examples" && this.examplesDetailOpen;
+        const showGravity = showExampleContent && this.selectedExampleField === "gravity";
+        const showMagnetic = showExampleContent && this.selectedExampleField === "magnetism";
+        const showWind = showExampleContent && this.selectedExampleField === "wind";
+        const showAerodynamics = showExampleContent && this.selectedExampleField === "aerodynamics";
+        const showWindGlobe = showWind;
+        const showCarFlow = showAerodynamics;
         const showArtemis = showGravity && this.selectedGravityVariant === "artemis";
 
         this.setObjectEnabledByName("Motion Field Root", showMotion);
-        this.setObjectEnabledByName("Library_Analytical_Field_Patterns", showAnalytical);
         this.setObjectEnabledByName("Vector Field Examples Root", showVector);
         this.setObjectEnabledByName("Target", false);
-        this.setObjectEnabledByName("Theory Field Menu", false);
         this.setObjectEnabledByName("Magnetic Field Root", showMagnetic);
         this.setObjectEnabledByName("Gravity Field Root", showGravity);
         this.setObjectEnabledByName("Artemis Trajectory Path", showArtemis);
@@ -1615,9 +2331,6 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.setObjectEnabledByName("Mission Info", showArtemis);
         this.setObjectEnabledByName("MissionInfoPanel", showArtemis);
         this.setObjectEnabledByName("Globe Calibration", showWindGlobe);
-        this.setObjectEnabledByName("Globe Wind", showWindGlobe);
-        this.setObjectEnabledByName("Story Widgets", false);
-        this.setObjectEnabledByName("Field Controller", false);
         this.setObjectEnabledByName("Car Fluid Flow", showCarFlow);
         if (showMotion || showVector) {
             this.stageFallbackTheoryFieldMode();
@@ -1629,12 +2342,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.applyTubeMode(this.findObjectByName("Magnetic Field Root"), this.selectedMagnetismTubeMode);
         }
         if (showWindGlobe) {
-            this.applyTubeMode(this.findObjectByName("Globe Calibration") || this.findObjectByName("Globe Wind"), this.selectedWindTubeMode);
-        }
-
-        if (this.hideLegacySystems) {
-            this.setObjectEnabledByName("Guide", false);
-            this.setObjectEnabledByName("SlideStage", false);
+            this.applyTubeMode(this.findObjectByName("Globe Calibration"), this.selectedWindTubeMode);
         }
     }
 
@@ -1741,30 +2449,20 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const baseTexture = binding.pressedState ? binding.pressed : (binding.selected ? binding.active : binding.normal);
         this.setBindingTexture(binding, baseTexture);
 
-        let overlayTexture: Texture | null = null;
         if (binding.pressedState) {
-            overlayTexture = binding.pressedOverlay;
             binding.targetScale = 0.985;
             binding.targetLift = 0.0;
         } else if (binding.hovered) {
-            overlayTexture = binding.hoverOverlay;
             binding.targetScale = 1.025;
             binding.targetLift = 0.0;
         } else if (binding.selected) {
-            overlayTexture = binding.selectedOverlay;
             binding.targetScale = 1.015;
             binding.targetLift = 0.0;
         } else {
             binding.targetScale = 1.0;
             binding.targetLift = 0.0;
         }
-
-        if (overlayTexture) {
-            binding.overlay.object.enabled = true;
-            this.applyTexture(binding.overlay.material, overlayTexture, binding.overlay.component);
-        } else {
-            binding.overlay.object.enabled = false;
-        }
+        binding.overlay.object.enabled = false;
 
         if (binding.label) {
             const color = binding.selected
@@ -1773,6 +2471,26 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             try {
                 binding.label.textFill.color = color;
             } catch (e) {}
+        }
+    }
+
+    private setButtonImageAlpha(binding: ButtonBinding, alpha: number): void {
+        const clamped = this.clamp(alpha, 0.0, 1.0);
+        const pass = this.tryMainPass(binding.image.material);
+        if (pass) {
+            try { pass.baseColor = new vec4(1.0, 1.0, 1.0, clamped); } catch (e) {}
+        }
+    }
+
+    private setButtonInteractionEnabled(binding: ButtonBinding, enabled: boolean): void {
+        const interactable = (binding.button as any).interactable;
+        if (interactable) {
+            try { interactable.enabled = enabled; } catch (e) {}
+        }
+        const colliders = binding.object.getComponents("Physics.ColliderComponent");
+        for (let i = 0; i < colliders.length; i++) {
+            const collider = colliders[i] as ColliderComponent;
+            if (collider) collider.enabled = enabled;
         }
     }
 
@@ -1875,6 +2593,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         try { button.size = new vec3(width, height, depth); } catch (e) {}
         try { button.renderOrder = renderOrder; } catch (e) {}
         this.initializeUIKitButton(button);
+        this.configureDefaultCursorTarget(button);
     }
 
     private initializeUIKitButton(button: RectangleButton): void {
@@ -1890,6 +2609,25 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 delayed.reset(0.0);
             } catch (inner) {}
         }
+    }
+
+    private configureDefaultCursorTarget(button: RectangleButton): void {
+        const apply = (): boolean => {
+            const interactable = (button as any).interactable;
+            if (!interactable) return false;
+
+            try { interactable.targetingMode = TargetingMode.All; } catch (e) {}
+            try { interactable.targetingVisual = 1; } catch (e) {}
+            try { interactable.ignoreInteractionPlane = true; } catch (e) {}
+            return true;
+        };
+
+        if (apply()) return;
+        try {
+            const delayed = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
+            delayed.bind(() => apply());
+            delayed.reset(0.0);
+        } catch (e) {}
     }
 
     private hideRegisteredUIKitVisuals(): void {
@@ -1911,25 +2649,82 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         } catch (e) {}
     }
 
-    private bindCursorEvents(button: RectangleButton, binding: ButtonBinding): void {
-        const interactable = (button as any).interactable;
-        if (!interactable) return;
+    private bindCursorEvents(button: RectangleButton, binding: ButtonBinding, retries: number = 2): void {
+        if (binding.cursorEventsBound) return;
 
-        this.listen(interactable.onHoverEnter, (event: any) => this.showCursorFromEvent(binding, false, event));
+        const interactable = (button as any).interactable;
+        if (!interactable) {
+            if (retries > 0) {
+                try {
+                    const delayed = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
+                    delayed.bind(() => this.bindCursorEvents(button, binding, retries - 1));
+                    delayed.reset(0.0);
+                } catch (e) {}
+            }
+            return;
+        }
+
+        binding.cursorEventsBound = true;
+        this.listen(interactable.onHoverEnter, (event: any) => {
+            this.setTextureButtonHover(binding, true);
+            this.showCursorFromEvent(binding, false, event);
+        });
         this.listen(interactable.onHoverUpdate, (event: any) => this.showCursorFromEvent(binding, false, event));
+        this.listen(interactable.onHoverExit, () => this.setTextureButtonHover(binding, false));
         this.listen(interactable.onTriggerStart, (event: any) => this.showCursorFromEvent(binding, true, event));
         this.listen(interactable.onTriggerUpdate, (event: any) => this.showCursorFromEvent(binding, true, event));
     }
 
-    private findScaffoldApi(): any {
-        const root = this.scaffoldRoot || this.findObjectByName("VF Story Scaffold");
-        if (!root) return null;
-        const scripts = root.getComponents("Component.ScriptComponent");
-        for (let i = 0; i < scripts.length; i++) {
-            const script = scripts[i] as any;
-            if (script && typeof script.showRoot === "function") return script;
+    private bindButtonActionEvents(button: RectangleButton, binding: ButtonBinding, action: () => void, retries: number = 2): void {
+        if (!binding.actionButtonEventBound) {
+            binding.actionButtonEventBound = true;
+            this.listen((button as any).onTriggerUp, () => this.runTextureButtonAction(binding, action));
         }
-        return null;
+
+        if (binding.actionInteractableEventBound) return;
+        const interactable = (button as any).interactable;
+        if (!interactable) {
+            if (retries > 0) {
+                try {
+                    const delayed = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
+                    delayed.bind(() => this.bindButtonActionEvents(button, binding, action, retries - 1));
+                    delayed.reset(0.0);
+                } catch (e) {}
+            }
+            return;
+        }
+
+        binding.actionInteractableEventBound = true;
+        this.listen(interactable.onTriggerEnd, () => this.runTextureButtonAction(binding, action));
+    }
+
+    private runTextureButtonAction(binding: ButtonBinding, action: () => void): void {
+        const now = getTime();
+        if (binding.lastActionTime !== undefined && now - binding.lastActionTime < 0.12) return;
+        binding.lastActionTime = now;
+        action();
+        binding.pressedState = false;
+        if (binding.hovered) {
+            this.showCursor(binding, false);
+        }
+        this.syncVisualState();
+    }
+
+    private setTextureButtonHover(binding: ButtonBinding, hovered: boolean): void {
+        binding.hovered = hovered;
+        this.hidePanelCursor();
+
+        if (hovered) {
+            this.showCursor(binding, binding.pressedState);
+            this.updateBindingVisual(binding);
+            return;
+        }
+
+        binding.pressedState = false;
+        if (this.cursorOwner === binding) {
+            this.hideCursor();
+        }
+        this.updateBindingVisual(binding);
     }
 
     private findDirectorApi(): any {
@@ -1937,6 +2732,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const preferred = this.findScriptApi(preferredRoot, "stageStep");
         if (preferred) return preferred;
         return this.findScriptApi(this.sceneObject, "stageStep");
+    }
+
+    private findProxyApi(): any {
+        const root = this.findObjectByName("ProxyInteractionPlane");
+        return this.findScriptApi(root, "toggleActive") || this.findScriptApi(root, "activate");
     }
 
     private findStageCalibrationApi(): any {
@@ -1959,7 +2759,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const scripts = root.getComponents("Component.ScriptComponent");
         for (let i = 0; i < scripts.length; i++) {
             const script = scripts[i] as any;
-            const api = (script && (script.motionFieldApi || script.analyticalFieldApi || script.fieldApi || script.gravityApi || script.windApi || script.panelApi)) || script;
+            const api = (script && (script.motionFieldApi || script.fieldApi || script.gravityApi || script.windApi || script.panelApi)) || script;
             if (api && typeof api[methodName] === "function") return api;
         }
         for (let i = 0; i < root.getChildrenCount(); i++) {
@@ -1993,7 +2793,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         transform.setWorldPosition(next);
 
         const toCamera = cameraPosition.sub(next);
-        const faceDirection = this.safeHorizontalDirection(toCamera, new vec3(0.0, 0.0, 1.0));
+        const horizontalFace = this.safeHorizontalDirection(toCamera, new vec3(0.0, 0.0, 1.0));
+        const directFace = this.safeDirection(toCamera, horizontalFace);
+        const faceDirection = this.safeDirection(
+            this.mixVec3(horizontalFace, directFace, this.clamp(this.menuBillboardPitchBlend, 0.0, 1.0)),
+            horizontalFace
+        );
         if (faceDirection.length > 0.0001) {
             transform.setWorldRotation(quat.lookAt(faceDirection, worldUp));
         }
@@ -2004,7 +2809,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.foldableObjects[i].enabled = !this.folded;
         }
         for (let i = 0; i < this.utilityButtons.length; i++) {
-            this.utilityButtons[i].object.enabled = true;
+            const utility = this.utilityButtons[i];
+            // Reset is not part of the folded toolbar, so it hides when collapsed.
+            utility.object.enabled = !(this.folded && utility.id === "reset");
         }
         if (this.folded) {
             this.hideCursor();
@@ -2014,20 +2821,33 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private syncMenuModeVisibility(): void {
         const showMainMenu = !this.folded && !this.examplesMenuOpen && !this.theoryMenuOpen;
+        const showPageNav = !this.folded && this.theoryMenuOpen &&
+            (this.selectedTheoryCard === "metrics" || this.selectedTheoryCard === "definition");
+        const showNav = showPageNav;
         for (let i = 0; i < this.cards.length; i++) {
             this.cards[i].object.enabled = showMainMenu;
         }
         for (let i = 0; i < this.navButtons.length; i++) {
-            this.navButtons[i].object.enabled = showMainMenu;
+            const binding = this.navButtons[i];
+            const enabled = showNav && this.canUseNavButton(binding.id);
+            binding.object.enabled = enabled;
+            if (!enabled) {
+                binding.hovered = false;
+                binding.pressedState = false;
+                this.updateBindingVisual(binding);
+            }
         }
         if (this.progressObject) {
-            this.progressObject.enabled = showMainMenu;
+            this.progressObject.enabled = false;
         }
         if (this.examplesBackButton) {
             this.examplesBackButton.object.enabled = !this.folded && (this.examplesMenuOpen || this.theoryMenuOpen);
         }
         if (this.panelHitObject) {
             this.panelHitObject.enabled = !this.folded;
+        }
+        if (this.cursorOwner && !this.cursorOwner.object.enabled) {
+            this.hideCursor();
         }
         const canCalibrate = this.currentStateCanCalibrate();
         if (!canCalibrate) {
@@ -2046,7 +2866,49 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private canUseNavButton(id: string): boolean {
+        if (id === "back") {
+            return this.canScrollBack();
+        }
+        if (id === "next") {
+            return this.canScrollNext();
+        }
+        return true;
+    }
+
+    private canScrollBack(): boolean {
+        if (this.theoryMenuOpen) {
+            if (this.selectedTheoryCard === "metrics") {
+                return this.metricsPage > 0;
+            }
+            if (this.selectedTheoryCard === "definition") {
+                return this.definitionPage > 0;
+            }
+            return false;
+        }
+        return this.currentIndex > 0;
+    }
+
+    private canScrollNext(): boolean {
+        if (this.theoryMenuOpen) {
+            if (this.selectedTheoryCard === "metrics") {
+                return this.metricsPage < MATH_EXPLAINER_TEXTURES.length - 1;
+            }
+            if (this.selectedTheoryCard === "definition") {
+                return this.definitionPage < VF_DEFINITION_TEXTURES.length - 1;
+            }
+            return false;
+        }
+        return this.currentIndex < GUIDE_STEPS.length - 1;
+    }
+
     private syncUtilityDockTargets(): void {
+        if (this.moveHandleButton) {
+            this.setButtonTargetSlot(
+                this.moveHandleButton,
+                this.offsetSlot(this.folded ? MENU_MOVE_HANDLE_SLOT_FOLDED : MENU_MOVE_HANDLE_SLOT)
+            );
+        }
         if (this.followButton) {
             this.setButtonTargetSlot(
                 this.followButton,
@@ -2063,6 +2925,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.setButtonTargetSlot(
                 this.resetButton,
                 this.offsetSlot(STORY_GUIDE_UTILITY.planeFloor)
+            );
+        }
+        if (this.proxyButton) {
+            this.setButtonTargetSlot(
+                this.proxyButton,
+                this.offsetSlot(this.folded ? PROXY_SLOT_FOLDED : STORY_GUIDE_UTILITY.planeFront)
             );
         }
     }
@@ -2084,7 +2952,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private isTheoryBinding(binding: ButtonBinding): boolean {
-        return binding.id.indexOf("theory:") === 0;
+        return binding.id.indexOf("theory_mode:") === 0;
     }
 
     private isPaletteBinding(binding: ButtonBinding): boolean {
@@ -2111,7 +2979,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         for (let i = 0; i < this.fieldSelectorButtons.length; i++) {
             const binding = this.fieldSelectorButtons[i];
             binding.object.enabled = visible;
-            binding.selected = binding.id === "field:" + this.selectedExampleField;
+            binding.selected = this.hasSelectedExampleField && binding.id === "field:" + this.selectedExampleField;
             this.updateBindingVisual(binding);
         }
     }
@@ -2141,10 +3009,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private syncExampleModeState(): void {
         const visibleField = !this.folded && this.examplesMenuOpen && this.examplesDetailOpen ? this.selectedExampleField : "";
         const selectedMode = this.currentExampleModeId();
+        const magneticAdvancedActive = visibleField === "magnetism" && this.magneticAdvancedOpen;
         for (let i = 0; i < this.exampleModeButtons.length; i++) {
             const binding = this.exampleModeButtons[i];
             const option = this.exampleModeOptionForBinding(binding);
-            const visible = !!option && option.field === visibleField && visibleField !== "gravity" && visibleField !== "wind";
+            const visible = !!option && option.field === visibleField && visibleField !== "gravity" && visibleField !== "wind" && !magneticAdvancedActive;
             binding.object.enabled = visible;
             if (!visible) {
                 binding.hovered = false;
@@ -2158,8 +3027,42 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private syncMagneticAdvancedState(): void {
+        const visible = this.isMagneticDetailActive();
+        if (this.magneticAdvancedButton) {
+            this.magneticAdvancedButton.object.enabled = visible;
+            if (!visible) {
+                this.magneticAdvancedButton.hovered = false;
+                this.magneticAdvancedButton.pressedState = false;
+            }
+            if (this.magneticAdvancedButton.label) {
+                this.magneticAdvancedButton.label.text = this.magneticAdvancedOpen ? "Done" : "Advanced";
+            }
+            this.magneticAdvancedButton.selected = visible && this.magneticAdvancedOpen;
+            this.updateBindingVisual(this.magneticAdvancedButton);
+        }
+
+        const slidersVisible = visible && this.magneticAdvancedOpen;
+        for (let i = 0; i < this.magneticSliders.length; i++) {
+            const binding = this.magneticSliders[i];
+            binding.object.enabled = slidersVisible;
+            if (!slidersVisible) {
+                binding.hovered = false;
+                binding.pressed = false;
+            }
+            this.updateGradientSliderVisual(binding);
+        }
+
+        if (this.cursorOwner && this.cursorOwner.id === "magnetic_advanced" && (!this.magneticAdvancedButton || !this.magneticAdvancedButton.object.enabled)) {
+            this.hideCursor();
+        }
+        if (!slidersVisible) {
+            this.hidePanelCursor();
+        }
+    }
+
     private syncTheoryFieldModeState(): void {
-        const visible = !this.folded && this.theoryMenuOpen;
+        const visible = !this.folded && this.theoryMenuOpen && this.selectedTheoryCard === "patterns";
         for (let i = 0; i < this.theoryModeButtons.length; i++) {
             const binding = this.theoryModeButtons[i];
             const option = this.theoryOptionForBinding(binding);
@@ -2177,7 +3080,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private syncGradientPaletteState(): void {
-        const visible = !this.folded && this.theoryMenuOpen && this.selectedTheoryMode !== "motion";
+        const visible = !this.folded && this.theoryMenuOpen && this.selectedTheoryCard === "patterns" && this.selectedTheoryMode !== "motion";
         for (let i = 0; i < this.paletteButtons.length; i++) {
             const binding = this.paletteButtons[i];
             const option = this.paletteOptionForBinding(binding);
@@ -2195,7 +3098,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private syncGradientSliderState(): void {
-        const visible = !this.folded && this.theoryMenuOpen && this.selectedTheoryMode !== "motion";
+        const visible = !this.folded && this.theoryMenuOpen && this.selectedTheoryCard === "patterns" && this.selectedTheoryMode !== "motion";
         for (let i = 0; i < this.gradientSliders.length; i++) {
             const binding = this.gradientSliders[i];
             binding.object.enabled = visible;
@@ -2204,6 +3107,138 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 binding.pressed = false;
             }
             this.updateGradientSliderVisual(binding);
+        }
+    }
+
+    private updateTheoryPatternUiSettle(): void {
+        if (this.theoryPatternUiSettleRemaining <= 0.0) return;
+        this.theoryPatternUiSettleRemaining = Math.max(0.0, this.theoryPatternUiSettleRemaining - getDeltaTime());
+        if (this.isTheoryPatternInterfaceActive()) {
+            this.forceTheoryPatternInterfaceNow();
+        }
+    }
+
+    private isTheoryPatternInterfaceActive(): boolean {
+        return !this.folded && this.theoryMenuOpen && this.selectedTheoryCard === "patterns";
+    }
+
+    private forceTheoryPatternInterfaceNow(): void {
+        if (this.theoryModeButtons.length < THEORY_FIELD_OPTIONS.length) {
+            this.createTheoryFieldSelectors();
+        }
+        if (this.paletteButtons.length < GRADIENT_PALETTE_OPTIONS.length) {
+            this.createGradientPaletteSelectors();
+        }
+        if (this.gradientSliders.length < 2) {
+            this.createGradientSliders();
+        }
+        if (!this.theoryInfoImage) {
+            this.createTheoryInfoCard();
+        }
+        this.forceTheoryPatternExperienceEnabled();
+        this.hideTheoryCardButtonsNow();
+        this.updateTheoryPatternControlSlots();
+        this.updateTheoryPanelTexture();
+        this.syncMenuModeVisibility();
+        this.syncTheoryCardState();
+        this.syncTheoryFieldModeState();
+        this.syncGradientPaletteState();
+        this.syncGradientSliderState();
+    }
+
+    private updateTheoryPatternControlSlots(): void {
+        for (let i = 0; i < THEORY_FIELD_OPTIONS.length; i++) {
+            const option = THEORY_FIELD_OPTIONS[i];
+            const newId = "theory_mode:" + option.id;
+            const binding = this.findCardBinding(this.theoryModeButtons, newId) ||
+                this.findCardBinding(this.theoryModeButtons, "theory:" + option.id);
+            if (!binding) continue;
+            binding.id = newId;
+            this.placeButtonBindingNow(binding, this.offsetSlot(option.slot));
+        }
+
+        for (let i = 0; i < GRADIENT_PALETTE_OPTIONS.length; i++) {
+            const option = GRADIENT_PALETTE_OPTIONS[i];
+            const binding = this.findCardBinding(this.paletteButtons, "palette:" + option.id);
+            if (!binding) continue;
+            this.placeButtonBindingNow(binding, this.offsetSlot(option.slot));
+        }
+
+        this.placeGradientSliderNow("scale", this.offsetSlot(GRADIENT_SCALE_SLOT));
+        this.placeGradientSliderNow("offset", this.offsetSlot(GRADIENT_OFFSET_SLOT));
+    }
+
+    private placeButtonBindingNow(binding: ButtonBinding, slot: StoryGuideSlot): void {
+        binding.homeSlot = this.cloneSlot(slot);
+        binding.targetSlot = this.cloneSlot(slot);
+        binding.slot = this.cloneSlot(slot);
+        this.place(binding.object, slot.x, slot.y, BUTTON_HIT_Z);
+        this.placeImage(binding.image, 0.0, 0.0, binding.image.z, slot.width, slot.height);
+        this.placeImage(binding.overlay, 0.0, 0.0, binding.overlay.z, slot.width, slot.height);
+        this.updateButtonHitSize(binding, slot);
+    }
+
+    private placeGradientSliderNow(id: GradientSliderId, slot: StoryGuideSlot): void {
+        for (let i = 0; i < this.gradientSliders.length; i++) {
+            const binding = this.gradientSliders[i];
+            if (binding.id !== id) continue;
+            binding.slot = this.cloneSlot(slot);
+            this.place(binding.object, slot.x, slot.y, BUTTON_HIT_Z);
+            this.configureUIKitButton(binding.button, slot.width, slot.height, BUTTON_HIT_DEPTH_CM, 248);
+            this.updateGradientSliderVisual(binding);
+            return;
+        }
+    }
+
+    private forceTheoryPatternExperienceEnabled(): void {
+        this.stageFallbackContent("theory");
+        this.beginMainExperiencePrioritySettle();
+    }
+
+    private isMagneticDetailActive(): boolean {
+        return !this.folded && this.examplesMenuOpen && this.examplesDetailOpen && this.selectedExampleField === "magnetism";
+    }
+
+    private toggleMagneticAdvanced(): void {
+        if (!this.isMagneticDetailActive()) return;
+        this.magneticAdvancedOpen = !this.magneticAdvancedOpen;
+    }
+
+    private isMagneticSliderId(id: ControlSliderId): id is MagneticSliderId {
+        return id === "mag_power" || id === "mag_pull" || id === "mag_length" || id === "mag_speed";
+    }
+
+    private setMagneticSliderValue(id: MagneticSliderId, value: number): void {
+        const normalized = this.clamp(value, 0.0, 1.0);
+        if (id === "mag_power") {
+            this.magneticPowerValue = normalized;
+        } else if (id === "mag_pull") {
+            this.magneticPullValue = normalized;
+        } else if (id === "mag_length") {
+            this.magneticLengthValue = normalized;
+        } else if (id === "mag_speed") {
+            this.magneticSpeedValue = normalized;
+        }
+        this.magneticControlsDirty = true;
+    }
+
+    private applyMagneticAdvancedControls(): void {
+        if (!this.magneticControlsDirty) return;
+        const root = this.findObjectByName("Magnetic Field Root");
+        if (!root) return;
+
+        const fieldApi = this.findAnyScriptApi(root, "setFieldStrengthNormalized");
+        if (fieldApi) {
+            if (typeof fieldApi.setFieldStrengthNormalized === "function") fieldApi.setFieldStrengthNormalized(this.magneticPowerValue);
+            if (typeof fieldApi.setLengthSegmentsNormalized === "function") fieldApi.setLengthSegmentsNormalized(this.magneticLengthValue);
+            if (typeof fieldApi.setFlowSpeedNormalized === "function") fieldApi.setFlowSpeedNormalized(this.magneticSpeedValue);
+            if (typeof fieldApi.refresh === "function") fieldApi.refresh();
+            else if (typeof fieldApi.queueRefresh === "function") fieldApi.queueRefresh(0.01);
+        }
+
+        const physicsApi = this.findAnyScriptApi(root, "setForceStrengthNormalized");
+        if (physicsApi && typeof physicsApi.setForceStrengthNormalized === "function") {
+            physicsApi.setForceStrengthNormalized(this.magneticPullValue);
         }
     }
 
@@ -2223,17 +3258,27 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private setGradientSliderValue(binding: GradientSliderBinding, rawValue: number): void {
         const value = this.snapSliderValue(rawValue, binding.min, binding.max, binding.step);
         if (Math.abs(binding.value - value) < 0.0001) {
-            this.applyGradientControlsToActiveVectorField();
+            if (this.isMagneticSliderId(binding.id)) {
+                this.magneticControlsDirty = true;
+                this.applyMagneticAdvancedControls();
+            } else {
+                this.applyGradientControlsToActiveVectorField();
+            }
             return;
         }
         binding.value = value;
         if (binding.id === "scale") {
             this.gradientScaleValue = value;
-        } else {
+        } else if (binding.id === "offset") {
             this.gradientOffsetValue = value;
+        } else {
+            this.setMagneticSliderValue(binding.id, value);
+            this.updateGradientSliderVisual(binding);
+            this.applyMagneticAdvancedControls();
+            return;
         }
         this.updateGradientSliderVisual(binding);
-        this.syncDirectorGradientControls(STORY_GUIDE_STEPS[this.currentIndex].id);
+        this.syncDirectorGradientControls(GUIDE_STEPS[this.currentIndex].id);
         this.applyGradientControlsToActiveVectorField();
     }
 
@@ -2298,6 +3343,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private gradientSliderValueText(binding: GradientSliderBinding): string {
         if (binding.id === "scale") return "x" + binding.value.toFixed(2);
+        if (this.isMagneticSliderId(binding.id)) return Math.round(binding.value * 100) + "%";
         const sign = binding.value >= 0.0 ? "+" : "";
         return sign + binding.value.toFixed(2);
     }
@@ -2312,6 +3358,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.updateBindingAnimations(this.navButtons);
         this.updateBindingAnimations(this.utilityButtons);
         this.updateBindingAnimations(this.viewPlaneButtons);
+        if (this.magneticAdvancedButton) {
+            this.updateBindingAnimations([this.magneticAdvancedButton]);
+        }
         if (this.examplesBackButton) {
             this.updateBindingAnimations([this.examplesBackButton]);
         }
@@ -2349,9 +3398,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private updateButtonHitSize(binding: ButtonBinding, target: StoryGuideSlot): void {
-        const foldedUtility = this.folded && (binding.id === "follow" || binding.id === "fold");
-        const hitWidth = target.width + (foldedUtility ? FOLDED_UTILITY_HIT_PAD_CM : 0.0);
-        const hitHeight = target.height + (foldedUtility ? FOLDED_UTILITY_HIT_PAD_CM : 0.0);
+        const foldedUtility = this.folded && (binding.id === "follow" || binding.id === "fold" || binding.id === "proxy" || binding.id === "move");
+        const utility = binding.id === "follow" || binding.id === "fold" || binding.id === "reset" || binding.id === "proxy";
+        const moveHandlePad = binding.id === "move" ? 0.44 : 0.0;
+        const hitPad = foldedUtility ? FOLDED_UTILITY_HIT_PAD_CM : (utility ? UTILITY_HIT_PAD_CM : moveHandlePad);
+        const hitWidth = target.width + hitPad;
+        const hitHeight = target.height + hitPad;
         const hitDepth = BUTTON_HIT_DEPTH_CM;
         if (
             Math.abs(binding.hitWidth - hitWidth) < 0.001 &&
@@ -2453,7 +3505,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.cursorTargetScale = pressed ? 0.84 : 1.0;
     }
 
-    private cursorLocalPointFromEvent(event: any): vec3 | null {
+    private cursorWorldPointFromEvent(event: any): vec3 | null {
         const interactor = event && event.interactor ? event.interactor : null;
         if (!interactor) return null;
 
@@ -2473,6 +3525,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 worldPoint = interactor.targetHitInfo.hit.position;
             }
         } catch (e) {}
+        return worldPoint;
+    }
+
+    private cursorLocalPointFromEvent(event: any): vec3 | null {
+        const worldPoint = this.cursorWorldPointFromEvent(event);
         if (!worldPoint) return null;
 
         try {
@@ -2575,6 +3632,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private hideStaleChapterCards(): void {
+        this.setObjectEnabledByName("__GuideCard_intro", false);
+    }
+
     private callObjectLifecycleByName(name: string, methodName: string): void {
         const object = this.findObjectByName(name);
         const api = this.findScriptApi(object, methodName);
@@ -2614,6 +3675,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private shouldPreserveInteractionRoot(rootName: string): boolean {
         if (this.theoryMenuOpen) {
+            if (this.selectedTheoryCard !== "patterns") {
+                return false;
+            }
             if (this.selectedTheoryMode === "motion") {
                 return rootName === "Motion Field Root";
             }
@@ -2628,10 +3692,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             return rootName === "Magnetic Field Root";
         }
         if (this.selectedExampleField === "wind") {
-            if (this.selectedWindVariant === "car_flow") {
-                return rootName === "Car Fluid Flow" || rootName === "Flow Slice";
-            }
-            return rootName === "Globe Calibration" || rootName === "Globe Wind" || rootName === "Globe Spin-Lock Button";
+            return rootName === "Globe Calibration" || rootName === "Globe Spin-Lock Button";
+        }
+        if (this.selectedExampleField === "aerodynamics") {
+            return rootName === "Car Fluid Flow" || rootName === "Flow Slice";
         }
         return false;
     }
@@ -2701,23 +3765,31 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private selectExampleField(field: ExampleFieldId): void {
+        this.setProxyPlaneActive(false);
         this.selectedExampleField = field;
+        this.hasSelectedExampleField = true;
+        if (field !== "magnetism") {
+            this.magneticAdvancedOpen = false;
+        }
         if (field === "gravity") {
             this.selectedGravityVariant = "field";
         }
         if (field === "wind") {
+            this.selectedWindVariant = "globe";
+            this.selectedWindTubeMode = 0;
+            this.selectedWindEventIndex = -1;
+        }
+        if (field === "aerodynamics") {
+            this.selectedWindVariant = "car_flow";
             this.selectedWindTubeMode = 0;
         }
-        if (STORY_GUIDE_STEPS[this.currentIndex].id !== "examples") {
+        if (GUIDE_STEPS[this.currentIndex].id !== "examples") {
             this.currentIndex = this.stepIndexForId("examples");
         }
         this.examplesMenuOpen = true;
         this.examplesDetailOpen = true;
         this.theoryMenuOpen = false;
         this.stageCurrentRoot();
-        // Menu and field both sit at arm level, so collapse the panel out of the
-        // way when a field opens; the user can unfold to reach the controls.
-        this.setFolded(true);
         this.syncVisualState();
     }
 
@@ -2725,15 +3797,15 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const option = this.variantOptionForId(id);
         if (!option) return;
 
+        this.setProxyPlaneActive(false);
         this.selectedExampleField = option.field;
+        this.hasSelectedExampleField = true;
+        this.magneticAdvancedOpen = false;
         if (option.field === "gravity") {
             this.selectedGravityVariant = this.selectedGravityVariant === "artemis" ? "field" : "artemis";
-        } else if (option.field === "wind") {
-            this.selectedWindVariant = id === "wind:car_flow" ? "car_flow" : "globe";
-            this.selectedWindTubeMode = 0;
         }
 
-        if (STORY_GUIDE_STEPS[this.currentIndex].id !== "examples") {
+        if (GUIDE_STEPS[this.currentIndex].id !== "examples") {
             this.currentIndex = this.stepIndexForId("examples");
         }
         this.examplesMenuOpen = true;
@@ -2747,7 +3819,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         const option = this.exampleModeOptionForId(id);
         if (!option) return;
 
+        this.setProxyPlaneActive(false);
         this.selectedExampleField = option.field;
+        this.hasSelectedExampleField = true;
+        if (option.field !== "magnetism") {
+            this.magneticAdvancedOpen = false;
+        }
         if (option.field === "gravity") {
             this.selectedGravityStage = option.mode;
         } else if (option.field === "magnetism") {
@@ -2756,7 +3833,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.selectedWindTubeMode = option.mode;
         }
 
-        if (STORY_GUIDE_STEPS[this.currentIndex].id !== "examples") {
+        if (GUIDE_STEPS[this.currentIndex].id !== "examples") {
             this.currentIndex = this.stepIndexForId("examples");
         }
         this.examplesMenuOpen = true;
@@ -2766,9 +3843,116 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.syncVisualState();
     }
 
+    private createTheoryCardButtons(): void {
+        for (let i = 0; i < STORY_GUIDE_THEORY_CARDS.length; i++) {
+            const card = STORY_GUIDE_THEORY_CARDS[i];
+            const tex = THEORY_CARD_TEXTURES[card.id];
+            if (!tex) continue;
+            const slot = this.offsetSlot(card.slot);
+            const binding = this.createTextureButton(
+                "__GuideTheoryCard_" + card.id,
+                "theory:" + card.id,
+                slot,
+                tex.normal,
+                tex.active,
+                tex.pressed,
+                242,
+                () => this.selectTheoryCard(card.id),
+                true,
+                TEX_CARD_OVERLAY_HOVER,
+                TEX_CARD_OVERLAY_SELECTED,
+                TEX_CARD_OVERLAY_PRESSED
+            );
+            binding.object.enabled = false;
+            this.theoryCardButtons.push(binding);
+        }
+        // Full-panel image for definition and metrics pages
+        this.theoryPanelImage = this.createImage(
+            this.sceneObject,
+            "__GuideTheoryPanelImage",
+            this.offsetSlot(THEORY_FULL_PANEL_SLOT),
+            MATH_EXPLAINER_TEXTURES[0],
+            246,
+            0.2
+        );
+        this.theoryPanelImage.object.enabled = false;
+    }
+
+    private syncTheoryCardState(): void {
+        const showCards = !this.folded && this.theoryMenuOpen && this.selectedTheoryCard === "";
+        for (let i = 0; i < this.theoryCardButtons.length; i++) {
+            const b = this.theoryCardButtons[i];
+            b.object.enabled = showCards;
+            if (!showCards) {
+                b.hovered = false;
+                b.pressedState = false;
+            }
+            b.selected = false;
+            this.updateBindingVisual(b);
+        }
+        if (this.cursorOwner && this.isTheoryCardBinding(this.cursorOwner) && !this.cursorOwner.object.enabled) {
+            this.hideCursor();
+        }
+    }
+
+    private isTheoryCardBinding(b: ButtonBinding): boolean {
+        return typeof b.id === "string" && b.id.startsWith("theory:");
+    }
+
+    private selectTheoryCard(id: string): void {
+        this.selectedTheoryCard = id;
+        this.metricsPage = 0;
+        this.definitionPage = 0;
+        if (GUIDE_STEPS[this.currentIndex].id !== "theory") {
+            this.currentIndex = this.stepIndexForId("theory");
+        }
+        this.examplesMenuOpen = false;
+        this.examplesDetailOpen = false;
+        this.theoryMenuOpen = true;
+        this.hideTheoryCardButtonsNow();
+
+        if (id === "patterns") {
+            this.stageCurrentRoot();
+            this.syncDirectorTheoryFieldMode("theory");
+            this.syncDirectorGradientPalette("theory");
+            this.syncDirectorGradientControls("theory");
+        } else {
+            this.clearDirectorTheorySelection();
+            this.stageFallbackContent("theory");
+        }
+        this.updateTheoryPanelTexture();
+        this.syncVisualState();
+        if (id === "patterns") {
+            this.theoryPatternUiSettleRemaining = 0.35;
+            this.forceTheoryPatternInterfaceNow();
+        } else {
+            this.theoryPatternUiSettleRemaining = 0.0;
+        }
+    }
+
+    private hideTheoryCardButtonsNow(): void {
+        for (let i = 0; i < this.theoryCardButtons.length; i++) {
+            const binding = this.theoryCardButtons[i];
+            binding.object.enabled = false;
+            binding.hovered = false;
+            binding.pressedState = false;
+            binding.selected = false;
+            this.updateBindingVisual(binding);
+        }
+        if (this.cursorOwner && this.isTheoryCardBinding(this.cursorOwner)) {
+            this.hideCursor();
+        }
+    }
+
+    private clearDirectorTheorySelection(): void {
+        if (this.directorApi && typeof this.directorApi.clearTheorySelection === "function") {
+            this.directorApi.clearTheorySelection();
+        }
+    }
+
     private selectTheoryFieldMode(id: TheoryFieldModeId): void {
         this.selectedTheoryMode = id;
-        if (STORY_GUIDE_STEPS[this.currentIndex].id !== "theory") {
+        if (GUIDE_STEPS[this.currentIndex].id !== "theory") {
             this.goTo(this.stepIndexForId("theory"));
             return;
         }
@@ -2777,14 +3961,14 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.syncDirectorGradientPalette("theory");
         this.syncDirectorGradientControls("theory");
         if (!this.directorApi || typeof this.directorApi.selectTheoryFieldMode !== "function") {
-            this.stageFallbackTheoryFieldMode();
+            this.stageFallbackContent("theory");
         }
         this.syncVisualState();
     }
 
     private selectGradientPalette(id: GradientPaletteId): void {
         this.selectedGradientPalette = id;
-        if (STORY_GUIDE_STEPS[this.currentIndex].id !== "theory") {
+        if (GUIDE_STEPS[this.currentIndex].id !== "theory") {
             this.goTo(this.stepIndexForId("theory"));
             return;
         }
@@ -2792,21 +3976,26 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.syncDirectorGradientPalette("theory");
         this.syncDirectorGradientControls("theory");
         if (!this.directorApi || typeof this.directorApi.selectGradientPalette !== "function") {
-            this.stageFallbackTheoryFieldMode();
+            this.stageFallbackContent("theory");
         }
         this.syncVisualState();
     }
 
     private returnToChapterList(): void {
-        if (this.examplesMenuOpen && this.examplesDetailOpen) {
-            this.examplesDetailOpen = false;
+        if (this.theoryMenuOpen && this.selectedTheoryCard !== "") {
+            this.selectedTheoryCard = "";
+            this.metricsPage = 0;
+            this.definitionPage = 0;
             this.syncVisualState();
             return;
         }
-        this.examplesMenuOpen = false;
-        this.examplesDetailOpen = false;
-        this.theoryMenuOpen = false;
-        this.syncVisualState();
+        if (this.examplesMenuOpen && this.examplesDetailOpen) {
+            this.examplesDetailOpen = false;
+            this.magneticAdvancedOpen = false;
+            this.syncVisualState();
+            return;
+        }
+        this.showChapterList();
     }
 
     private cycleExampleField(direction: number): void {
@@ -2834,8 +4023,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private stepIndexForId(id: string): number {
-        for (let i = 0; i < STORY_GUIDE_STEPS.length; i++) {
-            if (STORY_GUIDE_STEPS[i].id === id) return i;
+        for (let i = 0; i < GUIDE_STEPS.length; i++) {
+            if (GUIDE_STEPS[i].id === id) return i;
         }
         return 0;
     }
@@ -2850,6 +4039,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (!this.folded) {
             this.keepPlaneControlsWhileFolded = false;
         }
+        this.dockProxyPlaneSoftly();
         this.syncVisualState();
     }
 
@@ -2863,9 +4053,6 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private currentVariantId(): ExampleVariantId | null {
         if (this.selectedExampleField === "gravity") {
             return this.selectedGravityVariant === "artemis" ? "gravity:artemis" : null;
-        }
-        if (this.selectedExampleField === "wind") {
-            return this.selectedWindVariant === "car_flow" ? "wind:car_flow" : "wind:globe";
         }
         return null;
     }
@@ -2904,7 +4091,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private theoryOptionForBinding(binding: ButtonBinding): TheoryFieldOption | null {
-        const id = binding.id.indexOf("theory:") === 0 ? binding.id.substr(7) : binding.id;
+        const id = binding.id.indexOf("theory_mode:") === 0
+            ? binding.id.substr(12)
+            : (binding.id.indexOf("theory:") === 0 ? binding.id.substr(7) : binding.id);
         return this.theoryOptionForId(id as TheoryFieldModeId);
     }
 
