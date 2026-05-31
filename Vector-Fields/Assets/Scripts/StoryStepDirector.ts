@@ -295,11 +295,9 @@ export class StoryStepDirector extends BaseScriptComponent {
     private selectedMagneticTubeMode: number = 0;
     private selectedWindTubeMode: number = 0;
     private appliedKey: string = "";
-    // Master switch for hand manipulation (move/scale) on the active example.
-    // Default ON so move/scale and the car slice-scrub work out of the box; the
-    // story-menu toggle turns it OFF to hand the drag to a custom interaction
-    // (e.g. globe surface-spin). Re-applied every time an example is staged.
-    private exampleManipulationEnabled: boolean = true;
+    // Master switch for moving/scaling the whole active visual root. Default OFF
+    // so child controls own interaction: target, magnets, globe spin, slice scrub.
+    private exampleManipulationEnabled: boolean = false;
     private elapsed: number = 0.0;
     private renderPrioritySettleRemaining: number = 0.0;
     private calibrationSubscribed: boolean = false;
@@ -510,33 +508,77 @@ export class StoryStepDirector extends BaseScriptComponent {
         return this.exampleManipulationEnabled;
     }
 
-    // Walk a subtree and enable/disable every InteractableManipulation script
-    // (matched by name or by its translation properties, so it works for the
-    // SIK packaged component). Colliders are left alone — globe surface-spin
-    // needs the collider to read hit points.
+    // The broad root collider is only for moving the whole visual. Keep it off
+    // by default so custom child controls remain targetable.
     private applyManipulationLock(roots: Array<SceneObject | null>): void {
         for (let i = 0; i < roots.length; i++) {
-            this.setManipulationEnabledInTree(roots[i], this.exampleManipulationEnabled);
+            this.setRootInteractionEnabled(roots[i], this.exampleManipulationEnabled);
+            this.setChildManipulationEnabled(roots[i], !this.exampleManipulationEnabled);
+        }
+    }
+
+    private setRootInteractionEnabled(root: SceneObject | null, enabled: boolean): void {
+        if (!root) return;
+        const colliders = root.getComponents("Physics.ColliderComponent");
+        for (let i = 0; i < colliders.length; i++) {
+            const collider = colliders[i] as ColliderComponent;
+            if (collider) collider.enabled = enabled;
+        }
+        this.setOwnInteractableScriptsEnabled(root, enabled);
+    }
+
+    private setChildManipulationEnabled(root: SceneObject | null, enabled: boolean): void {
+        if (!root) return;
+        for (let i = 0; i < root.getChildrenCount(); i++) {
+            this.setManipulationEnabledInTree(root.getChild(i), enabled);
         }
     }
 
     private setManipulationEnabledInTree(root: SceneObject | null, enabled: boolean): void {
         if (!root) return;
+        const shouldEnable = enabled && !this.hasScriptNamed(root, "GlobeSurfaceRotator");
         const scripts = root.getComponents("Component.ScriptComponent");
         for (let i = 0; i < scripts.length; i++) {
             const script = scripts[i] as any;
             try {
-                const isManip =
-                    script &&
-                    (script.name === "InteractableManipulation" ||
-                        script._enableXTranslation !== undefined ||
-                        script.enableTranslation !== undefined);
-                if (isManip) script.enabled = enabled;
+                if (this.isManipulationScript(script)) script.enabled = shouldEnable;
             } catch (e) {}
         }
         for (let i = 0; i < root.getChildrenCount(); i++) {
             this.setManipulationEnabledInTree(root.getChild(i), enabled);
         }
+    }
+
+    private setOwnInteractableScriptsEnabled(root: SceneObject, enabled: boolean): void {
+        const scripts = root.getComponents("Component.ScriptComponent");
+        for (let i = 0; i < scripts.length; i++) {
+            const script = scripts[i] as any;
+            try {
+                if (this.isManipulationScript(script) || this.isInteractableScript(script)) {
+                    script.enabled = enabled;
+                }
+            } catch (e) {}
+        }
+    }
+
+    private isInteractableScript(script: any): boolean {
+        return !!script && script.name === "Interactable";
+    }
+
+    private isManipulationScript(script: any): boolean {
+        return !!script &&
+            (script.name === "InteractableManipulation" ||
+                script._enableXTranslation !== undefined ||
+                script.enableTranslation !== undefined);
+    }
+
+    private hasScriptNamed(root: SceneObject, scriptName: string): boolean {
+        const scripts = root.getComponents("Component.ScriptComponent");
+        for (let i = 0; i < scripts.length; i++) {
+            const script = scripts[i] as any;
+            if (script && script.name === scriptName) return true;
+        }
+        return false;
     }
 
     private onUpdate(): void {
@@ -679,9 +721,14 @@ export class StoryStepDirector extends BaseScriptComponent {
             this.callLifecycle(carFlowRoot, "refresh");
         }
 
-        // Lock/unlock hand manipulation on the staged examples (globe spins
-        // instead of being dragged; car slice plane stays put) per the menu toggle.
-        this.applyManipulationLock([gravityRoot, magneticRoot, windRoot, carFlowRoot]);
+        this.applyManipulationLock([
+            motionRoot,
+            vectorRoot,
+            gravityRoot,
+            magneticRoot,
+            windRoot,
+            carFlowRoot,
+        ]);
 
         this.promoteMainExperienceVisuals([
             motionRoot,

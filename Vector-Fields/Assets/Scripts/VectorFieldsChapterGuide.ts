@@ -646,9 +646,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.foldButton = foldButton;
         this.utilityButtons.push(foldButton);
 
-        // Manipulation lock toggle (reuses the freed floor-plane slot/art).
-        // ON = hand manipulation (move/scale, car slice-scrub); OFF hands the
-        // drag to a custom interaction (globe surface-spin).
+        // Root-move toggle. OFF keeps child interactions primary.
         const manipButton = this.createTextureButton(
             "__GuideManipToggle",
             "manip",
@@ -1270,19 +1268,15 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.foldButton.selected = false;
             this.updateBindingVisual(this.foldButton);
         }
-        if (this.planeFloorButton) {
-            const texture = this.viewPlaneMode === 0 ? TEX_UTILITY_PLANE_FLOOR_ON : TEX_UTILITY_PLANE_FLOOR_OFF;
-            this.planeFloorButton.normal = texture;
-            this.planeFloorButton.active = texture;
-            this.planeFloorButton.selected = this.viewPlaneMode === 0;
-            this.updateBindingVisual(this.planeFloorButton);
-        }
-        if (this.planeFrontButton) {
-            const texture = this.viewPlaneMode === 1 ? TEX_UTILITY_PLANE_FRONT_ON : TEX_UTILITY_PLANE_FRONT_OFF;
-            this.planeFrontButton.normal = texture;
-            this.planeFrontButton.active = texture;
-            this.planeFrontButton.selected = this.viewPlaneMode === 1;
-            this.updateBindingVisual(this.planeFrontButton);
+        if (this.manipButton) {
+            const manipOn = this.directorApi && typeof this.directorApi.getExampleManipulationEnabled === "function"
+                ? this.directorApi.getExampleManipulationEnabled()
+                : false;
+            const texture = manipOn ? TEX_UTILITY_PLANE_FLOOR_ON : TEX_UTILITY_PLANE_FLOOR_OFF;
+            this.manipButton.normal = texture;
+            this.manipButton.active = texture;
+            this.manipButton.selected = manipOn;
+            this.updateBindingVisual(this.manipButton);
         }
         this.updateBindings(this.navButtons);
         this.updateBindings(this.utilityButtons);
@@ -2051,16 +2045,10 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 this.offsetSlot(STORY_GUIDE_UTILITY.fold)
             );
         }
-        if (this.planeFloorButton) {
+        if (this.manipButton) {
             this.setButtonTargetSlot(
-                this.planeFloorButton,
+                this.manipButton,
                 this.offsetSlot(STORY_GUIDE_UTILITY.planeFloor)
-            );
-        }
-        if (this.planeFrontButton) {
-            this.setButtonTargetSlot(
-                this.planeFrontButton,
-                this.offsetSlot(STORY_GUIDE_UTILITY.planeFront)
             );
         }
     }
@@ -2585,12 +2573,16 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.restoreSceneInteractionIsolation();
         if (!this.isolateSceneInteractors || !this.sceneObject.isEnabledInHierarchy) return;
 
+        const rootMoveEnabled = this.rootMoveInteractionEnabled();
         for (let i = 0; i < INTERACTION_ISOLATION_ROOTS.length; i++) {
             const rootName = INTERACTION_ISOLATION_ROOTS[i];
             const root = this.findObjectByName(rootName);
             if (this.shouldPreserveInteractionRoot(rootName)) {
                 if (root && root.isEnabledInHierarchy) {
-                    this.restoreCollidersInTree(root);
+                    this.restoreCollidersInTree(root, !rootMoveEnabled);
+                    if (!rootMoveEnabled) {
+                        this.setOwnCollidersEnabled(root, false);
+                    }
                 }
                 continue;
             }
@@ -2598,6 +2590,12 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 this.captureCollidersInTree(root);
             }
         }
+    }
+
+    private rootMoveInteractionEnabled(): boolean {
+        return this.directorApi && typeof this.directorApi.getExampleManipulationEnabled === "function"
+            ? this.directorApi.getExampleManipulationEnabled()
+            : false;
     }
 
     private shouldPreserveInteractionRoot(rootName: string): boolean {
@@ -2624,14 +2622,24 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         return false;
     }
 
-    private restoreCollidersInTree(root: SceneObject): void {
-        const colliders = root.getComponents("Physics.ColliderComponent");
-        for (let i = 0; i < colliders.length; i++) {
-            const collider = colliders[i] as ColliderComponent;
-            if (collider) collider.enabled = true;
+    private restoreCollidersInTree(root: SceneObject, skipRoot: boolean = false): void {
+        if (!skipRoot) {
+            const colliders = root.getComponents("Physics.ColliderComponent");
+            for (let i = 0; i < colliders.length; i++) {
+                const collider = colliders[i] as ColliderComponent;
+                if (collider) collider.enabled = true;
+            }
         }
         for (let i = 0; i < root.getChildrenCount(); i++) {
             this.restoreCollidersInTree(root.getChild(i));
+        }
+    }
+
+    private setOwnCollidersEnabled(root: SceneObject, enabled: boolean): void {
+        const colliders = root.getComponents("Physics.ColliderComponent");
+        for (let i = 0; i < colliders.length; i++) {
+            const collider = colliders[i] as ColliderComponent;
+            if (collider) collider.enabled = enabled;
         }
     }
 
