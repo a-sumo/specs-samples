@@ -3,6 +3,8 @@
 // stirred by moving a handle through it. Built with MeshBuilder so it avoids
 // fragile shader-graph wiring during UX iteration.
 
+import { TargetingMode } from "SpectaclesInteractionKit.lspkg/Core/Interactor/Interactor";
+
 type FieldSample = {
     x: number;
     z: number;
@@ -291,6 +293,45 @@ export class MotionFieldPlane extends BaseScriptComponent {
             const cursor = this.findChildByName("Motion Field Metric Cursor");
             if (cursor) this.metricCursorObject = cursor;
         }
+        this.configureInteractionTarget(this.interactionObject);
+        this.configureInteractionTarget(this.metricCursorObject);
+    }
+
+    private configureInteractionTarget(target: SceneObject | null): void {
+        if (!target) return;
+        target.enabled = true;
+
+        const colliders = target.getComponents("Physics.ColliderComponent");
+        for (let i = 0; i < colliders.length; i++) {
+            const collider = colliders[i] as ColliderComponent;
+            if (collider) collider.enabled = true;
+        }
+
+        const scripts = target.getComponents("Component.ScriptComponent");
+        for (let i = 0; i < scripts.length; i++) {
+            const script = scripts[i] as any;
+            if (!script) continue;
+            if (script.name === "Interactable") {
+                try { script.enabled = true; } catch (e) {}
+                try { script.targetingMode = TargetingMode.All; } catch (e) {}
+                try { script.targetingVisual = 1; } catch (e) {}
+                try { script.ignoreInteractionPlane = true; } catch (e) {}
+                try { script.keepHoverOnTrigger = true; } catch (e) {}
+                try { script.enableInstantDrag = true; } catch (e) {}
+                try { script.allowMultipleInteractors = true; } catch (e) {}
+                try { script.enablePokeDirectionality = false; } catch (e) {}
+                try { script.useFilteredPinch = false; } catch (e) {}
+            } else if (script.name === "InteractableManipulation" || script.enableTranslation !== undefined || script._enableXTranslation !== undefined) {
+                try { script.enabled = true; } catch (e) {}
+                try { script.enableTranslation = true; } catch (e) {}
+                try { script.enableRotation = false; } catch (e) {}
+                try { script.enableScale = false; } catch (e) {}
+                try { script._enableXTranslation = true; } catch (e) {}
+                try { script._enableYTranslation = true; } catch (e) {}
+                try { script._enableZTranslation = true; } catch (e) {}
+                try { script.isSynced = false; } catch (e) {}
+            }
+        }
     }
 
     private disableChild(name: string): void {
@@ -466,10 +507,9 @@ export class MotionFieldPlane extends BaseScriptComponent {
     }
 
     private sampleMotionField(x: number, z: number, time: number): FieldSample {
-        const handWeight = this.handActiveCount > 0 ? 0.18 : 1.0;
-        let vx = this.flowSpeed * handWeight;
-        let vz = (Math.sin(z * 0.55 + time * 0.9) * 0.22 + Math.sin(x * 0.27 + time * 0.42) * 0.12) * handWeight;
-        if (this.handleActive && this.handActiveCount === 0) {
+        let vx = this.flowSpeed;
+        let vz = Math.sin(z * 0.55 + time * 0.9) * 0.22 + Math.sin(x * 0.27 + time * 0.42) * 0.12;
+        if (this.handleActive) {
             const dx = x - this.handleX;
             const dz = z - this.handleZ;
             const radius = Math.max(0.001, this.gustRadius);
@@ -484,40 +524,15 @@ export class MotionFieldPlane extends BaseScriptComponent {
             vx += (-dz / len) * this.curlStrength * falloff * (0.55 + this.driveEnergy * 0.65) * swirlSign;
             vz += (dx / len) * this.curlStrength * falloff * (0.55 + this.driveEnergy * 0.65) * swirlSign;
         }
-        if (this.handActiveCount > 0) {
-            const radius = Math.max(0.001, this.fingerInfluenceRadius);
-            const velocityScale = this.fingerFieldStrength * 0.13;
-            const curlScale = this.curlStrength * 0.20;
-            for (let i = 0; i < this.fingerSources.length; i++) {
-                const source = this.fingerSources[i];
-                if (!source.active) continue;
-                const dx = x - source.x;
-                const dz = z - source.z;
-                const d2 = dx * dx + dz * dz;
-                const falloff = Math.exp(-d2 / (radius * radius)) * source.strength;
-                if (falloff < 0.001) continue;
-                const speed = Math.sqrt(source.vx * source.vx + source.vz * source.vz);
-                const speedBoost = this.clamp(speed / Math.max(1.0, this.maxFingerVelocityCmPerSec), 0.0, 1.0);
-                const len = Math.max(0.001, Math.sqrt(d2));
-                vx += source.vx * velocityScale * falloff;
-                vz += source.vz * velocityScale * falloff;
-                const circulation = this.clamp((source.vx * dz - source.vz * dx) / Math.max(0.001, radius * this.maxFingerVelocityCmPerSec), -1.0, 1.0);
-                vx += (-dz / len) * curlScale * falloff * speedBoost * circulation;
-                vz += (dx / len) * curlScale * falloff * speedBoost * circulation;
-            }
-        }
         return { x: vx, z: vz, speed: Math.sqrt(vx * vx + vz * vz) };
     }
 
     private updateDetailMaterial(): void {
         if (!this.backdropMaterial) return;
-        const detailX = this.handActiveCount > 0 ? this.handFocusX : this.handleX;
-        const detailZ = this.handActiveCount > 0 ? this.handFocusZ : this.handleZ;
-        const u = this.clamp((detailX / Math.max(0.001, this.planeWidth)) + 0.5, 0.0, 1.0);
-        const v = this.clamp((detailZ / Math.max(0.001, this.planeDepth)) + 0.5, 0.0, 1.0);
+        const u = this.clamp((this.handleX / Math.max(0.001, this.planeWidth)) + 0.5, 0.0, 1.0);
+        const v = this.clamp((this.handleZ / Math.max(0.001, this.planeDepth)) + 0.5, 0.0, 1.0);
         const handleSpeed = Math.sqrt(this.handleVX * this.handleVX + this.handleVZ * this.handleVZ);
-        const handWake = this.handActiveCount > 0 ? (0.35 + this.handEnergy * 0.85) : 0.0;
-        const wake = this.clamp(Math.max(handWake, this.driveEnergy + handleSpeed * 0.018), 0.28, 1.0);
+        const wake = this.clamp(this.driveEnergy + handleSpeed * 0.018, 0.28, 1.0);
         const data = new vec4(u, v, wake, 0.88);
         const pass = this.backdropMaterial.mainPass as any;
         try { pass.FlatColor = data; } catch (e) {}
@@ -545,12 +560,11 @@ export class MotionFieldPlane extends BaseScriptComponent {
             }
             for (let i = 0; i <= rows; i++) {
                 const z = -hd + this.planeDepth * (i / rows);
-            this.addLine(mb, -hw, z, hw, z, 0.052, 0.016);
+                this.addLine(mb, -hw, z, hw, z, 0.052, 0.016);
             }
             this.gridVisual.mesh = mb.getMesh();
             mb.updateMesh();
         }
-        this.buildGrabHandleMesh();
         this.buildMetricReadoutPlateMesh();
     }
 
@@ -559,9 +573,7 @@ export class MotionFieldPlane extends BaseScriptComponent {
         this.buildArrowMesh();
         this.buildRippleMesh();
         this.buildMetricStencilMesh();
-        this.buildHandleGizmoMesh();
         this.buildMetricCursorGizmoMesh();
-        this.buildFingerGizmoMesh();
     }
 
     private buildTrailMesh(): void {
@@ -654,56 +666,6 @@ export class MotionFieldPlane extends BaseScriptComponent {
         mb.updateMesh();
     }
 
-    private buildHandleGizmoMesh(): void {
-        if (!this.handleGizmoVisual) return;
-        const mb = this.makeBuilder();
-        if (this.handleActive && this.handActiveCount === 0) {
-            const t = getTime();
-            const pulse = 0.5 + 0.5 * Math.sin(t * 4.0);
-            const outer = 0.68 + pulse * 0.06;
-            this.addDiamondFrame(mb, this.handleX, this.handleZ, outer, 0.052, 0.21);
-            this.addDiamondFrame(mb, this.handleX, this.handleZ, 0.40, 0.044, 0.235);
-            this.addSolidDiamond(mb, this.handleX, this.handleZ, 0.18, 0.255);
-            this.addLine(mb, this.handleX - 0.90, this.handleZ, this.handleX - 0.58, this.handleZ, 0.036, 0.23);
-            this.addLine(mb, this.handleX + 0.58, this.handleZ, this.handleX + 0.90, this.handleZ, 0.036, 0.23);
-            this.addLine(mb, this.handleX, this.handleZ - 0.90, this.handleX, this.handleZ - 0.58, 0.036, 0.23);
-            this.addLine(mb, this.handleX, this.handleZ + 0.58, this.handleX, this.handleZ + 0.90, 0.036, 0.23);
-
-            const mag = Math.sqrt(this.driveX * this.driveX + this.driveZ * this.driveZ);
-            if (mag > 0.05) {
-                const dx = this.driveX / mag;
-                const dz = this.driveZ / mag;
-                const len = this.clamp(0.55 + mag * 0.20, 0.55, 1.08);
-                this.addLine(mb, this.handleX, this.handleZ, this.handleX + dx * len, this.handleZ + dz * len, 0.06, 0.265);
-                this.addArrowHead(mb, this.handleX + dx * len, this.handleZ + dz * len, dx, dz, 0.24, 0.10, 0.268);
-            }
-        }
-        this.handleGizmoVisual.mesh = mb.getMesh();
-        mb.updateMesh();
-    }
-
-    private buildFingerGizmoMesh(): void {
-        if (!this.fingerGizmoVisual) return;
-        const mb = this.makeBuilder();
-        if (this.handActiveCount > 0) {
-            for (let i = 0; i < this.fingerSources.length; i++) {
-                const source = this.fingerSources[i];
-                if (!source.active) continue;
-                const speed = Math.sqrt(source.vx * source.vx + source.vz * source.vz);
-                const radius = 0.12 + source.strength * 0.08;
-                this.addDiamondFrame(mb, source.x, source.z, radius, 0.018, 0.235);
-                if (speed > 0.35) {
-                    const scale = this.clamp(speed * 0.035, 0.12, 0.58);
-                    const dx = source.vx / Math.max(0.001, speed);
-                    const dz = source.vz / Math.max(0.001, speed);
-                    this.addLine(mb, source.x, source.z, source.x + dx * scale, source.z + dz * scale, 0.022, 0.242);
-                }
-            }
-        }
-        this.fingerGizmoVisual.mesh = mb.getMesh();
-        mb.updateMesh();
-    }
-
     private buildMetricCursorGizmoMesh(): void {
         if (!this.metricCursorGizmoVisual) return;
         const mb = this.makeBuilder();
@@ -720,27 +682,6 @@ export class MotionFieldPlane extends BaseScriptComponent {
         this.addSolidBox(mb, x, z, 0.10, 0.10, 0.258);
         this.metricCursorGizmoVisual.mesh = mb.getMesh();
         mb.updateMesh();
-    }
-
-    private buildGrabHandleMesh(): void {
-        const hw = this.planeWidth * 0.5 + 1.35;
-        const hd = this.planeDepth * 0.5 + 1.35;
-        if (this.grabPlateVisual) {
-            const mb = this.makeBuilder();
-            this.addSolidBox(mb, 0.0, 0.0, hw, hd, 0.004);
-            this.grabPlateVisual.mesh = mb.getMesh();
-            mb.updateMesh();
-        }
-        if (this.grabFrameVisual) {
-            const mb = this.makeBuilder();
-            this.addBoxFrame(mb, 0.0, 0.0, hw, hd, 0.075, 0.285);
-            this.addCornerTab(mb, -hw, -hd, 1.40, 1.0, 1.0);
-            this.addCornerTab(mb, hw, -hd, 1.40, -1.0, 1.0);
-            this.addCornerTab(mb, -hw, hd, 1.40, 1.0, -1.0);
-            this.addCornerTab(mb, hw, hd, 1.40, -1.0, -1.0);
-            this.grabFrameVisual.mesh = mb.getMesh();
-            mb.updateMesh();
-        }
     }
 
     private buildMetricReadoutPlateMesh(): void {
@@ -848,22 +789,6 @@ export class MotionFieldPlane extends BaseScriptComponent {
         this.addLine(mb, cx - halfX, cz + halfZ, cx - halfX, cz - halfZ, width, y);
     }
 
-    private addCornerTab(mb: MeshBuilder, x: number, z: number, length: number, sx: number, sz: number): void {
-        this.addLine(mb, x, z, x + sx * length, z, 0.10, 0.32);
-        this.addLine(mb, x, z, x, z + sz * length, 0.10, 0.32);
-        this.addLine(mb, x + sx * length * 0.62, z, x + sx * length, z + sz * length * 0.38, 0.052, 0.335);
-        this.addLine(mb, x, z + sz * length * 0.62, x + sx * length * 0.38, z + sz * length, 0.052, 0.335);
-    }
-
-    private addSolidDiamond(mb: MeshBuilder, cx: number, cz: number, radius: number, y: number): void {
-        const base = mb.getVerticesCount();
-        this.addVertex(mb, cx, y, cz + radius, 0.5, 0.5);
-        this.addVertex(mb, cx + radius, y, cz, 0.5, 0.5);
-        this.addVertex(mb, cx, y, cz - radius, 0.5, 0.5);
-        this.addVertex(mb, cx - radius, y, cz, 0.5, 0.5);
-        mb.appendIndices([base, base + 1, base + 2, base, base + 2, base + 3]);
-    }
-
     private addSolidBox(mb: MeshBuilder, cx: number, cz: number, halfX: number, halfZ: number, y: number): void {
         const base = mb.getVerticesCount();
         this.addVertex(mb, cx - halfX, y, cz - halfZ, 0.5, 0.5);
@@ -871,19 +796,6 @@ export class MotionFieldPlane extends BaseScriptComponent {
         this.addVertex(mb, cx + halfX, y, cz + halfZ, 0.5, 0.5);
         this.addVertex(mb, cx - halfX, y, cz + halfZ, 0.5, 0.5);
         mb.appendIndices([base, base + 1, base + 2, base, base + 2, base + 3]);
-    }
-
-    private addArrowHead(mb: MeshBuilder, tipX: number, tipZ: number, dx: number, dz: number, length: number, width: number, y: number): void {
-        const px = -dz;
-        const pz = dx;
-        const baseX = tipX - dx * length;
-        const baseZ = tipZ - dz * length;
-        const base = mb.getVerticesCount();
-        const scaledWidth = width * LINE_WIDTH_SCALE;
-        this.addVertex(mb, tipX, y, tipZ, 0.5, 0.5);
-        this.addVertex(mb, baseX + px * scaledWidth, y, baseZ + pz * scaledWidth, 0.0, 0.0);
-        this.addVertex(mb, baseX - px * scaledWidth, y, baseZ - pz * scaledWidth, 1.0, 1.0);
-        mb.appendIndices([base, base + 1, base + 2]);
     }
 
     private addArrow(mb: MeshBuilder, x: number, z: number, vx: number, vz: number, length: number, width: number, y: number): void {

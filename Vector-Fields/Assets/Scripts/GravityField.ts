@@ -10,6 +10,7 @@
 
 import { ARTEMIS_II_TRAJECTORY } from "./ArtemisTrajectory";
 import { MOON_EPHEMERIS } from "./MoonEphemeris";
+import { SurfaceLabel } from "./SurfaceLabel";
 
 type GravitySample = {
     field: vec3;
@@ -232,6 +233,10 @@ export class GravityField extends BaseScriptComponent {
     private artemisMissionT: number = 0.0;
     private artemisFrameRot: quat = quat.fromEulerAngles(0, 0, 0);
     private artemisFrameReady: boolean = false;
+    private artemisEventLabels: SurfaceLabel[] = [];
+    private artemisEventLabelTimes: number[] = [];
+    private artemisEventLabelsBuilt: boolean = false;
+    private cachedCameraObject: SceneObject | null = null;
 
     onAwake(): void {
         this.captureBaseTransforms();
@@ -284,6 +289,7 @@ export class GravityField extends BaseScriptComponent {
         this.setIssOrbitMotionEnabled(false);
         this.setMoonOrbitMotionEnabled(false);
         this.setMoonSynchronousRotationEnabled(enabled);
+        if (!enabled) this.destroyArtemisEventLabels();
         this.rebuild();
     }
 
@@ -323,6 +329,86 @@ export class GravityField extends BaseScriptComponent {
     private tick(): void {
         const fieldBodyMoved = this.updateCelestialMotion();
         this.rebuildIfModelInputsChanged(fieldBodyMoved);
+        this.updateArtemisEventLabels();
+    }
+
+    // Floating timestamp labels at each Artemis waypoint. Created once when the
+    // mission is enabled, repositioned + billboarded every frame, destroyed on
+    // disable. Driven entirely by ARTEMIS_II_TRAJECTORY.events, so a fuller OEM
+    // (all 15 steps) lights up all the labels with no extra code.
+    private updateArtemisEventLabels(): void {
+        if (!this.artemisMissionEnabled) {
+            this.destroyArtemisEventLabels();
+            return;
+        }
+        this.ensureArtemisEventLabels();
+        const camera = this.cameraWorldPosition();
+        for (let i = 0; i < this.artemisEventLabels.length; i++) {
+            const at = this.artemisPlanarLocalForKm(
+                this.sampleArtemis(ARTEMIS_II_TRAJECTORY, this.artemisEventLabelTimes[i]),
+                GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.04
+            );
+            this.artemisEventLabels[i].setLocalPosition(at);
+            if (camera) this.artemisEventLabels[i].face(camera);
+        }
+    }
+
+    private ensureArtemisEventLabels(): void {
+        if (this.artemisEventLabelsBuilt) return;
+        const d: any = ARTEMIS_II_TRAJECTORY;
+        const events: any[] = d.events || [];
+        const duration = d.t[d.t.length - 1];
+        let slot = 0;
+        for (let i = 0; i < events.length; i++) {
+            const ev = events[i];
+            if (!ev || typeof ev.t !== "number" || ev.t < 0.0 || ev.t > duration) continue;
+            const label = new SurfaceLabel(this.sceneObject, "ArtemisEventLabel_" + i, this.material);
+            label.setRenderOrder(GravityField.BODY_RENDER_ORDER + 6);
+            const num = (typeof ev.n === "number") ? (ev.n + "  ") : "";
+            const when = (typeof ev.utc === "string" && ev.utc.length >= 16) ? ev.utc.substring(5, 16) : "";
+            // Alternate the box left/right and stagger the leader so neighbouring
+            // cards near Earth don't stack on top of each other.
+            const side = (slot % 2 === 0) ? 1.0 : -1.0;
+            const lift = Math.floor(slot / 2) * 1.6;
+            label.setCallout(num + (ev.label || "") + (when ? "\n" + when : ""), new vec4(0.15, 0.55, 1.0, 1.0), side, lift);
+            this.artemisEventLabels.push(label);
+            this.artemisEventLabelTimes.push(ev.t);
+            slot++;
+        }
+        this.artemisEventLabelsBuilt = true;
+    }
+
+    private destroyArtemisEventLabels(): void {
+        if (!this.artemisEventLabelsBuilt) return;
+        for (let i = 0; i < this.artemisEventLabels.length; i++) this.artemisEventLabels[i].destroy();
+        this.artemisEventLabels = [];
+        this.artemisEventLabelTimes = [];
+        this.artemisEventLabelsBuilt = false;
+    }
+
+    private cameraWorldPosition(): vec3 | null {
+        if (!this.cachedCameraObject) {
+            this.cachedCameraObject = this.findSceneObjectByName("Camera Object") || this.findSceneObjectByName("Camera");
+        }
+        return this.cachedCameraObject ? this.cachedCameraObject.getTransform().getWorldPosition() : null;
+    }
+
+    private findSceneObjectByName(name: string): SceneObject | null {
+        const count = global.scene.getRootObjectsCount();
+        for (let i = 0; i < count; i++) {
+            const found = this.searchTree(global.scene.getRootObject(i), name);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    private searchTree(root: SceneObject, name: string): SceneObject | null {
+        if (root.name === name) return root;
+        for (let i = 0; i < root.getChildrenCount(); i++) {
+            const found = this.searchTree(root.getChild(i), name);
+            if (found) return found;
+        }
+        return null;
     }
 
     private rebuildIfModelInputsChanged(throttleForMotion: boolean): void {
@@ -569,13 +655,13 @@ export class GravityField extends BaseScriptComponent {
 
     private buildArtemisMissionVisuals(): void {
         const trajectory = this.buildArtemisTrajectoryMesh(false);
-        this.assignVisual("artemisTrajectory", trajectory, new vec4(0.94, 0.93, 0.88, 0.72), GravityField.FIELD_RENDER_ORDER + 6);
+        this.assignVisual("artemisTrajectory", trajectory, new vec4(0.22, 0.55, 1.0, 0.70), GravityField.FIELD_RENDER_ORDER + 6);
 
         const trail = this.buildArtemisTrajectoryMesh(true);
-        this.assignVisual("artemisTrail", trail, new vec4(1.0, 0.98, 0.90, 0.96), GravityField.FIELD_RENDER_ORDER + 7);
+        this.assignVisual("artemisTrail", trail, new vec4(0.42, 0.72, 1.0, 0.96), GravityField.FIELD_RENDER_ORDER + 7);
 
         const cursor = this.buildArtemisCursorMesh(this.artemisDisplayLocalForTime(this.artemisMissionT, GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.03));
-        this.assignVisual("artemisCursor", cursor, new vec4(1.0, 0.99, 0.94, 1.0), GravityField.BODY_RENDER_ORDER + 4);
+        this.assignVisual("artemisCursor", cursor, new vec4(0.70, 0.86, 1.0, 1.0), GravityField.BODY_RENDER_ORDER + 4);
 
         this.buildArtemisEventMarkers();
     }
@@ -596,7 +682,7 @@ export class GravityField extends BaseScriptComponent {
                 GravityField.ARTEMIS_TRAJECTORY_LIFT + 0.04
             );
             const mb = this.buildArtemisMarkerMesh(center);
-            this.assignVisual("artemisEvent" + i, mb, new vec4(1.0, 0.80, 0.15, 0.95), GravityField.BODY_RENDER_ORDER + 3);
+            this.assignVisual("artemisEvent" + i, mb, new vec4(0.12, 0.52, 1.0, 0.95), GravityField.BODY_RENDER_ORDER + 3);
         }
     }
 

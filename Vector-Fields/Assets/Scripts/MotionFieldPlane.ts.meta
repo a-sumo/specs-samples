@@ -30,10 +30,6 @@
     arrowLength: false
     arrowRows: false
     curlStrength: false
-    enableHandInput: false
-    fingerFieldStrength: false
-    fingerInfluenceRadius: false
-    fingerProjectionDepthCm: false
     flowAccumulation: false
     flowMemorySeconds: false
     flowSpeed: false
@@ -41,11 +37,9 @@
     gustStrength: false
     initialPreset: false
     interactionObject: false
-    maxFingerVelocityCmPerSec: false
     metricCursorObject: false
     metricSampleStep: false
     planeDepth: false
-    planeGrabObject: false
     planeWidth: false
     tracerCount: false
     trailSamples: false
@@ -61,7 +55,6 @@
   DefaultScriptInputs:
     - interactionObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       metricCursorObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      planeGrabObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       initialPreset: !<float> 3.000000
       planeWidth: !<float> 24.000000
       planeDepth: !<float> 14.000000
@@ -76,11 +69,6 @@
       trailWidth: 0.075000
       arrowLength: 0.420000
       metricSampleStep: 0.550000
-      enableHandInput: true
-      fingerInfluenceRadius: 2.600000
-      fingerFieldStrength: !<float> 1.000000
-      fingerProjectionDepthCm: !<float> 12.000000
-      maxFingerVelocityCmPerSec: !<float> 36.000000
       flowMemorySeconds: !<float> 2.000000
       flowAccumulation: !<float> 1.000000
   ScriptTypes:
@@ -89,7 +77,6 @@
   InputLines:
     - '// @input SceneObject interactionObject {"hint":"Optional draggable handle. Its local X/Z position creates a moving gust in the field."}'
     - '// @input SceneObject metricCursorObject {"hint":"Optional draggable metric cursor. Its local X/Z position samples divergence and curl."}'
-    - '// @input SceneObject planeGrabObject {"hint":"Optional planar grab handle. Its manipulation target is rebound to this field root at runtime."}'
     - '// @input float initialPreset = 3 {"hint":"Initial planar field preset.", "widget":"combobox", "values":[{"label":"Expansion", "value":0}, {"label":"Contraction", "value":1}, {"label":"Curl", "value":2}, {"label":"Motion", "value":3}]}'
     - '// @input float planeWidth = 48 {"widget":"slider", "min":8, "max":64, "step":0.5}'
     - '// @input float planeDepth = 28 {"widget":"slider", "min":5, "max":44, "step":0.5}'
@@ -104,10 +91,5 @@
     - '// @input float trailWidth = 0.075 {"widget":"slider", "min":0.02, "max":0.18, "step":0.005}'
     - '// @input float arrowLength = 0.42 {"widget":"slider", "min":0.15, "max":0.8, "step":0.025}'
     - '// @input float metricSampleStep = 0.55 {"widget":"slider", "min":0.18, "max":1.2, "step":0.02}'
-    - '// @input bool enableHandInput {"hint":"Project tracked fingertips onto the plane and use their motion as field input. Disabled until SIK hand provider is initialized by the host experience."}'
-    - '// @input float fingerInfluenceRadius = 2.6 {"hint":"How far each fingertip pushes the planar field, in centimeters.", "widget":"slider", "min":1, "max":8, "step":0.25}'
-    - '// @input float fingerFieldStrength = 1 {"hint":"Multiplier for fingertip velocity injected into the field.", "widget":"slider", "min":0.1, "max":2.5, "step":0.05}'
-    - '// @input float fingerProjectionDepthCm = 12 {"hint":"How far above/in front of the plane fingertips can be and still affect it.", "widget":"slider", "min":2, "max":24, "step":0.5}'
-    - '// @input float maxFingerVelocityCmPerSec = 36 {"hint":"Clamp fingertip speed to reject tracking spikes.", "widget":"slider", "min":4, "max":80, "step":1}'
     - '// @input float flowMemorySeconds = 2 {"hint":"Field memory: seconds for stirred motion to ease back to rest after you stop. 0 = snap back instantly.", "widget":"slider", "min":0, "max":5, "step":0.1}'
     - '// @input float flowAccumulation = 1 {"hint":"How strongly continued stirring builds up momentum in the field (cumulative energy).", "widget":"slider", "min":0, "max":3, "step":0.05}'

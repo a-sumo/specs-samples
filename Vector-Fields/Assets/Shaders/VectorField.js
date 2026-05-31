@@ -604,11 +604,15 @@ void main() {
         pos = advanceDomain(pos, domainRadius, fractional);
 
         vec3 vel = getDomainField(pos, domainRadius);
-        vec3 viewDir = safeNormalize(system.getCameraPosition() - pos, vec3(0.0, 0.0, 1.0));
-        vec3 right = cross(vec3(0.0, 1.0, 0.0), viewDir);
-        if (length(right) < 0.001) right = cross(vec3(1.0, 0.0, 0.0), viewDir);
-        right = safeNormalize(right, vec3(1.0, 0.0, 0.0));
-        vec3 billboardUp = safeNormalize(cross(viewDir, right), vec3(0.0, 1.0, 0.0));
+        vec3 posWorld = (system.getMatrixWorld() * vec4(pos, 1.0)).xyz;
+        vec3 viewDir = safeNormalize(system.getCameraPosition() - posWorld, vec3(0.0, 0.0, 1.0));
+        vec3 rightWorld = cross(vec3(0.0, 1.0, 0.0), viewDir);
+        if (length(rightWorld) < 0.001) rightWorld = cross(vec3(1.0, 0.0, 0.0), viewDir);
+        rightWorld = safeNormalize(rightWorld, vec3(1.0, 0.0, 0.0));
+        vec3 upWorld = safeNormalize(cross(viewDir, rightWorld), vec3(0.0, 1.0, 0.0));
+        mat4 worldInv = system.getMatrixWorldInverse();
+        vec3 right = safeNormalize((worldInv * vec4(rightWorld, 0.0)).xyz, vec3(1.0, 0.0, 0.0));
+        vec3 billboardUp = safeNormalize((worldInv * vec4(upWorld, 0.0)).xyz, vec3(0.0, 1.0, 0.0));
 
         if (usesSphereSurface()) {
             vec3 surfaceNormal = safeNormalize(pos, vec3(0.0, 1.0, 0.0));

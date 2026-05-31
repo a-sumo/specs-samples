@@ -62,20 +62,27 @@ void main() {
     vec2 fieldDir = (fieldMag > 0.0001) ? fieldXZ / fieldMag : vec2(1.0, 0.0);
 
     // Heatmap by potential intensity. The log keeps the Earth well readable
-    // while preserving the Moon's smaller field.
+    // while preserving the Moon's smaller field. The low end is widened so the
+    // tint reaches across the whole plane instead of clustering at the cores.
     float logPotential = log(1.0 + potential * 0.6);
-    float intensity = smoothstep(0.75, 2.65, logPotential);
-    intensity = pow(clamp(intensity, 0.0, 1.0), 1.35);
+    float intensity = smoothstep(0.18, 2.45, logPotential);
+    intensity = pow(clamp(intensity, 0.0, 1.0), 1.2);
     vec3 baseColor = mix(ColorLow.rgb, ColorHigh.rgb, intensity);
 
-    // Iso-potential contour lines. Using log-potential spaces the isolines
-    // evenly across the gravity well and keeps the density readable near masses.
-    float isoPhase = logPotential * ContourCount;
+    // Iso-potential contour lines. Spacing on the reciprocal of the potential
+    // makes the rings roughly evenly spaced in distance, so they keep filling
+    // the plane out to the edge instead of bunching up near the masses.
+    float isoMetric = 1.0 / (0.35 + potential);
+    float isoPhase = isoMetric * ContourCount * 1.4;
     float isoDist = abs(fract(isoPhase) - 0.5) * 2.0;
     float isoWidth = clamp(ContourThickness, 0.01, 0.45);
     float isoCore = 1.0 - smoothstep(0.0, isoWidth, isoDist);
     float isoHalo = 1.0 - smoothstep(isoWidth, min(1.0, isoWidth * 2.8), isoDist);
     float contourMask = clamp(isoCore + isoHalo * 0.32, 0.0, 1.0) * ContourColor.a;
+
+    // Normalized field strength, used to scale (not hide) the overlays so they
+    // stay visible far from the masses where the raw magnitude is tiny.
+    float fieldStrength = fieldMag / (fieldMag + 0.05);
 
     // Field lines: a procedural tangent-line overlay. The local line coordinate
     // is measured perpendicular to the gravity vector, so the visible strokes
@@ -86,7 +93,7 @@ void main() {
     float fieldLineWidth = clamp(FieldLineWidth, 0.005, 0.45);
     float fieldLineMask = (1.0 - smoothstep(fieldLineWidth, fieldLineWidth + 0.055, fieldLineDist))
                         * FieldLineColor.a
-                        * smoothstep(0.02, 0.32, fieldMag);
+                        * mix(0.55, 1.0, fieldStrength);
 
     // Arrow glyphs sampled on a grid. Each cell reads the gravity field at
     // its center, then draws a small shaft + triangular head in that direction.
@@ -104,7 +111,10 @@ void main() {
     vec2 arrowDir = (cellMag > 0.0001) ? cellField / cellMag : vec2(1.0, 0.0);
     vec2 arrowPerp = vec2(-arrowDir.y, arrowDir.x);
     vec2 rel = planeP - cellCenter;
-    float arrowLen = spacing * clamp(ArrowScale, 0.1, 1.2);
+    // Scale each glyph by a normalized strength so near-mass arrows read long
+    // and far-field arrows stay short but visible — never gated fully off.
+    float cellStrength = cellMag / (cellMag + 0.06);
+    float arrowLen = spacing * clamp(ArrowScale, 0.1, 1.2) * mix(0.5, 1.0, cellStrength);
     float u = dot(rel, arrowDir);
     float v = dot(rel, arrowPerp);
     float tail = -0.34 * arrowLen;
@@ -121,8 +131,7 @@ void main() {
     float bodyFade = smoothstep(0.50, 1.25, min(crE, crM));
     float arrowMask = max(shaftMask, headMask)
                     * ArrowColor.a
-                    * bodyFade
-                    * smoothstep(0.02, 0.45, cellMag);
+                    * bodyFade;
 
     // Flow stripes: animate along field direction so the field "moves."
     float flowParam = dot(vec2(sampleP.x, sampleP.z), fieldDir) * FlowScale
