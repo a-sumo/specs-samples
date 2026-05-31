@@ -188,17 +188,17 @@ export class VectorFieldTubes extends BaseScriptComponent {
 
     @input
     @hint("Object that affects the field - field reacts to its position")
-    trackedObject: SceneObject;
+    trackedObject: SceneObject = null as any;
 
     @input
     @hint("Box collider - field only animates when tracked object is inside")
-    fieldCollider: ColliderComponent;
+    fieldCollider: ColliderComponent = null as any;
 
     // ============ MATERIAL ============
 
     @input
     @hint("Material with VectorFieldTubesShader.js")
-    material: Material;
+    material: Material = null as any;
 
     // Multiple mesh support for large geometry counts
     private static readonly MAX_VERTS_PER_MESH: number = 32000;  // Safe UInt16 limit with headroom
@@ -206,7 +206,7 @@ export class VectorFieldTubes extends BaseScriptComponent {
     private meshVisuals: RenderMeshVisual[] = [];
     private currentMeshIndex: number = 0;
     private currentMeshVertexCount: number = 0;
-    private mainPass: Pass;
+    private mainPass: Pass = null as any;
     private refreshEvent: DelayedCallbackEvent | null = null;
     private refreshQueued: boolean = false;
     private hasGeneratedMesh: boolean = false;
