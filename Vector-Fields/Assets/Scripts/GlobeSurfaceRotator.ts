@@ -94,6 +94,7 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
     private targetTransform: Transform | null = null;
     private interactable: any = null;
     private gravityApi: any = null;
+    private proxyApi: any = null;
     private dragging: boolean = false;
 
     // Trackball math runs in WORLD space relative to the globe center. Using the
@@ -192,6 +193,7 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
 
     private beginDrag(event: any): void {
         if (!this.enabled) return;
+        this.deactivateProxyForContentInteraction();
         this.gravityApi = this.findGravityApi();
         this.dragging = true;
         this.returning = false;
@@ -411,6 +413,59 @@ export class GlobeSurfaceRotator extends BaseScriptComponent {
             ) {
                 return candidate;
             }
+        }
+        return null;
+    }
+
+    private deactivateProxyForContentInteraction(): void {
+        const api = this.proxyApi || this.findProxyApi();
+        this.proxyApi = api;
+        if (!api) return;
+        try {
+            if (typeof api.deactivateForContentInteraction === "function") {
+                api.deactivateForContentInteraction();
+            } else if (typeof api.notifyContentInteractionStart === "function") {
+                api.notifyContentInteractionStart();
+            } else if (typeof api.setActive === "function") {
+                api.setActive(false);
+            } else if (typeof api.cancelAndDock === "function") {
+                api.cancelAndDock();
+            }
+        } catch (e) {}
+    }
+
+    private findProxyApi(): any {
+        const root = this.findObjectByName("ProxyInteractionPlane");
+        if (!root) return null;
+        const scripts = root.getComponents("Component.ScriptComponent");
+        for (let i = 0; i < scripts.length; i++) {
+            const candidate = scripts[i] as any;
+            if (
+                candidate &&
+                (typeof candidate.deactivateForContentInteraction === "function" ||
+                    typeof candidate.notifyContentInteractionStart === "function" ||
+                    typeof candidate.setActive === "function" ||
+                    typeof candidate.cancelAndDock === "function")
+            ) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    private findObjectByName(name: string): SceneObject | null {
+        for (let i = 0; i < global.scene.getRootObjectsCount(); i++) {
+            const found = this.findInTree(global.scene.getRootObject(i), name);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    private findInTree(root: SceneObject, name: string): SceneObject | null {
+        if (root.name === name) return root;
+        for (let i = 0; i < root.getChildrenCount(); i++) {
+            const found = this.findInTree(root.getChild(i), name);
+            if (found) return found;
         }
         return null;
     }

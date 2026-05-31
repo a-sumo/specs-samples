@@ -159,7 +159,6 @@ const GUIDE_FONT = requireAsset("../Fonts/Nunito_Sans/NunitoSans.ttf") as Font;
 const TEX_PANEL_MAIN = requireAsset("../Images/StoryUI/chapter_panel_main_v3.png") as Texture;
 const TEX_PANEL_EXAMPLES = requireAsset("../Images/StoryUI/examples_panel.png") as Texture;
 const TEX_PANEL_THEORY = requireAsset("../Images/StoryUI/theory_panel.png") as Texture;
-const TEX_PANEL_THEORY_MOTION = requireAsset("../Images/StoryUI/theory_panel_motion.png") as Texture;
 const EXAMPLE_DETAIL_PANEL_TEXTURES: { [key: string]: Texture } = {
     gravity: requireAsset("../Images/StoryUI/example_detail_gravity_panel.png") as Texture,
     magnetism: requireAsset("../Images/StoryUI/example_detail_magnetism_panel.png") as Texture,
@@ -410,6 +409,7 @@ const GRADIENT_PALETTE_OPTIONS: GradientPaletteOption[] = [
 ];
 
 const THEORY_INFO_SLOT: StoryGuideSlot = STORY_GUIDE_THEORY.info;
+const MOTION_INSTRUCTION_SLOT: StoryGuideSlot = { x: 0.0, y: -0.08, width: 19.6, height: 4.8 };
 const GRADIENT_SCALE_SLOT: StoryGuideSlot = { x: 3.28, y: -5.18, width: 12.4, height: 1.42 };
 const GRADIENT_OFFSET_SLOT: StoryGuideSlot = { x: 3.28, y: -7.08, width: 12.4, height: 1.42 };
 const MAGNETIC_ADVANCED_SLOT: StoryGuideSlot = { x: 0.0, y: -7.84, width: 8.0, height: 1.64 };
@@ -546,6 +546,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private theoryModeButtons: ButtonBinding[] = [];
     private theoryCardButtons: ButtonBinding[] = [];
     private theoryPanelImage: ImageBinding | null = null;
+    private motionInstructionObject: SceneObject | null = null;
+    private motionInstructionKicker: Text | null = null;
+    private motionInstructionCopy: Text | null = null;
     private selectedTheoryCard: string = "";
     private metricsPage: number = 0;
     private definitionPage: number = 0;
@@ -757,6 +760,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.createGradientPaletteSelectors();
         this.createGradientSliders();
         this.createTheoryInfoCard();
+        this.createMotionInstructionText();
         this.prewarmTheoryPatternControls();
         this.createExamplesBackButton();
         this.createNavButton("__GuideBack", "back", this.offsetSlot(STORY_GUIDE_NAV.back), TEX_NAV_BACK_NORMAL, TEX_NAV_BACK_PRESSED, 244, () => this.prev());
@@ -1174,6 +1178,45 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             0.2
         );
         this.theoryInfoImage.object.enabled = false;
+    }
+
+    private createMotionInstructionText(): void {
+        const slot = this.offsetSlot(MOTION_INSTRUCTION_SLOT);
+        const root = this.ensureChild(this.sceneObject, "__GuideMotionInstructions");
+        this.place(root, slot.x, slot.y, 0.72);
+
+        const kickerObject = this.ensureChild(root, "__Kicker");
+        this.place(kickerObject, 0.0, 1.22, 0.0);
+        this.motionInstructionKicker = this.configureGuideText(
+            kickerObject,
+            this.motionInstructionKicker,
+            "M O T I O N   F I E L D",
+            slot.width,
+            0.62,
+            30,
+            HorizontalAlignment.Center,
+            VerticalAlignment.Center,
+            262,
+            new vec4(0.72, 0.84, 1.0, 0.92)
+        );
+
+        const copyObject = this.ensureChild(root, "__Copy");
+        this.place(copyObject, 0.0, -0.12, 0.0);
+        this.motionInstructionCopy = this.configureGuideText(
+            copyObject,
+            this.motionInstructionCopy,
+            "Move the handle through the plane.\nFaster motion lengthens the arrows and bends the local field.",
+            slot.width,
+            2.7,
+            42,
+            HorizontalAlignment.Center,
+            VerticalAlignment.Center,
+            262,
+            new vec4(0.96, 0.98, 1.0, 0.98)
+        );
+
+        root.enabled = false;
+        this.motionInstructionObject = root;
     }
 
     private ensureRuntimeAdditions(): void {
@@ -1608,7 +1651,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private currentPanelTexture(): Texture {
         if (this.theoryMenuOpen) {
-            return this.selectedTheoryMode === "motion" ? TEX_PANEL_THEORY_MOTION : TEX_PANEL_THEORY;
+            return TEX_PANEL_THEORY;
         }
         if (this.examplesMenuOpen) {
             if (this.examplesDetailOpen && this.selectedExampleField === "gravity" && this.selectedGravityVariant === "artemis") {
@@ -1678,6 +1721,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.syncExampleModeState();
         this.syncMagneticAdvancedState();
         this.syncTheoryFieldModeState();
+        this.syncMotionInstructionState();
         this.syncGradientPaletteState();
         this.syncGradientSliderState();
         this.syncUtilityDockTargets();
@@ -1797,6 +1841,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private selectWindEvent(index: number): void {
         if (index < 0 || index >= STORMS.length) return;
+        this.setProxyPlaneActive(false);
         this.selectedWindEventIndex = index;
         const storm = STORMS[index];
         const root = this.findObjectByName("Globe Calibration");
@@ -3113,6 +3158,20 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         if (this.cursorOwner && this.isTheoryBinding(this.cursorOwner) && !this.cursorOwner.object.enabled) {
             this.hideCursor();
+        }
+    }
+
+    private syncMotionInstructionState(): void {
+        const visible = !this.folded &&
+            this.theoryMenuOpen &&
+            this.selectedTheoryCard === "patterns" &&
+            this.selectedTheoryMode === "motion";
+        if (!this.motionInstructionObject) {
+            if (visible) this.createMotionInstructionText();
+            else return;
+        }
+        if (this.motionInstructionObject) {
+            this.motionInstructionObject.enabled = visible;
         }
     }
 

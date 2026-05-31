@@ -59,6 +59,7 @@ export class TexturedButton extends BaseScriptComponent {
     private hovered: boolean = false;
     private toggled: boolean = false;
     private onPressCallbacks: Array<() => void> = [];
+    private proxyApi: any = null;
 
     onAwake(): void {
         this.createEvent("OnStartEvent").bind(() => this.bind());
@@ -99,6 +100,7 @@ export class TexturedButton extends BaseScriptComponent {
     // Only counts as a press when the release happened inside the button.
     private fire(inside: boolean): void {
         if (inside) {
+            this.deactivateProxyForContentInteraction();
             if (this.isToggle) this.toggled = !this.toggled;
             this.performAction();
             for (let i = 0; i < this.onPressCallbacks.length; i++) {
@@ -148,6 +150,59 @@ export class TexturedButton extends BaseScriptComponent {
             if (candidate && candidate.onTriggerEnd && typeof candidate.onTriggerEnd.add === "function") {
                 return candidate;
             }
+        }
+        return null;
+    }
+
+    private deactivateProxyForContentInteraction(): void {
+        const api = this.proxyApi || this.findProxyApi();
+        this.proxyApi = api;
+        if (!api) return;
+        try {
+            if (typeof api.deactivateForContentInteraction === "function") {
+                api.deactivateForContentInteraction();
+            } else if (typeof api.notifyContentInteractionStart === "function") {
+                api.notifyContentInteractionStart();
+            } else if (typeof api.setActive === "function") {
+                api.setActive(false);
+            } else if (typeof api.cancelAndDock === "function") {
+                api.cancelAndDock();
+            }
+        } catch (e) {}
+    }
+
+    private findProxyApi(): any {
+        const root = this.findObjectByName("ProxyInteractionPlane");
+        if (!root) return null;
+        const scripts = root.getComponents("Component.ScriptComponent");
+        for (let i = 0; i < scripts.length; i++) {
+            const candidate = scripts[i] as any;
+            if (
+                candidate &&
+                (typeof candidate.deactivateForContentInteraction === "function" ||
+                    typeof candidate.notifyContentInteractionStart === "function" ||
+                    typeof candidate.setActive === "function" ||
+                    typeof candidate.cancelAndDock === "function")
+            ) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    private findObjectByName(name: string): SceneObject | null {
+        for (let i = 0; i < global.scene.getRootObjectsCount(); i++) {
+            const found = this.findInTree(global.scene.getRootObject(i), name);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    private findInTree(root: SceneObject, name: string): SceneObject | null {
+        if (root.name === name) return root;
+        for (let i = 0; i < root.getChildrenCount(); i++) {
+            const found = this.findInTree(root.getChild(i), name);
+            if (found) return found;
         }
         return null;
     }

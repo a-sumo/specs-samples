@@ -114,6 +114,7 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
     private tubeModeButtonStyles: FieldButtonBinding[] = [];
     private lodButtonStyles: FieldButtonBinding[] = [];
     private activeComponent: any = null;
+    private proxyApi: any = null;
     private fieldModesBuilt: boolean = false;
     private presetsBuilt: boolean = false;
     private tubeModesBuilt: boolean = false;
@@ -764,6 +765,7 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
 
     private onSliderValueChanged(propertyName: string, value: number): void {
         if (!this.activeComponent) return;
+        this.deactivateProxyForContentInteraction();
 
         // referenceDistance goes only to MagnetPhysics
         if (propertyName === "referenceDistance" && this.magnetPhysicsComponent) {
@@ -897,6 +899,59 @@ export class DynamicSettingsPanel extends BaseScriptComponent {
         }
         for (const config of this.magneticFieldConfigs) {
             if (config.propertyName === propertyName) return config;
+        }
+        return null;
+    }
+
+    private deactivateProxyForContentInteraction(): void {
+        const api = this.proxyApi || this.findProxyApi();
+        this.proxyApi = api;
+        if (!api) return;
+        try {
+            if (typeof api.deactivateForContentInteraction === "function") {
+                api.deactivateForContentInteraction();
+            } else if (typeof api.notifyContentInteractionStart === "function") {
+                api.notifyContentInteractionStart();
+            } else if (typeof api.setActive === "function") {
+                api.setActive(false);
+            } else if (typeof api.cancelAndDock === "function") {
+                api.cancelAndDock();
+            }
+        } catch (e) {}
+    }
+
+    private findProxyApi(): any {
+        const root = this.findObjectByName("ProxyInteractionPlane");
+        if (!root) return null;
+        const scripts = root.getComponents("Component.ScriptComponent");
+        for (let i = 0; i < scripts.length; i++) {
+            const candidate = scripts[i] as any;
+            if (
+                candidate &&
+                (typeof candidate.deactivateForContentInteraction === "function" ||
+                    typeof candidate.notifyContentInteractionStart === "function" ||
+                    typeof candidate.setActive === "function" ||
+                    typeof candidate.cancelAndDock === "function")
+            ) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    private findObjectByName(name: string): SceneObject | null {
+        for (let i = 0; i < global.scene.getRootObjectsCount(); i++) {
+            const found = this.findInTree(global.scene.getRootObject(i), name);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    private findInTree(root: SceneObject, name: string): SceneObject | null {
+        if (root.name === name) return root;
+        for (let i = 0; i < root.getChildrenCount(); i++) {
+            const found = this.findInTree(root.getChild(i), name);
+            if (found) return found;
         }
         return null;
     }

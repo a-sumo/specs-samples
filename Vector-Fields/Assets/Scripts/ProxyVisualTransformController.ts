@@ -156,6 +156,18 @@ export class ProxyVisualTransformController extends BaseScriptComponent {
         this.deactivate();
     }
 
+    public deactivateForContentInteraction(): void {
+        if (this.active) {
+            this.deactivate();
+            return;
+        }
+        this.setProxyAvailable(this.resolveActiveVisualRoot() !== null);
+    }
+
+    public notifyContentInteractionStart(): void {
+        this.deactivateForContentInteraction();
+    }
+
     public dockSoftly(): void {
         if (this.active) return;
         this.beginDockTween();
