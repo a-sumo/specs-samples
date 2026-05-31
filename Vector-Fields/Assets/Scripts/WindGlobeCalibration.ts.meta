@@ -29,10 +29,16 @@
     anchor: false
     anchorLat: false
     anchorLon: false
+    calloutMaterial: false
+    cameraRoot: false
     desiredRadiusWorld: false
     earthSphere: false
+    eventCalloutSurfaceLiftCm: false
+    eventFocusSeconds: false
+    invertLongitude: false
     legend: false
     legendGapCm: false
+    textureLongitudeOffsetDeg: false
     verifier: false
     verifyLat: false
     verifyLon: false
@@ -55,6 +61,12 @@
       desiredRadiusWorld: !<float> 12.000000
       legend: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       legendGapCm: !<float> 8.000000
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      calloutMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      eventFocusSeconds: 0.700000
+      eventCalloutSurfaceLiftCm: 0.150000
+      textureLongitudeOffsetDeg: !<float> 0.000000
+      invertLongitude: false
   ScriptTypes:
     -
       {}
@@ -69,3 +81,9 @@
     - '// @input float desiredRadiusWorld = 12 {"hint":"If > 0, rescale the Earth so its bbox radius matches this (cm). Otherwise leave natural size."}'
     - '// @input SceneObject legend {"hint":"Wind-speed widget. Pinned directly below the globe AABB so it keeps the same relative position and never orbits when the globe spins."}'
     - "// @input float legendGapCm = 8 {\"hint\":\"Gap (cm) between the bottom of the globe's AABB and the wind-speed widget.\"}"
+    - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor. Empty searches for Camera Object."}'
+    - '// @input Asset.Material calloutMaterial {"hint":"Flat material used for selected weather-event callouts."}'
+    - '// @input float eventFocusSeconds = 0.7 {"hint":"Seconds for an event focus rotation.", "widget":"slider", "min":0.2, "max":2, "step":0.05}'
+    - '// @input float eventCalloutSurfaceLiftCm = 0.15 {"hint":"Small lift for selected weather-event callout anchor, in cm. Keep near zero so the dot remains on the true event location.", "widget":"slider", "min":0, "max":2, "step":0.05}'
+    - '// @input float textureLongitudeOffsetDeg {"hint":"Manual longitude offset for the Earth texture, in degrees. Use if the map texture seam is not aligned to the default lat/lon convention.", "widget":"slider", "min":-180, "max":180, "step":1}'
+    - '// @input bool invertLongitude {"hint":"Flip east/west longitude mapping for Earth textures with mirrored UV orientation."}'

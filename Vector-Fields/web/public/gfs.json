@@ -1,8 +1,10 @@
 {
   "source": "NOAA ERDDAP · ncep_global_lon180 (NCEP GFS Atmospheric Model)",
+  "sourceUrl": "https://upwell.pfeg.noaa.gov/erddap/griddap/ncep_global_lon180.html",
+  "datasetId": "ncep_global_lon180",
   "variable": "10 m wind (ugrd10m, vgrd10m)",
-  "refTime": "2026-05-28T06:00:00Z",
-  "endTime": "2026-05-29T03:00:00Z",
+  "refTime": "2026-05-31T09:00:00Z",
+  "endTime": "2026-06-01T06:00:00Z",
   "stepHours": 3,
   "nt": 8,
   "ny": 91,
@@ -14,15 +16,29 @@
   "lonRes": 2,
   "latRes": 2,
   "times": [
-    "2026-05-28T06:00:00Z",
-    "2026-05-28T09:00:00Z",
-    "2026-05-28T12:00:00Z",
-    "2026-05-28T15:00:00Z",
-    "2026-05-28T18:00:00Z",
-    "2026-05-28T21:00:00Z",
-    "2026-05-29T00:00:00Z",
-    "2026-05-29T03:00:00Z"
+    "2026-05-31T09:00:00Z",
+    "2026-05-31T12:00:00Z",
+    "2026-05-31T15:00:00Z",
+    "2026-05-31T18:00:00Z",
+    "2026-05-31T21:00:00Z",
+    "2026-06-01T00:00:00Z",
+    "2026-06-01T03:00:00Z",
+    "2026-06-01T06:00:00Z"
   ],
   "units": "m/s",
-  "layout": "Float32 little-endian, concatenated [u (nt × ny × nx), v (nt × ny × nx)]"
+  "layout": "Float32 little-endian, concatenated [u (nt x ny x nx), v (nt x ny x nx)]",
+  "fetchedAt": "2026-05-31T17:29:02.109Z",
+  "lastAttemptAt": "2026-05-31T17:29:02.109Z",
+  "dataMode": "live",
+  "usingFallback": false,
+  "fallbackReason": "",
+  "nullCount": 0,
+  "attemptedSources": [
+    {
+      "sourceUrl": "https://upwell.pfeg.noaa.gov/erddap/griddap/ncep_global_lon180.html",
+      "startIso": "2026-05-31T09:00:00Z",
+      "endIso": "2026-06-01T06:00:00Z",
+      "ok": true
+    }
+  ]
 }

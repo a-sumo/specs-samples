@@ -37,6 +37,11 @@ export class StormMarkers extends BaseScriptComponent {
   @hint("Pulse frequency in Hz.")
   pulseHz: number = 1.4;
 
+  @input
+  @widget(new SliderWidget(0.0, 2.0, 0.05))
+  @hint("Tiny outward lift from the globe surface, in cm. Keep low so the marker remains on the storm location.")
+  surfaceLiftCm: number = 0.0;
+
   private cal: any = null;
   private markers: { obj: SceneObject; storm: Storm; baseScale: vec3 }[] = [];
 
@@ -65,6 +70,10 @@ export class StormMarkers extends BaseScriptComponent {
   }
 
   private spawnMarker(s: Storm) {
+    if (s.lat === null || s.lon === null || isNaN(s.lat) || isNaN(s.lon)) {
+      print(`[StormMarkers] ${s.name} has no valid coordinate — skipping marker.`);
+      return;
+    }
     let obj: SceneObject | null = null;
     if (this.markerPrefab) {
       obj = this.markerPrefab.instantiate(this.sceneObject);
@@ -79,13 +88,13 @@ export class StormMarkers extends BaseScriptComponent {
       return;
     }
     obj.name = `Storm · ${s.name}`;
-    const world = this.cal.latLonToWorld(s.lat, s.lon) as vec3;
     const t = obj.getTransform();
-    t.setWorldPosition(world);
     const baseScale = new vec3(this.markerScale, this.markerScale, this.markerScale);
     t.setLocalScale(baseScale);
 
-    this.markers.push({ obj, storm: s, baseScale });
+    const marker = { obj, storm: s, baseScale };
+    this.placeMarker(marker);
+    this.markers.push(marker);
   }
 
   private tick() {
@@ -94,6 +103,7 @@ export class StormMarkers extends BaseScriptComponent {
     const phase = t * this.pulseHz * 2 * Math.PI;
     for (let i = 0; i < this.markers.length; i++) {
       const m = this.markers[i];
+      this.placeMarker(m);
       const f = 1 + this.pulseAmount * Math.sin(phase + i);
       m.obj.getTransform().setLocalScale(new vec3(
         m.baseScale.x * f,
@@ -101,5 +111,19 @@ export class StormMarkers extends BaseScriptComponent {
         m.baseScale.z * f,
       ));
     }
+  }
+
+  private placeMarker(m: { obj: SceneObject; storm: Storm; baseScale: vec3 }) {
+    if (!this.cal || typeof this.cal.latLonToWorld !== "function") return;
+    if (m.storm.lat === null || m.storm.lon === null || isNaN(m.storm.lat) || isNaN(m.storm.lon)) return;
+    const world = this.cal.latLonToWorld(m.storm.lat, m.storm.lon) as vec3;
+    let placed = world;
+    if (this.surfaceLiftCm > 0 && this.cal.earthSphere) {
+      const center = this.cal.earthSphere.getTransform().getWorldPosition() as vec3;
+      const normal = world.sub(center);
+      const len = normal.length;
+      if (len > 0.0001) placed = world.add(normal.uniformScale(this.surfaceLiftCm / len));
+    }
+    m.obj.getTransform().setWorldPosition(placed);
   }
 }

@@ -32,6 +32,7 @@
     markerTemplate: false
     pulseAmount: false
     pulseHz: false
+    surfaceLiftCm: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -47,6 +48,7 @@
       markerScale: 0.800000
       pulseAmount: 0.350000
       pulseHz: 1.400000
+      surfaceLiftCm: !<float> 0.000000
   ScriptTypes:
     -
       {}
@@ -57,3 +59,4 @@
     - // @input float markerScale = 0.8
     - '// @input float pulseAmount = 0.35 {"hint":"Multiplier on the pulse amplitude. 0 = static, 1 = breathing."}'
     - '// @input float pulseHz = 1.4 {"hint":"Pulse frequency in Hz."}'
+    - '// @input float surfaceLiftCm {"hint":"Tiny outward lift from the globe surface, in cm. Keep low so the marker remains on the storm location.", "widget":"slider", "min":0, "max":2, "step":0.05}'
