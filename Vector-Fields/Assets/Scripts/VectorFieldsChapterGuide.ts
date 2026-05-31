@@ -2324,7 +2324,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
         this.setObjectEnabledByName("Motion Field Root", showMotion);
         this.setObjectEnabledByName("Vector Field Examples Root", showVector);
-        this.setObjectEnabledByName("Target", false);
+        this.setVectorFieldTargetEnabled(showVector);
         this.setObjectEnabledByName("Magnetic Field Root", showMagnetic);
         this.setObjectEnabledByName("Gravity Field Root", showGravity);
         this.setObjectEnabledByName("Artemis Trajectory Path", showArtemis);
@@ -2336,6 +2336,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.setObjectEnabledByName("Car Fluid Flow", showCarFlow);
         if (showMotion || showVector) {
             this.stageFallbackTheoryFieldMode();
+            if (showVector) this.restoreVectorFieldTarget();
         }
         if (showGravity) {
             this.applyGravityStage(this.findObjectByName("Gravity Field Root"));
@@ -2349,7 +2350,8 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private restoreVectorFieldTarget(): void {
-        const target = this.findObjectByName("Target");
+        const root = this.findObjectByName("Vector Field Examples Root");
+        const target = root ? this.findInTree(root, "Target") : this.findObjectByName("Target");
         if (!target) return;
         target.enabled = true;
 
@@ -2367,6 +2369,16 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             const script = scripts[i] as any;
             if (script) script.enabled = true;
         }
+    }
+
+    private setVectorFieldTargetEnabled(enabled: boolean): void {
+        if (enabled) {
+            this.restoreVectorFieldTarget();
+            return;
+        }
+        const root = this.findObjectByName("Vector Field Examples Root");
+        const target = root ? this.findInTree(root, "Target") : this.findObjectByName("Target");
+        if (target) target.enabled = false;
     }
 
     private applyGravityStage(root: SceneObject | null): void {
@@ -3258,6 +3270,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private forceTheoryPatternExperienceEnabled(): void {
+        if (this.directorApi && typeof this.directorApi.stageStep === "function") {
+            if (this.selectedTheoryMode !== "motion") this.restoreVectorFieldTarget();
+            this.beginMainExperiencePrioritySettle();
+            return;
+        }
         this.stageFallbackContent("theory");
         this.beginMainExperiencePrioritySettle();
     }
