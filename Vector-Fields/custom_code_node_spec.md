@@ -3,6 +3,7 @@ NO inline comments for input and output variables.
 NO early returns.
 Bottom Left UV is (0, 0).
 Top Right UV is (1, 1).
+'active' : Reserved word. 
 
 VERTEX SHADER NOTES:
 
