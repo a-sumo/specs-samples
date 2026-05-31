@@ -1,0 +1,84 @@
+- !<Material/8fbd8f29-744c-48d0-a0b2-ee6eb5d7f98b>
+  PackagePath: ""
+  PassesInfo:
+    - !<own> d65ffc69-6ea0-403e-92a2-40b46310c27d
+- !<PassInfo/d65ffc69-6ea0-403e-92a2-40b46310c27d>
+  CachedProperties:
+    - Port_Depth_N004:
+        typeIdx: 1
+        value: 1.000000
+    - Port_FinalColor1_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor2_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_FinalColor3_N004:
+        typeIdx: 5
+        value: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+    - Port_GSplatPointSize_N004:
+        typeIdx: 1
+        value: 0.000000
+    - Port_GSplatRotation_N004:
+        typeIdx: 5
+        value: {x: 0.000000, y: 0.000000, z: 0.000000, w: 1.000000}
+    - Port_GSplatScale_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_PrevWorldPosition_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_RayDirection_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 1.000000, z: 0.000000}
+    - Port_RayOrigin_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 0.000000}
+    - Port_WorldNormal_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 1.000000, z: 0.000000}
+    - Port_WorldTangent_N004:
+        typeIdx: 4
+        value: {x: 0.000000, y: 0.000000, z: 1.000000}
+  DepthWrite: true
+  DepthTest: true
+  DepthFunction: LessEqual
+  TwoSided: false
+  ColorMask: {x: true, y: true, z: true, w: true}
+  CullMode: Back
+  PolygonOffset: {x: 0.000000, y: 0.000000}
+  FrustumCulling: Auto
+  FrustumCullPad: 0.000000
+  InstanceCount: 1
+  Defines:
+    []
+  BlendMode: Disabled
+  Properties:
+    BaseTex:
+      typeIdx: 9
+      value:
+        id: 00000000-0000-0000-0000-000000000000
+        sampler:
+          filteringMode: Trilinear
+          wrapModeU: Repeat
+          wrapModeV: Repeat
+          wrapModeW: Repeat
+          borderColor: {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+          mipmaps: false
+        type: Texture2D
+    Brightness:
+      typeIdx: 1
+      value: 1.000000
+    FadeEnd:
+      typeIdx: 1
+      value: 1.000000
+    FadeStart:
+      typeIdx: 1
+      value: 1.000000
+    MaxAlpha:
+      typeIdx: 1
+      value: 1.000000
+    PreviewEnabled:
+      typeIdx: 0
+      value: 0
+  Pass: !<reference> 0096d93e-4c24-449b-9bb8-f1cf519a7f9c
