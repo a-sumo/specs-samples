@@ -1,6 +1,7 @@
 data:
   externalSources:
     - 064056df-0d5e-4c10-ae06-1ea766ebdd23: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/SpectaclesUIKit@0.0.8/SpectaclesUIKit.lspkg
+    - 089055a0-8232-48dc-be3c-8d82695e66cc: /Users/armand/Downloads/Earth-Moon-field-source-https-commonswikimediaorg-wiki-FileEarthmoon-fieldsvg.png
     - 092d5f33-0b75-4654-82a2-cb7f73aa1b85: /Users/armand/Documents/specs-samples/Color-Spaces/Assets/Materials/UI/BG.ss_graph
     - 0bfddb4b-43c6-4829-9e3c-29351320a9b9: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Resources/Base.png
     - 0da6fcec-1406-44ec-af79-728878e4a021: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/UnlitMaterial/Resources/unlit.ss_graph
@@ -10,9 +11,11 @@ data:
     - 179bc280-43f2-4b94-81c7-8bea73855535: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Meshes/Resources/Plane.mesh
     - 1f937e43-5ea6-4cd3-b480-0b1b6c70c47e: /Users/armand/Downloads/moon.glb
     - 2d396ae7-4f5e-4654-b6e8-7a9a051053fd: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - 36e282a2-2927-4485-a661-b7059adb7406: /Users/armand/Downloads/DipolMagnet.svg.png
     - 3af65709-cf3b-463a-b91d-f46a766245d6: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Resources/flat.ss_graph
     - 472f29ee-0e23-4d3b-8fc5-012a8e647d3c: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Meshes/Resources/Cylinder.mesh
     - 47c7c1a8-81bb-46c7-bd58-b7fce9704c16: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Meshes/Resources/Cone.mesh
+    - 4c0e58b9-fdb1-49d7-877b-288fa8f88ba7: /Users/armand/Downloads/Meteosat-12-fci-march-equinox-2025-noon.jpg
     - 505da725-2b4d-4f99-bb47-0f5b2b595d41: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 6074e1cf-bd94-442c-8a18-9033749d790c: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 66ca8328-c4af-498e-9856-70a468738d30: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/Visual Demonstration@1.0.1/Visual Demonstration.lsc
@@ -23,9 +26,10 @@ data:
     - 8fdf66e3-3c0e-4ff8-acf1-bdf823261f97: /Users/armand/Documents/specs-samples/Vector-Fields/Cache/064056df-0d5e-4c10-ae06-1ea766ebdd23/6b8202a6b55a598827ab6a7d0a098a39/Data/Meshes/CapsuleSphere.mesh
     - 9ccf9591-9d5b-4780-ac4c-a813f40e6a86: /Users/armand/Documents/specs-samples/Vector-Fields/Assets/Materials/FlatMaterial.ss_graph
     - a8a6a36a-96a0-4a29-9484-bf783e64d212: /Users/armand/Downloads/earth(1).glb
+    - ac497807-4ba1-4fcc-92f1-fd6d522b9c7c: /Users/armand/Downloads/magnetic-field-background.jpg
     - bf9d1043-e380-44bd-b9a3-ec3a0e6ab5ba: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/UnlitMaterial/Resources/unlit.ss_graph
-    - d207cae5-f01f-437e-9a64-42f3cf9382d6: /Applications/Lens Studio_5.15.4.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - d3e0efa3-6d0b-419b-a7f7-3437b8523b83: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Resources/Normal.png
+    - de89442e-36a0-4d79-86f3-22abbc94e221: /Applications/Lens Studio_5.15.4.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - df80fc0d-c841-4c5e-ac02-e7453fc0c6bb: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Resources/MaterialParams.png
     - e489815f-225e-49ee-b6be-724819d95f88: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - fa0c8799-c8c8-4f13-9a04-6a9443011247: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Meshes/Resources/Sphere.mesh

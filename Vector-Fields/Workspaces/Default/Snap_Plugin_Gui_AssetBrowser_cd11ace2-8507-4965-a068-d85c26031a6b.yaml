@@ -1,23 +1,17 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 1088
+    size: 1122
     values:
       - ""
+      - Audio_TODO
       - Base.png
-      - Cone.mesh
-      - Cylinder.mesh
       - Device Camera Texture.deviceCameraTexture
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
       - FieldBoundsMat.mat
       - Flow
-      - Flow/FlowSlice.mat
-      - Flow/FlowSlice.ss_graph
-      - Flow/FlowSliceShader.js
-      - Flow/flow_field.json
-      - Flow/flow_field.png
       - Flow/flow_paths.json
       - FlowGizmoBlue.mat
       - FlowGizmoMat.mat
@@ -30,6 +24,7 @@ CollapsedEntities:
       - Image 4.mat
       - Image 5.mat
       - Image 6.mat
+      - Image 7.mat
       - Image.mat
       - Images
       - Images/CalibrationUI
@@ -40,6 +35,12 @@ CollapsedEntities:
       - Images/StoryUI/card_definition_normal.png
       - Images/StoryUI/card_definition_pressed.png
       - Images/StoryUI/card_examples_active.png
+      - Images/StoryUI/card_examples_main_v2_active.png
+      - Images/StoryUI/card_examples_main_v2_normal.png
+      - Images/StoryUI/card_examples_main_v2_pressed.png
+      - Images/StoryUI/card_examples_main_v3_active.png
+      - Images/StoryUI/card_examples_main_v3_normal.png
+      - Images/StoryUI/card_examples_main_v3_pressed.png
       - Images/StoryUI/card_examples_normal.png
       - Images/StoryUI/card_examples_pressed.png
       - Images/StoryUI/card_intro_active.png
@@ -58,11 +59,23 @@ CollapsedEntities:
       - Images/StoryUI/card_patterns_normal.png
       - Images/StoryUI/card_patterns_pressed.png
       - Images/StoryUI/card_theory_active.png
+      - Images/StoryUI/card_theory_main_v2_active.png
+      - Images/StoryUI/card_theory_main_v2_normal.png
+      - Images/StoryUI/card_theory_main_v2_pressed.png
+      - Images/StoryUI/card_theory_main_v3_active.png
+      - Images/StoryUI/card_theory_main_v3_normal.png
+      - Images/StoryUI/card_theory_main_v3_pressed.png
       - Images/StoryUI/card_theory_normal.png
       - Images/StoryUI/card_theory_pressed.png
       - Images/StoryUI/chapter_panel.png
+      - Images/StoryUI/chapter_panel_main_v2.png
+      - Images/StoryUI/chapter_panel_main_v3.png
       - Images/StoryUI/cursor_hover.png
       - Images/StoryUI/cursor_pressed.png
+      - Images/StoryUI/example_aerodynamics_active.png
+      - Images/StoryUI/example_aerodynamics_normal.png
+      - Images/StoryUI/example_aerodynamics_pressed.png
+      - Images/StoryUI/example_detail_aerodynamics_panel.png
       - Images/StoryUI/example_detail_gravity_artemis_panel.png
       - Images/StoryUI/example_detail_gravity_panel.png
       - Images/StoryUI/example_detail_magnetism_panel.png
@@ -79,8 +92,11 @@ CollapsedEntities:
       - Images/StoryUI/examples_back_normal.png
       - Images/StoryUI/examples_back_pressed.png
       - Images/StoryUI/examples_panel.png
+      - Images/StoryUI/magnetic-field-background.jpg
       - Images/StoryUI/math_explainer_curl.png
       - Images/StoryUI/math_explainer_curl_example.png
+      - Images/StoryUI/math_explainer_del_coordinates.png
+      - Images/StoryUI/math_explainer_del_intro.png
       - Images/StoryUI/math_explainer_divergence.png
       - Images/StoryUI/math_explainer_divergence_example.png
       - Images/StoryUI/math_explainer_operator.png
@@ -108,6 +124,7 @@ CollapsedEntities:
       - Images/StoryUI/palette_viridis_normal.png
       - Images/StoryUI/palette_viridis_pressed.png
       - Images/StoryUI/panel_cursor_wash.png
+      - Images/StoryUI/proxy_interaction_plane_bg.png
       - Images/StoryUI/slider_backplate.png
       - Images/StoryUI/slider_fill.png
       - Images/StoryUI/slider_knob.png
@@ -137,6 +154,9 @@ CollapsedEntities:
       - Images/StoryUI/utility_follow_off.png
       - Images/StoryUI/utility_follow_on.png
       - Images/StoryUI/utility_follow_pressed.png
+      - Images/StoryUI/utility_move_active.png
+      - Images/StoryUI/utility_move_normal.png
+      - Images/StoryUI/utility_move_pressed.png
       - Images/StoryUI/utility_plane_floor_off.png
       - Images/StoryUI/utility_plane_floor_on.png
       - Images/StoryUI/utility_plane_floor_pressed.png
@@ -149,10 +169,20 @@ CollapsedEntities:
       - Images/StoryUI/variant_artemis_pressed.png
       - Images/StoryUI/variant_normal.png
       - Images/StoryUI/variant_pressed.png
+      - Images/StoryUI/vf_def_scalar_to_vector.png
+      - Images/StoryUI/vf_def_vf_examples.png
+      - Images/StoryUI/vf_def_vf_formal.png
+      - Images/StoryUI/vf_def_vf_gradient.png
+      - Images/StoryUI/vf_def_vf_informal.png
       - Images/UI
+      - Images/aerodynamics-wind-tunnel.attribution.txt
+      - Images/aerodynamics-wind-tunnel.jpg
       - Images/circulation_sprite.png
       - Images/contraction_sprite.png
+      - Images/earth-satellite-view.jpg
       - Images/expansion_sprite.png
+      - Images/gravitational-field-earth-moon.png
+      - Images/magnet-dipole.png
       - Images/magnetic_sprite.png
       - Images/vf_definition.png
       - Images/vf_dipole_field.png
@@ -170,8 +200,6 @@ CollapsedEntities:
       - Materials/Article/VfEulerMat.mat
       - Materials/Article/VfFalloffMat.mat
       - Materials/Article/VfReadingKeyMat.mat
-      - Materials/CarFlowStream.ss_graph
-      - Materials/CarFlowStream.ss_graph.bak
       - Materials/FieldLines.mat
       - Materials/FieldLines.ss_graph
       - Materials/FlatMaterial 2.mat
@@ -182,6 +210,8 @@ CollapsedEntities:
       - Materials/GravityFieldPlane.ss_graph
       - Materials/GuidePanelHover.mat
       - Materials/GuidePanelHover.ss_graph
+      - Materials/HeroFade.mat
+      - Materials/HeroFade.ss_graph
       - Materials/IridescentMaterial.mat
       - Materials/IridescentMaterial.ss_graph
       - Materials/MagnetPole.mat
@@ -190,6 +220,8 @@ CollapsedEntities:
       - Materials/MagneticField.ss_graph
       - Materials/MotionFieldDetail.mat
       - Materials/MotionFieldDetail.ss_graph
+      - Materials/ProxyInteractionDots.mat
+      - Materials/ProxyInteractionDots.ss_graph
       - Materials/SpriteSheetBG.mat
       - Materials/SpriteSheetBG.ss_graph
       - Materials/TestTubeDeformation.mat
@@ -200,9 +232,11 @@ CollapsedEntities:
       - Materials/WindStreamFlow.mat
       - Materials/WindStreamFlow.ss_graph
       - Meshes
+      - Meshes/Cone.mesh
       - Meshes/Custom BoxMesh.mesh
       - Meshes/Custom CapsuleSphere.mesh
       - Meshes/Custom Sphere.mesh
+      - Meshes/Cylinder.mesh
       - Meshes/Models
       - Meshes/Models/earth.glb
       - Meshes/Models/earth.glb/.hidden
@@ -314,7 +348,6 @@ CollapsedEntities:
       - Scripts/FieldLines.ts
       - Scripts/FlowPaths.ts
       - Scripts/FlowSliceGizmo.ts
-      - Scripts/FlowSlicePlane.ts
       - Scripts/GfsData.ts
       - Scripts/GlobeSurfaceRotator.ts
       - Scripts/GravityField.ts
@@ -325,6 +358,8 @@ CollapsedEntities:
       - Scripts/MissionInfoPanel.ts
       - Scripts/MoonEphemeris.ts
       - Scripts/MotionFieldPlane.ts
+      - Scripts/ProxyVisualTransformController.ts
+      - Scripts/SIKCursorRenderPriority.ts
       - Scripts/SnapToStage.ts
       - Scripts/SpatialFlexLite.ts
       - Scripts/StageCalibration.ts
@@ -332,6 +367,7 @@ CollapsedEntities:
       - Scripts/StormsData.ts
       - Scripts/StoryGuideLayoutGenerated.ts
       - Scripts/StoryStepDirector.ts
+      - Scripts/SurfaceLabel.ts
       - Scripts/TexturedButton.ts
       - Scripts/TubeTest.ts
       - Scripts/Utils
@@ -352,24 +388,22 @@ CollapsedEntities:
       - Scripts/VectorField.ts
       - Scripts/VectorFieldUIStyle.ts
       - Scripts/VectorFieldsChapterGuide.ts
-      - Scripts/VectorFieldsScaffoldLabels.ts
       - Scripts/VectorFieldsStageLayout.ts
-      - Scripts/VectorFieldsStoryScaffold.ts
       - Scripts/WindGlobeCalibration.ts
       - Scripts/WindStreamlines.ts
-      - Shaders
       - Shaders/AnimatedSpriteSheet.js
-      - Shaders/CarFlowStream.js
       - Shaders/FieldLines.js
       - Shaders/FlatMaterial.js
       - Shaders/GravityFieldPlane.js
       - Shaders/GuidePanelHover.js
+      - Shaders/HeroFade.js
       - Shaders/IridescentShader.js
       - Shaders/IridescentSimple.js
       - Shaders/MagnetPole.js
       - Shaders/MagneticField.js
       - Shaders/MotionFieldDetail.js
       - Shaders/MotionFieldLine.js
+      - Shaders/ProxyInteractionDots.js
       - Shaders/TubeTest.js
       - Shaders/VectorField.js
       - Shaders/VectorFieldTransform.js
