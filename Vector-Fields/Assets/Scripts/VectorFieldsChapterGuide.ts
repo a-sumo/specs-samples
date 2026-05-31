@@ -579,6 +579,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private updateEventRef: any = null;
     private renderPrioritySettleRemaining: number = 0.0;
     private theoryPatternUiSettleRemaining: number = 0.0;
+    private theoryPatternControlsPrewarmed: boolean = false;
 
     onAwake(): void {
         this.startEventRef = this.createEvent("OnStartEvent");
@@ -751,6 +752,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.createGradientPaletteSelectors();
         this.createGradientSliders();
         this.createTheoryInfoCard();
+        this.prewarmTheoryPatternControls();
         this.createExamplesBackButton();
         this.createNavButton("__GuideBack", "back", this.offsetSlot(STORY_GUIDE_NAV.back), TEX_NAV_BACK_NORMAL, TEX_NAV_BACK_PRESSED, 244, () => this.prev());
         this.createNavButton("__GuideNext", "next", this.offsetSlot(STORY_GUIDE_NAV.next), TEX_NAV_NEXT_NORMAL, TEX_NAV_NEXT_PRESSED, 244, () => this.next());
@@ -2494,6 +2496,18 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
     }
 
+    private setSliderInteractionEnabled(binding: GradientSliderBinding, enabled: boolean): void {
+        const interactable = (binding.button as any).interactable;
+        if (interactable) {
+            try { interactable.enabled = enabled; } catch (e) {}
+        }
+        const colliders = binding.object.getComponents("Physics.ColliderComponent");
+        for (let i = 0; i < colliders.length; i++) {
+            const collider = colliders[i] as ColliderComponent;
+            if (collider) collider.enabled = enabled;
+        }
+    }
+
     private applyTexture(material: Material, texture: Texture, image?: Image): void {
         if (!material || !texture) return;
         const pass = this.tryMainPass(material);
@@ -3067,6 +3081,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             const binding = this.theoryModeButtons[i];
             const option = this.theoryOptionForBinding(binding);
             binding.object.enabled = visible;
+            this.setButtonInteractionEnabled(binding, visible);
             if (!visible) {
                 binding.hovered = false;
                 binding.pressedState = false;
@@ -3085,6 +3100,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             const binding = this.paletteButtons[i];
             const option = this.paletteOptionForBinding(binding);
             binding.object.enabled = visible;
+            this.setButtonInteractionEnabled(binding, visible);
             if (!visible) {
                 binding.hovered = false;
                 binding.pressedState = false;
@@ -3102,6 +3118,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         for (let i = 0; i < this.gradientSliders.length; i++) {
             const binding = this.gradientSliders[i];
             binding.object.enabled = visible;
+            this.setSliderInteractionEnabled(binding, visible);
             if (!visible) {
                 binding.hovered = false;
                 binding.pressed = false;
@@ -3187,6 +3204,56 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.configureUIKitButton(binding.button, slot.width, slot.height, BUTTON_HIT_DEPTH_CM, 248);
             this.updateGradientSliderVisual(binding);
             return;
+        }
+    }
+
+    private prewarmTheoryPatternControls(): void {
+        if (this.theoryPatternControlsPrewarmed) return;
+        this.theoryPatternControlsPrewarmed = true;
+
+        const offscreenSlot: StoryGuideSlot = { x: 0.0, y: -1000.0, width: 1.0, height: 1.0 };
+        for (let i = 0; i < this.theoryModeButtons.length; i++) {
+            const binding = this.theoryModeButtons[i];
+            this.placeButtonBindingNow(binding, offscreenSlot);
+            binding.object.enabled = true;
+            this.setButtonInteractionEnabled(binding, false);
+        }
+        for (let i = 0; i < this.paletteButtons.length; i++) {
+            const binding = this.paletteButtons[i];
+            this.placeButtonBindingNow(binding, offscreenSlot);
+            binding.object.enabled = true;
+            this.setButtonInteractionEnabled(binding, false);
+        }
+        for (let i = 0; i < this.gradientSliders.length; i++) {
+            const binding = this.gradientSliders[i];
+            binding.slot = this.cloneSlot(offscreenSlot);
+            this.place(binding.object, offscreenSlot.x, offscreenSlot.y, BUTTON_HIT_Z);
+            binding.object.enabled = true;
+            this.setSliderInteractionEnabled(binding, false);
+            this.updateGradientSliderVisual(binding);
+        }
+
+        const hideAfterWarm = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
+        hideAfterWarm.bind(() => this.hidePrewarmedTheoryPatternControls());
+        hideAfterWarm.reset(0.0);
+    }
+
+    private hidePrewarmedTheoryPatternControls(): void {
+        if (this.isTheoryPatternInterfaceActive()) {
+            this.forceTheoryPatternInterfaceNow();
+            return;
+        }
+        for (let i = 0; i < this.theoryModeButtons.length; i++) {
+            this.theoryModeButtons[i].object.enabled = false;
+            this.setButtonInteractionEnabled(this.theoryModeButtons[i], false);
+        }
+        for (let i = 0; i < this.paletteButtons.length; i++) {
+            this.paletteButtons[i].object.enabled = false;
+            this.setButtonInteractionEnabled(this.paletteButtons[i], false);
+        }
+        for (let i = 0; i < this.gradientSliders.length; i++) {
+            this.gradientSliders[i].object.enabled = false;
+            this.setSliderInteractionEnabled(this.gradientSliders[i], false);
         }
     }
 
