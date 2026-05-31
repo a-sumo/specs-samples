@@ -236,7 +236,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     @input
     @hint("Camera-relative placement for the 2D motion plane.")
-    motionFrontOffset: vec3 = new vec3(0.0, 0.0, -88.0);
+    motionFrontOffset: vec3 = new vec3(0.0, 0.0, -50.0);
 
     @input
     @hint("Camera-relative placement for analytical field-pattern examples.")
@@ -244,7 +244,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     @input
     @hint("Camera-relative placement for the real VectorField in the theory chapter.")
-    theoryVectorFrontOffset: vec3 = new vec3(0.0, 0.0, -88.0);
+    theoryVectorFrontOffset: vec3 = new vec3(0.0, 0.0, -50.0);
 
     @input
     @hint("Camera-relative placement for the theory mode menu.")
@@ -262,7 +262,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     @input
     @hint("Camera-relative placement for gravity when reference calibration is disabled.")
-    gravityFrontOffset: vec3 = new vec3(0.0, 0.0, -82.0);
+    gravityFrontOffset: vec3 = new vec3(0.0, -28.0, -82.0);
 
     @input
     @hint("Camera-relative placement for magnetism when reference calibration is disabled.")
@@ -302,6 +302,8 @@ export class StoryStepDirector extends BaseScriptComponent {
     private renderPrioritySettleRemaining: number = 0.0;
     private calibrationSubscribed: boolean = false;
     private boundReferenceUpdate: () => void = () => this.onReferenceFrameChanged();
+    private baseScaleRoots: SceneObject[] = [];
+    private baseScales: vec3[] = [];
 
     onAwake(): void {
         this.enableStageCalibrationObject();
@@ -680,6 +682,7 @@ export class StoryStepDirector extends BaseScriptComponent {
             this.applyTheoryMotionFieldMode(motionRoot);
         }
         if (step.analytical) {
+            this.restoreRootBaseScale(analyticalRoot);
             this.placeFrontFacing(analyticalRoot, this.analyticalFrontOffset, false);
             this.callLifecycle(analyticalRoot, "stage");
         }
@@ -821,6 +824,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     private placeMotionPlane(root: SceneObject | null): void {
         if (!root) return;
+        this.restoreRootBaseScale(root);
         this.placeFrontFacing(root, this.motionFrontOffset, true);
         this.disableScriptByName(root, "SurfacePlacer");
     }
@@ -840,6 +844,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     private placeTheoryVectorField(root: SceneObject | null): void {
         if (!root) return;
+        this.restoreRootBaseScale(root);
         this.placeFrontFacing(root, this.theoryVectorFrontOffset, false);
         root.getTransform().setLocalScale(new vec3(this.theoryVectorScale, this.theoryVectorScale, this.theoryVectorScale));
         this.restoreVectorFieldTarget(root);
@@ -960,6 +965,7 @@ export class StoryStepDirector extends BaseScriptComponent {
 
     private placeExampleRoot(root: SceneObject | null, frontOffset: vec3, referenceOffset: vec3, proxySlotName: string): void {
         if (!root) return;
+        this.restoreRootBaseScale(root);
         if (this.useFrontPlacementForAllVisuals) {
             this.placeFrontFacing(root, frontOffset, false);
             return;
@@ -1046,9 +1052,35 @@ export class StoryStepDirector extends BaseScriptComponent {
         transform.setWorldRotation(rotation);
     }
 
+    private restoreRootBaseScale(root: SceneObject | null): void {
+        if (!root) return;
+        const scale = this.baseScaleForRoot(root);
+        root.getTransform().setLocalScale(new vec3(scale.x, scale.y, scale.z));
+    }
+
+    private baseScaleForRoot(root: SceneObject): vec3 {
+        for (let i = 0; i < this.baseScaleRoots.length; i++) {
+            if (this.baseScaleRoots[i] === root) return this.baseScales[i];
+        }
+        const scale = root.getTransform().getLocalScale();
+        const copy = new vec3(scale.x, scale.y, scale.z);
+        this.baseScaleRoots.push(root);
+        this.baseScales.push(copy);
+        return copy;
+    }
+
     public resetToDefaultStance(): void {
+        this.exampleManipulationEnabled = false;
         this.appliedKey = "";
         this.applyCurrent(true);
+    }
+
+    public resetActiveVisual(): void {
+        this.resetToDefaultStance();
+    }
+
+    public resetActiveVisualTransform(): void {
+        this.resetToDefaultStance();
     }
 
     public resetDefaultStance(): void {

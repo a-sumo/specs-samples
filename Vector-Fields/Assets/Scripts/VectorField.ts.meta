@@ -27,6 +27,9 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     _arrowScale: false
+    _colorMap: false
+    _colorMapOffset: false
+    _colorMapScale: false
     _coneLength: false
     _coneRadius: false
     _desiredLengthSegments: false
@@ -74,6 +77,9 @@
       _fieldScale: !<float> 1.000000
       _flowSpeed: !<float> 2.000000
       _preset: !<float> 0.000000
+      _colorMap: !<float> 9.000000
+      _colorMapScale: !<float> 1.000000
+      _colorMapOffset: !<float> 0.000000
       trackedObject: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       fieldCollider: !<reference.ColliderComponent> 00000000-0000-0000-0000-000000000000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
@@ -99,6 +105,9 @@
     - '// @input float _fieldScale = 1 {"hint":"Field noise/frequency scale", "widget":"slider", "min":0.1, "max":3, "step":0.1}'
     - '// @input float _flowSpeed = 50 {"hint":"Speed at which tubes flow along field lines", "widget":"slider", "min":0, "max":100, "step":0.5}'
     - '// @input float _preset {"hint":"Vector field type", "widget":"combobox", "values":[{"label":"Burst", "value":0}, {"label":"Pull", "value":1}, {"label":"Orbit", "value":2}, {"label":"Waves", "value":3}, {"label":"Surface Wind", "value":8}, {"label":"Ambient Audio Plane", "value":9}]}'
+    - '// @input float _colorMap = 17 {"hint":"Matplotlib-style colormap for speed/intensity.", "widget":"combobox", "values":[{"label":"jet", "value":13}, {"label":"viridis", "value":17}, {"label":"plasma", "value":18}]}'
+    - '// @input float _colorMapScale = 1 {"hint":"Multiplies the normalized value before sampling the selected color gradient.", "widget":"slider", "min":0.05, "max":4, "step":0.01}'
+    - '// @input float _colorMapOffset {"hint":"Adds to the normalized value before sampling the selected color gradient.", "widget":"slider", "min":-1, "max":1, "step":0.01}'
     - '// @input SceneObject trackedObject {"hint":"Object that affects the field - field reacts to its position"}'
     - '// @input Component.ColliderComponent fieldCollider {"hint":"Box collider - field only animates when tracked object is inside"}'
     - '// @input Asset.Material material {"hint":"Material with VectorFieldTubesShader.js"}'

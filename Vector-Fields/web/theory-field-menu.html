@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    @font-face {
+      font-family: "Nunito Sans";
+      src: url("../Assets/Fonts/Nunito_Sans/NunitoSans.ttf") format("truetype");
+      font-weight: 400 900;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: transparent;
+      font-family: "Nunito Sans", system-ui, sans-serif;
+      color: rgba(238, 248, 255, 0.96);
+    }
+
+    * {
+      box-sizing: border-box;
+      border-radius: 0 !important;
+    }
+
+    .stage {
+      position: relative;
+      width: 1200px;
+      height: 760px;
+      padding: 24px;
+    }
+
+    .panel {
+      position: relative;
+      isolation: isolate;
+      width: 444px;
+      height: 336px;
+      border-radius: 0;
+      background:
+        linear-gradient(160deg, rgba(120, 170, 240, 0.26), rgba(80, 130, 210, 0.14) 60%, rgba(60, 110, 190, 0.10)),
+        rgba(150, 190, 240, 0.16);
+      border: 2px solid rgba(200, 224, 255, 0.42);
+      overflow: hidden;
+      clip-path: inset(0);
+      box-shadow:
+        inset 0 1px 0 rgba(238, 248, 255, 0.16),
+        inset 0 -18px 42px rgba(238, 248, 255, 0.04),
+        0 12px 28px rgba(0,0,0,0.10);
+      padding: 26px 32px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grad-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .panel > *:not(.grad-canvas),
+    .button > .lbl,
+    .palette-button > span,
+    .palette-button > .swatch {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: 0;
+      color: rgba(238, 248, 255, 0.82);
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin-top: 6px;
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .panel.motion-panel {
+      padding: 28px 34px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .panel.motion-panel .eyebrow,
+    .panel.motion-panel .signature,
+    .panel.motion-panel .readout {
+      display: none !important;
+    }
+
+    .panel.motion-panel .title {
+      margin-top: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 35px;
+    }
+
+    /* Equation-first body: nabla operator + div/curl definitions, no prose. */
+    .eqs {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 19px;
+      font-weight: 760;
+      color: rgba(238, 248, 255, 0.96);
+    }
+
+    .eq {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      white-space: nowrap;
+    }
+
+    .eq .lhs {
+      color: rgba(238, 248, 255, 0.70);
+      font-weight: 850;
+    }
+
+    .eq sub {
+      font-size: 0.62em;
+      font-weight: 760;
+      vertical-align: -0.22em;
+    }
+
+    .eq.curl {
+      align-items: stretch;
+      gap: 4px;
+    }
+
+    .eq.curl .lhs {
+      display: flex;
+      align-items: center;
+    }
+
+    .eq.curl .bracket {
+      font-size: 62px;
+      font-weight: 200;
+      line-height: 0.9;
+      color: rgba(238, 248, 255, 0.82);
+    }
+
+    .vec {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      font-size: 16px;
+      font-weight: 740;
+    }
+
+    /* Per-mode defining condition (type-specific). The general operator
+       definitions live in the dedicated math explainer, not here. */
+    .signature {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 26px;
+      font-weight: 850;
+      color: rgba(238, 248, 255, 0.96);
+    }
+
+    .signature .sep {
+      width: 2px;
+      height: 26px;
+      background: rgba(238, 248, 255, 0.28);
+      font-size: 0;
+    }
+
+    /* Motion is interactive (no fixed values), so it shows how to drive it. */
+    .instruction {
+      margin-top: 22px;
+      max-width: 340px;
+      font-size: 22px;
+      line-height: 1.24;
+      font-weight: 820;
+      color: rgba(248, 252, 255, 0.96);
+    }
+    .instruction[hidden],
+    .signature[hidden],
+    .readout[hidden] { display: none !important; }
+
+    .readout {
+      position: static;
+      margin-top: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .metric {
+      height: 60px;
+      border-radius: 0;
+      border: 1px solid rgba(210, 230, 255, 0.28);
+      background: rgba(210, 230, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .metric span:first-child {
+      font-size: 12px;
+      color: rgba(238, 248, 255, 0.74);
+      font-weight: 820;
+      text-transform: uppercase;
+    }
+
+    .metric span:last-child {
+      margin-top: 2px;
+      font-size: 24px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.96);
+    }
+
+    /* The metric driven by the selected mode reads brighter. */
+    .metric.hot {
+      border-color: rgba(120, 178, 248, 0.78);
+      background: rgba(120, 178, 248, 0.18);
+    }
+
+    .metric.hot span:first-child { color: rgba(255, 255, 255, 0.92); }
+    .metric.hot span:last-child { color: #ffffff; }
+
+    .button {
+      position: relative;
+      isolation: isolate;
+      width: 250px;
+      height: 76px;
+      border-radius: 0;
+      border: 2px solid rgba(190, 220, 255, 0.30);
+      background: rgba(190, 220, 255, 0.12);
+      overflow: hidden;
+      clip-path: inset(0);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 10px 22px rgba(0,0,0,0.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(238, 248, 255, 0.88);
+      font-size: 23px;
+      font-weight: 880;
+    }
+
+    .button.active {
+      border-color: rgba(80, 160, 255, 0.86);
+      background: rgba(80, 160, 255, 0.18);
+      color: #ffffff;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+        0 0 14px rgba(80, 160, 255, 0.16),
+        0 10px 22px rgba(0,0,0,0.10);
+    }
+
+    .button.pressed {
+      border-color: rgba(80, 160, 255, 0.48);
+      background: rgba(80, 160, 255, 0.12);
+      transform: translateY(3px) scale(0.985);
+      box-shadow:
+        inset 0 0 14px rgba(0, 0, 0, 0.16),
+        0 8px 18px rgba(0,0,0,0.10);
+    }
+
+    .palette-button {
+      position: relative;
+      isolation: isolate;
+      box-sizing: border-box;
+      width: 314px;
+      height: 80px;
+      border-radius: 0;
+      border: 2px solid rgba(190, 220, 255, 0.30);
+      background: rgba(190, 220, 255, 0.12);
+      overflow: hidden;
+      clip-path: inset(0);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 18px rgba(0,0,0,0.10);
+      padding: 10px 12px 12px;
+      display: grid;
+      grid-template-rows: 22px 1fr;
+      gap: 8px;
+      color: rgba(238, 248, 255, 0.88);
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 820;
+    }
+
+    .palette-button span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .palette-button .swatch {
+      border-radius: 0;
+      border: 1px solid rgba(255,255,255,0.32);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.10);
+    }
+
+    .palette-button.active {
+      border-color: rgba(80, 160, 255, 0.86);
+      background: rgba(80, 160, 255, 0.18);
+      color: #ffffff;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+        0 0 14px rgba(80, 160, 255, 0.16),
+        0 8px 18px rgba(0,0,0,0.10);
+    }
+
+    .palette-button.pressed {
+      border-color: rgba(80, 160, 255, 0.48);
+      background: rgba(80, 160, 255, 0.12);
+      transform: translateY(3px) scale(0.982);
+      box-shadow:
+        inset 0 0 12px rgba(0, 0, 0, 0.16),
+        0 6px 14px rgba(0,0,0,0.10);
+    }
+
+    .slider-asset {
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+      box-shadow: none !important;
+    }
+
+    .capture,
+    .capture::before,
+    .capture::after,
+    .panel,
+    .button,
+    .palette-button {
+      box-shadow: none !important;
+    }
+
+    #slider_backplate {
+      width: 620px;
+      height: 72px;
+      border-radius: 0;
+      border: 2px solid rgba(255, 255, 255, 0.58);
+      background: rgba(255, 255, 255, 0.22);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 0 12px rgba(255,255,255,0.08);
+    }
+
+    #slider_track,
+    #slider_fill {
+      width: 596px;
+      height: 20px;
+      border-radius: 0;
+    }
+
+    #slider_track {
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    #slider_fill {
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    #slider_knob {
+      width: 36px;
+      height: 36px;
+      border-radius: 0;
+      border: 2px solid rgba(255,255,255,0.96);
+      background: rgba(255, 255, 255, 1.0);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.46),
+        0 0 10px rgba(255,255,255,0.16);
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section id="theory_panel" class="panel">
+      <div class="eyebrow">Field Metrics</div>
+      <div class="title">Contraction</div>
+      <div class="signature" id="signature">∇·F &lt; 0<span class="sep">/</span>∇×F = 0</div>
+      <div class="readout" id="readout">
+        <div class="metric" id="divMetric"><span>∇·F</span><span id="divValue">−2.00</span></div>
+        <div class="metric" id="curlMetric"><span>∇×F</span><span id="curlValue">+0.00</span></div>
+      </div>
+      <div class="instruction" id="instruction" hidden>
+        Move the cursor to recompute field metrics. Use your hands to distort the field.
+      </div>
+    </section>
+
+    <div id="mode_expansion_normal" class="button"><span class="lbl">Expansion</span></div>
+    <div id="mode_expansion_active" class="button active"><span class="lbl">Expansion</span></div>
+    <div id="mode_expansion_pressed" class="button pressed"><span class="lbl">Expansion</span></div>
+
+    <div id="mode_contraction_normal" class="button"><span class="lbl">Contraction</span></div>
+    <div id="mode_contraction_active" class="button active"><span class="lbl">Contraction</span></div>
+    <div id="mode_contraction_pressed" class="button pressed"><span class="lbl">Contraction</span></div>
+
+    <div id="mode_curl_normal" class="button"><span class="lbl">Curl</span></div>
+    <div id="mode_curl_active" class="button active"><span class="lbl">Curl</span></div>
+    <div id="mode_curl_pressed" class="button pressed"><span class="lbl">Curl</span></div>
+
+    <div id="mode_motion_normal" class="button"><span class="lbl">Motion</span></div>
+    <div id="mode_motion_active" class="button active"><span class="lbl">Motion</span></div>
+    <div id="mode_motion_pressed" class="button pressed"><span class="lbl">Motion</span></div>
+
+    <div id="slider_backplate" class="capture slider-asset"></div>
+    <div id="slider_track" class="capture slider-asset"></div>
+    <div id="slider_fill" class="capture slider-asset"></div>
+    <div id="slider_knob" class="capture slider-asset"></div>
+  </main>
+  <script src="./mesh-gradient-bg.js"></script>
+  <script>
+    const palettes = [
+      { id: "jet", label: "Jet", gradient: "linear-gradient(90deg,#001174,#004cff,#00c7ff,#56ff9b,#fff23a,#ff8b00,#b00000)" },
+      { id: "viridis", label: "Viridis", gradient: "linear-gradient(90deg,#fde725,#5ec962,#21918c,#3b528b,#440154)" },
+      { id: "plasma", label: "Plasma", gradient: "linear-gradient(90deg,#f0f921,#fca636,#e16462,#b12a90,#6a00a8,#0d0887)" },
+    ];
+    const main = document.querySelector(".stage");
+    for (const palette of palettes) {
+      for (const state of ["normal", "active", "pressed"]) {
+        const button = document.createElement("div");
+        button.id = `palette_${palette.id}_${state}`;
+        button.className = `capture palette-button ${state === "active" ? "active" : state === "pressed" ? "pressed" : ""}`.trim();
+        button.innerHTML = `<span>${palette.label}</span><div class="swatch"></div>`;
+        button.querySelector(".swatch").style.background = palette.gradient;
+        main.appendChild(button);
+      }
+    }
+
+    // Keep these controls flat and legible. The colormap swatches should carry
+    // the color, while the actual control chrome stays neutral.
+    const ACTIVE_PALETTE = ["#f4f5f7", "#ffffff", "#e8ebef", "#ffffff", "#f7f8fa"];
+    const seedTime = (s) => {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 997;
+      return 5 + (h % 48) * 0.5;
+    };
+    const mountGrad = (el, opts) => {
+      const canvas = document.createElement("canvas");
+      canvas.className = "grad-canvas";
+      el.insertBefore(canvas, el.firstChild);
+      const w = el.clientWidth || el.getBoundingClientRect().width;
+      const h = el.clientHeight || el.getBoundingClientRect().height;
+      window.mountMeshGradient(canvas, Object.assign({ width: w, height: h }, opts));
+    };
+    const gradFor = (el) => {
+      const active = el.classList.contains("active");
+      const pressed = el.classList.contains("pressed");
+      if (active) return { time: seedTime(el.id), brightness: 0.36, grain: 0.05, vignette: 0.42, noiseScale: 0.7, colors: ACTIVE_PALETTE };
+      if (pressed) return { time: seedTime(el.id), brightness: 0.17, grain: 0.05, vignette: 0.52, noiseScale: 0.8 };
+      return { time: seedTime(el.id), brightness: 0.25, grain: 0.05, vignette: 0.5, noiseScale: 0.8 };
+    };
+
+    window.theoryMenuReady = true;
+  </script>
+</body>
+</html>

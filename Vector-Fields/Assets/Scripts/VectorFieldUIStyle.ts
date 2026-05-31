@@ -507,7 +507,9 @@ export class VectorFieldUIStyle extends BaseScriptComponent {
         const hw = width * 0.5;
         const hh = height * 0.5;
         const hd = depth * 0.5;
-        const r = Math.min(cornerRadius, Math.min(hw, hh) * 0.92);
+        // Square corners for all field UI widgets. cornerRadius is kept in the
+        // signature for compatibility but forced to 0 (straight corners).
+        const r = 0;
         const perCorner = Math.max(2, Math.floor(cornerSegments));
         const points: vec3[] = [];
 

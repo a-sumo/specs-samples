@@ -17,13 +17,15 @@ input_float TubeRadius;
 input_float StepSize;
 input_float NumSteps;
 input_float FieldScale;
-input_int Preset;
+input_float Preset;
 input_vec3 TargetPosition;
 input_float Time;
 input_float FlowSpeed;
 input_float ArrowScale;
 input_float ConeLength;
 input_float ConeRadius;
+input_float ColorMapScale;
+input_float ColorMapOffset;
 
 output_vec3 transformedPosition;
 output_vec4 vertexColor;
@@ -267,6 +269,14 @@ vec3 safeNormalize(vec3 v, vec3 fallback) {
     return v / len;
 }
 
+float fieldPresetValue() {
+    return floor(Preset + 0.0001);
+}
+
+float colorMapValue() {
+    return floor(fract(Preset) * 100.0 + 0.5);
+}
+
 // 9: Ambient audio plane - one shared direction with subtle per-vector noise.
 // TargetPosition encodes the audio/control channels: x=recorded yaw, y=22-40Hz bass, z=opacity/magnitude.
 vec3 fieldAmbientPlane(vec3 p) {
@@ -283,21 +293,22 @@ vec3 fieldAmbientPlane(vec3 p) {
 }
 
 vec3 getField(vec3 p) {
-    if (Preset == 0) return fieldExpansion(p);
-    if (Preset == 1) return fieldContraction(p);
-    if (Preset == 2) return fieldCirculation(p);
-    if (Preset == 3) return fieldWaves(p);
-    if (Preset == 4) return fieldVortex(p);
-    if (Preset == 5) return fieldSaddle(p);
-    if (Preset == 6) return fieldHelix(p);
-    if (Preset == 7) return fieldRiver(p);
-    if (Preset == 8) return fieldSurfaceWind(p);
-    if (Preset == 9) return fieldAmbientPlane(p);
+    float preset = fieldPresetValue();
+    if (preset < 0.5) return fieldExpansion(p);
+    if (preset < 1.5) return fieldContraction(p);
+    if (preset < 2.5) return fieldCirculation(p);
+    if (preset < 3.5) return fieldWaves(p);
+    if (preset < 4.5) return fieldVortex(p);
+    if (preset < 5.5) return fieldSaddle(p);
+    if (preset < 6.5) return fieldHelix(p);
+    if (preset < 7.5) return fieldRiver(p);
+    if (preset < 8.5) return fieldSurfaceWind(p);
+    if (preset < 9.5) return fieldAmbientPlane(p);
     return fieldWaves(p);
 }
 
 bool usesSphereSurface() {
-    return Preset == 8;
+    return fieldPresetValue() > 7.5 && fieldPresetValue() < 8.5;
 }
 
 vec3 projectToDomain(vec3 p, float domainRadius) {
@@ -321,39 +332,151 @@ vec3 advanceDomain(vec3 p, float domainRadius, float amount) {
 }
 
 // ========================================
-// PLASMA COLOR GRADIENT
+// MATPLOTLIB-STYLE COLOR MAPS
 // ========================================
 
-// Cosmic classroom palette: cyan -> blue -> purple -> red -> yellow -> green -> white
-vec3 plasmaGradient(float value) {
-    vec3 c0 = vec3(0.00, 0.92, 1.00);  // Cyan
-    vec3 c1 = vec3(0.12, 0.38, 1.00);  // Blue
-    vec3 c2 = vec3(0.64, 0.20, 1.00);  // Purple
-    vec3 c3 = vec3(1.00, 0.16, 0.30);  // Red
-    vec3 c4 = vec3(1.00, 0.90, 0.10);  // Yellow
-    vec3 c5 = vec3(0.30, 0.98, 0.32);  // Green
-    vec3 c6 = vec3(1.00, 0.96, 0.88);  // Warm white
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0);
+    return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
 
-    if (value < 0.166) return mix(c0, c1, value * 6.0);
-    else if (value < 0.333) return mix(c1, c2, (value - 0.166) * 6.0);
-    else if (value < 0.500) return mix(c2, c3, (value - 0.333) * 6.0);
-    else if (value < 0.666) return mix(c3, c4, (value - 0.500) * 6.0);
-    else if (value < 0.833) return mix(c4, c5, (value - 0.666) * 6.0);
-    else return mix(c5, c6, (value - 0.833) * 6.0);
+vec3 stops5(float x, vec3 c0, vec3 c1, vec3 c2, vec3 c3, vec3 c4) {
+    x = clamp(x, 0.0, 1.0);
+    if (x < 0.25) return mix(c0, c1, smoothstep(0.0, 0.25, x));
+    if (x < 0.50) return mix(c1, c2, smoothstep(0.25, 0.50, x));
+    if (x < 0.75) return mix(c2, c3, smoothstep(0.50, 0.75, x));
+    return mix(c3, c4, smoothstep(0.75, 1.0, x));
+}
+
+vec3 stops7(float x, vec3 c0, vec3 c1, vec3 c2, vec3 c3, vec3 c4, vec3 c5, vec3 c6) {
+    x = clamp(x, 0.0, 1.0);
+    if (x < 0.1667) return mix(c0, c1, smoothstep(0.0, 0.1667, x));
+    if (x < 0.3333) return mix(c1, c2, smoothstep(0.1667, 0.3333, x));
+    if (x < 0.5000) return mix(c2, c3, smoothstep(0.3333, 0.5000, x));
+    if (x < 0.6667) return mix(c3, c4, smoothstep(0.5000, 0.6667, x));
+    if (x < 0.8333) return mix(c4, c5, smoothstep(0.6667, 0.8333, x));
+    return mix(c5, c6, smoothstep(0.8333, 1.0, x));
+}
+
+vec3 stops9(float x, vec3 c0, vec3 c1, vec3 c2, vec3 c3, vec3 c4, vec3 c5, vec3 c6, vec3 c7, vec3 c8) {
+    x = clamp(x, 0.0, 1.0);
+    if (x < 0.125) return mix(c0, c1, smoothstep(0.0, 0.125, x));
+    if (x < 0.250) return mix(c1, c2, smoothstep(0.125, 0.250, x));
+    if (x < 0.375) return mix(c2, c3, smoothstep(0.250, 0.375, x));
+    if (x < 0.500) return mix(c3, c4, smoothstep(0.375, 0.500, x));
+    if (x < 0.625) return mix(c4, c5, smoothstep(0.500, 0.625, x));
+    if (x < 0.750) return mix(c5, c6, smoothstep(0.625, 0.750, x));
+    if (x < 0.875) return mix(c6, c7, smoothstep(0.750, 0.875, x));
+    return mix(c7, c8, smoothstep(0.875, 1.0, x));
+}
+
+vec3 mapFlag(float x) {
+    float p = fract(x * 8.0);
+    if (p < 0.25) return vec3(1.0, 0.0, 0.0);
+    if (p < 0.50) return vec3(1.0);
+    if (p < 0.75) return vec3(0.0, 0.0, 1.0);
+    return vec3(0.0);
+}
+
+vec3 mapPrism(float x) {
+    return hsv2rgb(vec3(fract(x * 6.0), 1.0, 1.0));
+}
+
+vec3 mapTurbo(float x) {
+    const vec4 kRedVec4 = vec4(0.13572138, 4.61539260, -42.66032258, 132.13108234);
+    const vec4 kGreenVec4 = vec4(0.09140261, 2.19418839, 4.84296658, -14.18503333);
+    const vec4 kBlueVec4 = vec4(0.10667330, 12.64194608, -60.58204836, 110.36276771);
+    const vec2 kRedVec2 = vec2(-152.94239396, 59.28637943);
+    const vec2 kGreenVec2 = vec2(4.27729857, 2.82956604);
+    const vec2 kBlueVec2 = vec2(-89.90310912, 27.34824973);
+    float t = clamp(x, 0.0, 1.0);
+    vec4 v4 = vec4(1.0, t, t * t, t * t * t);
+    vec2 v2 = vec2(v4.z, v4.w) * v4.z;
+    return clamp(vec3(
+        dot(v4, kRedVec4) + dot(v2, kRedVec2),
+        dot(v4, kGreenVec4) + dot(v2, kGreenVec2),
+        dot(v4, kBlueVec4) + dot(v2, kBlueVec2)
+    ), 0.0, 1.0);
+}
+
+vec3 mapJet(float x) {
+    float t = clamp(x, 0.0, 1.0);
+    return clamp(vec3(
+        1.5 - abs(4.0 * t - 3.0),
+        1.5 - abs(4.0 * t - 2.0),
+        1.5 - abs(4.0 * t - 1.0)
+    ), 0.0, 1.0);
+}
+
+vec3 mapCubehelix(float x) {
+    float t = clamp(x, 0.0, 1.0);
+    float angle = 6.2831853 * (0.5 / 3.0 - 1.5 * t);
+    float amp = 0.5 * t * (1.0 - t);
+    float c = cos(angle);
+    float s = sin(angle);
+    return clamp(vec3(
+        t + amp * (-0.14861 * c + 1.78277 * s),
+        t + amp * (-0.29227 * c - 0.90649 * s),
+        t + amp * (1.97294 * c)
+    ), 0.0, 1.0);
+}
+
+vec3 mapViridis(float x) {
+    return stops5(
+        x,
+        vec3(0.99, 0.91, 0.15),
+        vec3(0.37, 0.79, 0.38),
+        vec3(0.13, 0.57, 0.55),
+        vec3(0.23, 0.32, 0.55),
+        vec3(0.27, 0.01, 0.33)
+    );
+}
+
+vec3 mapPlasma(float x) {
+    return stops7(
+        x,
+        vec3(0.94, 0.98, 0.13),
+        vec3(0.99, 0.65, 0.21),
+        vec3(0.88, 0.39, 0.38),
+        vec3(0.70, 0.16, 0.56),
+        vec3(0.42, 0.00, 0.66),
+        vec3(0.23, 0.06, 0.50),
+        vec3(0.05, 0.03, 0.53)
+    );
+}
+
+vec3 sampleColorMap(float value) {
+    float scale = ColorMapScale;
+    if (abs(scale) < 0.0001) scale = 1.0;
+    float x = clamp(value * scale + ColorMapOffset, 0.0, 1.0);
+    float m = colorMapValue();
+    if (m < 0.5) return mapFlag(x);
+    if (m < 1.5) return mapPrism(x);
+    if (m < 2.5) return stops5(x, vec3(0.0, 0.06, 0.09), vec3(0.0, 0.22, 0.40), vec3(0.0, 0.44, 0.50), vec3(0.46, 0.72, 0.70), vec3(0.95, 0.94, 0.86));
+    if (m < 3.5) return stops7(x, vec3(0.0, 0.0, 0.08), vec3(0.03, 0.09, 0.31), vec3(0.05, 0.34, 0.44), vec3(0.25, 0.53, 0.34), vec3(0.56, 0.65, 0.36), vec3(0.79, 0.65, 0.52), vec3(0.96, 0.93, 0.93));
+    if (m < 4.5) return stops7(x, vec3(0.14, 0.20, 0.54), vec3(0.08, 0.54, 0.83), vec3(0.07, 0.75, 0.64), vec3(0.56, 0.83, 0.42), vec3(0.92, 0.91, 0.56), vec3(0.60, 0.46, 0.36), vec3(0.95, 0.93, 0.93));
+    if (m < 5.5) return stops7(x, vec3(0.0), vec3(0.73, 0.0, 0.09), vec3(0.20, 0.14, 0.37), vec3(0.47, 0.49, 0.91), vec3(0.65, 0.65, 0.67), vec3(0.71, 0.65, 0.36), vec3(0.96, 0.94, 0.80));
+    if (m < 6.5) return stops5(x, vec3(0.0), vec3(0.11, 0.0, 0.30), vec3(0.50, 0.0, 0.55), vec3(0.88, 0.29, 0.15), vec3(1.0, 0.96, 0.0));
+    if (m < 7.5) return stops7(x, vec3(0.0), vec3(0.0, 0.06, 0.37), vec3(0.21, 0.0, 0.66), vec3(0.60, 0.14, 0.82), vec3(0.93, 0.31, 0.60), vec3(1.0, 0.58, 0.31), vec3(1.0));
+    if (m < 8.5) return stops7(x, vec3(0.0), vec3(0.08, 0.08, 0.24), vec3(0.27, 0.17, 0.47), vec3(0.65, 0.18, 0.28), vec3(0.94, 0.40, 0.18), vec3(0.90, 0.85, 0.37), vec3(1.0));
+    if (m < 9.5) return mapCubehelix(x);
+    if (m < 10.5) return stops5(x, vec3(0.0, 0.0, 1.0), vec3(0.49, 0.0, 0.53), vec3(1.0, 0.0, 0.0), vec3(0.69, 0.38, 0.0), vec3(0.0, 1.0, 0.0));
+    if (m < 11.5) return hsv2rgb(vec3(fract(0.99 - x * 0.86), 1.0, 1.0));
+    if (m < 12.5) return hsv2rgb(vec3(0.76 - x * 0.76, 0.72, 1.0));
+    if (m < 13.5) return mapJet(x);
+    if (m < 14.5) return mapTurbo(x);
+    if (m < 15.5) return stops9(x, vec3(0.0), vec3(0.42, 0.0, 0.31), vec3(0.0, 0.07, 0.66), vec3(0.0, 0.59, 1.0), vec3(0.0, 0.69, 0.0), vec3(0.84, 1.0, 0.0), vec3(1.0, 0.48, 0.0), vec3(0.86, 0.0, 0.16), vec3(0.96, 0.93, 0.96));
+    if (m < 16.5) return stops9(x, vec3(0.0), vec3(0.0, 0.19, 0.44), vec3(0.0, 0.42, 1.0), vec3(0.0, 0.89, 0.94), vec3(0.0, 0.80, 0.22), vec3(0.84, 1.0, 0.0), vec3(1.0, 0.57, 0.0), vec3(1.0, 0.0, 0.30), vec3(0.92, 0.53, 1.0));
+    if (m < 17.5) return mapViridis(x);
+    return mapPlasma(x);
 }
 
 vec3 ambientGradient(float value) {
-    vec3 deepBlue = vec3(0.10, 0.26, 1.00);
-    vec3 cyan = vec3(0.02, 0.84, 1.00);
-    vec3 green = vec3(0.38, 1.00, 0.36);
-    vec3 lit = vec3(0.88, 1.00, 0.88);
-    vec3 c = mix(deepBlue, cyan, smoothstep(0.0, 0.58, value));
-    c = mix(c, green, smoothstep(0.34, 1.0, value));
-    return mix(c, lit, smoothstep(0.82, 1.0, value) * 0.22);
+    return sampleColorMap(value);
 }
 
 vec3 getColor(vec3 vel, float t, vec3 p) {
-    if (Preset == 9) {
+    if (fieldPresetValue() > 8.5 && fieldPresetValue() < 9.5) {
         float magnitude = clamp(TargetPosition.z, 0.0, 1.0);
         float bass = clamp(TargetPosition.y, 0.0, 1.0);
         float band = 0.5 + 0.5 * sin(p.x * 1.15 + p.z * 0.78 + t * 1.7 + Time * 0.12);
@@ -364,7 +487,7 @@ vec3 getColor(vec3 vel, float t, vec3 p) {
     float speed = length(vel);
     float intensity = min(1.0, speed * 2.5);
 
-    return plasmaGradient(intensity);
+    return sampleColorMap(intensity) * (0.72 + intensity * 0.34);
 }
 
 void main() {
@@ -462,7 +585,7 @@ void main() {
         if (isArrowCone) {
             color = mix(color, vec3(1.0), 0.2);
         }
-        alpha = (Preset == 9) ? (0.18 + clamp(TargetPosition.z, 0.0, 1.0) * 0.72) : 1.0;
+        alpha = (fieldPresetValue() > 8.5 && fieldPresetValue() < 9.5) ? (0.18 + clamp(TargetPosition.z, 0.0, 1.0) * 0.72) : 1.0;
 
     // ========================================
     // PARTICLE MODE: flowing billboard fans
@@ -502,7 +625,7 @@ void main() {
         float edgeFade = 1.0 - smoothstep(0.74, 1.0, disc);
         color = getColor(vel, 0.5, pos);
         alpha = edgeFade * birthFade * deathFade;
-        if (Preset == 9) {
+        if (fieldPresetValue() > 8.5 && fieldPresetValue() < 9.5) {
             alpha *= 0.18 + clamp(TargetPosition.z, 0.0, 1.0) * 0.72;
         }
 
@@ -576,7 +699,7 @@ void main() {
 
         color = getColor(vel, tClamped, pos);
         alpha = flowFade;
-        if (Preset == 9) {
+        if (fieldPresetValue() > 8.5 && fieldPresetValue() < 9.5) {
             alpha *= 0.18 + clamp(TargetPosition.z, 0.0, 1.0) * 0.72;
         }
     }

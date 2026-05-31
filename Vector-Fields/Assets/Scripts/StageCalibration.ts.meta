@@ -53,7 +53,7 @@
     -
       {}
   InputLines:
-    - '// @input bool calibrateOnStart = true {"hint":"Run calibration automatically at lens start, then keep that anchor until the user changes the view plane."}'
+    - '// @input bool calibrateOnStart {"hint":"Run calibration automatically at lens start, then keep that anchor until the user changes the view plane."}'
     - '// @input float placementMode {"hint":"Surface type used for calibration.", "widget":"combobox", "values":[{"label":"Horizontal (floor)", "value":0}, {"label":"Vertical (wall)", "value":1}, {"label":"Tabletop (near surface)", "value":2}]}'
     - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor. Empty searches for Camera Object."}'
     - '// @input float previewSizeCm = 36 {"hint":"Size of the preview reference plane in centimeters.", "widget":"slider", "min":12, "max":80, "step":1}'

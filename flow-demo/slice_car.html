@@ -83,7 +83,7 @@ for(let f=0;f<NF;f++){ const a=f*9; const ux=P[a+3]-P[a],uy=P[a+4]-P[a+1],uz=P[a
   FN[f*3]=nx/l;FN[f*3+1]=ny/l;FN[f*3+2]=nz/l; }
 
 // ---------- domain + bake the volume ----------
-X0=-CARL*0.62; X1=CARL*1.5; Y0=-CARH*1.5; Y1=CARH*1.9; Z0=-CARW*0.62; Z1=CARW*0.62;
+X0=-CARL*0.62; X1=CARL*0.62; Y0=-CARH*0.95; Y1=CARH*0.95; Z0=-CARW*0.5; Z1=CARW*0.5;
 fitView();
 const _Q=new URLSearchParams(location.search);
 const NX=+(_Q.get('nx'))||100, NY=+(_Q.get('ny'))||48, NZ=+(_Q.get('nz'))||54;

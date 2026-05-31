@@ -36,19 +36,33 @@
     gravityFrontOffset: false
     gravityReferenceOffset: false
     hideLegacySystems: false
+    initialExampleField: false
     initialStep: false
+    initialTheoryFieldMode: false
+    initialVectorColorMap: false
     legacyGuideRoot: false
     legacySlideStageRoot: false
     magneticFieldRoot: false
     magneticFrontOffset: false
     magneticReferenceOffset: false
+    mainExperienceRenderOrder: false
     motionFieldRoot: false
     motionFrontOffset: false
+    resetDefaultStanceNow: false
     scaffoldRoot: false
     settleSeconds: false
     showScaffold: false
     storyWidgetsRoot: false
+    theoryFieldMenuRoot: false
+    theoryMenuFrontOffset: false
+    theoryMenuScale: false
+    theoryVectorFrontOffset: false
+    theoryVectorScale: false
+    useExampleProxySlots: false
+    useFrontPlacementForAllVisuals: false
     useReferenceCalibrationForExamples: false
+    vectorColorMapOffset: false
+    vectorColorMapScale: false
     vectorFieldRoot: false
     viewPlaneMode: false
     windFrontOffset: false
@@ -67,6 +81,7 @@
       motionFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       analyticalPatternsRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       vectorFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      theoryFieldMenuRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       magneticFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       gravityFieldRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       windGlobeRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
@@ -79,12 +94,25 @@
       showScaffold: true
       controlContentRoots: true
       hideLegacySystems: true
+      mainExperienceRenderOrder: !<float> 0.000000
       settleSeconds: 1.250000
       viewPlaneMode: !<float> 0.000000
       calibrateReferenceOnStart: true
       useReferenceCalibrationForExamples: false
+      useExampleProxySlots: true
+      useFrontPlacementForAllVisuals: true
+      resetDefaultStanceNow: false
+      initialExampleField: !<float> 0.000000
+      initialTheoryFieldMode: !<float> 0.000000
+      initialVectorColorMap: !<float> 9.000000
+      vectorColorMapScale: !<float> 1.000000
+      vectorColorMapOffset: !<float> 0.000000
       motionFrontOffset: !<Vec3> {x: 0.000000, y: -3.000000, z: -82.000000}
       analyticalFrontOffset: !<Vec3> {x: 0.000000, y: 8.000000, z: -78.000000}
+      theoryVectorFrontOffset: !<Vec3> {x: -15.000000, y: -2.000000, z: -82.000000}
+      theoryMenuFrontOffset: !<Vec3> {x: 16.000000, y: -3.000000, z: -78.000000}
+      theoryVectorScale: 1.050000
+      theoryMenuScale: !<float> 1.000000
       gravityFrontOffset: !<Vec3> {x: 0.000000, y: -6.000000, z: -82.000000}
       magneticFrontOffset: !<Vec3> {x: 0.000000, y: -4.000000, z: -78.000000}
       windFrontOffset: !<Vec3> {x: 0.000000, y: -5.000000, z: -78.000000}
@@ -99,27 +127,41 @@
     - '// @input SceneObject motionFieldRoot {"hint":"Planar motion field rig."}'
     - '// @input SceneObject analyticalPatternsRoot {"hint":"Analytical field-pattern library rig."}'
     - '// @input SceneObject vectorFieldRoot {"hint":"Legacy abstract vector field rig."}'
+    - '// @input SceneObject theoryFieldMenuRoot {"hint":"Legacy standalone theory menu. Kept hidden when the main guide owns theory controls."}'
     - '// @input SceneObject magneticFieldRoot {"hint":"Magnetic field example rig."}'
     - '// @input SceneObject gravityFieldRoot {"hint":"Gravity field example rig."}'
     - '// @input SceneObject windGlobeRoot {"hint":"Wind globe example rig."}'
     - '// @input SceneObject storyWidgetsRoot {"hint":"Older image widget group. Usually hidden while the new scaffold is active."}'
     - '// @input SceneObject legacyGuideRoot {"hint":"Older narration panel root to park while this director owns the story."}'
     - '// @input SceneObject legacySlideStageRoot {"hint":"Older slide stage root to park while this director owns the story."}'
-    - '// @input bool applyOnStart = true {"hint":"Stage a step at startup."}'
-    - '// @input float initialStep {"hint":"Initial step index when applyOnStart is enabled.", "widget":"slider", "min":0, "max":3, "step":1}'
+    - '// @input bool applyOnStart {"hint":"Stage a step at startup when the director runs without the main guide."}'
+    - '// @input float initialStep {"hint":"Initial step index when applyOnStart is enabled.", "widget":"slider", "min":0, "max":2, "step":1}'
     - '// @input SceneObject cameraRoot {"hint":"Optional head/camera anchor for menu-selected front placement. Empty searches for Camera Object."}'
     - '// @input bool showScaffold = true {"hint":"Show the matching proxy/root in VF Story Scaffold."}'
     - '// @input bool controlContentRoots = true {"hint":"Enable the real content roots associated with the selected story step."}'
     - '// @input bool hideLegacySystems = true {"hint":"Hide the older narration and slide systems."}'
+    - '// @input float mainExperienceRenderOrder {"hint":"Render-order floor for active field/example visuals, keeping the main experience above the story guide when they overlap.", "widget":"slider", "min":0, "max":900, "step":1}'
     - '// @input float settleSeconds = 1.25 {"hint":"Keep applying briefly after startup so other setup scripts settle first."}'
     - '// @input float viewPlaneMode {"hint":"Reference frame used by gravity, magnetism, and wind examples.", "widget":"combobox", "values":[{"label":"Floor plane", "value":0}, {"label":"Front plane", "value":1}]}'
-    - '// @input bool calibrateReferenceOnStart = true {"hint":"Ask for the shared reference-frame calibration on first start."}'
-    - '// @input bool useReferenceCalibrationForExamples = true {"hint":"Use StageCalibration/SnapToStage for real-world examples. Off keeps menu selections immediate and camera-relative."}'
-    - '// @input vec3 motionFrontOffset = {0,-3,-82} {"hint":"Camera-relative placement for the 2D motion plane."}'
-    - '// @input vec3 analyticalFrontOffset = {0,8,-78} {"hint":"Camera-relative placement for analytical field-pattern examples."}'
-    - '// @input vec3 gravityFrontOffset = {0,-6,-82} {"hint":"Camera-relative placement for gravity when reference calibration is disabled."}'
-    - '// @input vec3 magneticFrontOffset = {0,-4,-78} {"hint":"Camera-relative placement for magnetism when reference calibration is disabled."}'
-    - '// @input vec3 windFrontOffset = {0,-5,-78} {"hint":"Camera-relative placement for wind when reference calibration is disabled."}'
+    - '// @input bool calibrateReferenceOnStart {"hint":"Ask for the shared reference-frame calibration on first start."}'
+    - '// @input bool useReferenceCalibrationForExamples {"hint":"Use StageCalibration/SnapToStage for real-world examples. Usually off; front placement is the stable default."}'
+    - '// @input bool useExampleProxySlots {"hint":"Use the C03 scaffold proxy slots as the default staging positions for real-world examples."}'
+    - '// @input bool useFrontPlacementForAllVisuals = true {"hint":"Place each active visual root once in front of the user, leveled to world +Y, ignoring calibration/proxy slots."}'
+    - '// @input bool resetDefaultStanceNow {"hint":"Set true in Inspector to put the active visual back into its default front-facing stance."}'
+    - '// @input float initialExampleField {"hint":"Initial real-world example when the examples step is opened at startup.", "widget":"combobox", "values":[{"label":"Gravity", "value":0}, {"label":"Magnetism", "value":1}, {"label":"Wind", "value":2}]}'
+    - '// @input float initialTheoryFieldMode {"hint":"Initial theory field mode when the theory step is opened at startup.", "widget":"combobox", "values":[{"label":"Expansion", "value":0}, {"label":"Contraction", "value":1}, {"label":"Curl", "value":2}, {"label":"Motion", "value":3}]}'
+    - '// @input float initialVectorColorMap = 17 {"hint":"Initial cube VectorField color map for theory modes.", "widget":"combobox", "values":[{"label":"jet", "value":13}, {"label":"viridis", "value":17}, {"label":"plasma", "value":18}]}'
+    - '// @input float vectorColorMapScale = 1 {"hint":"Color-gradient scale for cube VectorField theory modes.", "widget":"slider", "min":0.05, "max":4, "step":0.01}'
+    - '// @input float vectorColorMapOffset {"hint":"Color-gradient offset for cube VectorField theory modes.", "widget":"slider", "min":-1, "max":1, "step":0.01}'
+    - '// @input vec3 motionFrontOffset = {0,0,-50} {"hint":"Camera-relative placement for the 2D motion plane."}'
+    - '// @input vec3 analyticalFrontOffset = {0,0,-78} {"hint":"Camera-relative placement for analytical field-pattern examples."}'
+    - '// @input vec3 theoryVectorFrontOffset = {0,0,-50} {"hint":"Camera-relative placement for the real VectorField in the theory chapter."}'
+    - '// @input vec3 theoryMenuFrontOffset = {16,-12,-78} {"hint":"Camera-relative placement for the theory mode menu."}'
+    - '// @input float theoryVectorScale = 0.85 {"hint":"Local scale for the real VectorField when staged in theory.", "widget":"slider", "min":0.35, "max":2, "step":0.05}'
+    - '// @input float theoryMenuScale = 1 {"hint":"Local scale for the theory field menu.", "widget":"slider", "min":0.55, "max":1.8, "step":0.05}'
+    - '// @input vec3 gravityFrontOffset = {0,-28,-82} {"hint":"Camera-relative placement for gravity when reference calibration is disabled."}'
+    - '// @input vec3 magneticFrontOffset = {0,0,-78} {"hint":"Camera-relative placement for magnetism when reference calibration is disabled."}'
+    - '// @input vec3 windFrontOffset = {0,0,-78} {"hint":"Camera-relative placement for wind when reference calibration is disabled."}'
     - '// @input vec3 gravityReferenceOffset = {0,0,0} {"hint":"Gravity offset in calibrated plane-local space."}'
     - '// @input vec3 magneticReferenceOffset = {0,7,0} {"hint":"Magnetism offset in calibrated plane-local space."}'
     - '// @input vec3 windReferenceOffset = {0,24,0} {"hint":"Wind globe offset in calibrated plane-local space."}'

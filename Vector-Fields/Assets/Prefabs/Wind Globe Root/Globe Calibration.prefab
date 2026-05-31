@@ -632,6 +632,8 @@
     verifyLat: true
     verifyLon: true
     desiredRadiusWorld: true
+    legend: true
+    legendGapCm: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -644,6 +646,8 @@
       verifyLat: 51.509998
       verifyLon: -0.130000
       desiredRadiusWorld: !<float> 12.000000
+      legend: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      legendGapCm: !<float> 8.000000
   ScriptTypes:
     "":
       {}

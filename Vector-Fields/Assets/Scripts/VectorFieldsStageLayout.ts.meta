@@ -39,6 +39,8 @@
     menuY: false
     menuZ: false
     motionFieldRoot: false
+    motionFrontY: false
+    motionFrontZ: false
     settleSeconds: false
     windGlobeRoot: false
   ScriptTypesHidden:
@@ -59,6 +61,8 @@
       settleSeconds: 1.250000
       floorY: !<float> -112.000000
       floorZ: !<float> -118.000000
+      motionFrontY: !<float> -3.000000
+      motionFrontZ: !<float> -82.000000
       handLevelY: !<float> -6.000000
       handLevelZ: !<float> -72.000000
       handLevelSpacing: !<float> 42.000000
@@ -74,13 +78,15 @@
     - '// @input SceneObject windGlobeRoot {"hint":"Wind globe root. Falls back to Globe Calibration by name."}'
     - '// @input SceneObject magneticFieldRoot {"hint":"Magnetic field root. Falls back to Magnetic Field Root by name."}'
     - '// @input SceneObject menuRoot {"hint":"Chapter guide root. Falls back to Story Chapter Guide UI by name."}'
-    - '// @input bool applyOnStart = true {"hint":"Apply the authored layout at startup."}'
+    - '// @input bool applyOnStart {"hint":"Apply the authored layout at startup."}'
     - '// @input float settleSeconds = 1.25 {"hint":"Keep applying for a brief startup window so older setup scripts settle first."}'
     - '// @input float floorY = -112 {"hint":"Floor height relative to the head/camera anchor, in centimeters."}'
     - '// @input float floorZ = -118 {"hint":"Default forward distance for floor fields, in centimeters."}'
+    - '// @input float motionFrontY = -3 {"hint":"Head-relative height for the 2D motion plane. This is a front display, not a floor plane."}'
+    - '// @input float motionFrontZ = -50 {"hint":"Head-relative forward distance for the 2D motion plane."}'
     - '// @input float handLevelY = -6 {"hint":"Chest/head height for hand-rotated examples, in centimeters."}'
     - '// @input float handLevelZ = -72 {"hint":"Default forward distance for hand-rotated examples, in centimeters."}'
     - '// @input float handLevelSpacing = 42 {"hint":"Horizontal spacing between hand-level wind and magnetic examples."}'
     - '// @input float menuZ = -68 {"hint":"Fallback menu distance when Follow is off."}'
-    - '// @input float menuY = -7 {"hint":"Fallback menu height when Follow is off."}'
+    - '// @input float menuY = -16 {"hint":"Fallback menu height when Follow is off."}'
     - '// @input bool applyScales = true {"hint":"Apply scale presets with the positions."}'

@@ -66,6 +66,9 @@ export class VectorFieldsScaffoldLabels extends BaseScriptComponent {
     }
 
     private textFromName(name: string): string {
+        const override = this.labelOverride(name);
+        if (override.length > 0) return override;
+
         let value = name.substr(6);
         value = value.replace(/^C[0-9][0-9]_/, "");
         value = value.replace(/^Library_/, "");
@@ -78,5 +81,24 @@ export class VectorFieldsScaffoldLabels extends BaseScriptComponent {
         value = value.replace(/\bR2\b/g, "R2");
         value = value.replace(/\bR3\b/g, "R3");
         return value;
+    }
+
+    private labelOverride(name: string): string {
+        if (name === "Label_Library_Title_Analytical_field_patterns") {
+            return "Analytical fields for div and curl";
+        }
+        if (name === "Label_C02_Uniform_pattern_same_arrow_at_each_point") {
+            return "Expansion: positive divergence";
+        }
+        if (name === "Label_Library_Source_sink_pattern_expand_or_converge") {
+            return "Contraction: negative divergence";
+        }
+        if (name === "Label_Library_Vortex_pattern_local_rotation") {
+            return "Rotation: positive curl";
+        }
+        if (name === "Label_Library_Saddle_pattern_stretching_axis") {
+            return "Saddle: stretch plus compression";
+        }
+        return "";
     }
 }

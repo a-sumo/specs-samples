@@ -184,8 +184,13 @@
     _tubeMode: true
     _domainMode: true
     _sphereRadius: true
+    _planeWidth: true
+    _planeDepth: true
     _stepSize: true
     _preset: true
+    _colorMap: true
+    _colorMapScale: true
+    _colorMapOffset: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -202,10 +207,15 @@
       _gridSpacing: 0.600000
       _domainMode: !<float> 0.000000
       _sphereRadius: 4.800000
+      _planeWidth: 6.800000
+      _planeDepth: 4.050000
       _stepSize: 0.100000
       _fieldScale: 1.100000
       _flowSpeed: !<float> 48.000000
       _preset: !<float> 0.000000
+      _colorMap: !<float> 9.000000
+      _colorMapScale: !<float> 1.000000
+      _colorMapOffset: !<float> 0.000000
       trackedObject: !<reference.SceneObject> 993a5b8b-d62f-4329-5f51-f5c9950706b4
       fieldCollider: !<reference.ColliderComponent> 204b33fe-8ed9-4616-b055-6c4ef0c3c9e9
       material: !<reference.Material> 7fbeeccd-8752-46ab-b178-c4fb67055d42

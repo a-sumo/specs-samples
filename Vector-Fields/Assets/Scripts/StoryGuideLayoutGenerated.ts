@@ -25,6 +25,20 @@ export type StoryGuideExample = {
     slot: StoryGuideSlot;
 };
 
+export type StoryGuideTheoryMode = {
+    id: string;
+    index: string;
+    title: string;
+    slot: StoryGuideSlot;
+};
+
+export type StoryGuideGradientPalette = {
+    id: string;
+    index: string;
+    title: string;
+    slot: StoryGuideSlot;
+};
+
 export const STORY_GUIDE_TEXTURE = {
     widthPx: 1500,
     heightPx: 1000,
@@ -46,49 +60,36 @@ export const STORY_GUIDE_STEPS: StoryGuideStep[] = [
         "root": "C00_Intro",
         "canCalibrate": false,
         "slot": {
-            "x": -7,
-            "y": 2.98,
-            "width": 13.2,
-            "height": 3.4
-        }
-    },
-    {
-        "id": "motion_fields",
-        "index": "02",
-        "title": "Motion Fields",
-        "root": "C01_Motion_Fields",
-        "canCalibrate": false,
-        "slot": {
-            "x": 7,
-            "y": 2.98,
-            "width": 13.2,
-            "height": 3.4
+            "x": -9.6,
+            "y": 1.5,
+            "width": 8,
+            "height": 5
         }
     },
     {
         "id": "theory",
-        "index": "03",
+        "index": "02",
         "title": "Theory",
         "root": "C02_Theory",
         "canCalibrate": false,
         "slot": {
-            "x": -7,
-            "y": -1.18,
-            "width": 13.2,
-            "height": 3.4
+            "x": 0,
+            "y": 1.5,
+            "width": 8,
+            "height": 5
         }
     },
     {
         "id": "examples",
-        "index": "04",
-        "title": "Real World Examples",
+        "index": "03",
+        "title": "Examples",
         "root": "C03_Real_World_Examples",
         "canCalibrate": true,
         "slot": {
-            "x": 7,
-            "y": -1.18,
-            "width": 13.2,
-            "height": 3.4
+            "x": 9.6,
+            "y": 1.5,
+            "width": 8,
+            "height": 5
         }
     }
 ];
@@ -99,13 +100,13 @@ export const STORY_GUIDE_EXAMPLES = {
     {
         "id": "gravity",
         "index": "01",
-        "title": "Gravity",
+        "title": "Gravitational Fields",
         "canCalibrate": true,
         "slot": {
             "x": 0,
-            "y": 3.14,
+            "y": 2.8,
             "width": 27.2,
-            "height": 3.08
+            "height": 2.8
         }
     },
     {
@@ -115,9 +116,9 @@ export const STORY_GUIDE_EXAMPLES = {
         "canCalibrate": true,
         "slot": {
             "x": 0,
-            "y": -0.7,
+            "y": -0.88,
             "width": 27.2,
-            "height": 3.08
+            "height": 2.8
         }
     },
     {
@@ -127,12 +128,124 @@ export const STORY_GUIDE_EXAMPLES = {
         "canCalibrate": true,
         "slot": {
             "x": 0,
-            "y": -4.54,
+            "y": -4.56,
             "width": 27.2,
-            "height": 3.08
+            "height": 2.8
         }
     }
 ] as StoryGuideExample[],
+};
+
+export const STORY_GUIDE_EXAMPLE_DETAIL = {
+    info: {"x":0,"y":2.06,"width":26.4,"height":4.2},
+    modes: [
+    {
+        "x": -9.2,
+        "y": -4.42,
+        "width": 8,
+        "height": 1.64
+    },
+    {
+        "x": 0,
+        "y": -4.42,
+        "width": 8,
+        "height": 1.64
+    },
+    {
+        "x": 9.2,
+        "y": -4.42,
+        "width": 8,
+        "height": 1.64
+    }
+] as StoryGuideSlot[],
+};
+
+export const STORY_GUIDE_THEORY = {
+    info: {"x":-9.04,"y":-2.4,"width":8.88,"height":6.72},
+    modes: [
+    {
+        "id": "expansion",
+        "index": "01",
+        "title": "Expansion",
+        "slot": {
+            "x": -9.1,
+            "y": 3,
+            "width": 5,
+            "height": 1.52
+        }
+    },
+    {
+        "id": "contraction",
+        "index": "02",
+        "title": "Contraction",
+        "slot": {
+            "x": -3.1,
+            "y": 3,
+            "width": 5,
+            "height": 1.52
+        }
+    },
+    {
+        "id": "curl",
+        "index": "03",
+        "title": "Curl",
+        "slot": {
+            "x": 2.9,
+            "y": 3,
+            "width": 5,
+            "height": 1.52
+        }
+    },
+    {
+        "id": "motion",
+        "index": "04",
+        "title": "Motion",
+        "slot": {
+            "x": 8.9,
+            "y": 3,
+            "width": 5,
+            "height": 1.52
+        }
+    }
+] as StoryGuideTheoryMode[],
+};
+
+export const STORY_GUIDE_GRADIENTS = {
+    palettes: [
+    {
+        "id": "jet",
+        "index": "01",
+        "title": "Jet",
+        "slot": {
+            "x": 0.22,
+            "y": 0,
+            "width": 6.28,
+            "height": 1.6
+        }
+    },
+    {
+        "id": "viridis",
+        "index": "02",
+        "title": "Viridis",
+        "slot": {
+            "x": 7.1,
+            "y": 0,
+            "width": 6.28,
+            "height": 1.6
+        }
+    },
+    {
+        "id": "plasma",
+        "index": "03",
+        "title": "Plasma",
+        "slot": {
+            "x": 0.22,
+            "y": -2.08,
+            "width": 6.28,
+            "height": 1.6
+        }
+    }
+] as StoryGuideGradientPalette[],
 };
 
 export const STORY_GUIDE_NAV = {
@@ -146,4 +259,10 @@ export const STORY_GUIDE_UTILITY = {
     fold: {"x":11.46,"y":7.84,"width":3.8,"height":1.52},
     planeFloor: {"x":7.06,"y":6.2,"width":3.8,"height":1.28},
     planeFront: {"x":11.46,"y":6.2,"width":3.8,"height":1.28},
+};
+
+export const STORY_GUIDE_VARIANTS = {
+    primary: {"x":-9.2,"y":-1.86,"width":8,"height":1.64},
+    secondary: {"x":0,"y":-1.86,"width":8,"height":1.64},
+    artemis: {"x":0,"y":-3.16,"width":26.4,"height":5.36},
 };

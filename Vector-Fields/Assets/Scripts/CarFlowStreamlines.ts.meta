@@ -1,0 +1,74 @@
+- !<AssetImportMetadata/e687cddb-4082-4fb0-b411-4d97978fbdaa>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 96387e59-493a-40d3-9df9-a6fd05246c27
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 96387e59-493a-40d3-9df9-a6fd05246c27
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> f9f0f677-c2c0-4793-807d-2c9459c3701b
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/f9f0f677-c2c0-4793-807d-2c9459c3701b>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 11c68b12-9cdc-4399-94bf-1a82390c42ee
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    autoScroll: false
+    autoScrollSpeed: false
+    axis: false
+    driveFromPosition: false
+    material: false
+    phaseSpeed: false
+    planeHeight: false
+    planeWidth: false
+    ribbonWidth: false
+    speedScaleRef: false
+    travel: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      planeWidth: !<float> 24.000000
+      planeHeight: 9.270000
+      ribbonWidth: 0.100000
+      phaseSpeed: 0.400000
+      speedScaleRef: 1.500000
+      autoScroll: true
+      autoScrollSpeed: 0.200000
+      driveFromPosition: false
+      axis: 2
+      travel: !<float> 20.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.Material material
+    - // @input float planeWidth = 24
+    - // @input float planeHeight = 9.27
+    - // @input float ribbonWidth = 0.1
+    - // @input float phaseSpeed = 0.4
+    - // @input float speedScaleRef = 1.5
+    - // @input bool autoScroll
+    - // @input float autoScrollSpeed = 0.2
+    - // @input bool driveFromPosition = true
+    - // @input int axis = 2
+    - // @input float travel = 3.635

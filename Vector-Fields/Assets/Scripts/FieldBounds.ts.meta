@@ -1,0 +1,56 @@
+- !<AssetImportMetadata/0bf4d24c-e9f5-4524-8135-3475c65e4927>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 4f1b915b-0a7e-440b-b58f-902314decfb3
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 4f1b915b-0a7e-440b-b58f-902314decfb3
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 25c12a78-9c88-40af-969a-b43675c0983f
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/25c12a78-9c88-40af-969a-b43675c0983f>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: cb9e9c2f-a17c-4c5e-8c1e-c809d99956ca
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    depth: false
+    lineWidth: false
+    material: false
+    planeHeight: false
+    planeWidth: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - material: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      planeWidth: 36.599998
+      planeHeight: 14.120000
+      depth: !<float> 9.000000
+      lineWidth: 0.180000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input Asset.Material material
+    - // @input float planeWidth = 36.6
+    - // @input float planeHeight = 14.12
+    - // @input float depth = 9
+    - // @input float lineWidth = 0.18

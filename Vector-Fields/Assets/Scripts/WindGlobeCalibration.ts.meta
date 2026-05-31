@@ -31,6 +31,8 @@
     anchorLon: false
     desiredRadiusWorld: false
     earthSphere: false
+    legend: false
+    legendGapCm: false
     verifier: false
     verifyLat: false
     verifyLon: false
@@ -51,6 +53,8 @@
       verifyLat: 51.509998
       verifyLon: -0.130000
       desiredRadiusWorld: !<float> 12.000000
+      legend: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      legendGapCm: !<float> 8.000000
   ScriptTypes:
     -
       {}
@@ -63,3 +67,5 @@
     - '// @input float verifyLat = 51.51 {"hint":"Verifier latitude (London = 51.51)."}'
     - '// @input float verifyLon = -0.13 {"hint":"Verifier longitude (London = -0.13)."}'
     - '// @input float desiredRadiusWorld = 12 {"hint":"If > 0, rescale the Earth so its bbox radius matches this (cm). Otherwise leave natural size."}'
+    - '// @input SceneObject legend {"hint":"Wind-speed widget. Pinned directly below the globe AABB so it keeps the same relative position and never orbits when the globe spins."}'
+    - "// @input float legendGapCm = 8 {\"hint\":\"Gap (cm) between the bottom of the globe's AABB and the wind-speed widget.\"}"

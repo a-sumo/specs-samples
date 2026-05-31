@@ -13,6 +13,9 @@
     - ColliderHalfExtents:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
+    - ConeRadius:
+        typeIdx: 1
+        value: 0.000000
     - FieldCenter:
         typeIdx: 4
         value: {x: 1.000000, y: 1.000000, z: 1.000000}
@@ -282,25 +285,34 @@
     []
   BlendMode: PremultipliedAlpha
   Properties:
-    PreviewEnabled:
-      typeIdx: 0
-      value: 0
-    TubeRadius:
+    ArrowScale:
       typeIdx: 1
       value: 0.000000
-    StepSize:
+    ColorMapOffset:
       typeIdx: 1
       value: 0.000000
-    ConeRadius:
+    ColorMapScale:
       typeIdx: 1
       value: 0.000000
-    NumSteps:
+    ConeLength:
       typeIdx: 1
       value: 0.000000
     FieldScale:
       typeIdx: 1
       value: 0.000000
+    FlowSpeed:
+      typeIdx: 1
+      value: 0.000000
+    NumSteps:
+      typeIdx: 1
+      value: 0.000000
     Preset:
+      typeIdx: 1
+      value: 0.000000
+    PreviewEnabled:
+      typeIdx: 0
+      value: 0
+    StepSize:
       typeIdx: 1
       value: 0.000000
     TargetPosition:
@@ -309,13 +321,7 @@
     Time:
       typeIdx: 1
       value: 0.000000
-    FlowSpeed:
-      typeIdx: 1
-      value: 0.000000
-    ArrowScale:
-      typeIdx: 1
-      value: 0.000000
-    ConeLength:
+    TubeRadius:
       typeIdx: 1
       value: 0.000000
   Pass: !<reference> f5440cbc-b54a-4809-8554-48231fc75b02

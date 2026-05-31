@@ -18,6 +18,16 @@
       --active: #555757;
       --active-ink: #fffaf0;
       --pressed: #3f4242;
+
+      /* Vivid-blue accent system (high saturation, per UI color rules). */
+      --accent-blue: #1878e0;
+      --accent-blue-bright: #2b8dff;
+      --accent-blue-deep: #0f4e9a;
+      --blue-edge: rgba(40, 140, 240, 0.92);
+      --blue-edge-soft: rgba(40, 140, 240, 0.46);
+      --blue-glow: rgba(24, 120, 224, 0.42);
+      --blue-glow-soft: rgba(24, 120, 224, 0.22);
+      --blue-fill: rgba(30, 110, 210, 0.16);
     }
 
     @font-face {
@@ -26,7 +36,10 @@
       font-weight: 200 1000;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      border-radius: 0 !important;
+    }
 
     html,
     body {
@@ -51,16 +64,46 @@
       overflow: hidden;
       isolation: isolate;
       color: var(--text);
+      background-clip: padding-box;
+      box-shadow: none !important;
+    }
+
+    .capture::before,
+    .capture::after {
+      box-shadow: none !important;
+    }
+
+    /* Baked mesh-gradient background canvas. Sits inside the element's border
+       (inset:0 == padding box) so the border stays visible, and below the
+       title underline / content (which get z-index:1). */
+    .grad-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
     }
 
     .panel-surface {
-      background:
-        radial-gradient(circle at 16% 0%, rgba(244, 241, 233, 0.16), rgba(244, 241, 233, 0) 34%),
-        linear-gradient(145deg, #323534 0%, #202221 58%, #151716 100%);
-      border: 3px solid var(--line);
+      background: #0c1016;
+      border: 2px solid rgba(150, 186, 230, 0.30);
+      clip-path: inset(0);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.14),
-        inset 0 -34px 82px rgba(0,0,0,0.24);
+        inset 0 1px 0 rgba(150, 190, 240, 0.16),
+        inset 0 -34px 82px rgba(0,0,0,0.30);
+    }
+
+    .panel-surface > .title,
+    .panel-surface > .slot,
+    .panel-surface > .detail-info,
+    .panel-surface > .artemis-map-card,
+    .panel-surface > .detail-caption,
+    .panel-surface::before,
+    .card > :not(.grad-canvas),
+    .example-card > :not(.grad-canvas) {
+      z-index: 1;
     }
 
     .panel-surface::before {
@@ -70,7 +113,29 @@
       right: 70px;
       top: 224px;
       height: 2px;
-      background: linear-gradient(90deg, var(--accent), rgba(255,255,255,0.12));
+      background: linear-gradient(90deg, var(--accent-blue), rgba(43, 141, 255, 0.10));
+      box-shadow: 0 0 14px rgba(40, 140, 240, 0.34);
+    }
+
+    #examples_panel::before {
+      top: 254px;
+    }
+
+    .example-detail-panel::before {
+      top: 254px;
+      background: linear-gradient(90deg, var(--accent-blue) 0%, rgba(43,141,255,0.22) 76%, rgba(43,141,255,0));
+    }
+
+    #theory_panel::before {
+      top: 254px;
+      background: linear-gradient(90deg, rgba(120, 178, 248, 0.66) 0%, rgba(120, 178, 248, 0.16) 76%, rgba(120, 178, 248, 0));
+    }
+
+    #theory_panel.panel-surface {
+      background: rgba(198, 222, 250, 0.15);
+      border-color: rgba(210, 230, 255, 0.26);
+      box-shadow:
+        inset 0 1px 0 rgba(235, 246, 255, 0.12);
     }
 
     .title {
@@ -92,42 +157,51 @@
 
     .slot {
       position: absolute;
-      border-radius: 32px;
-      border: 2px solid var(--line-soft);
-      background: rgba(255,255,255,0.035);
+      border-radius: 0;
+      border: 2px solid rgba(150, 186, 230, 0.16);
+      background: rgba(80, 150, 240, 0.035);
     }
 
     .slot.progress {
-      border-radius: 28px;
-      background: rgba(255,255,255,0.025);
+      border-radius: 0;
+      background: rgba(80, 150, 240, 0.028);
+    }
+
+    .slot.theory_info {
+      border-radius: 0;
+      border-color: rgba(150, 186, 230, 0.26);
+      background: rgba(80, 150, 240, 0.030);
+    }
+
+    .slot.example_info {
+      border-radius: 0;
+      border-color: rgba(150, 186, 230, 0.26);
+      background: rgba(80, 150, 240, 0.030);
     }
 
     .card {
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-        var(--panel-2);
-      border: 2px solid rgba(235,242,246,0.42);
-      border-radius: 28px;
+      background: #0d1118;
+      border: 2px solid rgba(150, 186, 230, 0.28);
+      border-radius: 0;
       box-shadow:
-        0 18px 44px rgba(0,0,0,0.28);
+        inset 0 1px 0 rgba(150, 190, 240, 0.10),
+        0 18px 44px rgba(0,0,0,0.30);
     }
 
     .card[data-state="active"] {
       color: var(--active-ink);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06)),
-        var(--active);
-      border-color: rgba(255,255,255,0.88);
+      border-color: var(--blue-edge);
       box-shadow:
-        0 0 0 8px rgba(232,229,220,0.16),
-        0 20px 48px rgba(0,0,0,0.34);
+        inset 0 0 0 1px rgba(120, 180, 255, 0.20),
+        0 0 16px var(--blue-glow-soft),
+        0 18px 44px rgba(0,0,0,0.34);
     }
 
     .card[data-state="pressed"] {
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
-        var(--pressed);
-      border-color: rgba(235,242,246,0.72);
+      border-color: var(--blue-edge-soft);
+      box-shadow:
+        inset 0 0 18px rgba(20, 70, 140, 0.40),
+        0 12px 30px rgba(0,0,0,0.30);
       transform: scale(0.984);
     }
 
@@ -163,31 +237,28 @@
     }
 
     .example-card {
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.025)),
-        var(--panel-2);
-      border: 2px solid rgba(235,242,246,0.46);
-      border-radius: 28px;
+      background: #0d1118;
+      border: 2px solid rgba(150, 186, 230, 0.30);
+      border-radius: 0;
       box-shadow:
-        0 20px 48px rgba(0,0,0,0.30);
+        inset 0 1px 0 rgba(150, 190, 240, 0.10),
+        0 20px 48px rgba(0,0,0,0.32);
     }
 
     .example-card[data-state="active"] {
       color: var(--active-ink);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06)),
-        var(--active);
-      border-color: rgba(255,255,255,0.9);
+      border-color: var(--blue-edge);
       box-shadow:
-        0 0 0 8px rgba(232,229,220,0.17),
-        0 22px 52px rgba(0,0,0,0.35);
+        inset 0 0 0 1px rgba(120, 180, 255, 0.20),
+        0 0 16px var(--blue-glow-soft),
+        0 22px 52px rgba(0,0,0,0.36);
     }
 
     .example-card[data-state="pressed"] {
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.012)),
-        var(--pressed);
-      border-color: rgba(235,242,246,0.76);
+      border-color: var(--blue-edge-soft);
+      box-shadow:
+        inset 0 0 18px rgba(20, 70, 140, 0.40),
+        0 14px 32px rgba(0,0,0,0.32);
       transform: scale(0.986);
     }
 
@@ -214,7 +285,7 @@
       top: 50%;
       margin: 0;
       color: currentColor;
-      font-size: 64px;
+      font-size: 58px;
       line-height: 1;
       font-weight: 730;
       letter-spacing: 0;
@@ -227,56 +298,262 @@
     .nav {
       display: grid;
       place-items: center;
-      border-radius: 22px;
+      border-radius: 0;
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.015)),
-        var(--panel-3);
-      border: 2px solid rgba(235,242,246,0.54);
+        linear-gradient(140deg, rgba(40, 120, 220, 0.12), rgba(20, 60, 120, 0.04)),
+        #11161f;
+      border: 2px solid rgba(150, 186, 230, 0.38);
       color: var(--text);
       font-size: 46px;
       line-height: 1;
       font-weight: 780;
       box-shadow:
-        0 18px 40px rgba(0,0,0,0.28);
+        inset 0 1px 0 rgba(150, 190, 240, 0.10),
+        0 18px 40px rgba(0,0,0,0.30);
     }
 
     .nav[data-state="pressed"] {
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
-        var(--pressed);
+        linear-gradient(140deg, rgba(40, 130, 235, 0.22), rgba(20, 70, 140, 0.08)),
+        #0e1620;
+      border-color: var(--blue-edge-soft);
+      box-shadow: inset 0 0 16px rgba(20, 70, 140, 0.42);
       transform: scale(0.984);
     }
 
     .utility {
       display: grid;
       place-items: center;
-      border-radius: 20px;
+      border-radius: 0;
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02)),
-        #3c3f3f;
-      border: 2px solid rgba(235,242,246,0.52);
+        linear-gradient(140deg, rgba(40, 120, 220, 0.14), rgba(20, 60, 120, 0.04)),
+        #131922;
+      border: 2px solid rgba(150, 186, 230, 0.40);
       color: var(--text);
       font-size: 34px;
       line-height: 1;
       font-weight: 650;
       box-shadow:
-        0 12px 28px rgba(0,0,0,0.26);
+        inset 0 1px 0 rgba(150, 190, 240, 0.10),
+        0 12px 28px rgba(0,0,0,0.28);
     }
 
     .utility[data-state="off"],
     .utility[data-state="closed"] {
       color: var(--muted);
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.01)),
-        #292c2c;
-      border-color: rgba(235,242,246,0.32);
+        linear-gradient(140deg, rgba(120, 150, 190, 0.05), rgba(255,255,255,0.01)),
+        #14181f;
+      border-color: rgba(150, 186, 230, 0.22);
     }
 
     .utility[data-state="pressed"] {
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01)),
-        var(--pressed);
+        linear-gradient(140deg, rgba(40, 130, 235, 0.22), rgba(20, 70, 140, 0.08)),
+        #0e1620;
+      border-color: var(--blue-edge-soft);
+      box-shadow: inset 0 0 14px rgba(20, 70, 140, 0.42);
       transform: scale(0.984);
+    }
+
+    .slot.example_variant,
+    .slot.example_mode {
+      border-radius: 0;
+      background: rgba(80, 150, 240, 0.028);
+      border-color: rgba(150, 186, 230, 0.22);
+    }
+
+    .slot.example_variant_artemis {
+      border-radius: 0;
+      background: rgba(244, 241, 232, 0.035);
+      border-color: rgba(232, 229, 220, 0.22);
+    }
+
+    .variant {
+      border-radius: 0;
+      background:
+        linear-gradient(140deg, rgba(40, 120, 220, 0.12), rgba(20, 60, 120, 0.03)),
+        #11161f;
+      border: 2px solid rgba(150, 186, 230, 0.36);
+      box-shadow:
+        inset 0 1px 0 rgba(150, 190, 240, 0.08),
+        0 12px 28px rgba(0,0,0,0.26);
+    }
+
+    .variant[data-state="active"] {
+      background:
+        linear-gradient(140deg, rgba(40, 130, 235, 0.26), rgba(20, 70, 140, 0.08)),
+        #122036;
+      border-color: var(--blue-edge);
+      box-shadow:
+        0 0 0 4px var(--blue-glow-soft),
+        0 0 18px var(--blue-glow-soft),
+        0 14px 32px rgba(0,0,0,0.32);
+    }
+
+    .variant[data-state="pressed"] {
+      background:
+        linear-gradient(140deg, rgba(40, 130, 235, 0.20), rgba(20, 70, 140, 0.06)),
+        #0e1620;
+      border-color: var(--blue-edge-soft);
+      box-shadow: inset 0 0 14px rgba(20, 70, 140, 0.42);
+      transform: scale(0.984);
+    }
+
+    .variant.artemis-variant {
+      border-radius: 0;
+      background: #101113;
+      border-color: rgba(232, 229, 220, 0.38);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        0 18px 42px rgba(0,0,0,0.30);
+    }
+
+    .variant.artemis-variant::before,
+    .variant.artemis-variant::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .variant.artemis-variant::before {
+      background-image: url("./assets/artemis_ii_rollout_cropped.jpg");
+      background-size: cover;
+      background-position: 50% 56%;
+      filter: saturate(0.92) contrast(1.06);
+      transform: scale(1.01);
+    }
+
+    .variant.artemis-variant::after {
+      background:
+        linear-gradient(90deg, rgba(8, 9, 10, 0.84), rgba(8, 9, 10, 0.34) 50%, rgba(8, 9, 10, 0.68)),
+        linear-gradient(0deg, rgba(244, 241, 232, 0.08), rgba(244, 241, 232, 0));
+    }
+
+    .variant.artemis-variant .mission-copy {
+      position: absolute;
+      left: 48px;
+      top: 44px;
+      z-index: 1;
+      width: 560px;
+      color: var(--text);
+      text-shadow: 0 2px 14px rgba(0,0,0,0.52);
+    }
+
+    .variant.artemis-variant .mission-copy b {
+      display: block;
+      margin-bottom: 18px;
+      font-size: 46px;
+      line-height: 1;
+      font-weight: 830;
+      letter-spacing: 0;
+    }
+
+    .variant.artemis-variant .mission-copy span {
+      display: block;
+      color: rgba(244, 241, 232, 0.86);
+      font-size: 25px;
+      line-height: 1.24;
+      font-weight: 570;
+      letter-spacing: 0;
+    }
+
+    .variant.artemis-variant[data-state="active"] {
+      border-color: var(--blue-edge);
+      box-shadow:
+        0 0 0 4px var(--blue-glow-soft),
+        0 0 18px var(--blue-glow-soft),
+        0 18px 42px rgba(0,0,0,0.34);
+    }
+
+    .detail-info {
+      position: absolute;
+      padding: 32px 42px;
+      border-radius: 0;
+      border: 2px solid rgba(150, 186, 230, 0.28);
+      background:
+        linear-gradient(135deg, rgba(40,120,220,0.10), rgba(20,60,120,0.03)),
+        rgba(14, 20, 30, 0.72);
+      box-shadow:
+        inset 0 1px 0 rgba(150,190,240,0.12),
+        0 18px 42px rgba(0,0,0,0.26);
+    }
+
+    .detail-info .kicker {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 760;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .detail-info p {
+      margin: 0;
+      max-width: 1120px;
+      color: var(--text);
+      font-size: 35px;
+      line-height: 1.24;
+      font-weight: 520;
+      letter-spacing: 0;
+    }
+
+    .artemis-map-card {
+      position: absolute;
+      left: 70px;
+      top: 228px;
+      width: 1360px;
+      height: 765px;
+      border-radius: 0;
+      border: 2px solid rgba(232, 229, 220, 0.34);
+      background: #101113;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        0 22px 50px rgba(0,0,0,0.32);
+    }
+
+    .artemis-map-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(0.94) contrast(1.02);
+    }
+
+    .artemis-map-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(8, 9, 10, 0.16), rgba(8, 9, 10, 0.02) 42%, rgba(8, 9, 10, 0.18)),
+        linear-gradient(90deg, rgba(8, 9, 10, 0.18), rgba(8, 9, 10, 0.02) 38%, rgba(8, 9, 10, 0.08));
+      pointer-events: none;
+    }
+
+    .detail-caption {
+      position: absolute;
+      left: 90px;
+      color: var(--muted);
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 720;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .theory-section-label {
+      position: absolute;
+      z-index: 1;
+      color: rgba(238, 248, 255, 0.78);
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 840;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow: none;
     }
 
     .overlay {
@@ -295,64 +572,64 @@
     .overlay.card::before,
     .overlay.example::before {
       inset: 4px;
-      border-radius: 24px;
-      border: 3px solid rgba(250, 248, 239, 0.82);
+      border-radius: 0;
+      border: 3px solid var(--blue-edge);
       background:
-        linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02) 34%, rgba(255,255,255,0.09)),
-        radial-gradient(circle at 86% 50%, rgba(255,255,255,0.22), rgba(255,255,255,0) 38%);
+        linear-gradient(90deg, rgba(60,150,255,0.14), rgba(60,150,255,0.02) 34%, rgba(60,150,255,0.08)),
+        radial-gradient(circle at 86% 50%, rgba(70,160,255,0.22), rgba(70,160,255,0) 38%);
       box-shadow:
-        inset 0 0 28px rgba(255,255,255,0.10),
-        0 0 20px rgba(245,242,232,0.22);
+        inset 0 0 28px rgba(50,140,245,0.16),
+        0 0 22px rgba(40,140,240,0.34);
     }
 
     .overlay.card.selected::before,
     .overlay.example.selected::before {
       inset: 3px;
       border-width: 4px;
-      border-radius: 24px;
-      border-color: rgba(255, 252, 242, 0.96);
+      border-radius: 0;
+      border-color: var(--accent-blue-bright);
       background:
-        linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02) 44%, rgba(255,255,255,0.08)),
-        radial-gradient(circle at 12% 50%, rgba(255,255,255,0.18), rgba(255,255,255,0) 34%);
+        linear-gradient(90deg, rgba(60,150,255,0.12), rgba(60,150,255,0.02) 44%, rgba(60,150,255,0.07)),
+        radial-gradient(circle at 12% 50%, rgba(70,160,255,0.18), rgba(70,160,255,0) 34%);
       box-shadow:
-        inset 0 0 28px rgba(255,255,255,0.10),
-        0 0 22px rgba(245,242,232,0.22);
+        inset 0 0 28px rgba(50,140,245,0.16),
+        0 0 24px rgba(40,140,240,0.36);
     }
 
     .overlay.card.pressed::before,
     .overlay.example.pressed::before {
       inset: 8px;
       border-width: 3px;
-      border-radius: 20px;
-      border-color: rgba(255, 252, 242, 0.74);
-      background: rgba(255,255,255,0.11);
+      border-radius: 0;
+      border-color: var(--blue-edge-soft);
+      background: rgba(40,120,220,0.12);
       box-shadow:
-        inset 0 0 24px rgba(255,255,255,0.18),
-        0 0 10px rgba(245,242,232,0.16);
+        inset 0 0 24px rgba(40,130,235,0.22),
+        0 0 12px rgba(40,140,240,0.24);
     }
 
     .overlay.nav::before,
     .overlay.utility::before {
       inset: 4px;
-      border-radius: 18px;
-      border: 3px solid rgba(250, 248, 239, 0.84);
+      border-radius: 0;
+      border: 3px solid var(--blue-edge);
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02)),
-        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.24), rgba(255,255,255,0) 42%);
+        linear-gradient(135deg, rgba(60,150,255,0.16), rgba(60,150,255,0.02)),
+        radial-gradient(circle at 80% 20%, rgba(70,160,255,0.24), rgba(70,160,255,0) 42%);
       box-shadow:
-        0 0 18px rgba(245,242,232,0.22);
+        0 0 18px rgba(40,140,240,0.34);
     }
 
     .overlay.nav.pressed::before,
     .overlay.utility.pressed::before {
       inset: 7px;
-      border-color: rgba(255, 252, 242, 0.72);
-      background: rgba(255,255,255,0.11);
-      box-shadow: inset 0 0 20px rgba(255,255,255,0.17);
+      border-color: var(--blue-edge-soft);
+      background: rgba(40,120,220,0.12);
+      box-shadow: inset 0 0 20px rgba(40,130,235,0.24);
     }
 
     .overlay.utility::before {
-      border-radius: 16px;
+      border-radius: 0;
     }
 
     .cursor {
@@ -363,11 +640,11 @@
 
     .cursor::before {
       inset: 9px;
-      border-radius: 999px;
-      border: 6px solid rgba(255, 252, 242, 0.9);
+      border-radius: 0;
+      border: 6px solid rgba(150, 200, 255, 0.94);
       box-shadow:
-        inset 0 0 12px rgba(255,255,255,0.22),
-        0 0 20px rgba(245,242,232,0.28);
+        inset 0 0 12px rgba(90,160,255,0.30),
+        0 0 22px rgba(40,140,240,0.42);
     }
 
     .cursor::after {
@@ -375,16 +652,16 @@
       top: 50%;
       width: 11px;
       height: 11px;
-      border-radius: 999px;
+      border-radius: 0;
       transform: translate(-50%, -50%);
-      background: rgba(255, 252, 242, 0.96);
-      box-shadow: 0 0 14px rgba(245,242,232,0.34);
+      background: rgba(210, 232, 255, 0.98);
+      box-shadow: 0 0 14px rgba(60,150,255,0.50);
     }
 
     .cursor.pressed::before {
       inset: 13px;
       border-width: 7px;
-      background: rgba(255,255,255,0.12);
+      background: rgba(60,150,255,0.16);
     }
 
     .cursor.pressed::after {
@@ -397,25 +674,25 @@
       height: 256px;
       background:
         radial-gradient(circle at 50% 50%,
-          rgba(255, 252, 242, 0.44) 0%,
-          rgba(255, 252, 242, 0.26) 16%,
-          rgba(255, 252, 242, 0.12) 34%,
-          rgba(255, 252, 242, 0.04) 56%,
-          rgba(255, 252, 242, 0) 74%);
+          rgba(70, 155, 255, 0.42) 0%,
+          rgba(60, 145, 250, 0.24) 16%,
+          rgba(50, 135, 240, 0.11) 34%,
+          rgba(40, 130, 235, 0.04) 56%,
+          rgba(40, 130, 235, 0) 74%);
     }
 
     .panel-cursor-wash::before {
       inset: 58px;
-      border-radius: 999px;
-      border: 4px solid rgba(255, 252, 242, 0.34);
+      border-radius: 0;
+      border: 4px solid rgba(120, 185, 255, 0.36);
       box-shadow:
-        inset 0 0 20px rgba(255,255,255,0.14),
-        0 0 26px rgba(245,242,232,0.16);
+        inset 0 0 20px rgba(80,160,255,0.18),
+        0 0 26px rgba(40,140,240,0.24);
     }
 
     .panel-cursor-wash::after {
       inset: 84px;
-      border-radius: 999px;
+      border-radius: 0;
       background:
         repeating-linear-gradient(135deg,
           rgba(255,255,255,0.16) 0 4px,
@@ -425,6 +702,7 @@
   </style>
 </head>
 <body>
+  <script src="./mesh-gradient-bg.js"></script>
   <script src="./story-ui-layout.browser.js"></script>
   <script>
     const spec = window.STORY_UI_LAYOUT;
@@ -437,7 +715,7 @@
       const panel = document.createElement("section");
       panel.id = id;
       panel.className = "capture panel-surface";
-      panel.style.cssText = `width:${spec.texture.widthPx}px;height:${spec.texture.heightPx}px;border-radius:${spec.panel.cornerRadiusPx}px`;
+      panel.style.cssText = `width:${spec.texture.widthPx}px;height:${spec.texture.heightPx}px`;
 
       const titleSlot = spec.slots.find((s) => s.id === titleSlotId);
       const title = document.createElement("h1");
@@ -455,8 +733,141 @@
       document.body.appendChild(panel);
     };
 
+    const detailPanels = [
+      {
+        id: "gravity",
+        title: "Gravitational Fields",
+        kicker: "Mass bends the local field",
+        body: "Earth and Moon share one reference plane, with Artemis II available as a mission overlay that carries the crewed Orion path through the gravity field.",
+        topCaption: "",
+        bottomCaption: "",
+      },
+      {
+        id: "magnetism",
+        title: "Magnetism",
+        kicker: "Two movable dipoles",
+        body: "Move the magnets to reshape the field. Loops show direction around the poles, while trails or arrows reveal local strength.",
+        topCaption: "",
+        bottomCaption: "Rendering",
+      },
+      {
+        id: "wind",
+        title: "Wind",
+        kicker: "Globe streamlines and flow slice",
+        body: "Use the globe for real weather circulation, or the car slice for a controlled flow example. Color stays tied to represented speed.",
+        topCaption: "Dataset",
+        bottomCaption: "",
+        showModes: false,
+      },
+    ];
+
+    const createExampleDetailPanel = (detail) => {
+      const panel = document.createElement("section");
+      panel.id = `example_detail_${detail.id}_panel`;
+      panel.className = "capture panel-surface example-detail-panel";
+      panel.style.cssText = `width:${spec.texture.widthPx}px;height:${spec.texture.heightPx}px`;
+
+      const titleSlot = spec.slots.find((s) => s.id === "example_detail_title");
+      const title = document.createElement("h1");
+      title.className = "title examples";
+      title.style.cssText = px(titleSlot);
+      title.textContent = detail.title;
+      panel.appendChild(title);
+
+      const infoSlot = spec.slots.find((s) => s.id === "example_info");
+      const info = document.createElement("article");
+      info.className = "detail-info";
+      info.style.cssText = px(infoSlot);
+      info.innerHTML = `<div class="kicker">${detail.kicker}</div><p>${detail.body}</p>`;
+      panel.appendChild(info);
+
+      if (detail.topCaption) {
+        const top = document.createElement("div");
+        top.className = "detail-caption";
+        top.style.cssText = "top:520px";
+        top.textContent = detail.topCaption;
+        panel.appendChild(top);
+      }
+
+      if (detail.bottomCaption) {
+        const bottom = document.createElement("div");
+        bottom.className = "detail-caption";
+        bottom.style.cssText = "top:648px";
+        bottom.textContent = detail.bottomCaption;
+        panel.appendChild(bottom);
+      }
+
+      let visibleSlotIds = ["example_mode_a", "example_mode_b", "example_mode_c"];
+      if (detail.id === "gravity") {
+        visibleSlotIds = ["variant_artemis"];
+      } else if (detail.showModes === false) {
+        visibleSlotIds = ["variant_primary", "variant_secondary"];
+      }
+      for (const slot of spec.slots.filter((s) => visibleSlotIds.includes(s.id))) {
+        const div = document.createElement("div");
+        div.className = `slot ${slot.role}`;
+        div.style.cssText = px(slot);
+        panel.appendChild(div);
+      }
+      document.body.appendChild(panel);
+    };
+
+    const createArtemisDetailPanel = () => {
+      const panel = document.createElement("section");
+      panel.id = "example_detail_gravity_artemis_panel";
+      panel.className = "capture panel-surface example-detail-panel";
+      panel.style.cssText = `width:${spec.texture.widthPx}px;height:${spec.texture.heightPx}px`;
+
+      const titleSlot = spec.slots.find((s) => s.id === "example_detail_title");
+      const title = document.createElement("h1");
+      title.className = "title examples";
+      title.style.cssText = px(titleSlot);
+      title.textContent = "Gravitational Fields";
+      panel.appendChild(title);
+
+      const map = document.createElement("article");
+      map.className = "artemis-map-card";
+      map.innerHTML = `<img src="./assets/artemis_2_map_october_2021.jpg" alt="">`;
+      panel.appendChild(map);
+      document.body.appendChild(panel);
+    };
+
     createPanel("panel", "Guide", "title", ["card", "progress"]);
     createPanel("examples_panel", "Real World Examples", "examples_title", ["example_card"], "examples");
+    const createTheoryPanel = () => {
+      createPanel("theory_panel", "Theory", "theory_title", [], "examples");
+      const panel = document.getElementById("theory_panel");
+      const labels = [
+        ["Field preset", 170, 274],
+        ["Field metrics", 76, 412],
+        ["Color map", 604, 412],
+        ["Gradient range", 604, 682],
+      ];
+      for (const [text, left, top] of labels) {
+        const label = document.createElement("div");
+        label.className = "theory-section-label";
+        label.style.cssText = `left:${left}px;top:${top}px`;
+        label.textContent = text;
+        panel.appendChild(label);
+      }
+    };
+
+    const createTheoryMotionPanel = () => {
+      createPanel("theory_panel_motion", "Theory", "theory_title", [], "examples");
+      const panel = document.getElementById("theory_panel_motion");
+      const label = document.createElement("div");
+      label.className = "theory-section-label";
+      label.style.cssText = "left:170px;top:274px";
+      label.textContent = "Field preset";
+      panel.appendChild(label);
+    };
+
+    createTheoryPanel();
+    createTheoryMotionPanel();
+    for (const detail of detailPanels) {
+      createExampleDetailPanel(detail);
+    }
+    createArtemisDetailPanel();
 
     for (const step of spec.steps) {
       const slot = spec.slots.find((s) => s.id === `card_${step.id}`);
@@ -515,9 +926,9 @@
       { id: "utility_fold_open", slot: "utility_fold", label: "Fold", state: "open" },
       { id: "utility_fold_closed", slot: "utility_fold", label: "Open", state: "closed" },
       { id: "utility_fold_pressed", slot: "utility_fold", label: "Fold", state: "pressed" },
-      { id: "utility_plane_floor_on", slot: "utility_plane_floor", label: "Floor", state: "on" },
-      { id: "utility_plane_floor_off", slot: "utility_plane_floor", label: "Floor", state: "off" },
-      { id: "utility_plane_floor_pressed", slot: "utility_plane_floor", label: "Floor", state: "pressed" },
+      { id: "utility_plane_floor_on", slot: "utility_plane_floor", label: "Reset", state: "on" },
+      { id: "utility_plane_floor_off", slot: "utility_plane_floor", label: "Reset", state: "off" },
+      { id: "utility_plane_floor_pressed", slot: "utility_plane_floor", label: "Reset", state: "pressed" },
       { id: "utility_plane_front_on", slot: "utility_plane_front", label: "Front", state: "on" },
       { id: "utility_plane_front_off", slot: "utility_plane_front", label: "Front", state: "off" },
       { id: "utility_plane_front_pressed", slot: "utility_plane_front", label: "Front", state: "pressed" },
@@ -531,6 +942,27 @@
       button.dataset.state = utility.state;
       button.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
       button.textContent = utility.label;
+      document.body.appendChild(button);
+    }
+
+    for (const state of ["normal", "active", "pressed"]) {
+      const slot = spec.slots.find((s) => s.id === "variant_primary");
+      const button = document.createElement("div");
+      button.id = `variant_${state}`;
+      button.className = "capture variant";
+      button.dataset.state = state;
+      button.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
+      document.body.appendChild(button);
+    }
+
+    for (const state of ["normal", "active", "pressed"]) {
+      const slot = spec.slots.find((s) => s.id === "variant_artemis");
+      const button = document.createElement("div");
+      button.id = `variant_artemis_${state}`;
+      button.className = "capture variant artemis-variant";
+      button.dataset.state = state;
+      button.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
+      button.innerHTML = `<div class="mission-copy"><b>Artemis II Mission</b><span>Crewed Orion trajectory around the Moon and back to Earth.</span></div>`;
       document.body.appendChild(button);
     }
 
@@ -567,6 +999,38 @@
     panelWash.id = "panel_cursor_wash";
     panelWash.className = "capture panel-cursor-wash";
     document.body.appendChild(panelWash);
+
+    // Mount baked mesh-gradient backgrounds (HyperbolicStarLogo technique).
+    // Deterministic frozen time per element so bakes are reproducible; state
+    // drives brightness/palette so active cards read blue-lit.
+    const ACTIVE_PALETTE = ["#0e1626", "#15314f", "#2b8dff", "#1f6fd0", "#10395f", "#3aa0ff", "#0b1220"];
+    const seedTime = (s) => {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 997;
+      return 5 + (h % 48) * 0.5; // deterministic 5..29
+    };
+    const mountGrad = (el, opts) => {
+      const canvas = document.createElement("canvas");
+      canvas.className = "grad-canvas";
+      el.insertBefore(canvas, el.firstChild);
+      const w = el.clientWidth || el.getBoundingClientRect().width;
+      const h = el.clientHeight || el.getBoundingClientRect().height;
+      window.mountMeshGradient(canvas, Object.assign({ width: w, height: h }, opts));
+    };
+
+    document.querySelectorAll(".panel-surface:not(#theory_panel)").forEach((el) => {
+      mountGrad(el, { time: seedTime(el.id || "panel"), brightness: 0.32, grain: 0.055, vignette: 0.64, noiseScale: 0.78 });
+    });
+    document.querySelectorAll(".card:not(.overlay), .example-card:not(.overlay)").forEach((el) => {
+      const state = el.dataset.state || "normal";
+      if (state === "active") {
+        mountGrad(el, { time: seedTime(el.id), brightness: 0.36, grain: 0.05, vignette: 0.42, noiseScale: 0.7, colors: ACTIVE_PALETTE });
+      } else if (state === "pressed") {
+        mountGrad(el, { time: seedTime(el.id), brightness: 0.17, grain: 0.05, vignette: 0.52, noiseScale: 0.8 });
+      } else {
+        mountGrad(el, { time: seedTime(el.id), brightness: 0.25, grain: 0.05, vignette: 0.5, noiseScale: 0.8 });
+      }
+    });
 
     window.storyUiReady = true;
   </script>

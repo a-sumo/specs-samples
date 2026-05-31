@@ -24,6 +24,7 @@ void main() {
     float pathT = clamp(uv0.x, 0.0, 1.0);
     float templatePhase = fract(uv0.y);
     float speedColor = clamp(uv1.x, 0.0, 1.0);
+    float pointRadius = max(0.0001, uv1.y);
     float crossSection = clamp(uv2.x, -1.0, 1.0);
     float shapeTag = uv2.y;
     float pointMask = step(1.001, shapeTag) * (1.0 - step(2.0, shapeTag));
@@ -31,7 +32,8 @@ void main() {
     float trailMask = 1.0 - max(pointMask, arrowMask);
     float capMask = step(0.0, shapeTag) * trailMask;
     float bodyMask = (1.0 - step(0.0, shapeTag)) * trailMask;
-    float pointRadial = clamp((shapeTag - 1.02) / 0.96, 0.0, 1.0);
+    float pointFanY = clamp((shapeTag - 1.05) / 0.90 * 2.0 - 1.0, -1.0, 1.0);
+    float pointRadial = clamp(length(vec2(crossSection, pointFanY)), 0.0, 1.0);
     float radial = clamp(bodyMask * abs(crossSection)
                        + capMask * shapeTag
                        + pointMask * pointRadial
@@ -73,7 +75,17 @@ void main() {
     color += vec3(0.12, 0.13, 0.14) * core * (head * trailMask + pointMask * 0.42 + arrowMask * 0.25);
     color = clamp(color, 0.0, 1.0);
 
-    vec3 nrm = normalize(pos + vec3(0.0, 0.0, 0.0001));
+    vec3 centerPos = pos;
+    if (pointMask > 0.5) {
+        vec3 viewDir = normalize(system.getCameraPosition() - centerPos + vec3(0.0, 0.0, 0.0001));
+        vec3 right = cross(vec3(0.0, 1.0, 0.0), viewDir);
+        if (length(right) < 0.001) right = cross(vec3(1.0, 0.0, 0.0), viewDir);
+        right = normalize(right);
+        vec3 billboardUp = normalize(cross(viewDir, right));
+        pos = centerPos + (right * crossSection + billboardUp * pointFanY) * pointRadius;
+    }
+
+    vec3 nrm = normalize(centerPos + vec3(0.0, 0.0, 0.0001));
     float wave = sin(Time * 1.2 + templatePhase * 6.2831853) * head;
     pos += nrm * (0.12 + wave * Displace * (0.4 + 0.6 * speedColor));
 

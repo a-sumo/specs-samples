@@ -29,6 +29,8 @@
     arrowResolution: false
     arrowScale: false
     arrowWidth: false
+    artemisEarthClearance: false
+    artemisTrajectoryScale: false
     earthAxialMotionEnabled: false
     earthMass: false
     earthObject: false
@@ -84,6 +86,8 @@
       arrowScale: 0.340000
       arrowWidth: 0.070000
       lineWidth: 0.055000
+      artemisTrajectoryScale: 2.650000
+      artemisEarthClearance: 0.650000
       wellDepth: 1.450000
       material: !<reference.Material> 00000000-0000-0000-0000-000000000000
       initialStage: !<float> 2.000000
@@ -111,9 +115,11 @@
     - '// @input float fieldLineCount = 72 {"hint":"Number of integrated gravity field lines", "widget":"slider", "min":24, "max":120, "step":4}'
     - '// @input float fieldLineSteps = 168 {"hint":"Integration steps per field line", "widget":"slider", "min":36, "max":240, "step":4}'
     - '// @input float softening = 0.85 {"hint":"Body-relative softening multiplier. Keeps lines stable near bodies.", "widget":"slider", "min":0.1, "max":2, "step":0.05}'
-    - '// @input float arrowScale = 0.34 {"hint":"Visual arrow length scale", "widget":"slider", "min":0.05, "max":1.2, "step":0.05}'
-    - '// @input float arrowWidth = 0.07 {"hint":"Arrow shaft width", "widget":"slider", "min":0.02, "max":0.35, "step":0.01}'
+    - '// @input float arrowScale = 0.22 {"hint":"Visual arrow length scale", "widget":"slider", "min":0.05, "max":1.2, "step":0.05}'
+    - '// @input float arrowWidth = 0.04 {"hint":"Arrow shaft width", "widget":"slider", "min":0.02, "max":0.35, "step":0.01}'
     - '// @input float lineWidth = 0.08 {"hint":"Tube diameter for gravity field and same-potential curves", "widget":"slider", "min":0.025, "max":0.22, "step":0.005}'
+    - '// @input float artemisTrajectoryScale = 2.65 {"hint":"Display-only scale multiplier for the Artemis II trajectory and Moon distance. Body model sizes stay constant.", "widget":"slider", "min":0.75, "max":6, "step":0.05}'
+    - '// @input float artemisEarthClearance = 0.65 {"hint":"Minimum visual gap between the Artemis II path and the visible Earth model.", "widget":"slider", "min":0, "max":1.5, "step":0.05}'
     - '// @input float wellDepth = 2.4 {"hint":"How far the scalar gravity well falls along local Y. Depth scales with body mass so Earth dominates the Moon.", "widget":"slider", "min":0.15, "max":6, "step":0.05}'
     - '// @input Asset.Material material {"hint":"Flat/toon material cloned for generated gravity meshes"}'
     - '// @input float initialStage = 2 {"hint":"Standalone preview stage used when the component wakes up.", "widget":"combobox", "values":[{"label":"Bodies", "value":0}, {"label":"Arrows", "value":1}, {"label":"Field Lines", "value":2}]}'

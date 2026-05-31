@@ -34,7 +34,7 @@ type PreviewPose = {
 export class StageCalibration extends BaseScriptComponent {
     @input
     @hint("Run calibration automatically at lens start, then keep that anchor until the user changes the view plane.")
-    calibrateOnStart: boolean = true;
+    calibrateOnStart: boolean = false;
 
     @input
     @widget(

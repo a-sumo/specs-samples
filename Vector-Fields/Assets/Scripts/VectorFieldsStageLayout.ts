@@ -50,7 +50,7 @@ export class VectorFieldsStageLayout extends BaseScriptComponent {
 
     @input
     @hint("Head-relative forward distance for the 2D motion plane.")
-    motionFrontZ: number = -82.0;
+    motionFrontZ: number = -50.0;
 
     @input
     @hint("Chest/head height for hand-rotated examples, in centimeters.")

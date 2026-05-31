@@ -1,0 +1,68 @@
+- !<AssetImportMetadata/a64e72b4-3890-47f8-8963-531de7810d31>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 8e6e2f75-49fe-4253-9bcf-3ebb01119e7c
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 8e6e2f75-49fe-4253-9bcf-3ebb01119e7c
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> aa06c881-0215-43b7-ad79-439e2ee58b00
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/aa06c881-0215-43b7-ad79-439e2ee58b00>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 48c29833-0d1b-4b58-aaae-b5b2673cd980
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    arrowAlpha: false
+    arrowLength: false
+    arrowWidth: false
+    backdropAlpha: false
+    columns: false
+    hideProxyMeshes: false
+    patternHeight: false
+    patternWidth: false
+    rows: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - hideProxyMeshes: true
+      patternWidth: 1.720000
+      patternHeight: 1.180000
+      columns: !<float> 5.000000
+      rows: !<float> 5.000000
+      arrowLength: 0.220000
+      arrowWidth: 0.035000
+      backdropAlpha: 0.180000
+      arrowAlpha: 0.880000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input bool hideProxyMeshes = true {"hint":"Hide the simple proxy meshes once the generated analytical fields are ready."}'
+    - '// @input float patternWidth = 1.72 {"widget":"slider", "min":1.2, "max":4.8, "step":0.1}'
+    - '// @input float patternHeight = 1.18 {"widget":"slider", "min":0.8, "max":3.2, "step":0.1}'
+    - '// @input float columns = 5 {"widget":"slider", "min":3, "max":9, "step":1}'
+    - '// @input float rows = 5 {"widget":"slider", "min":3, "max":7, "step":1}'
+    - '// @input float arrowLength = 0.22 {"widget":"slider", "min":0.05, "max":0.45, "step":0.01}'
+    - '// @input float arrowWidth = 0.035 {"widget":"slider", "min":0.01, "max":0.1, "step":0.005}'
+    - '// @input float backdropAlpha = 0.18 {"widget":"slider", "min":0, "max":1, "step":0.01}'
+    - '// @input float arrowAlpha = 0.88 {"widget":"slider", "min":0, "max":1, "step":0.01}'

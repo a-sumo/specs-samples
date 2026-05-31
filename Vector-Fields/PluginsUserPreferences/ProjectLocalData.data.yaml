@@ -7,6 +7,7 @@ data:
     - 0f2192a8-0a49-4f18-9dd3-4001e0221313: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 1187b987-243a-4470-8bda-88e5da5192e4: /Users/armand/Documents/specs-samples/Vector-Fields/Cache/9d8c693a-a378-46c9-8021-febbb828c507/b9d337111b2b58ca91267151257bbbed/Data/Assets/Meshes/SphereMesh.mesh
     - 1592d7db-b2f2-4bd8-8467-441463c314c9: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
+    - 179bc280-43f2-4b94-81c7-8bea73855535: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Meshes/Resources/Plane.mesh
     - 1f937e43-5ea6-4cd3-b480-0b1b6c70c47e: /Users/armand/Downloads/moon.glb
     - 2d396ae7-4f5e-4654-b6e8-7a9a051053fd: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - 3af65709-cf3b-463a-b91d-f46a766245d6: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Resources/flat.ss_graph
@@ -23,8 +24,8 @@ data:
     - 9ccf9591-9d5b-4780-ac4c-a813f40e6a86: /Users/armand/Documents/specs-samples/Vector-Fields/Assets/Materials/FlatMaterial.ss_graph
     - a8a6a36a-96a0-4a29-9484-bf783e64d212: /Users/armand/Downloads/earth(1).glb
     - bf9d1043-e380-44bd-b9a3-ec3a0e6ab5ba: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/UnlitMaterial/Resources/unlit.ss_graph
+    - d207cae5-f01f-437e-9a64-42f3cf9382d6: /Applications/Lens Studio_5.15.4.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - d3e0efa3-6d0b-419b-a7f7-3437b8523b83: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Resources/Normal.png
     - df80fc0d-c841-4c5e-ac02-e7453fc0c6bb: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Resources/MaterialParams.png
     - e489815f-225e-49ee-b6be-724819d95f88: /Applications/Lens Studio.app/Contents/Plugins/Es_ShaderGraph_Presets.bundle/Assets/Empty.ss_graph
     - fa0c8799-c8c8-4f13-9a04-6a9443011247: /Applications/Lens Studio_5.15.4.app/Contents/JsPlugins/PresetsRegistry/Assets/Meshes/Resources/Sphere.mesh
-    - fd01d7ba-5599-4bb5-9f50-a8a3f9a335d9: /Users/armand/Library/Preferences/Snap/Lens Studio/LibraryComponents/SpectaclesInteractionKitExamples@0.17.2/SpectaclesInteractionKitExamples.lspkg

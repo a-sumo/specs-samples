@@ -4,663 +4,72 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
-  <title>Audio Vector Plane</title>
+  <title>Ambient Prototype Retired</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #e8e4e0;
+      --bg: #e7e2dc;
       --ink: #191817;
-      --muted: #68635d;
-      --panel: rgba(246, 243, 238, 0.86);
-      --panel-strong: rgba(251, 248, 243, 0.96);
-      --line: rgba(28, 25, 22, 0.16);
-      --button: #ded9d2;
-      --button-hover: #d0cac2;
-      --selected: #1f1d1b;
-      --selected-ink: #f7f3ee;
+      --muted: #68615a;
+      --panel: rgba(248, 245, 240, 0.82);
+      --line: rgba(30, 27, 24, 0.14);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     html,
     body {
       width: 100%;
       height: 100%;
       margin: 0;
-      overflow: hidden;
       background: var(--bg);
       color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    .app {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      min-width: 0;
-      min-height: 0;
-      background: var(--bg);
+    main {
+      display: grid;
+      min-height: 100%;
+      place-items: center;
+      padding: 24px;
     }
 
-    canvas {
-      position: absolute;
-      inset: 0;
-      display: block;
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-    }
-
-    .topbar,
-    .transport,
-    .readout {
-      position: absolute;
-      z-index: 2;
+    section {
+      width: min(420px, 100%);
       border: 1px solid var(--line);
+      border-radius: 0;
       background: var(--panel);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 14px 34px rgba(35, 30, 24, 0.12);
+      padding: 22px;
+      box-shadow: 0 18px 42px rgba(35, 30, 24, 0.12);
     }
 
-    .topbar {
-      top: 16px;
-      left: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 44px;
-      max-width: calc(100vw - 32px);
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 780;
+    h1,
+    p {
+      margin: 0;
     }
 
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      flex: 0 0 auto;
-      border-radius: 999px;
-      background: #f05a8a;
-      box-shadow: 0 0 12px rgba(240, 90, 138, 0.42);
-    }
-
-    .readout {
-      top: 16px;
-      right: 16px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(82px, 1fr));
-      gap: 1px;
-      overflow: hidden;
-      border-radius: 8px;
-      background: var(--line);
-    }
-
-    .meter {
-      min-width: 0;
-      padding: 9px 10px 10px;
-      background: var(--panel-strong);
-    }
-
-    .meter b,
-    .meter span {
-      display: block;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .meter b {
-      margin-bottom: 5px;
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 830;
-      text-transform: uppercase;
-    }
-
-    .meter span {
-      color: var(--ink);
+    h1 {
       font-size: 18px;
-      font-weight: 840;
-    }
-
-    .transport {
-      left: 16px;
-      right: 16px;
-      bottom: 16px;
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 14px;
-      min-height: 58px;
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    button {
-      appearance: none;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: var(--button);
-      color: var(--ink);
-      min-width: 84px;
-      min-height: 38px;
-      padding: 0 12px;
-      font: inherit;
-      font-size: 14px;
       font-weight: 820;
-      cursor: pointer;
-      transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+      letter-spacing: 0;
     }
 
-    button:hover {
-      background: var(--button-hover);
-      transform: translateY(-1px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    button[aria-pressed="true"] {
-      background: var(--selected);
-      color: var(--selected-ink);
-    }
-
-    .slider-row {
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    input[type="range"] {
-      flex: 1 1 0;
-      min-width: 0;
-      width: 0;
-      height: 28px;
-      appearance: none;
-      background: transparent;
-    }
-
-    input[type="range"]::-webkit-slider-runnable-track {
-      height: 8px;
-      border: 1px solid rgba(28, 25, 22, 0.18);
-      border-radius: 999px;
-      background: rgba(28, 25, 22, 0.16);
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      width: 20px;
-      height: 20px;
-      margin-top: -7px;
-      appearance: none;
-      border: 3px solid #f7f3ee;
-      border-radius: 999px;
-      background: var(--selected);
-      box-shadow: 0 3px 7px rgba(35, 30, 24, 0.22);
-    }
-
-    input[type="range"]::-moz-range-track {
-      height: 8px;
-      border: 1px solid rgba(28, 25, 22, 0.18);
-      border-radius: 999px;
-      background: rgba(28, 25, 22, 0.16);
-    }
-
-    input[type="range"]::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border: 3px solid #f7f3ee;
-      border-radius: 999px;
-      background: var(--selected);
-      box-shadow: 0 3px 7px rgba(35, 30, 24, 0.22);
-    }
-
-    .time {
-      min-width: 102px;
+    p {
+      margin-top: 8px;
       color: var(--muted);
-      text-align: right;
-      font-size: 13px;
-      font-weight: 780;
-      font-variant-numeric: tabular-nums;
-    }
-
-    @media (max-width: 720px) {
-      .topbar {
-        right: 16px;
-      }
-
-      .readout {
-        top: 70px;
-        left: 16px;
-        right: 16px;
-      }
-
-      .transport {
-        grid-template-columns: auto minmax(0, 1fr);
-      }
-
-      .time {
-        grid-column: 1 / -1;
-        text-align: left;
-      }
+      font-size: 14px;
+      line-height: 1.45;
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <canvas id="ambientCanvas" aria-label="Ambient vector plane"></canvas>
-
-    <div class="topbar" aria-label="Prototype title">
-      <span class="status-dot" aria-hidden="true"></span>
-      <span>Audio Vector Plane</span>
-    </div>
-
-    <section class="readout" aria-label="Channels">
-      <div class="meter">
-        <b>Magnitude</b>
-        <span id="ch1">0.00</span>
-      </div>
-      <div class="meter">
-        <b>Yaw</b>
-        <span id="ch2">0.00</span>
-      </div>
-      <div class="meter">
-        <b>Bass</b>
-        <span id="ch3">0.00</span>
-      </div>
-    </section>
-
-    <section class="transport" aria-label="Playback">
-      <button id="playButton" type="button" aria-pressed="false">Play</button>
-      <div class="slider-row">
-        <input id="timeline" type="range" min="0" max="463.759387" step="0.01" value="90" aria-label="Timeline">
-      </div>
-      <div class="time" id="timeReadout">1:30 / 7:44</div>
+  <main>
+    <section aria-label="Retired prototype">
+      <h1>Ambient Prototype Retired</h1>
+      <p>The experimental vector field and Europa audio playback are disabled.</p>
     </section>
   </main>
-
-  <script type="module">
-    import * as THREE from "three";
-    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-    import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-    import audioUrl from "@vector-assets/Audio/europa-tecnosine-main-version-07-43-13869.mp3?url";
-
-    globalThis.vec4 = class Vec4 {
-      constructor(x, y, z, w) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
-      }
-    };
-
-    const {
-      EUROPA_TECNOSINE_AMBIENT_DURATION: EUROPA_TECNOSINE_DURATION,
-      sampleEuropaTecnosineAmbientChannels: sampleEuropaTecnosine,
-    } = await import("@vector-assets/Scripts/EuropaTecnosineAmbientChannels.ts");
-
-    const canvas = document.getElementById("ambientCanvas");
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: false,
-      powerPreference: "high-performance",
-    });
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.VSMShadowMap;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setClearColor(0xe8e4e0, 1);
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xe8e4e0);
-    scene.fog = new THREE.Fog(0xe8e4e0, 9, 18);
-
-    const camera = new THREE.PerspectiveCamera(43, 1, 0.05, 60);
-    camera.position.set(0, 4.2, 7.8);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.06;
-    controls.screenSpacePanning = true;
-    controls.rotateSpeed = 0.7;
-    controls.zoomSpeed = 0.8;
-    controls.target.set(0, 0, 0);
-
-    const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    const roomEnv = new RoomEnvironment(renderer);
-    scene.environment = pmremGenerator.fromScene(roomEnv, 0.04).texture;
-    roomEnv.dispose();
-
-    const keyLight = new THREE.DirectionalLight(0xfff8f0, 1.8);
-    keyLight.position.set(0.4, 0.8, 0.5);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(2048, 2048);
-    keyLight.shadow.bias = -0.001;
-    keyLight.shadow.radius = 4;
-    keyLight.shadow.blurSamples = 16;
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0xf7f2ea, 0.48);
-    fillLight.position.set(-0.5, 0.5, -0.3);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0xfff0e0, 0.36);
-    rimLight.position.set(0, 0.3, -0.6);
-    scene.add(rimLight);
-
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xb0a090, 0.32);
-    scene.add(hemiLight);
-
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(16, 16),
-      new THREE.ShadowMaterial({ opacity: 0.09 })
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -2.4;
-    floor.receiveShadow = true;
-    scene.add(floor);
-
-    const fieldGroup = new THREE.Group();
-    fieldGroup.position.set(0, 0.05, 0);
-    scene.add(fieldGroup);
-
-    const planeWidth = 6.8;
-    const planeHeight = 4.05;
-    const planeSegmentsX = 56;
-    const planeSegmentsY = 34;
-    const planeGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, planeSegmentsX, planeSegmentsY);
-    const planeMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf7f2ea,
-      roughness: 0.64,
-      metalness: 0,
-      transparent: true,
-      opacity: 0.34,
-      side: THREE.DoubleSide,
-    });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -Math.PI / 2;
-    plane.receiveShadow = true;
-    plane.renderOrder = 0;
-    fieldGroup.add(plane);
-
-    const gridLines = createPlaneGrid(planeWidth, planeHeight, 18, 11);
-    gridLines.renderOrder = 1;
-    fieldGroup.add(gridLines);
-
-    const cols = 23;
-    const rows = 13;
-    const count = cols * rows;
-    const samples = [];
-    const shaftGeometry = new THREE.CylinderGeometry(0.008, 0.008, 1, 8, 1);
-    const headGeometry = new THREE.ConeGeometry(0.052, 1, 14, 1);
-    const vectorMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.92,
-      vertexColors: false,
-      depthWrite: true,
-      toneMapped: false,
-    });
-    const headMaterial = vectorMaterial.clone();
-    const shafts = new THREE.InstancedMesh(shaftGeometry, vectorMaterial, count);
-    const heads = new THREE.InstancedMesh(headGeometry, headMaterial, count);
-    shafts.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(count * 3), 3);
-    heads.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(count * 3), 3);
-    shafts.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    heads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    shafts.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    heads.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    shafts.castShadow = false;
-    heads.castShadow = false;
-    shafts.renderOrder = 3;
-    heads.renderOrder = 4;
-    fieldGroup.add(shafts);
-    fieldGroup.add(heads);
-
-    const deepVector = new THREE.Color(0x1d46ff);
-    const cyanVector = new THREE.Color(0x23d6ff);
-    const greenVector = new THREE.Color(0x70f06f);
-    const glowWhite = new THREE.Color(0xf3fff2);
-    const tmpColor = new THREE.Color();
-    const tmpPos = new THREE.Vector3();
-    const tmpQuat = new THREE.Quaternion();
-    const tmpScale = new THREE.Vector3();
-    const tmpMat = new THREE.Matrix4();
-    const up = new THREE.Vector3(0, 1, 0);
-    const dir = new THREE.Vector3();
-
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        const u = cols === 1 ? 0 : x / (cols - 1);
-        const v = rows === 1 ? 0 : y / (rows - 1);
-        const px = (u - 0.5) * planeWidth * 0.9;
-        const py = (v - 0.5) * planeHeight * 0.82;
-        const index = y * cols + x;
-        samples.push({
-          x: px,
-          y: py,
-          nx: u * 2 - 1,
-          ny: v * 2 - 1,
-          phase: rand(index, 3.7) * Math.PI * 2,
-          yawNoise: (rand(index, 13.1) - 0.5) * 0.30,
-          pitchNoise: (rand(index, 17.8) - 0.5) * 0.18,
-          weight: 0.72 + rand(index, 11.5) * 0.44,
-        });
-      }
-    }
-
-    const audio = new Audio(audioUrl);
-    audio.preload = "auto";
-
-    const INITIAL_TIME = 90;
-    const initialSample = sampleEuropaTecnosine(INITIAL_TIME);
-    let elapsed = INITIAL_TIME;
-    let playing = false;
-    let lastNow = 0;
-    let smoothed = {
-      x: initialSample.x,
-      y: initialSample.y,
-      z: initialSample.z,
-      w: initialSample.w,
-    };
-
-    const playButton = document.getElementById("playButton");
-    const timeline = document.getElementById("timeline");
-    const timeReadout = document.getElementById("timeReadout");
-    const ch1 = document.getElementById("ch1");
-    const ch2 = document.getElementById("ch2");
-    const ch3 = document.getElementById("ch3");
-    timeline.max = String(EUROPA_TECNOSINE_DURATION);
-    timeline.value = String(INITIAL_TIME);
-
-    playButton.addEventListener("click", async () => {
-      if (playing) {
-        audio.pause();
-        playing = false;
-        playButton.textContent = "Play";
-        playButton.setAttribute("aria-pressed", "false");
-        return;
-      }
-      audio.currentTime = Math.min(elapsed, EUROPA_TECNOSINE_DURATION - 0.05);
-      await audio.play();
-      playing = true;
-      playButton.textContent = "Pause";
-      playButton.setAttribute("aria-pressed", "true");
-    });
-
-    timeline.addEventListener("input", () => {
-      elapsed = Number(timeline.value);
-      if (playing) {
-        audio.currentTime = elapsed;
-      }
-      updateReadout();
-    });
-
-    audio.addEventListener("ended", () => {
-      playing = false;
-      elapsed = EUROPA_TECNOSINE_DURATION;
-      playButton.textContent = "Play";
-      playButton.setAttribute("aria-pressed", "false");
-    });
-
-    window.addEventListener("resize", resize);
-    resize();
-    updateField(0, smoothed, elapsed);
-    updateReadout();
-    requestAnimationFrame(animate);
-
-    function animate(now) {
-      requestAnimationFrame(animate);
-      const dt = Math.min((now - (lastNow || now)) / 1000, 0.05);
-      lastNow = now;
-
-      if (playing) {
-        elapsed = Math.min(audio.currentTime, EUROPA_TECNOSINE_DURATION);
-      } else {
-        elapsed = Math.min(EUROPA_TECNOSINE_DURATION, elapsed + dt * 0.16);
-      }
-
-      const raw = sampleEuropaTecnosine(elapsed);
-      const alpha = Math.min(1, Math.max(0.02, dt * 8));
-      smoothed.x = lerp(smoothed.x, raw.x, alpha);
-      smoothed.y = lerp(smoothed.y, raw.y, alpha);
-      smoothed.z = lerp(smoothed.z, raw.z, alpha);
-      smoothed.w = lerp(smoothed.w, raw.w, alpha);
-
-      updateField(dt, smoothed, elapsed);
-      updateReadout();
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    function updateField(dt, sample, timeSeconds) {
-      const magnitude = ease(sample.x);
-      const yaw = (ease(sample.y) - 0.5) * 1.62;
-      const pitch = (ease(sample.z) - 0.5) * 1.05;
-      const time = timeSeconds * 0.34;
-
-      planeMaterial.opacity = 0.18 + magnitude * 0.25;
-      gridLines.material.opacity = 0.10 + magnitude * 0.22;
-      vectorMaterial.opacity = 0.18 + magnitude * 0.72;
-      headMaterial.opacity = vectorMaterial.opacity;
-
-      for (let i = 0; i < samples.length; i++) {
-        const p = samples[i];
-        const localYaw = yaw + p.yawNoise + Math.sin(time + p.phase) * 0.035;
-        const localPitch = pitch + p.pitchNoise + Math.cos(time * 0.8 + p.phase) * 0.025;
-        const pitchCos = Math.cos(localPitch);
-        dir.set(
-          Math.cos(localYaw) * pitchCos,
-          Math.sin(localPitch),
-          Math.sin(localYaw) * pitchCos
-        ).normalize();
-
-        const localGain = 0.86 + Math.sin(time + p.phase) * 0.07;
-        const length = (0.055 + magnitude * 0.42) * p.weight * localGain;
-        const baseX = p.x;
-        const baseY = 0.038;
-        const baseZ = p.y;
-
-        tmpQuat.setFromUnitVectors(up, dir);
-        tmpScale.set(1, Math.max(0.001, length), 1);
-        tmpPos.set(baseX + dir.x * length * 0.5, baseY + dir.y * length * 0.5, baseZ + dir.z * length * 0.5);
-        tmpMat.compose(tmpPos, tmpQuat, tmpScale);
-        shafts.setMatrixAt(i, tmpMat);
-
-        const headLength = Math.max(0.038, length * 0.42);
-        tmpScale.set(1, headLength, 1);
-        tmpPos.set(
-          baseX + dir.x * (length + headLength * 0.26),
-          baseY + dir.y * (length + headLength * 0.26),
-          baseZ + dir.z * (length + headLength * 0.26)
-        );
-        tmpMat.compose(tmpPos, tmpQuat, tmpScale);
-        heads.setMatrixAt(i, tmpMat);
-
-        const edge = Math.sqrt(p.nx * p.nx + p.ny * p.ny) * 0.5;
-        const spatialBand = 0.5 + Math.sin(p.x * 1.15 + p.y * 0.78 + time * 0.55 + p.phase) * 0.5;
-        const cyanMix = Math.min(1, Math.max(0, spatialBand * 0.55 + sample.y * 0.30 + edge * 0.18));
-        const greenMix = Math.min(1, Math.max(0, sample.z * 0.56 + spatialBand * 0.22 + (1 - edge) * 0.12));
-        tmpColor
-          .copy(deepVector)
-          .lerp(cyanVector, cyanMix)
-          .lerp(greenVector, greenMix)
-          .lerp(glowWhite, magnitude * 0.08);
-        shafts.setColorAt(i, tmpColor);
-        heads.setColorAt(i, tmpColor);
-      }
-
-      shafts.instanceMatrix.needsUpdate = true;
-      heads.instanceMatrix.needsUpdate = true;
-      if (shafts.instanceColor) shafts.instanceColor.needsUpdate = true;
-      if (heads.instanceColor) heads.instanceColor.needsUpdate = true;
-    }
-
-    function createPlaneGrid(width, height, cols, rows) {
-      const points = [];
-      for (let i = 0; i <= cols; i++) {
-        const x = -width / 2 + (i / cols) * width;
-        points.push(new THREE.Vector3(x, 0.006, -height / 2), new THREE.Vector3(x, 0.006, height / 2));
-      }
-      for (let i = 0; i <= rows; i++) {
-        const z = -height / 2 + (i / rows) * height;
-        points.push(new THREE.Vector3(-width / 2, 0.006, z), new THREE.Vector3(width / 2, 0.006, z));
-      }
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const material = new THREE.LineBasicMaterial({
-        color: 0x2a2724,
-        transparent: true,
-        opacity: 0.22,
-      });
-      return new THREE.LineSegments(geometry, material);
-    }
-
-    function updateReadout() {
-      timeline.value = String(elapsed);
-      ch1.textContent = smoothed.x.toFixed(2);
-      ch2.textContent = smoothed.y.toFixed(2);
-      ch3.textContent = smoothed.z.toFixed(2);
-      timeReadout.textContent = `${formatTime(elapsed)} / ${formatTime(EUROPA_TECNOSINE_DURATION)}`;
-    }
-
-    function resize() {
-      const width = Math.max(1, window.innerWidth);
-      const height = Math.max(1, window.innerHeight);
-      renderer.setSize(width, height, false);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    }
-
-    function rand(index, seed) {
-      return fract(Math.sin(index * 12.9898 + seed * 78.233) * 43758.5453123);
-    }
-
-    function fract(value) {
-      return value - Math.floor(value);
-    }
-
-    function lerp(a, b, t) {
-      return a + (b - a) * t;
-    }
-
-    function ease(value) {
-      const x = Math.min(1, Math.max(0, value));
-      return x * x * (3 - 2 * x);
-    }
-
-    function formatTime(seconds) {
-      const whole = Math.max(0, Math.floor(seconds));
-      const m = Math.floor(whole / 60);
-      const s = whole % 60;
-      return `${m}:${String(s).padStart(2, "0")}`;
-    }
-  </script>
 </body>
 </html>

@@ -836,6 +836,8 @@
     arrowResolution: true
     arrowScale: true
     arrowWidth: true
+    artemisTrajectoryScale: true
+    artemisEarthClearance: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -863,6 +865,8 @@
       arrowScale: 0.340000
       arrowWidth: 0.070000
       lineWidth: 0.080000
+      artemisTrajectoryScale: 2.650000
+      artemisEarthClearance: 0.650000
       wellDepth: 2.400000
       material: !<reference.Material> 6b93edd3-80a7-493c-ad6f-624202005066
       initialStage: !<float> 0.000000
@@ -1042,6 +1046,7 @@
     readoutText: true
     valueText: true
     title: true
+    showLabels: true
     refreshInterval: true
     showUTC: true
     showMET: true
@@ -1054,6 +1059,7 @@
       readoutText: !<reference.Text> 00000000-0000-0000-0000-000000000000
       valueText: !<reference.Text> 00000000-0000-0000-0000-000000000000
       title: ARTEMIS II
+      showLabels: true
       refreshInterval: 0.100000
       showUTC: true
       showMET: true

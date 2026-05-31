@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nabla Math Explainer</title>
+  <link rel="stylesheet" href="node_modules/katex/dist/katex.min.css">
+  <style>
+    @font-face {
+      font-family: NunitoSansLocal;
+      src: url("../Assets/Fonts/Nunito_Sans/NunitoSans.ttf");
+      font-weight: 200 1000;
+    }
+
+    /* Bright, high-contrast, no black. In LS the UI material keys opacity off
+       luminance (black reads transparent), so everything here is light: a
+       medium-bright translucent panel with white ink and vivid accents. */
+    :root {
+      --ink: #ffffff;
+      --ink-soft: rgba(226, 240, 255, 0.82);
+      --ink-quiet: rgba(210, 230, 255, 0.62);
+      --x: #e03020;   /* x axis — vivid red */
+      --y: #20c030;   /* y axis — vivid green */
+      --z: #1878e0;   /* z axis — vivid blue */
+      --line: rgba(200, 224, 255, 0.42);
+    }
+
+    * { box-sizing: border-box; margin: 0; border-radius: 0 !important; }
+
+    body {
+      background: transparent;
+      font-family: NunitoSansLocal, "Avenir Next", system-ui, sans-serif;
+      color: var(--ink);
+    }
+
+    #stage {
+      display: flex;
+      flex-direction: column;
+      gap: 44px;
+      padding: 44px;
+      align-items: flex-start;
+    }
+
+    .panel {
+      position: relative;
+      width: 1000px;
+      height: 640px;
+      overflow: hidden;
+      background:
+        linear-gradient(160deg, rgba(120, 170, 240, 0.26), rgba(80, 130, 210, 0.14) 60%, rgba(60, 110, 190, 0.10)),
+        rgba(150, 190, 240, 0.16);
+      border: 2px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      padding: 56px 66px 48px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .kicker {
+      font-size: 22px;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-quiet);
+    }
+
+    .title {
+      margin-top: 12px;
+      font-size: 58px;
+      line-height: 1;
+      font-weight: 900;
+      display: flex;
+      align-items: baseline;
+      gap: 22px;
+    }
+
+    .title .op {
+      font-family: "KaTeX_Main", NunitoSansLocal, serif;
+      font-weight: 700;
+    }
+
+    .eqwrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .eq .katex { color: var(--ink); font-size: 3.0em; }
+    .eq.sub .katex { font-size: 1.9em; color: var(--ink-soft); }
+
+    .tag {
+      font-size: 27px;
+      font-weight: 760;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .tag .pill {
+      padding: 6px 16px;
+      border: 2px solid var(--line);
+      background: rgba(120, 178, 248, 0.16);
+      font-weight: 850;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 26px;
+    }
+    .steps { display: flex; gap: 12px; }
+    .dot { width: 16px; height: 16px; background: rgba(210, 230, 255, 0.30); }
+    .dot.on { width: 40px; background: var(--z); }
+    .stepno { font-size: 22px; font-weight: 850; color: var(--ink-quiet); letter-spacing: 0.08em; }
+
+    /* Intro / text panel */
+    .intro-nabla {
+      font-family: "KaTeX_Main", NunitoSansLocal, serif;
+      font-size: 200px;
+      line-height: 1;
+      color: rgba(255, 255, 255, 0.07);
+      position: absolute;
+      right: 48px;
+      bottom: -12px;
+      pointer-events: none;
+      user-select: none;
+    }
+    .intro-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 32px;
+    }
+    .intro-text {
+      font-size: 23px;
+      line-height: 1.70;
+      font-weight: 500;
+      color: var(--ink-soft);
+      max-width: 800px;
+    }
+    .intro-text em {
+      font-style: normal;
+      font-weight: 850;
+      color: var(--ink);
+    }
+    .intro-ops {
+      display: flex;
+      gap: 0;
+    }
+    .intro-op {
+      padding: 9px 22px;
+      border: 1.5px solid rgba(200, 224, 255, 0.50);
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .intro-op + .intro-op { border-left: none; }
+
+    /* Coordinate-system table */
+    .coords-table {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+    }
+    .coord-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border-top: 1.5px solid rgba(200, 224, 255, 0.55);
+    }
+    .coord-row:last-child { border-bottom: 1.5px solid rgba(200, 224, 255, 0.55); }
+    .coord-name {
+      flex: 0 0 210px;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 0.10em;
+      color: var(--ink);
+      text-transform: uppercase;
+      padding: 20px 24px 20px 0;
+      border-right: 1.5px solid rgba(200, 224, 255, 0.55);
+    }
+    .coord-eq {
+      flex: 1;
+      padding: 16px 0 16px 32px;
+      min-width: 0;
+    }
+    .coord-eq .katex { color: var(--ink); font-size: 1.65em; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <script src="node_modules/katex/dist/katex.min.js"></script>
+  <script>
+    const C = { x: "#e03020", y: "#20c030", z: "#1878e0" };
+    const dx = (b) => `\\textcolor{${C.x}}{${b}}`;
+    const dy = (b) => `\\textcolor{${C.y}}{${b}}`;
+    const dz = (b) => `\\textcolor{${C.z}}{${b}}`;
+
+    const STEPS = [
+      {
+        id: "del_intro",
+        type: "intro",
+        kicker: "Metrics · Vector Calculus",
+        title: "Del / Nabla",
+        op: "∇",
+        body: "Del, or nabla (∇), is a vector differential operator used in vector calculus. Applied to a function on a one-dimensional domain, it denotes the standard derivative. Applied to a field on a multi-dimensional domain, it denotes one of three operations depending on how it is applied: the <em>gradient</em> — the locally steepest slope of a scalar field; the <em>divergence</em> of a vector field — a measure of how much the field expands or contracts at each point; or the <em>curl</em> of a vector field — a measure of its local rotation.",
+        ops: ["gradient", "divergence", "curl"],
+      },
+      {
+        id: "operator",
+        kicker: "Vector calculus",
+        title: "The ∇ operator",
+        op: "∇",
+        eqs: [
+          { tex: `\\nabla=\\left(${dx("\\tfrac{\\partial}{\\partial x}")},\\;${dy("\\tfrac{\\partial}{\\partial y}")},\\;${dz("\\tfrac{\\partial}{\\partial z}")}\\right)` },
+        ],
+        tag: { pill: "operator", text: "a vector of partial derivatives" },
+      },
+      {
+        id: "del_coordinates",
+        type: "coords",
+        kicker: "Vector Calculus",
+        title: "Del Operator",
+        op: "∇",
+        coords: [
+          {
+            name: "Cartesian",
+            note: "",
+            tex: `\\nabla = ${dx("\\dfrac{\\partial}{\\partial x}\\hat{a}_x")} + ${dy("\\dfrac{\\partial}{\\partial y}\\hat{a}_y")} + ${dz("\\dfrac{\\partial}{\\partial z}\\hat{a}_z")}`,
+          },
+          {
+            name: "Cylindrical",
+            note: "coord transform",
+            tex: `\\nabla = ${dx("\\dfrac{\\partial}{\\partial \\rho}\\hat{a}_{\\rho}")} + ${dy("\\dfrac{1}{\\rho}\\dfrac{\\partial}{\\partial \\phi}\\hat{a}_{\\phi}")} + ${dz("\\dfrac{\\partial}{\\partial z}\\hat{a}_z")}`,
+          },
+          {
+            name: "Spherical",
+            note: "coord transform",
+            tex: `\\nabla = ${dx("\\dfrac{\\partial}{\\partial r}\\hat{a}_r")} + ${dy("\\dfrac{1}{r}\\dfrac{\\partial}{\\partial \\theta}\\hat{a}_{\\theta}")} + ${dz("\\dfrac{1}{r\\sin\\theta}\\dfrac{\\partial}{\\partial \\phi}\\hat{a}_{\\phi}")}`,
+          },
+        ],
+        tag: null,
+      },
+      {
+        id: "divergence",
+        kicker: "Apply ∇ as a dot product",
+        title: "Divergence",
+        op: "∇·F",
+        eqs: [
+          { tex: `\\nabla\\cdot\\mathbf{F}=${dx("\\frac{\\partial F_x}{\\partial x}")}+${dy("\\frac{\\partial F_y}{\\partial y}")}+${dz("\\frac{\\partial F_z}{\\partial z}")}` },
+          { sub: true, tex: `\\nabla\\cdot\\mathbf{F}>0\\;\\Rightarrow\\;\\text{source}\\qquad \\nabla\\cdot\\mathbf{F}<0\\;\\Rightarrow\\;\\text{sink}` },
+        ],
+        tag: { pill: "scalar", text: "net flow out of a point" },
+      },
+      {
+        id: "divergence_example",
+        kicker: "Worked example",
+        title: "Divergence",
+        op: "∇·F",
+        eqs: [
+          { tex: `\\mathbf{F}=\\big(${dx("x")},\\,${dy("y")},\\,${dz("z")}\\big)` },
+          { sub: true, tex: `\\nabla\\cdot\\mathbf{F}=${dx("1")}+${dy("1")}+${dz("1")}=3` },
+        ],
+        tag: { pill: "source", text: "radial field → expansion" },
+      },
+      {
+        id: "curl",
+        kicker: "Apply ∇ as a cross product",
+        title: "Curl",
+        op: "∇×F",
+        eqs: [
+          { tex: `\\nabla\\times\\mathbf{F}=\\begin{pmatrix} ${dx("\\partial_y F_z-\\partial_z F_y")} \\\\ ${dy("\\partial_z F_x-\\partial_x F_z")} \\\\ ${dz("\\partial_x F_y-\\partial_y F_x")} \\end{pmatrix}` },
+        ],
+        tag: { pill: "vector", text: "local rotation about each axis" },
+      },
+      {
+        id: "curl_example",
+        kicker: "Worked example",
+        title: "Curl",
+        op: "∇×F",
+        eqs: [
+          { tex: `\\mathbf{F}=\\big(${dx("-y")},\\,${dy("x")},\\,${dz("0")}\\big)` },
+          { sub: true, tex: `\\nabla\\times\\mathbf{F}=\\big(0,\\,0,\\,${dz("2")}\\big),\\quad \\nabla\\cdot\\mathbf{F}=0` },
+        ],
+        tag: { pill: "rotation", text: "swirl about the z axis" },
+      },
+    ];
+
+    const stage = document.getElementById("stage");
+
+    STEPS.forEach((step, i) => {
+      const panel = document.createElement("section");
+      panel.id = `math_explainer_${step.id}`;
+      panel.className = "panel capture";
+
+      const kicker = document.createElement("div");
+      kicker.className = "kicker";
+      kicker.textContent = step.kicker;
+
+      const title = document.createElement("div");
+      title.className = "title";
+      const tlabel = document.createElement("span");
+      tlabel.textContent = step.title;
+      const top = document.createElement("span");
+      top.className = "op";
+      top.textContent = step.op;
+      title.append(tlabel, top);
+
+      let eqwrap;
+      if (step.type === "intro") {
+        eqwrap = document.createElement("div");
+        eqwrap.className = "intro-body";
+
+        const bg = document.createElement("div");
+        bg.className = "intro-nabla";
+        bg.textContent = "∇";
+        panel.appendChild(bg);
+
+        const text = document.createElement("div");
+        text.className = "intro-text";
+        text.innerHTML = step.body;
+        eqwrap.appendChild(text);
+
+        const ops = document.createElement("div");
+        ops.className = "intro-ops";
+        for (const op of step.ops) {
+          const pill = document.createElement("div");
+          pill.className = "intro-op";
+          pill.textContent = op;
+          ops.appendChild(pill);
+        }
+        eqwrap.appendChild(ops);
+      } else if (step.type === "coords") {
+        eqwrap = document.createElement("div");
+        eqwrap.className = "coords-table";
+        for (const coord of step.coords) {
+          const row = document.createElement("div");
+          row.className = "coord-row";
+
+          const name = document.createElement("div");
+          name.className = "coord-name";
+          name.textContent = coord.name;
+
+          const eq = document.createElement("div");
+          eq.className = "coord-eq";
+          katex.render(coord.tex, eq, { displayMode: true, throwOnError: false, trust: true, strict: false });
+
+          row.append(name, eq);
+          eqwrap.appendChild(row);
+        }
+      } else {
+        eqwrap = document.createElement("div");
+        eqwrap.className = "eqwrap";
+        for (const e of step.eqs) {
+          const eq = document.createElement("div");
+          eq.className = "eq" + (e.sub ? " sub" : "");
+          katex.render(e.tex, eq, { displayMode: true, throwOnError: false, trust: true, strict: false });
+          eqwrap.appendChild(eq);
+        }
+      }
+
+      const footer = document.createElement("div");
+      footer.className = "footer";
+      const stepDots = document.createElement("div");
+      stepDots.className = "steps";
+      STEPS.forEach((_, j) => {
+        const d = document.createElement("div");
+        d.className = "dot" + (j === i ? " on" : "");
+        stepDots.appendChild(d);
+      });
+      const stepno = document.createElement("div");
+      stepno.className = "stepno";
+      stepno.textContent = `${i + 1} / ${STEPS.length}`;
+
+      if (step.tag) {
+        const tag = document.createElement("div");
+        tag.className = "tag";
+        tag.innerHTML = `<span class="pill">${step.tag.pill}</span><span>${step.tag.text}</span>`;
+        footer.append(stepDots, tag, stepno);
+      } else {
+        footer.append(stepDots, stepno);
+      }
+
+      panel.append(kicker, title, eqwrap, footer);
+      stage.appendChild(panel);
+    });
+
+    Promise.resolve(document.fonts ? document.fonts.ready : null).then(() => {
+      window.mathExplainerReady = true;
+    });
+  </script>
+</body>
+</html>

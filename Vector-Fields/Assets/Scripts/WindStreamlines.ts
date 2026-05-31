@@ -100,8 +100,8 @@ export class WindStreamlines extends BaseScriptComponent {
   // - templatePhase ∈ [0, 1] random per-template offset
   // - speedColor  ∈ [0, 1]   wind speed at this sample / speedScale
   // - speedRatioRaw >= 0     unclamped wind speed / speedScale, retained for diagnostics/future modes
-  // - crossSection ∈ [-1, 1]  left/right ribbon coordinate for soft tube shading
-  // - capRadial    body=-1, caps=0..1, points=1.02..1.98, arrows=2
+  // - crossSection ∈ [-1, 1]  left/right ribbon coordinate, or point billboard X
+  // - capRadial    body=-1, caps=0..1, points=1.05..1.95 with billboard Y, arrows=2
   //
   // The WindStreamFlow Code Node consumes these to shade trails, points, and
   // arrows without changing hue as opacity scrolls.
@@ -406,23 +406,17 @@ export class WindStreamlines extends BaseScriptComponent {
 
       const emitPointFan = (k: number) => {
         if (!hasRoom(pointVertsPerGlyph)) return;
-        const frame = getFrame(k);
-        const tx = frame[0], ty = frame[1], tz = frame[2];
-        const wx = frame[3], wy = frame[4], wz = frame[5];
         const pathT = rings > 1 ? k / (rings - 1) : 0.5;
         const speedN = pathSpeed[k];
-        const speedRatioN = pathSpeedRatio[k];
         const radiusScale = pointRadiusBase * (0.86 + speedN * 0.34);
-        const center = emitVertex(pathX[k], pathY[k], pathZ[k], pathT, tphase, speedN, speedRatioN, 0, 1.02);
+        const center = emitVertex(pathX[k], pathY[k], pathZ[k], pathT, tphase, speedN, radiusScale, 0, 1.50);
         let prev = -1;
         for (let s = 0; s <= capSegments; s++) {
           const a = (s / capSegments) * Math.PI * 2.0;
           const ca = Math.cos(a);
           const sa = Math.sin(a);
-          const x = pathX[k] + (wx * ca + tx * sa) * radiusScale;
-          const y = pathY[k] + (wy * ca + ty * sa) * radiusScale;
-          const z = pathZ[k] + (wz * ca + tz * sa) * radiusScale;
-          const arc = emitVertex(x, y, z, pathT, tphase, speedN, speedRatioN, ca, 1.98);
+          const fanY = 1.05 + (sa + 1.0) * 0.45;
+          const arc = emitVertex(pathX[k], pathY[k], pathZ[k], pathT, tphase, speedN, radiusScale, ca, fanY);
           if (prev >= 0) {
             indices.push(center, prev, arc);
           }

@@ -165,6 +165,25 @@ export class VectorFieldTubes extends BaseScriptComponent {
     @hint("Vector field type")
     private _preset: number = 0;
 
+    @input
+    @widget(new ComboBoxWidget([
+        new ComboBoxItem("jet", 13),
+        new ComboBoxItem("viridis", 17),
+        new ComboBoxItem("plasma", 18)
+    ]))
+    @hint("Matplotlib-style colormap for speed/intensity.")
+    private _colorMap: number = 17;
+
+    @input
+    @widget(new SliderWidget(0.05, 4.0, 0.01))
+    @hint("Multiplies the normalized value before sampling the selected color gradient.")
+    private _colorMapScale: number = 1.0;
+
+    @input
+    @widget(new SliderWidget(-1.0, 1.0, 0.01))
+    @hint("Adds to the normalized value before sampling the selected color gradient.")
+    private _colorMapOffset: number = 0.0;
+
     // ============ TRACKED OBJECT ============
 
     @input
@@ -204,12 +223,25 @@ export class VectorFieldTubes extends BaseScriptComponent {
             setRadiusNormalized: (value: number) => self.setRadiusNormalized(value),
             setLengthSegmentsNormalized: (value: number) => self.setLengthSegmentsNormalized(value),
             setArrowScaleNormalized: (value: number) => self.setArrowScaleNormalized(value),
+            setColorMap: (value: number | string) => self.setColorMap(value),
+            setPalette: (value: number | string) => self.setColorMap(value),
+            setColorMapScale: (value: number) => self.setColorMapScale(value),
+            setColorMapOffset: (value: number) => self.setColorMapOffset(value),
+            setGradientScale: (value: number) => self.setColorMapScale(value),
+            setGradientOffset: (value: number) => self.setColorMapOffset(value),
+            updateMaterialParams: () => self.updateMaterialParams(),
             setAmbientChannels: (magnitude: number, yaw: number, bass: number, opacity?: number) =>
                 self.setAmbientChannels(magnitude, yaw, bass, opacity),
             queueRefresh: (delaySeconds?: number) => self.queueRefresh(delaySeconds),
             refresh: () => self.refresh(),
             get preset(): number { return self.preset; },
             set preset(value: number) { self.preset = value; },
+            get colorMap(): number { return self.colorMap; },
+            set colorMap(value: number) { self.colorMap = value; },
+            get colorMapScale(): number { return self.colorMapScale; },
+            set colorMapScale(value: number) { self.colorMapScale = value; },
+            get colorMapOffset(): number { return self.colorMapOffset; },
+            set colorMapOffset(value: number) { self.colorMapOffset = value; },
             get tubeMode(): number { return self.tubeMode; },
             set tubeMode(value: number) { self.tubeMode = value; },
             get domainMode(): number { return self.domainMode; },
@@ -512,7 +544,9 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this.mainPass.StepSize = this._stepSize;
         this.mainPass.NumSteps = this._lengthSegments;
         this.mainPass.FieldScale = this._fieldScale;
-        this.mainPass.Preset = this._preset;
+        this.mainPass.Preset = this._preset + this._colorMap * 0.01;
+        this.mainPass.ColorMapScale = this._colorMapScale;
+        this.mainPass.ColorMapOffset = this._colorMapOffset;
         this.mainPass.Time = getTime();
         this.mainPass.FlowSpeed = this._flowSpeed;
         this.mainPass.ArrowScale = this._arrowScale;
@@ -925,6 +959,23 @@ export class VectorFieldTubes extends BaseScriptComponent {
         this._preset = Math.floor(Math.min(9, Math.max(0, index)));
     }
 
+    public setColorMap(value: number | string): void {
+        this._colorMap = this.normalizeColorMap(value);
+        this.updateMaterialParams();
+    }
+
+    public setColorMapScale(value: number): void {
+        if (isNaN(value)) return;
+        this._colorMapScale = Math.max(-8.0, Math.min(8.0, value));
+        this.updateMaterialParams();
+    }
+
+    public setColorMapOffset(value: number): void {
+        if (isNaN(value)) return;
+        this._colorMapOffset = Math.max(-8.0, Math.min(8.0, value));
+        this.updateMaterialParams();
+    }
+
     /**
      * Set field scale from normalized value (0-1)
      * Maps to scale range 0.1-3.0
@@ -1168,6 +1219,48 @@ export class VectorFieldTubes extends BaseScriptComponent {
     get preset(): number { return this._preset; }
     set preset(value: number) {
         this._preset = Math.floor(Math.min(9, Math.max(0, value)));
+    }
+
+    get colorMap(): number { return this._colorMap; }
+    set colorMap(value: number) {
+        this.setColorMap(value);
+    }
+
+    get colorMapScale(): number { return this._colorMapScale; }
+    set colorMapScale(value: number) {
+        this.setColorMapScale(value);
+    }
+
+    get colorMapOffset(): number { return this._colorMapOffset; }
+    set colorMapOffset(value: number) {
+        this.setColorMapOffset(value);
+    }
+
+    private normalizeColorMap(value: number | string): number {
+        if (typeof value === "string") {
+            const key = value.toLowerCase();
+            if (key === "flag") return 0;
+            if (key === "prism") return 1;
+            if (key === "ocean") return 2;
+            if (key === "gist_earth") return 3;
+            if (key === "terrain") return 4;
+            if (key === "gist_stern") return 5;
+            if (key === "gnuplot") return 6;
+            if (key === "gnuplot2") return 7;
+            if (key === "cmrmap") return 8;
+            if (key === "cubehelix") return 9;
+            if (key === "brg") return 10;
+            if (key === "gist_rainbow") return 11;
+            if (key === "rainbow") return 12;
+            if (key === "jet") return 13;
+            if (key === "turbo") return 14;
+            if (key === "nipy_spectral") return 15;
+            if (key === "gist_ncar") return 16;
+            if (key === "viridis") return 17;
+            if (key === "plasma") return 18;
+            return 17;
+        }
+        return Math.floor(Math.min(18, Math.max(0, value)));
     }
 
     private hash01(value: number): number {

@@ -5,13 +5,14 @@
 
 enum MagneticTubeMode {
     Trails = 0,    // Flowing tubes that bend along field lines
-    Particles = 1, // Short trails - minimal geometry, same flow animation
+    Particles = 1, // Camera-facing billboard point sprites
     Arrows = 2     // Static arrows: orient + scale by field, cone tip
 }
 
 @component
 export class MagneticFieldTubes extends BaseScriptComponent {
     private static readonly FIELD_RENDER_ORDER: number = 40;
+    private static readonly PARTICLE_FAN_SEGMENTS: number = 8;
 
     // ============ PERFORMANCE ============
 
@@ -135,7 +136,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
         const radial = this._radialSegments;
 
         if (mode === MagneticTubeMode.Particles) {
-            return tubeCount * (2 * radial + 2);
+            return tubeCount * (MagneticFieldTubes.PARTICLE_FAN_SEGMENTS + 1);
         } else if (mode === MagneticTubeMode.Arrows) {
             const tubeVerts = 2 * radial;
             const coneVerts = radial + 1;
@@ -327,7 +328,7 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
         let vertsPerTube: number;
         if (this._tubeMode === MagneticTubeMode.Particles) {
-            vertsPerTube = 2 * circleSegments + 2;
+            vertsPerTube = MagneticFieldTubes.PARTICLE_FAN_SEGMENTS + 1;
         } else if (this._tubeMode === MagneticTubeMode.Arrows) {
             vertsPerTube = 2 * circleSegments + circleSegments + 1 + 1;
         } else {
@@ -568,69 +569,33 @@ export class MagneticFieldTubes extends BaseScriptComponent {
 
     private generateParticle(meshBuilder: MeshBuilder, startX: number, startY: number, startZ: number, circleSegments: number): void {
         const startVertexIndex = meshBuilder.getVerticesCount();
+        const segments = MagneticFieldTubes.PARTICLE_FAN_SEGMENTS;
 
-        for (let i = 0; i < 2; i++) {
-            const t = i;
-
-            for (let j = 0; j < circleSegments; j++) {
-                const theta = (j / circleSegments) * Math.PI * 2;
-                const localX = Math.cos(theta);
-                const localY = Math.sin(theta);
-
-                meshBuilder.appendVerticesInterleaved([
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    localX, localY,
-                    startX, startZ,
-                    startY, t,
-                    3.0
-                ]);
-            }
-        }
-
-        for (let i = 0; i < circleSegments; i++) {
-            const current = startVertexIndex + i;
-            const next = startVertexIndex + (i + 1) % circleSegments;
-            const currentNext = startVertexIndex + circleSegments + i;
-            const nextNext = startVertexIndex + circleSegments + (i + 1) % circleSegments;
-
-            meshBuilder.appendIndices([
-                current, next, currentNext,
-                next, nextNext, currentNext
-            ]);
-        }
-
-        const startCapIndex = meshBuilder.getVerticesCount();
         meshBuilder.appendVerticesInterleaved([
             0.0, 0.0, 0.0,
             0.0, 0.0, 0.0,
             0.0, 0.0,
             startX, startZ,
             startY, 0.0,
-            0.0
+            3.0
         ]);
 
-        for (let i = 0; i < circleSegments; i++) {
-            const current = startVertexIndex + i;
-            const next = startVertexIndex + (i + 1) % circleSegments;
-            meshBuilder.appendIndices([startCapIndex, next, current]);
+        for (let j = 0; j < segments; j++) {
+            const theta = (j / segments) * Math.PI * 2;
+            meshBuilder.appendVerticesInterleaved([
+                0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
+                Math.cos(theta), Math.sin(theta),
+                startX, startZ,
+                startY, 1.0,
+                3.0
+            ]);
         }
 
-        const endCapIndex = meshBuilder.getVerticesCount();
-        meshBuilder.appendVerticesInterleaved([
-            0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0,
-            0.0, 0.0,
-            startX, startZ,
-            startY, 1.0,
-            0.0
-        ]);
-
-        const lastRingStart = startVertexIndex + circleSegments;
-        for (let i = 0; i < circleSegments; i++) {
-            const current = lastRingStart + i;
-            const next = lastRingStart + (i + 1) % circleSegments;
-            meshBuilder.appendIndices([endCapIndex, current, next]);
+        for (let j = 0; j < segments; j++) {
+            const current = startVertexIndex + 1 + j;
+            const next = startVertexIndex + 1 + ((j + 1) % segments);
+            meshBuilder.appendIndices([startVertexIndex, current, next]);
         }
     }
 

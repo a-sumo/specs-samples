@@ -20,7 +20,6 @@ metaInfo:
     - Front
     - Back
   lensClientCompatibilities:
-    - Mobile
     - Spectacles
   platformBundlesEnabled: false
   iconHash: 3f990dc7db22b3f68d01bf8061d8451a

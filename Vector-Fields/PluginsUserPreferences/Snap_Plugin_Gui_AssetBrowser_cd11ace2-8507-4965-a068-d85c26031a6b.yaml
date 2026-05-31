@@ -1,7 +1,7 @@
 CollapsedEntities:
   type: stringset
   value:
-    size: 1535
+    size: 1088
     values:
       - ""
       - Base.png
@@ -11,6 +11,16 @@ CollapsedEntities:
       - Echopark.hdr
       - Echopark.hdr/Diffuse
       - Echopark.hdr/Specular
+      - FieldBoundsMat.mat
+      - Flow
+      - Flow/FlowSlice.mat
+      - Flow/FlowSlice.ss_graph
+      - Flow/FlowSliceShader.js
+      - Flow/flow_field.json
+      - Flow/flow_field.png
+      - Flow/flow_paths.json
+      - FlowGizmoBlue.mat
+      - FlowGizmoMat.mat
       - Fonts
       - Fonts/Nunito_Sans
       - Fonts/Nunito_Sans/NunitoSans.ttf
@@ -22,6 +32,9 @@ CollapsedEntities:
       - Image 6.mat
       - Image.mat
       - Images
+      - Images/CalibrationUI
+      - Images/CalibrationUI/reference_plane_panel.png
+      - Images/CalibrationUI/reference_plane_preview.png
       - Images/StoryUI
       - Images/StoryUI/card_definition_active.png
       - Images/StoryUI/card_definition_normal.png
@@ -36,17 +49,106 @@ CollapsedEntities:
       - Images/StoryUI/card_metrics_normal.png
       - Images/StoryUI/card_metrics_pressed.png
       - Images/StoryUI/card_motion_active.png
+      - Images/StoryUI/card_motion_fields_active.png
+      - Images/StoryUI/card_motion_fields_normal.png
+      - Images/StoryUI/card_motion_fields_pressed.png
       - Images/StoryUI/card_motion_normal.png
       - Images/StoryUI/card_motion_pressed.png
       - Images/StoryUI/card_patterns_active.png
       - Images/StoryUI/card_patterns_normal.png
       - Images/StoryUI/card_patterns_pressed.png
+      - Images/StoryUI/card_theory_active.png
+      - Images/StoryUI/card_theory_normal.png
+      - Images/StoryUI/card_theory_pressed.png
       - Images/StoryUI/chapter_panel.png
+      - Images/StoryUI/cursor_hover.png
+      - Images/StoryUI/cursor_pressed.png
+      - Images/StoryUI/example_detail_gravity_artemis_panel.png
+      - Images/StoryUI/example_detail_gravity_panel.png
+      - Images/StoryUI/example_detail_magnetism_panel.png
+      - Images/StoryUI/example_detail_wind_panel.png
+      - Images/StoryUI/example_gravity_active.png
+      - Images/StoryUI/example_gravity_normal.png
+      - Images/StoryUI/example_gravity_pressed.png
+      - Images/StoryUI/example_magnetism_active.png
+      - Images/StoryUI/example_magnetism_normal.png
+      - Images/StoryUI/example_magnetism_pressed.png
+      - Images/StoryUI/example_wind_active.png
+      - Images/StoryUI/example_wind_normal.png
+      - Images/StoryUI/example_wind_pressed.png
+      - Images/StoryUI/examples_back_normal.png
+      - Images/StoryUI/examples_back_pressed.png
+      - Images/StoryUI/examples_panel.png
+      - Images/StoryUI/math_explainer_curl.png
+      - Images/StoryUI/math_explainer_curl_example.png
+      - Images/StoryUI/math_explainer_divergence.png
+      - Images/StoryUI/math_explainer_divergence_example.png
+      - Images/StoryUI/math_explainer_operator.png
       - Images/StoryUI/nav_back_normal.png
       - Images/StoryUI/nav_back_pressed.png
       - Images/StoryUI/nav_next_normal.png
       - Images/StoryUI/nav_next_pressed.png
+      - Images/StoryUI/overlay_card_hover.png
+      - Images/StoryUI/overlay_card_pressed.png
+      - Images/StoryUI/overlay_card_selected.png
+      - Images/StoryUI/overlay_example_hover.png
+      - Images/StoryUI/overlay_example_pressed.png
+      - Images/StoryUI/overlay_example_selected.png
+      - Images/StoryUI/overlay_nav_hover.png
+      - Images/StoryUI/overlay_nav_pressed.png
+      - Images/StoryUI/overlay_utility_hover.png
+      - Images/StoryUI/overlay_utility_pressed.png
+      - Images/StoryUI/palette_jet_active.png
+      - Images/StoryUI/palette_jet_normal.png
+      - Images/StoryUI/palette_jet_pressed.png
+      - Images/StoryUI/palette_plasma_active.png
+      - Images/StoryUI/palette_plasma_normal.png
+      - Images/StoryUI/palette_plasma_pressed.png
+      - Images/StoryUI/palette_viridis_active.png
+      - Images/StoryUI/palette_viridis_normal.png
+      - Images/StoryUI/palette_viridis_pressed.png
+      - Images/StoryUI/panel_cursor_wash.png
+      - Images/StoryUI/slider_backplate.png
+      - Images/StoryUI/slider_fill.png
+      - Images/StoryUI/slider_knob.png
+      - Images/StoryUI/slider_track.png
       - Images/StoryUI/story_ui_layout.json
+      - Images/StoryUI/theory_field_panel_contraction.png
+      - Images/StoryUI/theory_field_panel_curl.png
+      - Images/StoryUI/theory_field_panel_expansion.png
+      - Images/StoryUI/theory_field_panel_motion.png
+      - Images/StoryUI/theory_mode_contraction_active.png
+      - Images/StoryUI/theory_mode_contraction_normal.png
+      - Images/StoryUI/theory_mode_contraction_pressed.png
+      - Images/StoryUI/theory_mode_curl_active.png
+      - Images/StoryUI/theory_mode_curl_normal.png
+      - Images/StoryUI/theory_mode_curl_pressed.png
+      - Images/StoryUI/theory_mode_expansion_active.png
+      - Images/StoryUI/theory_mode_expansion_normal.png
+      - Images/StoryUI/theory_mode_expansion_pressed.png
+      - Images/StoryUI/theory_mode_motion_active.png
+      - Images/StoryUI/theory_mode_motion_normal.png
+      - Images/StoryUI/theory_mode_motion_pressed.png
+      - Images/StoryUI/theory_panel.png
+      - Images/StoryUI/theory_panel_motion.png
+      - Images/StoryUI/utility_fold_closed.png
+      - Images/StoryUI/utility_fold_open.png
+      - Images/StoryUI/utility_fold_pressed.png
+      - Images/StoryUI/utility_follow_off.png
+      - Images/StoryUI/utility_follow_on.png
+      - Images/StoryUI/utility_follow_pressed.png
+      - Images/StoryUI/utility_plane_floor_off.png
+      - Images/StoryUI/utility_plane_floor_on.png
+      - Images/StoryUI/utility_plane_floor_pressed.png
+      - Images/StoryUI/utility_plane_front_off.png
+      - Images/StoryUI/utility_plane_front_on.png
+      - Images/StoryUI/utility_plane_front_pressed.png
+      - Images/StoryUI/variant_active.png
+      - Images/StoryUI/variant_artemis_active.png
+      - Images/StoryUI/variant_artemis_normal.png
+      - Images/StoryUI/variant_artemis_pressed.png
+      - Images/StoryUI/variant_normal.png
+      - Images/StoryUI/variant_pressed.png
       - Images/UI
       - Images/circulation_sprite.png
       - Images/contraction_sprite.png
@@ -68,12 +170,18 @@ CollapsedEntities:
       - Materials/Article/VfEulerMat.mat
       - Materials/Article/VfFalloffMat.mat
       - Materials/Article/VfReadingKeyMat.mat
+      - Materials/CarFlowStream.ss_graph
+      - Materials/CarFlowStream.ss_graph.bak
       - Materials/FieldLines.mat
       - Materials/FieldLines.ss_graph
       - Materials/FlatMaterial 2.mat
       - Materials/FlatMaterial 2.ss_graph
       - Materials/FlatMaterial.mat
       - Materials/FlatMaterial.ss_graph
+      - Materials/GravityFieldPlane.mat
+      - Materials/GravityFieldPlane.ss_graph
+      - Materials/GuidePanelHover.mat
+      - Materials/GuidePanelHover.ss_graph
       - Materials/IridescentMaterial.mat
       - Materials/IridescentMaterial.ss_graph
       - Materials/MagnetPole.mat
@@ -96,419 +204,17 @@ CollapsedEntities:
       - Meshes/Custom CapsuleSphere.mesh
       - Meshes/Custom Sphere.mesh
       - Meshes/Models
-      - Meshes/Models/ISS.glb
-      - Meshes/Models/ISS.glb/.hidden
-      - Meshes/Models/ISS.glb/.hidden/ISS_01_dark _
-      - Meshes/Models/ISS.glb/ISS
-      - Meshes/Models/ISS.glb/Materials
-      - Meshes/Models/ISS.glb/Materials/ISS_01_dark _
-      - Meshes/Models/ISS.glb/Materials/ISS_01_dull
-      - Meshes/Models/ISS.glb/Materials/ISS_01_shiny_n
-      - Meshes/Models/ISS.glb/Materials/ISS_02_dark _
-      - Meshes/Models/ISS.glb/Materials/ISS_02_dull
-      - Meshes/Models/ISS.glb/Materials/ISS_03_dull
-      - Meshes/Models/ISS.glb/Materials/ISS_03_dull.001
-      - Meshes/Models/ISS.glb/Materials/ISS_03_dull.002
-      - Meshes/Models/ISS.glb/Materials/ISS_03_shiny_n
-      - Meshes/Models/ISS.glb/Materials/ISS_04_dull
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_01
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_02
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_03
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_04
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_05
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_06
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_07
-      - Meshes/Models/ISS.glb/Materials/ISS_AO_08
-      - Meshes/Models/ISS.glb/Materials/base_metal
-      - Meshes/Models/ISS.glb/Materials/ecostress
-      - Meshes/Models/ISS.glb/Materials/ecostress metal
-      - Meshes/Models/ISS.glb/Materials/ecostressWhite
-      - Meshes/Models/ISS.glb/Materials/ecostress_dexter
-      - Meshes/Models/ISS.glb/Materials/foil_silver
-      - Meshes/Models/ISS.glb/Materials/olive _
-      - Meshes/Models/ISS.glb/Materials/plastic black
-      - Meshes/Models/ISS.glb/Materials/shiny_panel
-      - Meshes/Models/ISS.glb/Materials/white
-      - Meshes/Models/ISS.glb/Meshes
-      - Meshes/Models/ISS.glb/Meshes/AMS2.000
-      - Meshes/Models/ISS.glb/Meshes/AMS21.000
-      - Meshes/Models/ISS.glb/Meshes/AMS22.000
-      - Meshes/Models/ISS.glb/Meshes/Cube.008
-      - Meshes/Models/ISS.glb/Meshes/Cube1.008
-      - Meshes/Models/ISS.glb/Meshes/Cube10.008
-      - Meshes/Models/ISS.glb/Meshes/Cube11.008
-      - Meshes/Models/ISS.glb/Meshes/Cube12.008
-      - Meshes/Models/ISS.glb/Meshes/Cube13.008
-      - Meshes/Models/ISS.glb/Meshes/Cube14.008
-      - Meshes/Models/ISS.glb/Meshes/Cube15.008
-      - Meshes/Models/ISS.glb/Meshes/Cube16.008
-      - Meshes/Models/ISS.glb/Meshes/Cube17.008
-      - Meshes/Models/ISS.glb/Meshes/Cube18.008
-      - Meshes/Models/ISS.glb/Meshes/Cube19.008
-      - Meshes/Models/ISS.glb/Meshes/Cube2.008
-      - Meshes/Models/ISS.glb/Meshes/Cube20.008
-      - Meshes/Models/ISS.glb/Meshes/Cube21.008
-      - Meshes/Models/ISS.glb/Meshes/Cube22.008
-      - Meshes/Models/ISS.glb/Meshes/Cube23.008
-      - Meshes/Models/ISS.glb/Meshes/Cube24.008
-      - Meshes/Models/ISS.glb/Meshes/Cube25.008
-      - Meshes/Models/ISS.glb/Meshes/Cube26.008
-      - Meshes/Models/ISS.glb/Meshes/Cube27.008
-      - Meshes/Models/ISS.glb/Meshes/Cube28.008
-      - Meshes/Models/ISS.glb/Meshes/Cube29.008
-      - Meshes/Models/ISS.glb/Meshes/Cube3.008
-      - Meshes/Models/ISS.glb/Meshes/Cube30.008
-      - Meshes/Models/ISS.glb/Meshes/Cube31.008
-      - Meshes/Models/ISS.glb/Meshes/Cube32.008
-      - Meshes/Models/ISS.glb/Meshes/Cube33.008
-      - Meshes/Models/ISS.glb/Meshes/Cube34.008
-      - Meshes/Models/ISS.glb/Meshes/Cube35.008
-      - Meshes/Models/ISS.glb/Meshes/Cube36.008
-      - Meshes/Models/ISS.glb/Meshes/Cube37.008
-      - Meshes/Models/ISS.glb/Meshes/Cube38.008
-      - Meshes/Models/ISS.glb/Meshes/Cube39.008
-      - Meshes/Models/ISS.glb/Meshes/Cube4.008
-      - Meshes/Models/ISS.glb/Meshes/Cube40.008
-      - Meshes/Models/ISS.glb/Meshes/Cube41.008
-      - Meshes/Models/ISS.glb/Meshes/Cube42.008
-      - Meshes/Models/ISS.glb/Meshes/Cube43.008
-      - Meshes/Models/ISS.glb/Meshes/Cube44.008
-      - Meshes/Models/ISS.glb/Meshes/Cube45.008
-      - Meshes/Models/ISS.glb/Meshes/Cube46.008
-      - Meshes/Models/ISS.glb/Meshes/Cube47.008
-      - Meshes/Models/ISS.glb/Meshes/Cube48.008
-      - Meshes/Models/ISS.glb/Meshes/Cube49.008
-      - Meshes/Models/ISS.glb/Meshes/Cube5.008
-      - Meshes/Models/ISS.glb/Meshes/Cube50.008
-      - Meshes/Models/ISS.glb/Meshes/Cube51.008
-      - Meshes/Models/ISS.glb/Meshes/Cube52.008
-      - Meshes/Models/ISS.glb/Meshes/Cube53.008
-      - Meshes/Models/ISS.glb/Meshes/Cube54.008
-      - Meshes/Models/ISS.glb/Meshes/Cube55.008
-      - Meshes/Models/ISS.glb/Meshes/Cube56.008
-      - Meshes/Models/ISS.glb/Meshes/Cube6.008
-      - Meshes/Models/ISS.glb/Meshes/Cube7.008
-      - Meshes/Models/ISS.glb/Meshes/Cube8.008
-      - Meshes/Models/ISS.glb/Meshes/Cube9.008
-      - Meshes/Models/ISS.glb/Meshes/Cylinder.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder1.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder10.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder11.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder12.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder13.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder14.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder15.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder16.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder17.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder18.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder19.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder2.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder20.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder21.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder22.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder23.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder24.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder25.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder26.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder27.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder28.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder29.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder3.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder30.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder31.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder32.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder33.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder34.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder35.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder36.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder37.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder38.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder39.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder4.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder40.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder41.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder42.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder43.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder44.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder45.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder46.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder47.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder48.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder49.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder5.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder50.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder51.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder52.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder53.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder54.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder55.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder56.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder57.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder58.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder59.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder6.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder60.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder61.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder62.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder63.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder64.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder65.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder66.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder67.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder68.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder69.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder7.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder70.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder71.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder72.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder73.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder74.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder75.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder76.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder77.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder78.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder79.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder8.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder80.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder81.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder82.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder83.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder84.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder85.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder86.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder87.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder88.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder89.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder9.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder90.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder91.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder92.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder93.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder94.022
-      - Meshes/Models/ISS.glb/Meshes/Cylinder95.022
-      - Meshes/Models/ISS.glb/Meshes/ESP3.000
-      - Meshes/Models/ISS.glb/Meshes/ESP31.000
-      - Meshes/Models/ISS.glb/Meshes/ESP32.000
-      - Meshes/Models/ISS.glb/Meshes/ESP33.000
-      - Meshes/Models/ISS.glb/Meshes/ESP34.000
-      - Meshes/Models/ISS.glb/Meshes/Plane.000
-      - Meshes/Models/ISS.glb/Meshes/Sphere.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere1.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere10.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere11.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere12.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere13.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere14.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere15.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere2.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere3.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere4.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere5.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere6.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere7.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere8.002
-      - Meshes/Models/ISS.glb/Meshes/Sphere9.002
-      - Meshes/Models/ISS.glb/Meshes/armA_SY_joint.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo1.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo10.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo11.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo12.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo13.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo14.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo15.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo16.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo17.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo18.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo2.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo3.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo4.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo5.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo6.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo7.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo8.000
-      - Meshes/Models/ISS.glb/Meshes/esp2_lo9.000
-      - Meshes/Models/ISS.glb/Meshes/jem_layers_jemrms.001
-      - Meshes/Models/ISS.glb/Meshes/mss_mbs.001
-      - Meshes/Models/ISS.glb/Meshes/mss_mbs1.001
-      - Meshes/Models/ISS.glb/Meshes/mss_mbs2.001
-      - Meshes/Models/ISS.glb/Meshes/mss_mbs3.001
-      - Meshes/Models/ISS.glb/Meshes/p6_ani.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani1.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani10.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani11.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani12.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani13.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani14.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani15.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani16.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani17.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani18.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani19.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani2.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani20.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani21.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani22.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani23.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani24.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani25.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani26.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani27.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani28.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani29.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani3.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani30.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani31.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani32.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani33.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani34.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani35.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani36.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani37.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani38.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani39.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani4.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani40.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani41.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani5.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani6.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani7.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani8.000
-      - Meshes/Models/ISS.glb/Meshes/p6_ani9.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani1.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani10.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani11.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani12.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani13.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani14.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani15.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani16.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani17.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani18.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani19.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani2.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani20.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani21.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani22.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani23.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani24.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani25.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani26.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani27.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani28.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani3.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani4.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani5.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani6.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani7.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani8.000
-      - Meshes/Models/ISS.glb/Meshes/s0_ani9.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm1.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm10.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm11.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm12.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm13.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm14.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm15.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm16.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm17.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm18.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm19.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm2.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm20.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm21.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm22.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm23.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm24.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm25.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm26.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm27.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm28.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm29.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm3.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm30.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm31.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm32.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm33.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm34.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm35.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm36.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm37.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm38.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm39.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm4.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm40.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm41.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm42.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm43.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm44.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm45.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm46.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm47.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm48.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm49.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm5.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm50.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm51.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm52.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm53.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm54.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm55.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm56.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm57.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm58.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm59.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm6.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm60.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm7.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm8.000
-      - Meshes/Models/ISS.glb/Meshes/sm_ext_sm9.000
-      - Meshes/Models/ISS.glb/Meshes/z1_ext_01.001
-      - Meshes/Models/ISS.glb/Meshes/z1_ext_011.001
-      - Meshes/Models/ISS.glb/Meshes/z1_ext_012.001
-      - Meshes/Models/ISS.glb/Meshes/z1_ext_013.001
-      - Meshes/Models/ISS.glb/Meshes/z1_ext_014.001
-      - Meshes/Models/ISS.glb/Meshes/z1_ext_015.001
-      - Meshes/Models/ISS.glb/Textures
-      - Meshes/Models/ISS.glb/Textures/ISS_01.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_01.jpg 3
-      - Meshes/Models/ISS.glb/Textures/ISS_01.jpg 5
-      - Meshes/Models/ISS.glb/Textures/ISS_01.jpg 7
-      - Meshes/Models/ISS.glb/Textures/ISS_01_n.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_02.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_02.jpg 3
-      - Meshes/Models/ISS.glb/Textures/ISS_02.jpg 5
-      - Meshes/Models/ISS.glb/Textures/ISS_03.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_03.jpg 3
-      - Meshes/Models/ISS.glb/Textures/ISS_03.jpg.001
-      - Meshes/Models/ISS.glb/Textures/ISS_03.png.002
-      - Meshes/Models/ISS.glb/Textures/ISS_03_n.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_04.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_01.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_02.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_03.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_04.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_05.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_06.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_07.jpg
-      - Meshes/Models/ISS.glb/Textures/ISS_AO_08.jpg
-      - Meshes/Models/ISS.glb/Textures/ecostress.jpg
-      - Meshes/Models/ISS.glb/Textures/ecostress.jpg 3
-      - Meshes/Models/ISS.glb/Textures/foil_n.jpg
-      - Meshes/Models/ISS.glb/Textures/foil_n.png
-      - Meshes/Models/earth(1).glb
-      - Meshes/Models/earth(1).glb/.hidden
-      - Meshes/Models/earth(1).glb/.hidden/Surface.mat
-      - Meshes/Models/earth(1).glb/Materials
-      - Meshes/Models/earth(1).glb/Materials/Surface.mat
-      - Meshes/Models/earth(1).glb/Meshes
-      - Meshes/Models/earth(1).glb/Meshes/Earth_Surface.mat_0
-      - Meshes/Models/earth(1).glb/Textures
-      - Meshes/Models/earth(1).glb/Textures/texture
-      - Meshes/Models/earth(1).glb/Textures/texture 3
-      - Meshes/Models/earth(1).glb/earth(1)
+      - Meshes/Models/earth.glb
+      - Meshes/Models/earth.glb/.hidden
+      - Meshes/Models/earth.glb/.hidden/Surface.mat
+      - Meshes/Models/earth.glb/Materials
+      - Meshes/Models/earth.glb/Materials/Surface.mat
+      - Meshes/Models/earth.glb/Meshes
+      - Meshes/Models/earth.glb/Meshes/Earth_Surface.mat_0
+      - Meshes/Models/earth.glb/Textures
+      - Meshes/Models/earth.glb/Textures/texture
+      - Meshes/Models/earth.glb/Textures/texture 3
+      - Meshes/Models/earth.glb/earth
       - Meshes/Models/moon.glb
       - Meshes/Models/moon.glb/.hidden
       - Meshes/Models/moon.glb/.hidden/Material.002
@@ -519,84 +225,113 @@ CollapsedEntities:
       - Meshes/Models/moon.glb/Textures
       - Meshes/Models/moon.glb/Textures/texture
       - Meshes/Models/moon.glb/moon
+      - Meshes/Models/racecar.glb
+      - Meshes/Models/racecar.glb/.hidden
+      - Meshes/Models/racecar.glb/.hidden/COCKPIT__TGA
+      - Meshes/Models/racecar.glb/Materials
+      - Meshes/Models/racecar.glb/Materials/COCKPIT__TGA
+      - Meshes/Models/racecar.glb/Materials/carb_tga
+      - Meshes/Models/racecar.glb/Materials/cockp1_tga
+      - Meshes/Models/racecar.glb/Materials/cockp1da_tga
+      - Meshes/Models/racecar.glb/Materials/cockpit.002
+      - Meshes/Models/racecar.glb/Materials/glass
+      - Meshes/Models/racecar.glb/Materials/rc13_1_TGA
+      - Meshes/Models/racecar.glb/Materials/rc13_2_TGA
+      - Meshes/Models/racecar.glb/Materials/rc13_3_TGA
+      - Meshes/Models/racecar.glb/Materials/tyre.001
+      - Meshes/Models/racecar.glb/Materials/tyre.002
+      - Meshes/Models/racecar.glb/Materials/tyre_tread.002
+      - Meshes/Models/racecar.glb/Meshes
+      - Meshes/Models/racecar.glb/Meshes/Object_0
+      - Meshes/Models/racecar.glb/Meshes/Object_1
+      - Meshes/Models/racecar.glb/Meshes/Object_10
+      - Meshes/Models/racecar.glb/Meshes/Object_11
+      - Meshes/Models/racecar.glb/Meshes/Object_12
+      - Meshes/Models/racecar.glb/Meshes/Object_13
+      - Meshes/Models/racecar.glb/Meshes/Object_14
+      - Meshes/Models/racecar.glb/Meshes/Object_15
+      - Meshes/Models/racecar.glb/Meshes/Object_16
+      - Meshes/Models/racecar.glb/Meshes/Object_17
+      - Meshes/Models/racecar.glb/Meshes/Object_18
+      - Meshes/Models/racecar.glb/Meshes/Object_19
+      - Meshes/Models/racecar.glb/Meshes/Object_2
+      - Meshes/Models/racecar.glb/Meshes/Object_20
+      - Meshes/Models/racecar.glb/Meshes/Object_3
+      - Meshes/Models/racecar.glb/Meshes/Object_4
+      - Meshes/Models/racecar.glb/Meshes/Object_5
+      - Meshes/Models/racecar.glb/Meshes/Object_6
+      - Meshes/Models/racecar.glb/Meshes/Object_7
+      - Meshes/Models/racecar.glb/Meshes/Object_8
+      - Meshes/Models/racecar.glb/Meshes/Object_9
+      - Meshes/Models/racecar.glb/Textures
+      - Meshes/Models/racecar.glb/Textures/Image_0
+      - Meshes/Models/racecar.glb/Textures/Image_1
+      - Meshes/Models/racecar.glb/Textures/Image_10
+      - Meshes/Models/racecar.glb/Textures/Image_10 3
+      - Meshes/Models/racecar.glb/Textures/Image_2
+      - Meshes/Models/racecar.glb/Textures/Image_3
+      - Meshes/Models/racecar.glb/Textures/Image_4
+      - Meshes/Models/racecar.glb/Textures/Image_5
+      - Meshes/Models/racecar.glb/Textures/Image_6
+      - Meshes/Models/racecar.glb/Textures/Image_7
+      - Meshes/Models/racecar.glb/Textures/Image_8
+      - Meshes/Models/racecar.glb/Textures/Image_9
+      - Meshes/Models/racecar.glb/Textures/Image_9 3
+      - Meshes/Models/racecar.glb/racecar
       - Normal.png
-      - PBR 10.mat
-      - PBR 11.mat
-      - PBR 12.mat
-      - PBR 13.mat
-      - PBR 14.mat
-      - PBR 15.mat
-      - PBR 16.mat
-      - PBR 17.mat
-      - PBR 18.mat
-      - PBR 19.mat
       - PBR 2.mat
-      - PBR 20.mat
-      - PBR 21.mat
-      - PBR 22.mat
-      - PBR 23.mat
-      - PBR 24.mat
-      - PBR 25.mat
-      - PBR 26.mat
-      - PBR 27.mat
-      - PBR 28.mat
-      - PBR 29.mat
       - PBR 3.mat
-      - PBR 30.mat
-      - PBR 31.mat
-      - PBR 32.mat
-      - PBR 33.mat
-      - PBR 34.mat
-      - PBR 35.mat
-      - PBR 36.mat
-      - PBR 37.mat
-      - PBR 38.mat
-      - PBR 39.mat
-      - PBR 4.mat
-      - PBR 40.mat
-      - PBR 41.mat
-      - PBR 42.mat
-      - PBR 43.mat
-      - PBR 44.mat
-      - PBR 45.mat
-      - PBR 46.mat
-      - PBR 47.mat
-      - PBR 48.mat
-      - PBR 49.mat
-      - PBR 5.mat
-      - PBR 50.mat
-      - PBR 6.mat
-      - PBR 7.mat
-      - PBR 8.mat
-      - PBR 9.mat
       - PBR.mat
+      - Plane.mesh
       - Prefabs
       - Prefabs/FieldLines.prefab
+      - Prefabs/Gravity Field Root
+      - Prefabs/Gravity Field Root.prefab
+      - Prefabs/Gravity Field Root/Gravity Field Root.prefab
       - Prefabs/Magnetic Field Root.prefab
+      - Prefabs/Motion Field Root
+      - Prefabs/Motion Field Root/Motion Field Root.prefab
       - Prefabs/Slider Preset.prefab
+      - Prefabs/Story Chapter Guide UI
+      - Prefabs/Story Chapter Guide UI/Story Chapter Guide UI.prefab
+      - Prefabs/Story Step Director
+      - Prefabs/Story Step Director/Story Step Director.prefab
       - Prefabs/Toggle Btn Large 2.prefab
       - Prefabs/Toggle Btn Large.prefab
       - Prefabs/Toggle Btn Small.prefab
       - Prefabs/Vector Field Examples Root.prefab
+      - Prefabs/Wind Globe Root
+      - Prefabs/Wind Globe Root/Globe Calibration.prefab
       - Render Target.renderTarget
       - Scene.scene
+      - Scripts/AnalyticalFieldPatterns.ts
+      - Scripts/ArtemisOrbit.ts
+      - Scripts/ArtemisTrajectory.ts
       - Scripts/CFDPanel.ts
       - Scripts/DynamicSettingsPanel.ts
+      - Scripts/FieldBounds.ts
       - Scripts/FieldController.ts
       - Scripts/FieldLines.ts
+      - Scripts/FlowPaths.ts
+      - Scripts/FlowSliceGizmo.ts
+      - Scripts/FlowSlicePlane.ts
       - Scripts/GfsData.ts
       - Scripts/GlobeSurfaceRotator.ts
+      - Scripts/GravityField.ts
+      - Scripts/GravityFieldPlane.ts
       - Scripts/IridescentMaterial.ts
       - Scripts/MagnetPhysics.ts
       - Scripts/MagneticField.ts
+      - Scripts/MissionInfoPanel.ts
+      - Scripts/MoonEphemeris.ts
       - Scripts/MotionFieldPlane.ts
       - Scripts/SnapToStage.ts
       - Scripts/SpatialFlexLite.ts
       - Scripts/StageCalibration.ts
       - Scripts/StormMarkers.ts
       - Scripts/StormsData.ts
-      - Scripts/StoryGuideLayout.generated.ts
       - Scripts/StoryGuideLayoutGenerated.ts
+      - Scripts/StoryStepDirector.ts
       - Scripts/TexturedButton.ts
       - Scripts/TubeTest.ts
       - Scripts/Utils
@@ -618,22 +353,27 @@ CollapsedEntities:
       - Scripts/VectorFieldUIStyle.ts
       - Scripts/VectorFieldsChapterGuide.ts
       - Scripts/VectorFieldsScaffoldLabels.ts
+      - Scripts/VectorFieldsStageLayout.ts
       - Scripts/VectorFieldsStoryScaffold.ts
       - Scripts/WindGlobeCalibration.ts
       - Scripts/WindStreamlines.ts
+      - Shaders
       - Shaders/AnimatedSpriteSheet.js
+      - Shaders/CarFlowStream.js
       - Shaders/FieldLines.js
       - Shaders/FlatMaterial.js
+      - Shaders/GravityFieldPlane.js
+      - Shaders/GuidePanelHover.js
       - Shaders/IridescentShader.js
       - Shaders/IridescentSimple.js
       - Shaders/MagnetPole.js
       - Shaders/MagneticField.js
       - Shaders/MotionFieldDetail.js
+      - Shaders/MotionFieldLine.js
       - Shaders/TubeTest.js
       - Shaders/VectorField.js
       - Shaders/VectorFieldTransform.js
       - Shaders/WindStreamFlow.js
-      - Slides
       - SnapDecorators.lspkg
       - SnapDecorators.lspkg/Examples.ts
       - SnapDecorators.lspkg/Examples__PLACE_IN_SCENE.prefab
@@ -1065,193 +805,6 @@ CollapsedEntities:
       - SpectaclesInteractionKit.lspkg/VersionNumber.ts
       - SpectaclesInteractionKit.lspkg/package.native
       - SpectaclesInteractionKit.lspkg/tsconfig.json
-      - SpectaclesInteractionKitExamples.lspkg
-      - SpectaclesInteractionKitExamples.lspkg/README.md
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/ModernBodyTube_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/ModernFins_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/ModernNoseCone_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/SleekBodyTube_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/SleekFins_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/SleekNoseCone_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/SpaceAgeBodyTube_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/SpaceAgeFins_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Icons/SpaceAgeNoseCone_icon.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Meteor.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Planet.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Planet_rings.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Platform.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_fire.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_glass.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_glass_satellite.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_grey.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_metal.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_metal_red.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_plastic_01.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_plastic_02.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_plastic_03.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_plastic_03_logo.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_white.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Rocket_white_logo.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Materials/Objects/SIK_Satellite_blue.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/.hidden
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/.hidden/Lightbake.001
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/.hidden/white
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/Bases
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/Materials
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/Materials/Lightbake.001
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/Meshes
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/Meshes/Circular
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/Meshes/Cubic_01
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/Bases.fbx/Meshes/Hexagon_01
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Meteor
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Planet
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Planet1
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_bottom
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_bottom1
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_bottom2
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_bottom3
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_middle
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_middle1
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_middle2
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_top
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_01_top1
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_02_bottom
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_02_middle
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_02_top
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_bottom
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_bottom1
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_bottom2
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_bottom3
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_bottom4
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_middle
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_top
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_top1
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Rocket_03_top2
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Satellite
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Satellite1
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Satellite2
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/Meshes/Satellite3
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Meshes/SIK_Rockets.fbx/SIK_Rockets
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Modern Body Tube.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Modern Fins.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Modern Nose Cone.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Sleek Body Tube.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Sleek Fins.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Sleek Nose Cone.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Space Age Body Tube.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Space Age Fins.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/Parts/Space Age Nose Cone.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Body Tube Category.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Fins Category.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Modern Body Tube.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Modern Fins.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Modern Nose Cone.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Nose Cone Category.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Sleek Body Tube.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Sleek Fins.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Sleek Nose Cone.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Space Age Body Tube.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Space Age Fins.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Prefabs/ScrollViewListItems/Space Age Nose Cone.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/SFX
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/SFX/ui-rocket-ignition_c-1db_stereo4824.wav
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/SFX/ui-rocket-land-cutoff-c_-1dB_stereo4824.wav
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Scripts
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Scripts/ExhaustControls.ts
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Scripts/RocketConfigurator.ts
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Scripts/RocketGridContentCreator.ts
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Scripts/RocketLaunchControl.ts
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Scripts/RocketScrollViewItem.ts
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Shaders
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Shaders/Glass.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Shaders/Meteor.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Shaders/Planet.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Shaders/Planet_rings.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Shaders/Platform.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Shaders/Rocket.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/A-icon.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/B-icon.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/C-icon.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/SIK_Meteor_bc.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/SIK_Platforms_AO.jpg
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/SIK_Rockets_AO.jpg
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/SIK_Snap_logo.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/SIK_Space_logo_TEMP.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/body-tube_rocket-A.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/body-tube_rocket-B.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/body-tube_rocket-C.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/fins_rocket-A.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/fins_rocket-B.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/fins_rocket-C.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/nose-cone_rocket-A.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/nose-cone_rocket-B.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/Textures/ScrollViewThumbnails/nose-cone_rocket-C.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Landing
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Landing/Bones_clouds_ANIM_mat_landing.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Landing/Bones_clouds_material_landing_.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Landing/CloudsLanding.animationAsset
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Landing/line1.mesh
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Start
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Start/Bones_clouds_ANIM_mat_takeoff.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Start/Bones_clouds_material_start_.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Start/CloudsStart.animationAsset
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Clouds Start/line1.mesh
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Custom Mesh Emitter
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Custom Mesh Emitter/Custom Mesh Emitter.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Custom Mesh Emitter/Rocket_clouds_emit.vfxgraph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Custom Mesh Emitter/cl_goup.mesh
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/Fire.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/Fire_ANIM_mat.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/Glow_ANIM_mat.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/Glow_MAt.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/blendshapes1.mesh
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/dots.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/engine_exhaust.prefab
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Exhaust/glow_plane.mesh
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Radial Heat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Radial Heat/Noise00.png
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Radial Heat/Plane.mesh
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Radial Heat/RadialHeat_ANIM_mat.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Radial Heat/Radial_heat.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Animations
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Animations/Base Layer Rocket 1.animationAsset
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Animations/Base Layer Rocket 2.animationAsset
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Animations/Base Layer Rocket 3.animationAsset
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Sparks
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Sparks/Rocket_sparks.mesh
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Sparks/Top_Rocket_Trail.mat
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Sparks/Top_Rocket_Trail.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/RocketWorkshop/VFX/Rocket Sparks/stripe_noise 2.png
-      - SpectaclesInteractionKitExamples.lspkg/SIK Examples__PLACE_IN_SCENE.prefab
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Materials
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Materials/ImageMaterial 2.mat
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Materials/ImageMaterial 3.mat
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Materials/ImageMaterial.mat
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Scripts
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Scripts/UIController.ts
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Scripts/UIManager.ts
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Textures
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Textures/ImageMaterial.mat
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Textures/Polygon 2.png
-      - SpectaclesInteractionKitExamples.lspkg/UIStarter/Textures/image_unlit.ss_graph
-      - SpectaclesInteractionKitExamples.lspkg/package.native
-      - SpectaclesInteractionKitExamples.lspkg/package_dependencies.json
       - SpectaclesUIKit.lspkg
       - SpectaclesUIKit.lspkg/Audio
       - SpectaclesUIKit.lspkg/Audio/HoverAudioTrack.wav

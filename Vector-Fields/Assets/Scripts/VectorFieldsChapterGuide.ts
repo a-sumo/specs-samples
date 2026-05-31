@@ -125,6 +125,7 @@ const GUIDE_FONT = requireAsset("../Fonts/Nunito_Sans/NunitoSans.ttf") as Font;
 const TEX_PANEL_MAIN = requireAsset("../Images/StoryUI/chapter_panel.png") as Texture;
 const TEX_PANEL_EXAMPLES = requireAsset("../Images/StoryUI/examples_panel.png") as Texture;
 const TEX_PANEL_THEORY = requireAsset("../Images/StoryUI/theory_panel.png") as Texture;
+const TEX_PANEL_THEORY_MOTION = requireAsset("../Images/StoryUI/theory_panel_motion.png") as Texture;
 const EXAMPLE_DETAIL_PANEL_TEXTURES: { [key: string]: Texture } = {
     gravity: requireAsset("../Images/StoryUI/example_detail_gravity_panel.png") as Texture,
     magnetism: requireAsset("../Images/StoryUI/example_detail_magnetism_panel.png") as Texture,
@@ -180,9 +181,8 @@ const TEX_UTILITY_FOLLOW_PRESSED = requireAsset("../Images/StoryUI/utility_follo
 const TEX_UTILITY_FOLD_OPEN = requireAsset("../Images/StoryUI/utility_fold_open.png") as Texture;
 const TEX_UTILITY_FOLD_CLOSED = requireAsset("../Images/StoryUI/utility_fold_closed.png") as Texture;
 const TEX_UTILITY_FOLD_PRESSED = requireAsset("../Images/StoryUI/utility_fold_pressed.png") as Texture;
-const TEX_UTILITY_PLANE_FLOOR_ON = requireAsset("../Images/StoryUI/utility_plane_floor_on.png") as Texture;
-const TEX_UTILITY_PLANE_FLOOR_OFF = requireAsset("../Images/StoryUI/utility_plane_floor_off.png") as Texture;
-const TEX_UTILITY_PLANE_FLOOR_PRESSED = requireAsset("../Images/StoryUI/utility_plane_floor_pressed.png") as Texture;
+const TEX_UTILITY_RESET_NORMAL = requireAsset("../Images/StoryUI/utility_plane_floor_on.png") as Texture;
+const TEX_UTILITY_RESET_PRESSED = requireAsset("../Images/StoryUI/utility_plane_floor_pressed.png") as Texture;
 const TEX_UTILITY_PLANE_FRONT_ON = requireAsset("../Images/StoryUI/utility_plane_front_on.png") as Texture;
 const TEX_UTILITY_PLANE_FRONT_OFF = requireAsset("../Images/StoryUI/utility_plane_front_off.png") as Texture;
 const TEX_UTILITY_PLANE_FRONT_PRESSED = requireAsset("../Images/StoryUI/utility_plane_front_pressed.png") as Texture;
@@ -335,7 +335,7 @@ const GRADIENT_SLIDER_BACKPLATE_Z = 0.12;
 const GRADIENT_SLIDER_TRACK_Z = 0.24;
 const GRADIENT_SLIDER_FILL_Z = 0.34;
 const GRADIENT_SLIDER_KNOB_Z = 0.54;
-const GRADIENT_SLIDER_KNOB_HOVER_Z = 0.04;
+const GRADIENT_SLIDER_KNOB_HOVER_Z = 0.0;
 
 @component
 export class VectorFieldsChapterGuide extends BaseScriptComponent {
@@ -414,9 +414,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     private viewPlaneButtons: ButtonBinding[] = [];
     private followButton: ButtonBinding | null = null;
     private foldButton: ButtonBinding | null = null;
-    private planeFloorButton: ButtonBinding | null = null;
-    private planeFrontButton: ButtonBinding | null = null;
-    private manipButton: ButtonBinding | null = null;
+    private resetButton: ButtonBinding | null = null;
     private examplesBackButton: ButtonBinding | null = null;
     private theoryInfoImage: ImageBinding | null = null;
     private panelCursorImage: ImageBinding | null = null;
@@ -646,28 +644,24 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.foldButton = foldButton;
         this.utilityButtons.push(foldButton);
 
-        // Root-move toggle. OFF keeps child interactions primary.
-        const manipButton = this.createTextureButton(
-            "__GuideManipToggle",
-            "manip",
+        const resetButton = this.createTextureButton(
+            "__GuideResetActive",
+            "reset",
             this.offsetSlot(STORY_GUIDE_UTILITY.planeFloor),
-            TEX_UTILITY_PLANE_FLOOR_ON,
-            TEX_UTILITY_PLANE_FLOOR_ON,
-            TEX_UTILITY_PLANE_FLOOR_PRESSED,
+            TEX_UTILITY_RESET_NORMAL,
+            TEX_UTILITY_RESET_NORMAL,
+            TEX_UTILITY_RESET_PRESSED,
             248,
             () => {
-                if (this.directorApi && typeof this.directorApi.toggleExampleManipulation === "function") {
-                    this.directorApi.toggleExampleManipulation();
-                }
-                this.syncVisualState();
+                this.resetActiveVisual();
             },
             false,
             TEX_UTILITY_OVERLAY_HOVER,
             null,
             TEX_UTILITY_OVERLAY_PRESSED
         );
-        this.manipButton = manipButton;
-        this.utilityButtons.push(manipButton);
+        this.resetButton = resetButton;
+        this.utilityButtons.push(resetButton);
     }
 
     private createTextureButton(
@@ -695,9 +689,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             button = buttonObject.createComponent(RectangleButton.getTypeName()) as RectangleButton;
         }
         (button as any)._style = "Ghost";
-        button.size = new vec3(slot.width, slot.height, BUTTON_HIT_DEPTH_CM);
-        button.renderOrder = renderOrder - 2;
-        button.initialize();
+        this.configureUIKitButton(button, slot.width, slot.height, BUTTON_HIT_DEPTH_CM, renderOrder - 2);
         this.registerHiddenUIKitButton(button);
 
         const image = this.createImage(buttonObject, "__Image", {
@@ -973,9 +965,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             button = object.createComponent(RectangleButton.getTypeName()) as RectangleButton;
         }
         (button as any)._style = "Ghost";
-        button.size = new vec3(slot.width, slot.height, BUTTON_HIT_DEPTH_CM);
-        button.renderOrder = 248;
-        button.initialize();
+        this.configureUIKitButton(button, slot.width, slot.height, BUTTON_HIT_DEPTH_CM, 248);
         this.registerHiddenUIKitButton(button);
 
         const trackCenterX = this.gradientSliderTrackCenterX(slot);
@@ -1204,9 +1194,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             button = object.createComponent(RectangleButton.getTypeName()) as RectangleButton;
         }
         (button as any)._style = "Ghost";
-        button.size = new vec3(STORY_GUIDE_PANEL.width, STORY_GUIDE_PANEL.height, PANEL_HIT_DEPTH_CM);
-        button.renderOrder = 218;
-        button.initialize();
+        this.configureUIKitButton(button, STORY_GUIDE_PANEL.width, STORY_GUIDE_PANEL.height, PANEL_HIT_DEPTH_CM, 218);
         this.registerHiddenUIKitButton(button);
 
         const interactable = (button as any).interactable;
@@ -1221,7 +1209,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
 
     private currentPanelTexture(): Texture {
         if (this.theoryMenuOpen) {
-            return TEX_PANEL_THEORY;
+            return this.selectedTheoryMode === "motion" ? TEX_PANEL_THEORY_MOTION : TEX_PANEL_THEORY;
         }
         if (this.examplesMenuOpen) {
             if (this.examplesDetailOpen && this.selectedExampleField === "gravity" && this.selectedGravityVariant === "artemis") {
@@ -1268,15 +1256,11 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             this.foldButton.selected = false;
             this.updateBindingVisual(this.foldButton);
         }
-        if (this.manipButton) {
-            const manipOn = this.directorApi && typeof this.directorApi.getExampleManipulationEnabled === "function"
-                ? this.directorApi.getExampleManipulationEnabled()
-                : false;
-            const texture = manipOn ? TEX_UTILITY_PLANE_FLOOR_ON : TEX_UTILITY_PLANE_FLOOR_OFF;
-            this.manipButton.normal = texture;
-            this.manipButton.active = texture;
-            this.manipButton.selected = manipOn;
-            this.updateBindingVisual(this.manipButton);
+        if (this.resetButton) {
+            this.resetButton.normal = TEX_UTILITY_RESET_NORMAL;
+            this.resetButton.active = TEX_UTILITY_RESET_NORMAL;
+            this.resetButton.selected = false;
+            this.updateBindingVisual(this.resetButton);
         }
         this.updateBindings(this.navButtons);
         this.updateBindings(this.utilityButtons);
@@ -1560,6 +1544,21 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.syncVisualState();
     }
 
+    private resetActiveVisual(): void {
+        const director = this.directorApi as any;
+        if (director) {
+            if (typeof director.resetActiveVisual === "function") {
+                director.resetActiveVisual();
+            } else if (typeof director.resetToDefaultStance === "function") {
+                director.resetToDefaultStance();
+            } else if (typeof director.resetDefaultStance === "function") {
+                director.resetDefaultStance();
+            }
+        }
+        this.keepPlaneControlsWhileFolded = false;
+        this.syncVisualState();
+    }
+
     private syncViewPlaneModeFromDirector(): void {
         if (this.directorApi && typeof this.directorApi.getViewPlaneMode === "function") {
             this.viewPlaneMode = this.normalizeViewPlaneMode(this.directorApi.getViewPlaneMode());
@@ -1579,13 +1578,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
     }
 
     private currentStateCanCalibrate(): boolean {
-        const step = STORY_GUIDE_STEPS[this.currentIndex] as any;
-        if (!step) return false;
-        if (this.examplesMenuOpen) {
-            const example = this.currentExampleConfig();
-            return !!example && example.canCalibrate === true;
-        }
-        return step.canCalibrate === true;
+        return false;
     }
 
     private currentExampleConfig(): any {
@@ -1752,15 +1745,15 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         if (binding.pressedState) {
             overlayTexture = binding.pressedOverlay;
             binding.targetScale = 0.985;
-            binding.targetLift = 0.035;
+            binding.targetLift = 0.0;
         } else if (binding.hovered) {
             overlayTexture = binding.hoverOverlay;
             binding.targetScale = 1.025;
-            binding.targetLift = 0.105;
+            binding.targetLift = 0.0;
         } else if (binding.selected) {
             overlayTexture = binding.selectedOverlay;
             binding.targetScale = 1.015;
-            binding.targetLift = 0.07;
+            binding.targetLift = 0.0;
         } else {
             binding.targetScale = 1.0;
             binding.targetLift = 0.0;
@@ -1876,6 +1869,27 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         }
         this.hiddenUIKitButtons.push(button);
         this.hideUIKitVisual(button);
+    }
+
+    private configureUIKitButton(button: RectangleButton, width: number, height: number, depth: number, renderOrder: number): void {
+        try { button.size = new vec3(width, height, depth); } catch (e) {}
+        try { button.renderOrder = renderOrder; } catch (e) {}
+        this.initializeUIKitButton(button);
+    }
+
+    private initializeUIKitButton(button: RectangleButton): void {
+        try {
+            button.initialize();
+        } catch (e) {
+            try {
+                const delayed = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent;
+                delayed.bind(() => {
+                    try { button.initialize(); } catch (inner) {}
+                    this.hideUIKitVisual(button);
+                });
+                delayed.reset(0.0);
+            } catch (inner) {}
+        }
     }
 
     private hideRegisteredUIKitVisuals(): void {
@@ -2045,9 +2059,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
                 this.offsetSlot(STORY_GUIDE_UTILITY.fold)
             );
         }
-        if (this.manipButton) {
+        if (this.resetButton) {
             this.setButtonTargetSlot(
-                this.manipButton,
+                this.resetButton,
                 this.offsetSlot(STORY_GUIDE_UTILITY.planeFloor)
             );
         }
@@ -2311,9 +2325,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
             const binding = bindings[i];
             this.updateBindingPosition(binding, positionAlpha);
             binding.visualScale += (binding.targetScale - binding.visualScale) * alpha;
-            binding.visualLift += (binding.targetLift - binding.visualLift) * alpha;
-            this.placeImageVisual(binding.image, binding.visualScale, binding.visualLift);
-            this.placeImageVisual(binding.overlay, binding.visualScale, binding.visualLift + 0.02);
+            binding.visualLift = 0.0;
+            this.placeImageVisual(binding.image, binding.visualScale, 0.0);
+            this.placeImageVisual(binding.overlay, binding.visualScale, 0.02);
         }
     }
 
@@ -2349,7 +2363,7 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         binding.hitWidth = hitWidth;
         binding.hitHeight = hitHeight;
         binding.hitDepth = hitDepth;
-        binding.button.size = new vec3(hitWidth, hitHeight, hitDepth);
+        try { binding.button.size = new vec3(hitWidth, hitHeight, hitDepth); } catch (e) {}
     }
 
     private placeImageVisual(binding: ImageBinding, scale: number, lift: number): void {
@@ -2701,6 +2715,9 @@ export class VectorFieldsChapterGuide extends BaseScriptComponent {
         this.examplesDetailOpen = true;
         this.theoryMenuOpen = false;
         this.stageCurrentRoot();
+        // Menu and field both sit at arm level, so collapse the panel out of the
+        // way when a field opens; the user can unfold to reach the controls.
+        this.setFolded(true);
         this.syncVisualState();
     }
 

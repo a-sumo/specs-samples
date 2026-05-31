@@ -55,6 +55,15 @@ export class WindGlobeCalibration extends BaseScriptComponent {
   @hint("If > 0, rescale the Earth so its bbox radius matches this (cm). Otherwise leave natural size.")
   desiredRadiusWorld: number = 12;
 
+  @input
+  @allowUndefined
+  @hint("Wind-speed widget. Pinned directly below the globe AABB so it keeps the same relative position and never orbits when the globe spins.")
+  legend: SceneObject = null as any;
+
+  @input
+  @hint("Gap (cm) between the bottom of the globe's AABB and the wind-speed widget.")
+  legendGapCm: number = 8;
+
   // Filled by the bbox measurement + anchor calibration. Streamline component
   // reads these directly.
   public radiusWorld: number = 1;
@@ -66,6 +75,10 @@ export class WindGlobeCalibration extends BaseScriptComponent {
   onAwake() {
     this.createEvent("OnStartEvent").bind(() => this.initOnce());
     this.createEvent("UpdateEvent").bind(() => this.tick());
+    // LateUpdate runs after GlobeSurfaceRotator has spun the globe root this
+    // frame, so re-pinning the widget's world position here cancels the orbit
+    // before the frame renders.
+    this.createEvent("LateUpdateEvent").bind(() => this.pinLegend());
   }
 
   private initOnce() {
@@ -84,11 +97,22 @@ export class WindGlobeCalibration extends BaseScriptComponent {
       this.measureRadius();
     }
     this.snapMarkersToSurface();
+    this.pinLegend();
     print(
       "[WindGlobeCalibration] radiusWorld=" +
         this.radiusWorld.toFixed(3) +
         " cm. Drag Anchor onto a landmark to calibrate yaw."
     );
+  }
+
+  // Keep the wind-speed widget directly under the globe's AABB, in world space,
+  // so it holds the same relative position and does not rotate around the globe
+  // when the surface is spun. Billboard handles facing; this only fixes position.
+  private pinLegend() {
+    if (!this.legend || !this.earthSphere) return;
+    const center = this.earthSphere.getTransform().getWorldPosition();
+    const drop = this.radiusWorld + Math.max(0, this.legendGapCm);
+    this.legend.getTransform().setWorldPosition(new vec3(center.x, center.y - drop, center.z));
   }
 
   // Public: lat/lon (degrees) → world point on the calibrated sphere.
@@ -163,6 +187,7 @@ export class WindGlobeCalibration extends BaseScriptComponent {
   }
 
   private tick() {
+    this.pinLegend();
     if (!this.earthSphere || !this.anchor) return;
     const earthT = this.earthSphere.getTransform();
     const center = earthT.getWorldPosition();

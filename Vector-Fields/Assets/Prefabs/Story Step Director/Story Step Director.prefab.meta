@@ -41,31 +41,72 @@
   Enabled: true
   ScriptAsset: !<reference> d80f0a0d-1625-4d52-887a-307078659a91
   ScriptInputsDefault:
-    applyOnStart: true
-    initialStep: true
+    theoryFieldMenuRoot: true
+    storyWidgetsRoot: true
+    legacyGuideRoot: true
+    legacySlideStageRoot: true
     showScaffold: true
     controlContentRoots: true
     hideLegacySystems: true
     settleSeconds: true
+    viewPlaneMode: true
+    useReferenceCalibrationForExamples: true
+    useFrontPlacementForAllVisuals: true
+    resetDefaultStanceNow: true
+    initialExampleField: true
+    initialTheoryFieldMode: true
+    vectorColorMapScale: true
+    vectorColorMapOffset: true
+    theoryMenuScale: true
+    gravityReferenceOffset: true
+    magneticReferenceOffset: true
+    windReferenceOffset: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       scaffoldRoot: !<reference.SceneObject> a198c9da-c135-470d-beea-4a0f196a20e0
       motionFieldRoot: !<reference.SceneObject> 99b17862-d9e9-410a-8319-599c8e6ed774
+      analyticalPatternsRoot: !<reference.SceneObject> a532a6e8-44a7-4ea3-838a-3b33398a3beb
       vectorFieldRoot: !<reference.SceneObject> e6bf6a72-c2f8-4cef-a39e-d48693bb2ccb
+      theoryFieldMenuRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       magneticFieldRoot: !<reference.SceneObject> 9e72f614-329f-4e4a-b149-7fe960315346
       gravityFieldRoot: !<reference.SceneObject> a0d85fd6-b271-46c7-b4cd-229a9b924811
       windGlobeRoot: !<reference.SceneObject> 33f7d2ff-6a63-4beb-b027-12bbe1f65b9d
-      storyWidgetsRoot: !<reference.SceneObject> 28ac247e-927a-4de4-84f2-d3f89f3b9bf4
-      legacyGuideRoot: !<reference.SceneObject> a1197dda-ad88-4710-8bf0-0d3185bf5c08
-      legacySlideStageRoot: !<reference.SceneObject> c1c00500-0000-4000-a000-000000000000
-      applyOnStart: true
-      initialStep: !<float> 0.000000
+      storyWidgetsRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      legacyGuideRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      legacySlideStageRoot: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      applyOnStart: false
+      initialStep: !<float> 1.000000
+      cameraRoot: !<reference.SceneObject> 00000000-0000-0065-0000-000000000064
       showScaffold: true
       controlContentRoots: true
       hideLegacySystems: true
+      mainExperienceRenderOrder: !<float> 520.000000
       settleSeconds: 1.250000
+      viewPlaneMode: !<float> 0.000000
+      calibrateReferenceOnStart: false
+      useReferenceCalibrationForExamples: false
+      useExampleProxySlots: false
+      useFrontPlacementForAllVisuals: true
+      resetDefaultStanceNow: false
+      initialExampleField: !<float> 0.000000
+      initialTheoryFieldMode: !<float> 0.000000
+      initialVectorColorMap: !<float> 17.000000
+      vectorColorMapScale: !<float> 1.000000
+      vectorColorMapOffset: !<float> 0.000000
+      motionFrontOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: -120.000000}
+      analyticalFrontOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: -78.000000}
+      theoryVectorFrontOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: -50.000000}
+      theoryMenuFrontOffset: !<Vec3> {x: 16.000000, y: -12.000000, z: -78.000000}
+      theoryVectorScale: 0.850000
+      theoryMenuScale: !<float> 1.000000
+      gravityFrontOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: -82.000000}
+      magneticFrontOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: -78.000000}
+      windFrontOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: -78.000000}
+      gravityReferenceOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
+      magneticReferenceOffset: !<Vec3> {x: 0.000000, y: 7.000000, z: 0.000000}
+      windReferenceOffset: !<Vec3> {x: 0.000000, y: 24.000000, z: 0.000000}
   ScriptTypes:
     "":
       {}

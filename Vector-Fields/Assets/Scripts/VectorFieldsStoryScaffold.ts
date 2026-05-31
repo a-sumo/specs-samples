@@ -17,6 +17,10 @@ export class VectorFieldsStoryScaffold extends BaseScriptComponent {
     activeRootName: string = "";
 
     @input
+    @hint("Optional library root to show alongside the active chapter, e.g. Library_Analytical_Field_Patterns.")
+    activeLibraryRootName: string = "";
+
+    @input
     @hint("Center the active chapter root around its proxy or slot content when a step is staged.")
     centerStagedContent: boolean = true;
 
@@ -41,6 +45,7 @@ export class VectorFieldsStoryScaffold extends BaseScriptComponent {
     public showEverything(): void {
         this.showAll = true;
         this.activeRootName = "";
+        this.activeLibraryRootName = "";
         this.appliedKey = "";
         this.applyVisibility();
     }
@@ -48,6 +53,15 @@ export class VectorFieldsStoryScaffold extends BaseScriptComponent {
     public showRoot(rootName: string): void {
         this.showAll = false;
         this.activeRootName = rootName || "";
+        this.activeLibraryRootName = "";
+        this.appliedKey = "";
+        this.applyVisibility();
+    }
+
+    public showRootWithLibrary(rootName: string, libraryRootName: string): void {
+        this.showAll = false;
+        this.activeRootName = rootName || "";
+        this.activeLibraryRootName = libraryRootName || "";
         this.appliedKey = "";
         this.applyVisibility();
     }
@@ -56,14 +70,15 @@ export class VectorFieldsStoryScaffold extends BaseScriptComponent {
         const chapter = Math.max(0, Math.floor(this.activeChapter));
         const requestedRootName = this.activeRootName || "";
         const rootName = requestedRootName.length > 0 ? this.resolveRootName(requestedRootName) : "";
-        const key = (this.showAll ? "all" : (rootName.length > 0 ? "root:" + rootName : "one:" + chapter));
+        const libraryRootName = this.activeLibraryRootName || "";
+        const key = (this.showAll ? "all" : (rootName.length > 0 ? "root:" + rootName : "one:" + chapter)) + ":lib:" + libraryRootName;
         if (key === this.appliedKey) return;
         this.appliedKey = key;
 
         for (let i = 0; i < this.sceneObject.getChildrenCount(); i++) {
             const child = this.sceneObject.getChild(i);
             if (this.isLibraryRoot(child.name)) {
-                child.enabled = this.showAll;
+                child.enabled = this.showAll || child.name === libraryRootName;
                 continue;
             }
             if (!this.isChapterRoot(child.name)) continue;

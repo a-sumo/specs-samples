@@ -69,6 +69,12 @@ vec3 getMagneticField(vec3 p) {
     return totalB;
 }
 
+vec3 safeNormalize(vec3 v, vec3 fallback) {
+    float len = length(v);
+    if (len < 0.0001) return fallback;
+    return v / len;
+}
+
 // ========================================
 // COLOR BASED ON FIELD DIRECTION
 // ========================================
@@ -127,6 +133,7 @@ void main() {
     float radius = TubeRadius;
 
     bool isTrailCap = (geoType < 0.5);
+    bool isParticle = (geoType > 2.5 && geoType < 3.5);
     bool isArrow = (geoType > 3.5 && geoType < 4.5);
     bool isArrowCone = (geoType > 4.5 && geoType < 5.5);
     bool isArrowCap = (geoType > 5.5);
@@ -182,6 +189,38 @@ void main() {
             color = mix(color, vec3(1.0), 0.2);
         }
         alpha = 1.0;
+
+    } else if (isParticle) {
+        float maxPreSteps = 36.0;
+        float tubePhase = fract(sin(dot(startPos, vec3(12.9898, 78.233, 45.164))) * 43758.5453) * maxPreSteps;
+        float flowOffset = mod(Time * FlowSpeed + tubePhase, maxPreSteps);
+        int preSteps = int(flowOffset);
+        float fractional = fract(flowOffset);
+
+        for (int i = 0; i < 36; i++) {
+            if (i >= preSteps) break;
+            pos += getMagneticField(pos) * StepSize;
+        }
+        pos += getMagneticField(pos) * StepSize * fractional;
+
+        vec3 vel = getMagneticField(pos);
+        vec3 viewDir = safeNormalize(system.getCameraPosition() - pos, vec3(0.0, 0.0, 1.0));
+        vec3 right = cross(vec3(0.0, 1.0, 0.0), viewDir);
+        if (length(right) < 0.001) right = cross(vec3(1.0, 0.0, 0.0), viewDir);
+        right = safeNormalize(right, vec3(1.0, 0.0, 0.0));
+        vec3 billboardUp = safeNormalize(cross(viewDir, right), vec3(0.0, 1.0, 0.0));
+
+        vec2 fanUV = vec2(localX, localY);
+        float disc = length(fanUV);
+        float discRadius = TubeRadius * 3.2;
+        finalPos = pos + (right * fanUV.x + billboardUp * fanUV.y) * discRadius;
+
+        float birthFade = smoothstep(0.0, 5.0, flowOffset);
+        float deathFade = smoothstep(0.0, 5.0, maxPreSteps - flowOffset);
+        float edgeFade = 1.0 - smoothstep(0.74, 1.0, disc);
+        float sphereShade = 0.72 + 0.28 * sqrt(max(0.0, 1.0 - disc * disc));
+        color = getColor(vel, 0.5) * sphereShade;
+        alpha = edgeFade * birthFade * deathFade;
 
     } else {
         float maxPreSteps = 32.0;

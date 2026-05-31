@@ -16,6 +16,10 @@ export class FlowSlicePlane extends BaseScriptComponent {
   @input('int') @widget(new ComboBoxWidget([new ComboBoxItem('X', 0), new ComboBoxItem('Y', 1), new ComboBoxItem('Z', 2)])) axis: number = 2;
   @input('float') travel: number = 8.6;      // car length in LS units (from bake: CARL)
 
+  // demo: ping-pong the plane along the slide axis to mock the collider sliding
+  @input('bool') autoScroll: boolean = false;
+  @input('float') autoScrollSpeed: number = 0.12;
+
   private pass: any;
 
   onAwake(): void {
@@ -30,12 +34,32 @@ export class FlowSlicePlane extends BaseScriptComponent {
 
   private onUpdate(): void {
     let s = this.slice;
-    if (this.driveFromPosition) {
+    const half = this.travel * 0.5;
+
+    if (this.autoScroll) {
+      // ping-pong the plane position along the slide axis, slice follows
+      const ph = getTime() * this.autoScrollSpeed;
+      const tri = Math.abs((ph % 2.0) - 1.0);        // 0 -> 1 -> 0
+      const c = (tri * 2.0 - 1.0) * half;            // -half .. +half
+      this.setSlidePos(c);
+      s = c / this.travel + 0.5;
+    } else if (this.driveFromPosition) {
+      // lock to a single slide axis, clamp within bounds so it can only slide
       const p = this.getTransform().getLocalPosition();
-      const c = this.axis === 0 ? p.x : this.axis === 1 ? p.y : p.z;
-      s = Math.max(0, Math.min(1, c / this.travel + 0.5));
+      let c = this.axis === 0 ? p.x : this.axis === 1 ? p.y : p.z;
+      c = Math.max(-half, Math.min(half, c));
+      this.setSlidePos(c);
+      s = c / this.travel + 0.5;
     }
+
     this.pass.Time = getTime();
     this.pass.SliceT = s;
+  }
+
+  private setSlidePos(c: number): void {
+    this.getTransform().setLocalPosition(new vec3(
+      this.axis === 0 ? c : 0,
+      this.axis === 1 ? c : 0,
+      this.axis === 2 ? c : 0));
   }
 }
