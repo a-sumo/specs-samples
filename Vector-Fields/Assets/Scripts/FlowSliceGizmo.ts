@@ -1,6 +1,11 @@
 // FlowSliceGizmo — procedural 3D guidance geometry for the flow slice plane.
 // The frame uses actual tube/cone geometry instead of flat quads, so it keeps
 // its shape when the object is scaled and reads as a physical slice control.
+//
+// Two parts, two materials so they can read as distinct colors:
+//   - a thin blue outline (in theme) tracing the slice, plus the one-way wind cue
+//   - bold accent-colored grab handles on the left and right edges, each with a
+//     depth double-arrow showing the slice slides toward/away from you
 @component
 export class FlowSliceGizmo extends BaseScriptComponent {
   @input material: Material;
@@ -11,50 +16,95 @@ export class FlowSliceGizmo extends BaseScriptComponent {
   @input('float') flowDirection: number = -1;
   @input('int') radialSegments: number = 10;
 
+  // In-theme blue for the slice outline + wind cue.
+  private static OUTLINE_COLOR = new vec4(0.094, 0.471, 0.878, 1.0);
+  // Vivid amber for the grab handles so they clearly stand apart from the outline.
+  private static HANDLE_COLOR = new vec4(0.878, 0.533, 0.094, 1.0);
+
+  private handleObject!: SceneObject;
+
   onAwake(): void {
-    this.tintMaterial();
     this.build();
   }
 
   private build(): void {
-    const mb = this.makeBuilder();
     const hw = this.planeWidth * 0.5;
     const hh = this.planeHeight * 0.5;
     const segs = Math.max(6, Math.min(18, Math.floor(this.radialSegments)));
-    const radius = Math.max(0.025, this.lineWidth * 0.18);
-    const lift = radius * 1.8;
 
-    // Tube outline in the X-Y slice plane, lifted slightly toward the viewer.
-    this.appendTubeSegment(mb, new vec3(-hw, -hh, lift), new vec3(hw, -hh, lift), radius, segs);
-    this.appendTubeSegment(mb, new vec3(hw, -hh, lift), new vec3(hw, hh, lift), radius, segs);
-    this.appendTubeSegment(mb, new vec3(hw, hh, lift), new vec3(-hw, hh, lift), radius, segs);
-    this.appendTubeSegment(mb, new vec3(-hw, hh, lift), new vec3(-hw, -hh, lift), radius, segs);
+    // Outline is deliberately thin so the handles dominate visually.
+    const lineRadius = Math.max(0.012, this.lineWidth * 0.10);
+    const lift = lineRadius * 1.8;
+
+    // --- Outline mesh (blue) -------------------------------------------------
+    const outline = this.makeBuilder();
+    this.appendTubeSegment(outline, new vec3(-hw, -hh, lift), new vec3(hw, -hh, lift), lineRadius, segs);
+    this.appendTubeSegment(outline, new vec3(hw, -hh, lift), new vec3(hw, hh, lift), lineRadius, segs);
+    this.appendTubeSegment(outline, new vec3(hw, hh, lift), new vec3(-hw, hh, lift), lineRadius, segs);
+    this.appendTubeSegment(outline, new vec3(-hw, hh, lift), new vec3(-hw, -hh, lift), lineRadius, segs);
 
     // One-way wind cue: default is nose/tip-to-back across the car image.
     const dir = this.flowDirection < 0 ? -1.0 : 1.0;
     const arrowY = -hh - this.lineWidth * 0.76;
-    const arrowA = new vec3(-dir * hw * 0.43, arrowY, lift);
-    const arrowB = new vec3(dir * hw * 0.43, arrowY, lift);
-    this.appendArrow(mb, arrowA, arrowB, radius * 0.78, radius * 3.1, segs);
-
-    // Depth scrub cue for the draggable slice, kept smaller than the flow cue.
-    const railY = arrowY - this.lineWidth * 0.52;
-    const ht = this.travel * 0.5;
-    this.appendDoubleArrow(
-      mb,
-      new vec3(0.0, railY, -ht),
-      new vec3(0.0, railY, ht),
-      radius * 0.58,
-      radius * 2.1,
+    this.appendArrow(
+      outline,
+      new vec3(-dir * hw * 0.43, arrowY, lift),
+      new vec3(dir * hw * 0.43, arrowY, lift),
+      lineRadius * 1.1,
+      lineRadius * 4.4,
       segs
     );
-
-    mb.updateMesh();
+    outline.updateMesh();
 
     let rmv = this.sceneObject.getComponent("Component.RenderMeshVisual") as RenderMeshVisual;
     if (!rmv) rmv = this.sceneObject.createComponent("Component.RenderMeshVisual") as RenderMeshVisual;
-    rmv.mesh = mb.getMesh();
-    if (this.material) rmv.mainMaterial = this.material;
+    rmv.mesh = outline.getMesh();
+    if (this.material) {
+      this.applyTint(this.material, FlowSliceGizmo.OUTLINE_COLOR);
+      rmv.mainMaterial = this.material;
+    }
+
+    // --- Handle mesh (accent) ------------------------------------------------
+    // A thick vertical grip on each side edge, plus a depth (Z) double-arrow so
+    // it reads as "grab here and slide the slice toward / away from you".
+    const handles = this.makeBuilder();
+    const gripRadius = Math.max(0.05, this.lineWidth * 0.34);
+    const gripHalf = hh * 0.5;
+    const depthHalf = Math.min(this.travel * 0.5, hh * 0.42);
+    for (const side of [-1, 1]) {
+      const x = side * hw;
+      this.appendTubeSegment(handles, new vec3(x, -gripHalf, lift), new vec3(x, gripHalf, lift), gripRadius, segs);
+      this.appendDoubleArrow(
+        handles,
+        new vec3(x, 0.0, -depthHalf),
+        new vec3(x, 0.0, depthHalf),
+        gripRadius * 0.55,
+        gripRadius * 1.7,
+        segs
+      );
+    }
+    handles.updateMesh();
+
+    this.handleObject = this.getOrCreateChild("Slice Handles");
+    let hrmv = this.handleObject.getComponent("Component.RenderMeshVisual") as RenderMeshVisual;
+    if (!hrmv) hrmv = this.handleObject.createComponent("Component.RenderMeshVisual") as RenderMeshVisual;
+    hrmv.mesh = handles.getMesh();
+    if (this.material) {
+      const handleMat = this.material.clone();
+      this.applyTint(handleMat, FlowSliceGizmo.HANDLE_COLOR);
+      hrmv.mainMaterial = handleMat;
+    }
+  }
+
+  private getOrCreateChild(name: string): SceneObject {
+    const count = this.sceneObject.getChildrenCount();
+    for (let i = 0; i < count; i++) {
+      const c = this.sceneObject.getChild(i);
+      if (c && c.name === name) return c;
+    }
+    const child = global.scene.createSceneObject(name);
+    child.setParent(this.sceneObject);
+    return child;
   }
 
   private appendArrow(mb: MeshBuilder, start: vec3, end: vec3, shaftRadius: number, headRadius: number, segments: number): void {
@@ -73,7 +123,7 @@ export class FlowSliceGizmo extends BaseScriptComponent {
     const length = this.len(axis);
     if (length < 0.001) return;
     const dir = this.scale(axis, 1.0 / length);
-    const headLength = Math.min(length * 0.22, Math.max(shaftRadius * 4.0, this.lineWidth * 0.46));
+    const headLength = Math.min(length * 0.34, Math.max(shaftRadius * 4.0, this.lineWidth * 0.46));
     const innerA = this.add(start, this.scale(dir, headLength));
     const innerB = this.sub(end, this.scale(dir, headLength));
     this.appendTubeSegment(mb, innerA, innerB, shaftRadius, segments);
@@ -170,10 +220,8 @@ export class FlowSliceGizmo extends BaseScriptComponent {
     return { x: x, y: y };
   }
 
-  private tintMaterial(): void {
-    if (!this.material) return;
-    const pass = this.material.mainPass as any;
-    const color = new vec4(0.22, 0.90, 0.12, 1.0);
+  private applyTint(mat: Material, color: vec4): void {
+    const pass = mat.mainPass as any;
     try { pass.baseColor = color; } catch (e) {}
     try { pass.baseColorFactor = color; } catch (e) {}
     try { pass.Port_Default_N369 = color; } catch (e) {}
