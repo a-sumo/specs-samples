@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vector Field Definition</title>
+  <link rel="stylesheet" href="node_modules/katex/dist/katex.min.css">
+  <style>
+    @font-face {
+      font-family: NunitoSansLocal;
+      src: url("../Assets/Fonts/Nunito_Sans/NunitoSans.ttf");
+      font-weight: 200 1000;
+    }
+
+    :root {
+      --ink: #ffffff;
+      --ink-soft: rgba(255, 255, 255, 0.82);
+      --ink-quiet: rgba(255, 255, 255, 0.50);
+      --x: #e03020;
+      --y: #20c030;
+      --z: #1878e0;
+      --div: rgba(255, 255, 255, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; border-radius: 0 !important; }
+    html { background: transparent; }
+    body {
+      background: transparent;
+      font-family: NunitoSansLocal, "Avenir Next", system-ui, sans-serif;
+      color: var(--ink);
+    }
+
+    #stage {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+      align-items: flex-start;
+    }
+
+    .panel {
+      position: relative;
+      width: 1320px;
+      height: 428px;
+      overflow: hidden;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 52px 22px;
+    }
+
+    .body-row {
+      flex: 1;
+      display: flex;
+      gap: 0;
+      min-height: 0;
+    }
+
+    .col-left {
+      flex: 0 0 280px;
+      display: flex;
+      flex-direction: column;
+      padding-right: 36px;
+      border-right: 1px solid var(--div);
+      min-width: 0;
+    }
+
+    .kicker {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-quiet);
+    }
+
+    .title {
+      margin-top: 10px;
+      font-size: 48px;
+      line-height: 0.96;
+      font-weight: 900;
+      max-width: 220px;
+    }
+
+    .title .op {
+      display: block;
+      font-family: "KaTeX_Main", NunitoSansLocal, serif;
+      font-size: 38px;
+      line-height: 1;
+      margin-top: 8px;
+      color: var(--ink-soft);
+    }
+
+    .col-tag {
+      margin-top: auto;
+      padding-top: 12px;
+    }
+
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      line-height: 1.25;
+      font-weight: 700;
+      color: var(--ink-soft);
+    }
+
+    .tag .pill {
+      padding: 4px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.40);
+      background: rgba(255, 255, 255, 0.07);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+
+    .col-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 44px;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .intro-text {
+      max-width: 820px;
+      font-size: 22px;
+      line-height: 1.62;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .intro-text em {
+      font-style: normal;
+      font-weight: 900;
+    }
+
+    .intro-ops {
+      display: flex;
+      gap: 0;
+      margin-top: 8px;
+    }
+
+    .intro-op {
+      padding: 7px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .intro-op + .intro-op { border-left: none; }
+
+    .eq .katex { color: var(--ink); font-size: 2.45em; }
+    .eq.sub .katex { font-size: 1.50em; color: var(--ink-soft); }
+
+    .contrast-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0;
+      width: 100%;
+    }
+
+    .contrast-card {
+      min-width: 0;
+      padding: 4px 30px 4px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .contrast-card + .contrast-card {
+      border-left: 1px solid rgba(255, 255, 255, 0.13);
+      padding-left: 30px;
+      padding-right: 0;
+    }
+
+    .contrast-label,
+    .example-label,
+    .visual-label {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-quiet);
+    }
+
+    .contrast-desc,
+    .example-desc,
+    .note {
+      font-size: 17px;
+      line-height: 1.48;
+      font-weight: 650;
+      color: var(--ink-soft);
+    }
+
+    .split-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .split-eqs {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .visual {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 38px;
+      width: 100%;
+    }
+
+    .example {
+      display: grid;
+      grid-template-columns: 108px minmax(0, 1fr);
+      align-items: baseline;
+      gap: 18px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      min-width: 0;
+    }
+
+    .equation-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-shrink: 0;
+    }
+
+    .steps { display: flex; gap: 8px; }
+    .dot { width: 10px; height: 10px; background: rgba(255, 255, 255, 0.22); }
+    .dot.on { width: 28px; background: rgba(255, 255, 255, 0.65); }
+    .stepno {
+      margin-left: auto;
+      font-size: 15px;
+      font-weight: 850;
+      color: var(--ink-quiet);
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <script src="node_modules/katex/dist/katex.min.js"></script>
+  <script>
+    const C = { x: "#e03020", y: "#20c030", z: "#1878e0" };
+    const col = (color, tex) => `\\textcolor{${color}}{${tex}}`;
+    const K = (tex, el, display = true) =>
+      katex.render(tex, el, { displayMode: display, throwOnError: false, trust: true, strict: false });
+
+    function makeVFSvg(field, {
+      n = 7,
+      size = 220,
+      pad = 24,
+      arrowColor = "rgba(255,255,255,0.82)",
+      dotColor = "rgba(255,255,255,0.32)",
+      scaleMax = 0.36
+    } = {}) {
+      const step = (size - 2 * pad) / (n - 1);
+      let arrows = "";
+      let dots = "";
+
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          const px = pad + i * step;
+          const py = pad + j * step;
+          const nx = (i / (n - 1)) * 2 - 1;
+          const ny = -((j / (n - 1)) * 2 - 1);
+          const [fx, fy] = field(nx, ny);
+          const len = Math.sqrt(fx * fx + fy * fy);
+
+          dots += `<circle cx="${px}" cy="${py}" r="2" fill="${dotColor}"/>`;
+          if (len < 0.001) continue;
+
+          const scale = step * scaleMax / Math.max(len, 0.01);
+          const dx = fx * scale;
+          const dy = -fy * scale;
+          const x2 = px + dx;
+          const y2 = py + dy;
+          const angle = Math.atan2(y2 - py, x2 - px);
+          const hw = 4.3;
+          const hl = 8.6;
+          const ax1 = x2 - hl * Math.cos(angle) + hw * Math.sin(angle);
+          const ay1 = y2 - hl * Math.sin(angle) - hw * Math.cos(angle);
+          const ax2 = x2 - hl * Math.cos(angle) - hw * Math.sin(angle);
+          const ay2 = y2 - hl * Math.sin(angle) + hw * Math.cos(angle);
+
+          arrows += `<line x1="${px}" y1="${py}" x2="${x2}" y2="${y2}"
+            stroke="${arrowColor}" stroke-width="1.8" stroke-linecap="round"/>`;
+          arrows += `<polygon points="${x2},${y2} ${ax1},${ay1} ${ax2},${ay2}"
+            fill="${arrowColor}"/>`;
+        }
+      }
+
+      return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"
+        style="display:block">${dots}${arrows}</svg>`;
+    }
+
+    const STEPS = [
+      {
+        id: "scalar_to_vector",
+        type: "contrast",
+        kicker: "Building Blocks",
+        title: "Fields",
+        tag: { pill: "basis", text: "vectors are built from scalar components" },
+        cols: [
+          {
+            label: "Scalar field",
+            eqs: [
+              `f:S\\subseteq\\mathbb{R}^{n}\\to\\mathbb{R}`,
+              `f(x,y,z)\\in\\mathbb{R}`,
+            ],
+            desc: "One number at each point, like temperature, pressure, height, or electric potential.",
+          },
+          {
+            label: "Vector field",
+            eqs: [
+              `\\mathbf{V}:S\\subseteq\\mathbb{R}^{n}\\to\\mathbb{R}^{n}`,
+              `\\mathbf{V}(x,y,z)\\in\\mathbb{R}^{3}`,
+            ],
+            desc: "One vector at each point, carrying magnitude and direction through the space.",
+          },
+        ],
+      },
+      {
+        id: "vf_informal",
+        type: "intro",
+        kicker: "Vector Calculus",
+        title: "Vector Field",
+        op: "V",
+        body: `A vector field assigns <em>a vector to every point in a region</em>. It lets a static space hold local direction and strength, so wind, gravity, fluid flow, and magnetic force can be read point by point.`,
+        ops: ["point", "magnitude", "direction"],
+        tag: { pill: "idea", text: "every point gets its own arrow" },
+      },
+      {
+        id: "vf_formal",
+        type: "split",
+        kicker: "Formal View",
+        title: "Vector Field",
+        op: "V",
+        eqs: [
+          `\\mathbf{V}:S\\subseteq\\mathbb{R}^{n}\\longrightarrow\\mathbb{R}^{n}`,
+          `\\mathbf{V}=\\bigl(${col(C.x, "V_x")},\\;${col(C.y, "V_y")},\\;${col(C.z, "V_z")}\\bigr)`,
+          `\\text{each component }${col(C.x, "V_i")}:S\\to\\mathbb{R}\\text{ is a scalar field}`,
+        ],
+        tag: { pill: "function", text: "a vector-valued function over space" },
+        svgField: (x, y) => [x, y],
+        svgLabel: "V = (x, y)",
+      },
+      {
+        id: "vf_examples",
+        type: "examples",
+        kicker: "Physical Examples",
+        title: "In Nature",
+        op: "V",
+        examples: [
+          { label: "Wind", text: "velocity and direction across Earth or through a room" },
+          { label: "Gravity", text: "force direction and strength around a body" },
+          { label: "Fluids", text: "flow speed at every point in a volume" },
+          { label: "Magnetism", text: "field lines shaped by poles, current, and distance" },
+        ],
+        tag: { pill: "models", text: "fields turn local measurements into structure" },
+      },
+      {
+        id: "vf_gradient",
+        type: "eqs",
+        kicker: "Scalar to Vector",
+        title: "Gradient Field",
+        op: "∇f",
+        eqs: [
+          `\\mathbf{V}=\\nabla f=\\left(${col(C.x, "\\dfrac{\\partial f}{\\partial x}")},\\;${col(C.y, "\\dfrac{\\partial f}{\\partial y}")},\\;${col(C.z, "\\dfrac{\\partial f}{\\partial z}")}\\right)`,
+        ],
+        note: "The gradient converts one scalar landscape into a vector field that points toward the steepest local increase.",
+        tag: { pill: "gradient", text: "direction of steepest change" },
+      },
+    ];
+
+    const stage = document.getElementById("stage");
+
+    function renderLeft(step) {
+      const left = document.createElement("div");
+      left.className = "col-left";
+
+      const kicker = document.createElement("div");
+      kicker.className = "kicker";
+      kicker.textContent = step.kicker;
+
+      const title = document.createElement("div");
+      title.className = "title";
+      title.textContent = step.title;
+      if (step.op) {
+        const op = document.createElement("span");
+        op.className = "op";
+        op.textContent = step.op;
+        title.appendChild(op);
+      }
+
+      left.append(kicker, title);
+
+      if (step.tag) {
+        const colTag = document.createElement("div");
+        colTag.className = "col-tag";
+        const tag = document.createElement("div");
+        tag.className = "tag";
+        tag.innerHTML = `<span class="pill">${step.tag.pill}</span><span>${step.tag.text}</span>`;
+        colTag.appendChild(tag);
+        left.appendChild(colTag);
+      }
+
+      return left;
+    }
+
+    function renderRight(step) {
+      const right = document.createElement("div");
+      right.className = "col-right";
+
+      if (step.type === "contrast") {
+        const grid = document.createElement("div");
+        grid.className = "contrast-grid";
+        for (const c of step.cols) {
+          const card = document.createElement("div");
+          card.className = "contrast-card";
+          const label = document.createElement("div");
+          label.className = "contrast-label";
+          label.textContent = c.label;
+          card.appendChild(label);
+          for (const tex of c.eqs) {
+            const eq = document.createElement("div");
+            eq.className = "eq" + (tex.includes("\\in") ? " sub" : "");
+            K(tex, eq);
+            card.appendChild(eq);
+          }
+          const desc = document.createElement("div");
+          desc.className = "contrast-desc";
+          desc.textContent = c.desc;
+          card.appendChild(desc);
+          grid.appendChild(card);
+        }
+        right.appendChild(grid);
+        return right;
+      }
+
+      if (step.type === "intro") {
+        const text = document.createElement("div");
+        text.className = "intro-text";
+        text.innerHTML = step.body;
+        right.appendChild(text);
+        if (step.ops) {
+          const ops = document.createElement("div");
+          ops.className = "intro-ops";
+          for (const op of step.ops) {
+            const pill = document.createElement("div");
+            pill.className = "intro-op";
+            pill.textContent = op;
+            ops.appendChild(pill);
+          }
+          right.appendChild(ops);
+        }
+        return right;
+      }
+
+      if (step.type === "split") {
+        const row = document.createElement("div");
+        row.className = "split-row";
+        const eqs = document.createElement("div");
+        eqs.className = "split-eqs";
+        step.eqs.forEach((tex, i) => {
+          const eq = document.createElement("div");
+          eq.className = "eq" + (i > 0 ? " sub" : "");
+          K(tex, eq);
+          eqs.appendChild(eq);
+        });
+        row.appendChild(eqs);
+        const visual = document.createElement("div");
+        visual.className = "visual";
+        visual.innerHTML = makeVFSvg(step.svgField);
+        const label = document.createElement("div");
+        label.className = "visual-label";
+        label.textContent = step.svgLabel;
+        visual.appendChild(label);
+        row.appendChild(visual);
+        right.appendChild(row);
+        return right;
+      }
+
+      if (step.type === "examples") {
+        const grid = document.createElement("div");
+        grid.className = "examples-grid";
+        for (const item of step.examples) {
+          const example = document.createElement("div");
+          example.className = "example";
+          const label = document.createElement("div");
+          label.className = "example-label";
+          label.textContent = item.label;
+          const desc = document.createElement("div");
+          desc.className = "example-desc";
+          desc.textContent = item.text;
+          example.append(label, desc);
+          grid.appendChild(example);
+        }
+        right.appendChild(grid);
+        return right;
+      }
+
+      const stack = document.createElement("div");
+      stack.className = "equation-stack";
+      for (const tex of step.eqs) {
+        const eq = document.createElement("div");
+        eq.className = "eq";
+        K(tex, eq);
+        stack.appendChild(eq);
+      }
+      if (step.note) {
+        const note = document.createElement("div");
+        note.className = "note";
+        note.textContent = step.note;
+        stack.appendChild(note);
+      }
+      right.appendChild(stack);
+      return right;
+    }
+
+    function makeFooter(i) {
+      const footer = document.createElement("div");
+      footer.className = "footer";
+      const dots = document.createElement("div");
+      dots.className = "steps";
+      STEPS.forEach((_, j) => {
+        const d = document.createElement("div");
+        d.className = "dot" + (j === i ? " on" : "");
+        dots.appendChild(d);
+      });
+      const num = document.createElement("div");
+      num.className = "stepno";
+      num.textContent = `${i + 1} / ${STEPS.length}`;
+      footer.append(dots, num);
+      return footer;
+    }
+
+    STEPS.forEach((step, i) => {
+      const panel = document.createElement("section");
+      panel.id = `vf_def_${step.id}`;
+      panel.className = "panel capture";
+
+      const row = document.createElement("div");
+      row.className = "body-row";
+      row.append(renderLeft(step), renderRight(step));
+      panel.append(row, makeFooter(i));
+      stage.appendChild(panel);
+    });
+
+    Promise.resolve(document.fonts ? document.fonts.ready : null).then(() => {
+      window.vfDefinitionReady = true;
+    });
+  </script>
+</body>
+</html>

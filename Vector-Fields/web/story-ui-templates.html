@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Story UI Templates</title>
+  <link rel="stylesheet" href="../node_modules/katex/dist/katex.min.css">
   <style>
     :root {
       --panel: #202221;
@@ -28,6 +29,13 @@
       --blue-glow: rgba(24, 120, 224, 0.42);
       --blue-glow-soft: rgba(24, 120, 224, 0.22);
       --blue-fill: rgba(30, 110, 210, 0.16);
+      --blue-value: #78baff;
+      --blue-value-bright: #b8dcff;
+      --blue-value-peak: #d4ecff;
+      --blue-value-soft: rgba(120, 186, 255, 0.74);
+      --blue-value-mid: rgba(64, 152, 255, 0.52);
+      --blue-value-faint: rgba(43, 141, 255, 0.32);
+      --blue-value-ghost: rgba(43, 141, 255, 0.20);
     }
 
     @font-face {
@@ -131,11 +139,13 @@
       background: linear-gradient(90deg, rgba(120, 178, 248, 0.66) 0%, rgba(120, 178, 248, 0.16) 76%, rgba(120, 178, 248, 0));
     }
 
-    #theory_panel.panel-surface {
-      background: rgba(198, 222, 250, 0.15);
-      border-color: rgba(210, 230, 255, 0.26);
+    #theory_panel.panel-surface,
+    #theory_panel_motion.panel-surface {
+      background: #0d1520;
+      border-color: rgba(120, 178, 248, 0.28);
       box-shadow:
-        inset 0 1px 0 rgba(235, 246, 255, 0.12);
+        inset 0 1px 0 rgba(150, 200, 255, 0.14),
+        inset 0 -34px 82px rgba(0,0,0,0.38);
     }
 
     .title {
@@ -148,10 +158,13 @@
       line-height: 1;
       letter-spacing: 0;
       font-weight: 820;
+      white-space: normal;
+      text-align: left;
     }
 
     .title.examples {
       font-size: 58px;
+      line-height: 0.92;
       font-weight: 780;
     }
 
@@ -180,12 +193,159 @@
     }
 
     .card {
-      background: #0d1118;
-      border: 2px solid rgba(150, 186, 230, 0.28);
+      background:
+        linear-gradient(180deg, rgba(43, 141, 255, 0.38), rgba(43, 141, 255, 0.20)),
+        rgba(20, 95, 210, 0.16);
+      border: 2px solid rgba(120, 186, 255, 0.76);
       border-radius: 0;
       box-shadow:
-        inset 0 1px 0 rgba(150, 190, 240, 0.10),
+        inset 0 1px 0 rgba(184, 220, 255, 0.34),
         0 18px 44px rgba(0,0,0,0.30);
+    }
+
+    .main-card-hero {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .main-card-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.24)),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0.08) 48%, rgba(0, 0, 0, 0.20) 100%);
+    }
+
+    .card[data-step="theory"] {
+      background: transparent;
+      border-color: rgba(120, 186, 255, 0.86);
+    }
+
+    .card[data-step="theory"]::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 26% 30%, rgba(43, 141, 255, 0.58), transparent 34%),
+        radial-gradient(circle at 78% 78%, rgba(43, 141, 255, 0.44), transparent 38%);
+      pointer-events: none;
+    }
+
+    .main-card-hero.theory {
+      opacity: 1;
+      background:
+        radial-gradient(circle at 70% 26%, rgba(43, 141, 255, 0.54), transparent 37%),
+        radial-gradient(circle at 34% 76%, rgba(43, 141, 255, 0.50), transparent 42%);
+    }
+
+    .main-card-hero.theory::after {
+      background:
+        radial-gradient(circle at 24% 50%, rgba(0, 0, 0, 0.44), transparent 42%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.28) 0%, transparent 52%);
+    }
+
+    .main-card-hero.theory .formula {
+      position: absolute;
+      color: var(--blue-value-bright);
+      font-size: 31px;
+      line-height: 1;
+      white-space: nowrap;
+      letter-spacing: 0;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+    }
+
+    .main-card-hero.theory .formula .katex {
+      font-size: 1em;
+    }
+
+    .main-card-hero.theory .nabla-formula {
+      left: 38px;
+      top: 126px;
+      font-size: 45px;
+      color: var(--blue-value-bright);
+    }
+
+    .main-card-hero.theory .nabla-mark {
+      right: -54px;
+      bottom: -10px;
+      font-size: 278px;
+      color: rgba(92, 173, 255, 0.72);
+    }
+
+    .main-card-hero.theory .nabla-label {
+      right: 34px;
+      bottom: 140px;
+      font-size: 27px;
+      color: rgba(139, 198, 255, 0.88);
+    }
+
+    .main-card-hero.examples {
+      opacity: 1;
+      background:
+        radial-gradient(circle at 74% 34%, rgba(43, 141, 255, 0.42), transparent 42%),
+        radial-gradient(circle at 28% 76%, rgba(24, 120, 224, 0.28), transparent 46%),
+        #0d1520;
+      filter: none;
+    }
+
+    .main-card-hero.examples::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("../Assets/Images/StoryUI/magnetic-field-background.jpg");
+      background-size: cover;
+      background-position: 50% 50%;
+      opacity: 0.36;
+      filter: grayscale(1) contrast(1.18) brightness(0.86);
+      mix-blend-mode: screen;
+    }
+
+    .main-card-hero.examples::after {
+      background:
+        linear-gradient(180deg, rgba(13, 21, 32, 0.08), rgba(3, 18, 48, 0.36)),
+        radial-gradient(circle at 22% 52%, rgba(0, 14, 46, 0.58), rgba(24, 120, 224, 0.08) 44%, rgba(0, 20, 62, 0.24) 100%),
+        linear-gradient(90deg, rgba(0, 14, 42, 0.62) 0%, rgba(24, 120, 224, 0.04) 52%, rgba(0, 20, 62, 0.22) 100%);
+    }
+
+    .card[data-state="active"] .main-card-hero {
+      opacity: 1;
+      filter: brightness(1.12) contrast(1.08);
+    }
+
+    .card[data-state="active"] .main-card-hero.theory .formula {
+      color: var(--blue-value-peak);
+    }
+
+    .card[data-state="active"] .main-card-hero.theory .nabla-mark {
+      color: rgba(184, 220, 255, 0.88);
+    }
+
+    .card[data-state="active"] .main-card-hero.examples {
+      filter: brightness(1.06);
+    }
+
+    .card[data-state="active"] .main-card-hero.examples::before {
+      opacity: 0.42;
+      filter: grayscale(1) contrast(1.22) brightness(0.94);
+    }
+
+    .card[data-state="pressed"] .main-card-hero.examples {
+      filter: brightness(0.90);
+    }
+
+    .card[data-state="pressed"] .main-card-hero.examples::before {
+      opacity: 0.30;
+      filter: grayscale(1) contrast(1.12) brightness(0.76);
+    }
+
+    .card[data-state="pressed"] .main-card-hero {
+      opacity: 0.78;
+      filter: brightness(0.86) contrast(1.12);
     }
 
     .card[data-state="active"] {
@@ -202,18 +362,110 @@
       box-shadow:
         inset 0 0 18px rgba(20, 70, 140, 0.40),
         0 12px 30px rgba(0,0,0,0.30);
-      transform: scale(0.984);
+    }
+
+    .card[data-kind="theory-card"] {
+      background: transparent;
+      border-color: rgba(120, 186, 255, 0.82);
+      box-shadow:
+        inset 0 1px 0 rgba(184, 220, 255, 0.30),
+        0 18px 44px rgba(0,0,0,0.24);
+    }
+
+    .card[data-kind="theory-card"]::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 30% 22%, rgba(43, 141, 255, 0.46), transparent 38%),
+        radial-gradient(circle at 78% 82%, rgba(43, 141, 255, 0.34), transparent 42%);
+      pointer-events: none;
+    }
+
+    .theory-card-hero {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .theory-card-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 28% 51%, rgba(0, 0, 0, 0.42), transparent 39%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.26), transparent 58%);
+    }
+
+    .theory-card-hero .formula {
+      position: absolute;
+      color: var(--blue-value-bright);
+      line-height: 1;
+      white-space: nowrap;
+      letter-spacing: 0;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.42);
+    }
+
+    .theory-card-hero .formula .katex {
+      font-size: 1em;
+    }
+
+    .theory-card-hero .mark {
+      right: -34px;
+      bottom: -28px;
+      font-size: 178px;
+      color: rgba(120, 186, 255, 0.68);
+    }
+
+    .theory-card-hero .primary {
+      left: 28px;
+      top: 108px;
+      font-size: 38px;
+    }
+
+    .theory-card-hero .secondary {
+      left: 34px;
+      bottom: 86px;
+      font-size: 27px;
+      color: rgba(184, 220, 255, 0.82);
+    }
+
+    .card[data-card="metrics"] .theory-card-hero .primary {
+      left: 25px;
+      top: 104px;
+      font-size: 42px;
+    }
+
+    .card[data-card="patterns"] .theory-card-hero .primary {
+      left: 24px;
+      top: 96px;
+      font-size: 35px;
+    }
+
+    .card[data-kind="theory-card"][data-state="active"] .theory-card-hero .formula {
+      color: var(--blue-value-peak);
+    }
+
+    .card[data-kind="theory-card"][data-state="active"] .theory-card-hero .mark {
+      color: rgba(184, 220, 255, 0.76);
     }
 
     .card .num {
       position: absolute;
       left: 30px;
       top: 25px;
-      color: var(--quiet);
+      color: rgba(184, 220, 255, 0.82);
       font-size: 28px;
       line-height: 1;
       font-weight: 740;
       letter-spacing: 0.08em;
+    }
+
+    .card[data-kind="theory-card"] .num {
+      color: rgba(184, 220, 255, 0.86);
     }
 
     .card[data-state="active"] .num {
@@ -222,23 +474,40 @@
 
     .card h2 {
       position: absolute;
-      left: 112px;
-      right: 32px;
-      top: 40px;
+      left: 42px;
+      right: 42px;
+      top: 50%;
       margin: 0;
       color: currentColor;
-      font-size: 48px;
-      line-height: 1;
+      font-size: 58px;
+      line-height: 0.96;
       font-weight: 760;
       letter-spacing: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      transform: translateY(-50%);
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    .card[data-kind="theory-card"] h2 {
+      top: 53%;
+      font-size: 54px;
+      line-height: 0.98;
+    }
+
+    .card .num,
+    .card h2 {
+      z-index: 4;
+      text-shadow: 0 3px 18px rgba(0,0,0,0.72);
     }
 
     .example-card {
-      background: #0d1118;
-      border: 2px solid rgba(150, 186, 230, 0.30);
+      background:
+        linear-gradient(180deg, rgba(43, 141, 255, 0.30), rgba(43, 141, 255, 0.14)),
+        rgba(20, 95, 210, 0.10);
+      border: 2px solid rgba(120, 186, 255, 0.72);
       border-radius: 0;
       box-shadow:
         inset 0 1px 0 rgba(150, 190, 240, 0.10),
@@ -259,14 +528,40 @@
       box-shadow:
         inset 0 0 18px rgba(20, 70, 140, 0.40),
         0 14px 32px rgba(0,0,0,0.32);
-      transform: scale(0.986);
+    }
+
+    .example-card .example-hero {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.82;
+      filter: saturate(1.16) contrast(1.20) brightness(1.62);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 22%, rgba(0,0,0,0.55) 42%, black 74%);
+      mask-image: linear-gradient(90deg, transparent 0%, transparent 22%, rgba(0,0,0,0.55) 42%, black 74%);
+    }
+
+    .example-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0.34) 28%, rgba(0, 0, 0, 0.08) 52%, rgba(0, 0, 0, 0.00) 100%),
+        linear-gradient(180deg, rgba(43, 141, 255, 0.24), rgba(0,0,0,0.04));
     }
 
     .example-card .num {
       position: absolute;
+      z-index: 4;
       left: 46px;
       top: 50%;
-      color: var(--quiet);
+      color: rgba(184, 220, 255, 0.82);
+      opacity: 1;
+      mix-blend-mode: normal;
       font-size: 28px;
       line-height: 1;
       font-weight: 720;
@@ -280,19 +575,28 @@
 
     .example-card h2 {
       position: absolute;
+      z-index: 4;
       left: 150px;
       right: 58px;
       top: 50%;
       margin: 0;
-      color: currentColor;
+      color: var(--text);
+      opacity: 1;
+      mix-blend-mode: normal;
       font-size: 58px;
-      line-height: 1;
+      line-height: 0.92;
       font-weight: 730;
       letter-spacing: 0;
       transform: translateY(-50%);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .capture.example-card > .num,
+    .capture.example-card > h2 {
+      z-index: 4;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.66);
     }
 
     .nav {
@@ -318,7 +622,6 @@
         #0e1620;
       border-color: var(--blue-edge-soft);
       box-shadow: inset 0 0 16px rgba(20, 70, 140, 0.42);
-      transform: scale(0.984);
     }
 
     .utility {
@@ -326,15 +629,15 @@
       place-items: center;
       border-radius: 0;
       background:
-        linear-gradient(140deg, rgba(40, 120, 220, 0.14), rgba(20, 60, 120, 0.04)),
-        #131922;
-      border: 2px solid rgba(150, 186, 230, 0.40);
+        linear-gradient(140deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)),
+        #161817;
+      border: 2px solid rgba(232, 229, 220, 0.28);
       color: var(--text);
-      font-size: 34px;
+      font-size: 38px;
       line-height: 1;
       font-weight: 650;
       box-shadow:
-        inset 0 1px 0 rgba(150, 190, 240, 0.10),
+        inset 0 1px 0 rgba(255,255,255,0.08),
         0 12px 28px rgba(0,0,0,0.28);
     }
 
@@ -353,7 +656,29 @@
         #0e1620;
       border-color: var(--blue-edge-soft);
       box-shadow: inset 0 0 14px rgba(20, 70, 140, 0.42);
-      transform: scale(0.984);
+    }
+
+    .utility.proxy[data-state="on"] {
+      background: #1878e0;
+      border-color: rgba(224, 240, 255, 0.98);
+      color: #ffffff;
+      box-shadow:
+        inset 0 0 22px rgba(130, 188, 255, 0.50),
+        0 12px 30px rgba(0,0,0,0.32);
+    }
+
+    .utility.proxy[data-state="off"] {
+      color: var(--muted);
+      background:
+        linear-gradient(140deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)),
+        #161817;
+      border-color: rgba(232, 229, 220, 0.28);
+    }
+
+    .utility.proxy[data-state="pressed"] {
+      background: #2462ce;
+      border-color: rgba(240, 248, 255, 0.98);
+      color: #fff;
     }
 
     .slot.example_variant,
@@ -365,8 +690,8 @@
 
     .slot.example_variant_artemis {
       border-radius: 0;
-      background: rgba(244, 241, 232, 0.035);
-      border-color: rgba(232, 229, 220, 0.22);
+      background: rgba(43, 141, 255, 0.045);
+      border-color: rgba(92, 173, 255, 0.28);
     }
 
     .variant {
@@ -397,15 +722,14 @@
         #0e1620;
       border-color: var(--blue-edge-soft);
       box-shadow: inset 0 0 14px rgba(20, 70, 140, 0.42);
-      transform: scale(0.984);
     }
 
     .variant.artemis-variant {
       border-radius: 0;
       background: #101113;
-      border-color: rgba(232, 229, 220, 0.38);
+      border-color: rgba(92, 173, 255, 0.52);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.14),
+        inset 0 1px 0 rgba(139, 198, 255, 0.18),
         0 18px 42px rgba(0,0,0,0.30);
     }
 
@@ -418,17 +742,17 @@
     }
 
     .variant.artemis-variant::before {
-      background-image: url("./assets/artemis_ii_rollout_cropped.jpg");
+      background-image: url("./assets/orion-nasa-artemis-ii.jpg");
       background-size: cover;
-      background-position: 50% 56%;
-      filter: saturate(0.92) contrast(1.06);
+      background-position: 50% 48%;
+      filter: saturate(1.04) contrast(1.08) brightness(1.08);
       transform: scale(1.01);
     }
 
     .variant.artemis-variant::after {
       background:
         linear-gradient(90deg, rgba(8, 9, 10, 0.84), rgba(8, 9, 10, 0.34) 50%, rgba(8, 9, 10, 0.68)),
-        linear-gradient(0deg, rgba(244, 241, 232, 0.08), rgba(244, 241, 232, 0));
+        linear-gradient(0deg, rgba(43, 141, 255, 0.12), rgba(43, 141, 255, 0));
     }
 
     .variant.artemis-variant .mission-copy {
@@ -452,7 +776,7 @@
 
     .variant.artemis-variant .mission-copy span {
       display: block;
-      color: rgba(244, 241, 232, 0.86);
+      color: rgba(220, 238, 255, 0.90);
       font-size: 25px;
       line-height: 1.24;
       font-weight: 570;
@@ -500,6 +824,71 @@
       letter-spacing: 0;
     }
 
+    .detail-info .detail-formula {
+      margin: 6px 0 26px;
+      color: var(--text);
+    }
+
+    .detail-info .detail-formula .katex {
+      font-size: 50px;
+      color: var(--text);
+    }
+
+    .detail-info .detail-formula + p {
+      text-align: center;
+    }
+
+    .detail-info.has-symbols {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 36px;
+      text-align: center;
+    }
+
+    .detail-info.has-symbols .detail-formula {
+      width: 100%;
+      margin: 0 0 10px;
+      text-align: center;
+    }
+
+    .detail-info.has-symbols .detail-formula .katex {
+      font-size: 40px;
+    }
+
+    .detail-symbols {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 7px 18px;
+      width: 100%;
+      margin: 0 0 8px;
+      color: #d7ebff;
+      font-size: 20px;
+      line-height: 1.12;
+      font-weight: 680;
+    }
+
+    .detail-symbol {
+      white-space: nowrap;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.52);
+    }
+
+    .detail-symbol .katex {
+      color: #ffffff;
+      font-size: 1.12em;
+    }
+
+    .detail-info.has-symbols p {
+      max-width: 100%;
+      font-size: 24px;
+      line-height: 1.12;
+      text-align: center;
+    }
+
     .artemis-map-card {
       position: absolute;
       left: 70px;
@@ -507,10 +896,10 @@
       width: 1360px;
       height: 765px;
       border-radius: 0;
-      border: 2px solid rgba(232, 229, 220, 0.34);
+      border: 2px solid rgba(92, 173, 255, 0.50);
       background: #101113;
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.14),
+        inset 0 1px 0 rgba(139, 198, 255, 0.18),
         0 22px 50px rgba(0,0,0,0.32);
     }
 
@@ -704,12 +1093,22 @@
 <body>
   <script src="./mesh-gradient-bg.js"></script>
   <script src="./story-ui-layout.browser.js"></script>
+  <script src="../node_modules/katex/dist/katex.min.js"></script>
   <script>
     const spec = window.STORY_UI_LAYOUT;
     const px = (slot) => {
       const p = slot.px;
       return `left:${p.x}px;top:${p.y}px;width:${p.width}px;height:${p.height}px`;
     };
+    const titleBreaks = new Map([
+      ["Real World", "Real<br>World"],
+      ["Real World Examples", "Real World<br>Examples"],
+      ["Gravitational Fields", "Gravitational<br>Fields"],
+      ["Earth Winds", "Earth<br>Winds"],
+      ["Field Metrics", "Field<br>Metrics"],
+      ["Analytical Examples", "Analytical<br>Examples"],
+    ]);
+    const titleHtml = (text) => titleBreaks.get(text) || text;
 
     const createPanel = (id, titleText, titleSlotId, slotRoles, titleClass = "") => {
       const panel = document.createElement("section");
@@ -721,7 +1120,7 @@
       const title = document.createElement("h1");
       title.className = `title ${titleClass}`.trim();
       title.style.cssText = px(titleSlot);
-      title.textContent = titleText;
+      title.innerHTML = titleHtml(titleText);
       panel.appendChild(title);
 
       for (const slot of spec.slots.filter((s) => slotRoles.includes(s.role))) {
@@ -745,19 +1144,36 @@
       {
         id: "magnetism",
         title: "Magnetism",
-        kicker: "Two movable dipoles",
-        body: "Move the magnets to reshape the field. Loops show direction around the poles, while trails or arrows reveal local strength.",
+        kicker: "",
+        formula: String.raw`\vec{B}(\vec{r}) \;=\; \frac{\mu_0}{4\pi}\,\frac{3(\vec{m}\cdot\hat{r})\,\hat{r} - \vec{m}}{r^{3}}`,
+        symbols: [
+          [String.raw`\vec{B}`, "field vector"],
+          [String.raw`\vec{r}`, "sample point"],
+          [String.raw`\vec{m}`, "dipole moment"],
+          [String.raw`\hat{r}`, "direction of r"],
+          [String.raw`\mu_0`, "vacuum constant"],
+        ],
+        body: "Move the magnets; field lines recompute from their dipole moments.",
         topCaption: "",
         bottomCaption: "Rendering",
       },
       {
         id: "wind",
-        title: "Wind",
-        kicker: "Globe streamlines and flow slice",
-        body: "Use the globe for real weather circulation, or the car slice for a controlled flow example. Color stays tied to represented speed.",
-        topCaption: "Dataset",
+        title: "Earth Winds",
+        kicker: "",
+        body: "",
+        topCaption: "",
         bottomCaption: "",
-        showModes: false,
+        controls: false,
+      },
+      {
+        id: "aerodynamics",
+        title: "Aerodynamics",
+        kicker: "Wind-tunnel flow around a car",
+        body: "A controlled slice makes the airflow readable: streamlines compress, separate, and curl as the body redirects the field.",
+        topCaption: "",
+        bottomCaption: "",
+        controls: false,
       },
     ];
 
@@ -771,15 +1187,35 @@
       const title = document.createElement("h1");
       title.className = "title examples";
       title.style.cssText = px(titleSlot);
-      title.textContent = detail.title;
+      title.innerHTML = titleHtml(detail.title);
       panel.appendChild(title);
 
-      const infoSlot = spec.slots.find((s) => s.id === "example_info");
-      const info = document.createElement("article");
-      info.className = "detail-info";
-      info.style.cssText = px(infoSlot);
-      info.innerHTML = `<div class="kicker">${detail.kicker}</div><p>${detail.body}</p>`;
-      panel.appendChild(info);
+      if (detail.kicker || detail.body || detail.formula) {
+        const infoSlot = spec.slots.find((s) => s.id === "example_info");
+        const info = document.createElement("article");
+        info.className = `detail-info${detail.symbols ? " has-symbols" : ""}`;
+        info.style.cssText = px(infoSlot);
+        let inner = "";
+        if (detail.kicker) inner += `<div class="kicker">${detail.kicker}</div>`;
+        if (detail.formula) {
+          const formulaHtml = window.katex
+            ? window.katex.renderToString(detail.formula, { throwOnError: false, displayMode: true })
+            : detail.formula;
+          inner += `<div class="detail-formula">${formulaHtml}</div>`;
+        }
+        if (detail.symbols) {
+          const symbolsHtml = detail.symbols.map(([tex, label]) => {
+            const rendered = window.katex
+              ? window.katex.renderToString(tex, { throwOnError: false, displayMode: false })
+              : tex;
+            return `<span class="detail-symbol">${rendered} ${label}</span>`;
+          }).join("");
+          inner += `<div class="detail-symbols">${symbolsHtml}</div>`;
+        }
+        if (detail.body) inner += `<p>${detail.body}</p>`;
+        info.innerHTML = inner;
+        panel.appendChild(info);
+      }
 
       if (detail.topCaption) {
         const top = document.createElement("div");
@@ -797,7 +1233,7 @@
         panel.appendChild(bottom);
       }
 
-      let visibleSlotIds = ["example_mode_a", "example_mode_b", "example_mode_c"];
+      let visibleSlotIds = detail.controls === false ? [] : ["example_mode_a", "example_mode_b", "example_mode_c"];
       if (detail.id === "gravity") {
         visibleSlotIds = ["variant_artemis"];
       } else if (detail.showModes === false) {
@@ -822,7 +1258,7 @@
       const title = document.createElement("h1");
       title.className = "title examples";
       title.style.cssText = px(titleSlot);
-      title.textContent = "Gravitational Fields";
+      title.innerHTML = titleHtml("Gravitational Fields");
       panel.appendChild(title);
 
       const map = document.createElement("article");
@@ -832,34 +1268,14 @@
       document.body.appendChild(panel);
     };
 
-    createPanel("panel", "Guide", "title", ["card", "progress"]);
+    createPanel("panel", "Vector Fields", "title", []);
     createPanel("examples_panel", "Real World Examples", "examples_title", ["example_card"], "examples");
     const createTheoryPanel = () => {
       createPanel("theory_panel", "Theory", "theory_title", [], "examples");
-      const panel = document.getElementById("theory_panel");
-      const labels = [
-        ["Field preset", 170, 274],
-        ["Field metrics", 76, 412],
-        ["Color map", 604, 412],
-        ["Gradient range", 604, 682],
-      ];
-      for (const [text, left, top] of labels) {
-        const label = document.createElement("div");
-        label.className = "theory-section-label";
-        label.style.cssText = `left:${left}px;top:${top}px`;
-        label.textContent = text;
-        panel.appendChild(label);
-      }
     };
 
     const createTheoryMotionPanel = () => {
       createPanel("theory_panel_motion", "Theory", "theory_title", [], "examples");
-      const panel = document.getElementById("theory_panel_motion");
-      const label = document.createElement("div");
-      label.className = "theory-section-label";
-      label.style.cssText = "left:170px;top:274px";
-      label.textContent = "Field preset";
-      panel.appendChild(label);
     };
 
     createTheoryPanel();
@@ -869,28 +1285,105 @@
     }
     createArtemisDetailPanel();
 
+    const mathMarkup = (tex, cls) => {
+      const html = window.katex
+        ? window.katex.renderToString(tex, { throwOnError: false, displayMode: false })
+        : tex;
+      return `<span class="formula ${cls}">${html}</span>`;
+    };
+
+    const theoryHeroMarkup = () => `
+      <div class="main-card-hero theory" aria-hidden="true">
+        ${mathMarkup(String.raw`\displaystyle \nabla=\left\langle{\partial\over\partial x},{\partial\over\partial y},{\partial\over\partial z}\right\rangle`, "nabla-formula")}
+        ${mathMarkup(String.raw`\nabla`, "nabla-mark")}
+        ${mathMarkup(String.raw`\text{gradient}\quad\text{divergence}\quad\text{curl}`, "nabla-label")}
+      </div>`;
+
+    const mainCardHeroMarkup = (id) => {
+      if (id === "theory") return theoryHeroMarkup();
+      if (id === "examples") return `<div class="main-card-hero examples" aria-hidden="true"></div>`;
+      return "";
+    };
+
+    const theoryCardHeroMarkup = (id) => {
+      if (id === "definition") {
+        return `
+          <div class="theory-card-hero" aria-hidden="true">
+            ${mathMarkup(String.raw`\mathbf{F}:\mathbb{R}^{n}\to\mathbb{R}^{n}`, "primary")}
+            ${mathMarkup(String.raw`\mathbf{x}\mapsto\mathbf{F}(\mathbf{x})`, "secondary")}
+            ${mathMarkup(String.raw`\mathbb{R}^{n}`, "mark")}
+          </div>`;
+      }
+      if (id === "metrics") {
+        return `
+          <div class="theory-card-hero" aria-hidden="true">
+            ${mathMarkup(String.raw`\nabla\cdot\mathbf{F}\quad\nabla\times\mathbf{F}`, "primary")}
+            ${mathMarkup(String.raw`\text{sources}\quad\text{rotation}`, "secondary")}
+            ${mathMarkup(String.raw`\nabla`, "mark")}
+          </div>`;
+      }
+      if (id === "patterns") {
+        return `
+          <div class="theory-card-hero" aria-hidden="true">
+            ${mathMarkup(String.raw`\mathbf{F}(x,y,z)=\langle x,y,z\rangle`, "primary")}
+            ${mathMarkup(String.raw`\nabla\cdot\mathbf{F}=3`, "secondary")}
+            ${mathMarkup(String.raw`\langle x,y,z\rangle`, "mark")}
+          </div>`;
+      }
+      return "";
+    };
+
     for (const step of spec.steps) {
       const slot = spec.slots.find((s) => s.id === `card_${step.id}`);
       for (const state of ["normal", "active", "pressed"]) {
         const card = document.createElement("article");
         card.id = `card_${step.id}_${state}`;
         card.className = "capture card";
+        card.dataset.step = step.id;
         card.dataset.state = state;
         card.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
-        card.innerHTML = `<span class="num">${step.index}</span><h2>${step.title}</h2>`;
+        card.innerHTML = `${mainCardHeroMarkup(step.id)}<span class="num">${step.index}</span><h2>${titleHtml(step.title)}</h2>`;
         document.body.appendChild(card);
+      }
+    }
+
+    if (spec.theoryCards) {
+      for (const card of spec.theoryCards) {
+        const slot = spec.slots.find((s) => s.id === `card_${card.id}`);
+        if (!slot) continue;
+        for (const state of ["normal", "active", "pressed"]) {
+          const el = document.createElement("article");
+          el.id = `card_${card.id}_${state}`;
+          el.className = "capture card";
+          el.dataset.kind = "theory-card";
+          el.dataset.card = card.id;
+          el.dataset.state = state;
+          el.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
+          el.innerHTML = `${theoryCardHeroMarkup(card.id)}<span class="num">${card.index}</span><h2>${titleHtml(card.title)}</h2>`;
+          document.body.appendChild(el);
+        }
       }
     }
 
     for (const example of spec.examples) {
       const slot = spec.slots.find((s) => s.id === `example_${example.id}`);
+      const heroes = {
+        gravity: { src: "../Assets/Images/gravitational-field-earth-moon.png", pos: "58% 50%" },
+        magnetism: { src: "../Assets/Images/magnet-dipole.png", pos: "50% 48%" },
+        wind: { src: "../Assets/Images/earth-satellite-view.jpg", pos: "50% 50%" },
+        aerodynamics: { src: "../Assets/Images/aerodynamics-wind-tunnel.jpg", pos: "50% 52%" },
+      };
       for (const state of ["normal", "active", "pressed"]) {
         const card = document.createElement("article");
         card.id = `example_${example.id}_${state}`;
         card.className = "capture example-card";
         card.dataset.state = state;
         card.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
-        card.innerHTML = `<span class="num">${example.index}</span><h2>${example.title}</h2>`;
+        const hero = heroes[example.id];
+        const heroMarkup = hero
+          ? `<img class="example-hero" src="${hero.src}" style="object-position:${hero.pos}" alt="">`
+          : "";
+        card.innerHTML = `${heroMarkup}<span class="num">${example.index}</span><h2>${titleHtml(example.title)}</h2>`;
         document.body.appendChild(card);
       }
     }
@@ -929,16 +1422,16 @@
       { id: "utility_plane_floor_on", slot: "utility_plane_floor", label: "Reset", state: "on" },
       { id: "utility_plane_floor_off", slot: "utility_plane_floor", label: "Reset", state: "off" },
       { id: "utility_plane_floor_pressed", slot: "utility_plane_floor", label: "Reset", state: "pressed" },
-      { id: "utility_plane_front_on", slot: "utility_plane_front", label: "Front", state: "on" },
-      { id: "utility_plane_front_off", slot: "utility_plane_front", label: "Front", state: "off" },
-      { id: "utility_plane_front_pressed", slot: "utility_plane_front", label: "Front", state: "pressed" },
+      { id: "utility_plane_front_on", slot: "utility_plane_front", label: "Proxy", state: "on", proxy: true },
+      { id: "utility_plane_front_off", slot: "utility_plane_front", label: "Proxy", state: "off", proxy: true },
+      { id: "utility_plane_front_pressed", slot: "utility_plane_front", label: "Proxy", state: "pressed", proxy: true },
     ];
 
     for (const utility of utilities) {
       const slot = spec.slots.find((s) => s.id === utility.slot);
       const button = document.createElement("div");
       button.id = utility.id;
-      button.className = "capture utility";
+      button.className = "capture utility" + (utility.proxy ? " proxy" : "");
       button.dataset.state = utility.state;
       button.style.cssText = `width:${slot.px.width}px;height:${slot.px.height}px`;
       button.textContent = utility.label;
@@ -967,9 +1460,9 @@
     }
 
     const overlaySpecs = [
-      { id: "overlay_card_hover", slot: "card_intro", classes: "overlay card hover" },
-      { id: "overlay_card_selected", slot: "card_intro", classes: "overlay card selected" },
-      { id: "overlay_card_pressed", slot: "card_intro", classes: "overlay card pressed" },
+      { id: "overlay_card_hover", slot: "card_theory", classes: "overlay card hover" },
+      { id: "overlay_card_selected", slot: "card_theory", classes: "overlay card selected" },
+      { id: "overlay_card_pressed", slot: "card_theory", classes: "overlay card pressed" },
       { id: "overlay_example_hover", slot: "example_gravity", classes: "overlay example hover" },
       { id: "overlay_example_selected", slot: "example_gravity", classes: "overlay example selected" },
       { id: "overlay_example_pressed", slot: "example_gravity", classes: "overlay example pressed" },

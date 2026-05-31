@@ -7,6 +7,23 @@
     "heightCm": 20,
     "pixelsPerCm": 50
   },
+  "theoryCards": [
+    {
+      "id": "definition",
+      "index": "01",
+      "title": "Definition"
+    },
+    {
+      "id": "metrics",
+      "index": "02",
+      "title": "Field Metrics"
+    },
+    {
+      "id": "patterns",
+      "index": "03",
+      "title": "Analytical Examples"
+    }
+  ],
   "panel": {
     "cornerRadiusPx": 0,
     "cornerRadiusCm": 0,
@@ -23,23 +40,16 @@
   },
   "steps": [
     {
-      "id": "intro",
-      "index": "01",
-      "title": "Intro",
-      "root": "C00_Intro",
-      "canCalibrate": false
-    },
-    {
       "id": "theory",
-      "index": "02",
+      "index": "01",
       "title": "Theory",
       "root": "C02_Theory",
       "canCalibrate": false
     },
     {
       "id": "examples",
-      "index": "03",
-      "title": "Examples",
+      "index": "02",
+      "title": "Real World",
       "root": "C03_Real_World_Examples",
       "canCalibrate": true
     }
@@ -60,7 +70,13 @@
     {
       "id": "wind",
       "index": "03",
-      "title": "Wind",
+      "title": "Earth Winds",
+      "canCalibrate": true
+    },
+    {
+      "id": "aerodynamics",
+      "index": "04",
+      "title": "Aerodynamics",
       "canCalibrate": true
     }
   ],
@@ -188,64 +204,64 @@
       "id": "utility_follow",
       "role": "utility",
       "px": {
-        "x": 1008,
-        "y": 70,
-        "width": 190,
-        "height": 76
+        "x": 900,
+        "y": 34,
+        "width": 260,
+        "height": 86
       },
       "cm": {
-        "x": 7.06,
-        "y": 7.84,
-        "width": 3.8,
-        "height": 1.52
+        "x": 5.6,
+        "y": 8.46,
+        "width": 5.2,
+        "height": 1.72
       }
     },
     {
       "id": "utility_fold",
       "role": "utility",
       "px": {
-        "x": 1228,
-        "y": 70,
-        "width": 190,
-        "height": 76
+        "x": 1200,
+        "y": 34,
+        "width": 260,
+        "height": 86
       },
       "cm": {
-        "x": 11.46,
-        "y": 7.84,
-        "width": 3.8,
-        "height": 1.52
+        "x": 11.6,
+        "y": 8.46,
+        "width": 5.2,
+        "height": 1.72
       }
     },
     {
       "id": "utility_plane_floor",
       "role": "utility",
       "px": {
-        "x": 1008,
-        "y": 158,
-        "width": 190,
-        "height": 64
+        "x": 900,
+        "y": 138,
+        "width": 260,
+        "height": 86
       },
       "cm": {
-        "x": 7.06,
-        "y": 6.2,
-        "width": 3.8,
-        "height": 1.28
+        "x": 5.6,
+        "y": 6.38,
+        "width": 5.2,
+        "height": 1.72
       }
     },
     {
       "id": "utility_plane_front",
       "role": "utility",
       "px": {
-        "x": 1228,
-        "y": 158,
-        "width": 190,
-        "height": 64
+        "x": 1200,
+        "y": 138,
+        "width": 260,
+        "height": 86
       },
       "cm": {
-        "x": 11.46,
-        "y": 6.2,
-        "width": 3.8,
-        "height": 1.28
+        "x": 11.6,
+        "y": 6.38,
+        "width": 5.2,
+        "height": 1.72
       }
     },
     {
@@ -345,51 +361,83 @@
       }
     },
     {
-      "id": "card_intro",
-      "role": "card",
-      "px": {
-        "x": 70,
-        "y": 300,
-        "width": 400,
-        "height": 250
-      },
-      "cm": {
-        "x": -9.6,
-        "y": 1.5,
-        "width": 8,
-        "height": 5
-      }
-    },
-    {
       "id": "card_theory",
       "role": "card",
       "px": {
-        "x": 550,
-        "y": 300,
-        "width": 400,
-        "height": 250
+        "x": 90,
+        "y": 270,
+        "width": 640,
+        "height": 650
       },
       "cm": {
-        "x": 0,
-        "y": 1.5,
-        "width": 8,
-        "height": 5
+        "x": -6.8,
+        "y": -1.9,
+        "width": 12.8,
+        "height": 13
       }
     },
     {
       "id": "card_examples",
       "role": "card",
       "px": {
-        "x": 1030,
-        "y": 300,
+        "x": 770,
+        "y": 270,
+        "width": 640,
+        "height": 650
+      },
+      "cm": {
+        "x": 6.8,
+        "y": -1.9,
+        "width": 12.8,
+        "height": 13
+      }
+    },
+    {
+      "id": "card_definition",
+      "role": "card",
+      "px": {
+        "x": 70,
+        "y": 282,
         "width": 400,
-        "height": 250
+        "height": 600
+      },
+      "cm": {
+        "x": -9.6,
+        "y": -1.64,
+        "width": 8,
+        "height": 12
+      }
+    },
+    {
+      "id": "card_metrics",
+      "role": "card",
+      "px": {
+        "x": 550,
+        "y": 282,
+        "width": 400,
+        "height": 600
+      },
+      "cm": {
+        "x": 0,
+        "y": -1.64,
+        "width": 8,
+        "height": 12
+      }
+    },
+    {
+      "id": "card_patterns",
+      "role": "card",
+      "px": {
+        "x": 1030,
+        "y": 282,
+        "width": 400,
+        "height": 600
       },
       "cm": {
         "x": 9.6,
-        "y": 1.5,
+        "y": -1.64,
         "width": 8,
-        "height": 5
+        "height": 12
       }
     },
     {
@@ -413,13 +461,13 @@
       "role": "example_card",
       "px": {
         "x": 70,
-        "y": 290,
+        "y": 274,
         "width": 1360,
         "height": 140
       },
       "cm": {
         "x": 0,
-        "y": 2.8,
+        "y": 3.12,
         "width": 27.2,
         "height": 2.8
       }
@@ -429,13 +477,13 @@
       "role": "example_card",
       "px": {
         "x": 70,
-        "y": 474,
+        "y": 434,
         "width": 1360,
         "height": 140
       },
       "cm": {
         "x": 0,
-        "y": -0.88,
+        "y": -0.08,
         "width": 27.2,
         "height": 2.8
       }
@@ -445,13 +493,29 @@
       "role": "example_card",
       "px": {
         "x": 70,
-        "y": 658,
+        "y": 594,
         "width": 1360,
         "height": 140
       },
       "cm": {
         "x": 0,
-        "y": -4.56,
+        "y": -3.28,
+        "width": 27.2,
+        "height": 2.8
+      }
+    },
+    {
+      "id": "example_aerodynamics",
+      "role": "example_card",
+      "px": {
+        "x": 70,
+        "y": 754,
+        "width": 1360,
+        "height": 140
+      },
+      "cm": {
+        "x": 0,
+        "y": -6.48,
         "width": 27.2,
         "height": 2.8
       }

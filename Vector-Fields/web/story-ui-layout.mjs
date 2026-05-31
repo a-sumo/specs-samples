@@ -20,15 +20,21 @@ export const STORY_UI_LAYOUT = (() => {
   });
 
   const steps = [
-    { id: "intro", index: "01", title: "Intro", root: "C00_Intro", canCalibrate: false },
-    { id: "theory", index: "02", title: "Theory", root: "C02_Theory", canCalibrate: false },
-    { id: "examples", index: "03", title: "Examples", root: "C03_Real_World_Examples", canCalibrate: true },
+    { id: "theory", index: "01", title: "Theory", root: "C02_Theory", canCalibrate: false },
+    { id: "examples", index: "02", title: "Real World", root: "C03_Real_World_Examples", canCalibrate: true },
+  ];
+
+  const theoryCards = [
+    { id: "definition", index: "01", title: "Definition" },
+    { id: "metrics",    index: "02", title: "Field Metrics" },
+    { id: "patterns",   index: "03", title: "Analytical Examples" },
   ];
 
   const examples = [
     { id: "gravity", index: "01", title: "Gravitational Fields", canCalibrate: true },
     { id: "magnetism", index: "02", title: "Magnetism", canCalibrate: true },
-    { id: "wind", index: "03", title: "Wind", canCalibrate: true },
+    { id: "wind", index: "03", title: "Earth Winds", canCalibrate: true },
+    { id: "aerodynamics", index: "04", title: "Aerodynamics", canCalibrate: true },
   ];
 
   const theoryModes = [
@@ -56,23 +62,26 @@ export const STORY_UI_LAYOUT = (() => {
     rect("example_detail_title", 350, 54, 640, 100, "title"),
     rect("theory_title", 430, 54, 640, 100, "title"),
     rect("status", 1016, 70, 414, 96, "status"),
-    rect("utility_follow", 1008, 70, 190, 76, "utility"),
-    rect("utility_fold", 1228, 70, 190, 76, "utility"),
-    rect("utility_plane_floor", 1008, 158, 190, 64, "utility"),
-    rect("utility_plane_front", 1228, 158, 190, 64, "utility"),
+    rect("utility_follow", 900, 34, 260, 86, "utility"),
+    rect("utility_fold", 1200, 34, 260, 86, "utility"),
+    rect("utility_plane_floor", 900, 138, 260, 86, "utility"),
+    rect("utility_plane_front", 1200, 138, 260, 86, "utility"),
     rect("variant_artemis", 90, 524, 1320, 268, "example_variant_artemis"),
     rect("variant_primary", 90, 552, 400, 82, "example_variant"),
     rect("variant_secondary", 550, 552, 400, 82, "example_variant"),
     rect("example_mode_a", 90, 680, 400, 82, "example_mode"),
     rect("example_mode_b", 550, 680, 400, 82, "example_mode"),
     rect("example_mode_c", 1010, 680, 400, 82, "example_mode"),
-    rect("card_intro", 70, 300, 400, 250, "card"),
-    rect("card_theory", 550, 300, 400, 250, "card"),
-    rect("card_examples", 1030, 300, 400, 250, "card"),
+    rect("card_theory", 90, 270, 640, 650, "card"),
+    rect("card_examples", 770, 270, 640, 650, "card"),
+    rect("card_definition", 70, 282, 400, 600, "card"),
+    rect("card_metrics", 550, 282, 400, 600, "card"),
+    rect("card_patterns", 1030, 282, 400, 600, "card"),
     rect("examples_back", 70, 70, 240, 84, "examples_button"),
-    rect("example_gravity", 70, 290, 1360, 140, "example_card"),
-    rect("example_magnetism", 70, 474, 1360, 140, "example_card"),
-    rect("example_wind", 70, 658, 1360, 140, "example_card"),
+    rect("example_gravity", 70, 274, 1360, 140, "example_card"),
+    rect("example_magnetism", 70, 434, 1360, 140, "example_card"),
+    rect("example_wind", 70, 594, 1360, 140, "example_card"),
+    rect("example_aerodynamics", 70, 754, 1360, 140, "example_card"),
     rect("example_info", 90, 292, 1320, 210, "example_info"),
     rect("theory_mode_expansion", 170, 312, 250, 76, "theory_mode"),
     rect("theory_mode_contraction", 470, 312, 250, 76, "theory_mode"),
@@ -88,6 +97,7 @@ export const STORY_UI_LAYOUT = (() => {
   return {
     version: 1,
     texture,
+    theoryCards,
     panel: {
       cornerRadiusPx: 0,
       cornerRadiusCm: 0,

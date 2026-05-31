@@ -10,7 +10,15 @@ const htmlPath = path.join(root, "web", "math-explainer.html");
 const outDir = path.join(root, "Assets", "Images", "StoryUI");
 const previewDir = path.join(root, "test", "screenshots", "preview");
 
-const steps = ["operator", "divergence", "divergence_example", "curl", "curl_example"];
+const steps = [
+  "del_intro",
+  "operator",
+  "del_coordinates",
+  "divergence",
+  "divergence_example",
+  "curl",
+  "curl_example",
+];
 
 await fs.mkdir(outDir, { recursive: true });
 await fs.mkdir(previewDir, { recursive: true });

@@ -1,5 +1,9 @@
 {
   "scripts": {
+    "render:story-ui": "node test/render_story_ui.mjs",
+    "render:math-explainer": "node test/render_math_explainer.mjs",
+    "render:vf-definition": "node test/render_vf_definition.mjs",
+    "render:theory-field-menu": "node test/render_theory_field_menu.mjs",
     "refresh:storms": "node test/fetch_storms.mjs",
     "bake:ls": "node test/bake_for_ls.mjs",
     "refresh:gfs": "node test/fetch_gfs.mjs && node test/bake_for_ls.mjs",
@@ -7,6 +11,7 @@
     "dedupe:pbr": "node test/dedupe_pbr_materials.mjs"
   },
   "devDependencies": {
+    "katex": "^0.17.0",
     "puppeteer": "^25.1.0",
     "typescript": "^6.0.3"
   }
